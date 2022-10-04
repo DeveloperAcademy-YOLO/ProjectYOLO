@@ -66,6 +66,7 @@ class SignUpViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignUpViewUI()
+        bind()
     }
     
     private func setSignUpViewUI() {
@@ -105,5 +106,65 @@ class SignUpViewController: UIViewController {
         signUpButton.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 30).isActive = true
         signUpButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         // TODO: relayout -> fit as HI-FI
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] receivedValue in
+                guard let self = self else { return }
+                switch receivedValue {
+                case .signInDidFail(error: let error):
+                    print(error.localizedDescription)
+                    break
+                case .signUpDidFail(error: let error):
+                    print(error.localizedDescription)
+                    break
+                case .emailDidMiss:
+                    break
+                case .passwordDidMiss:
+                    break
+                case .ninknameDidMiss:
+                    break
+                    // alert -> give info to user
+                case .signUpDidSuccess:
+                    break
+                    // success -> switch to current view (navigation dismiss, etc...)
+                }
+            }
+            .store(in: &cancellables)
+        signUpButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.input.send(.signInButtonDidTap)
+            }
+            .store(in: &cancellables)
+        
+        emailTextField
+            .textPublisher
+            .compactMap{$0}
+            .sink { [weak self] email in
+                guard let self = self else { return }
+                self.viewModel.email.send(email)
+            }
+            .store(in: &cancellables)
+        passwordTextField
+            .textPublisher
+            .compactMap{$0}
+            .sink { [weak self] password in
+                guard let self = self else { return }
+                self.viewModel.password.send(password)
+            }
+            .store(in: &cancellables)
+        nameTextField
+            .textPublisher
+            .compactMap{$0}
+            .sink { [weak self] name in
+                guard let self = self else { return }
+                self.viewModel.name.send(name)
+            }
+            .store(in: &cancellables)
     }
 }
