@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.makeKeyAndVisible()
-        window.rootViewController = MainViewController()
+        window.rootViewController = SignUpViewController()
         self.window = window
         FirebaseApp.configure()
         return true
