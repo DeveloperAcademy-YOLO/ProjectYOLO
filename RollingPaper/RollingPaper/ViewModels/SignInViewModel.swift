@@ -37,7 +37,7 @@ final class SignInViewModel {
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
-                case .appleSignInButtonTap: break
+                case .appleSignInButtonTap: self.handleAppleSignIn()
                 }
             }
             .store(in: &cancellables)
@@ -70,5 +70,9 @@ final class SignInViewModel {
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    private func handleAppleSignIn() {
+        
     }
 }
