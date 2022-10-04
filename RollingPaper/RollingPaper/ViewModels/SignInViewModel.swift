@@ -17,6 +17,7 @@ final class SignInViewModel {
     
     enum Input {
         case signInButtonTap
+        case appleSignInButtonTap
     }
     
     enum Output {
@@ -36,6 +37,7 @@ final class SignInViewModel {
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
+                case .appleSignInButtonTap: break
                 }
             }
             .store(in: &cancellables)

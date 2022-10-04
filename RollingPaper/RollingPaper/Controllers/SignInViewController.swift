@@ -125,7 +125,13 @@ class SignInViewController: UIViewController {
                 self.input.send(.signInButtonTap)
             }
             .store(in: &cancellables)
-        
+        appleSignInButton
+            .controlEventPublisher(for: .touchUpInside)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.input.send(.appleSignInButtonTap)
+            }
+            .store(in: &cancellables)
         emailTextField
             .textPublisher
             .compactMap({ $0 })
