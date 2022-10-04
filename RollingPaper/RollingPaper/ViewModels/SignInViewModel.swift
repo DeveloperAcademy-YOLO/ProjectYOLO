@@ -38,6 +38,7 @@ final class SignInViewModel {
                 case .signInButtonTap: self.handleSingIn()
                 }
             }
+            .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     

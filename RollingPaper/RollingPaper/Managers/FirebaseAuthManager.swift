@@ -33,6 +33,7 @@ final class FirebaseAuthManager: AuthManager {
     func signIn(email: String, password: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error> { [weak self] promise in
             self?.auth.signIn(withEmail: email, password: password) { result, error in
+                print(result)
                 if let error = error {
                     promise(.failure(error))
                 } else {

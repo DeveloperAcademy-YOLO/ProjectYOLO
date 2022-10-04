@@ -129,6 +129,7 @@ class SignUpViewController: UIViewController {
                     break
                     // alert -> give info to user
                 case .signUpDidSuccess:
+                    print("Successfully Signed Up")
                     break
                     // success -> switch to current view (navigation dismiss, etc...)
                 }
