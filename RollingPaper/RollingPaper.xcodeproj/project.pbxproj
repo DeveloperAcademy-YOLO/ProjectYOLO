@@ -7,14 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA128EBDC72001091DA /* AppDelegate.swift */; };
 		D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA328EBDC72001091DA /* SceneDelegate.swift */; };
 		D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA528EBDC72001091DA /* MainViewController.swift */; };
 		D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AAA28EBDC73001091DA /* Assets.xcassets */; };
 		D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AAC28EBDC73001091DA /* LaunchScreen.storyboard */; };
+		D22E4ABA28EBE317001091DA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AB928EBE317001091DA /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
+		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		D22E4A9E28EBDC72001091DA /* RollingPaper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RollingPaper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D22E4AA128EBDC72001091DA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D22E4AA328EBDC72001091DA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -22,6 +27,7 @@
 		D22E4AAA28EBDC73001091DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D22E4AAD28EBDC73001091DA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D22E4AAF28EBDC73001091DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D22E4AB928EBE317001091DA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,17 +35,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA4CAED2FDB153E404B2D7F0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */,
+				9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		D22E4A9528EBDC72001091DA = {
 			isa = PBXGroup;
 			children = (
 				D22E4AA028EBDC72001091DA /* RollingPaper */,
 				D22E4A9F28EBDC72001091DA /* Products */,
+				CA4CAED2FDB153E404B2D7F0 /* Pods */,
+				DBA722253A40AAB24E0738F8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,6 +72,7 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
+				D22E4AB928EBE317001091DA /* GoogleService-Info.plist */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
 				D22E4AB728EBDC8B001091DA /* Controllers */,
 				D22E4AB628EBDC86001091DA /* Models */,
@@ -96,6 +115,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		DBA722253A40AAB24E0738F8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -103,9 +130,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D22E4AB228EBDC73001091DA /* Build configuration list for PBXNativeTarget "RollingPaper" */;
 			buildPhases = (
+				9F2E485024D579BEDB6CC43C /* [CP] Check Pods Manifest.lock */,
 				D22E4A9A28EBDC72001091DA /* Sources */,
 				D22E4A9B28EBDC72001091DA /* Frameworks */,
 				D22E4A9C28EBDC72001091DA /* Resources */,
+				AA1AB6114683EDA640CFE7BC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -122,7 +151,6 @@
 		D22E4A9628EBDC72001091DA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
@@ -156,10 +184,53 @@
 			files = (
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
+				D22E4ABA28EBE317001091DA /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9F2E485024D579BEDB6CC43C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RollingPaper-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AA1AB6114683EDA640CFE7BC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RollingPaper/Pods-RollingPaper-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RollingPaper/Pods-RollingPaper-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RollingPaper/Pods-RollingPaper-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D22E4A9A28EBDC72001091DA /* Sources */ = {
@@ -302,6 +373,7 @@
 		};
 		D22E4AB328EBDC73001091DA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -330,6 +402,7 @@
 		};
 		D22E4AB428EBDC73001091DA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

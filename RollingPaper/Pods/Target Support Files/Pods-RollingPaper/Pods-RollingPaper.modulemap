@@ -1,0 +1,6 @@
+framework module Pods_RollingPaper {
+  umbrella header "Pods-RollingPaper-umbrella.h"
+
+  export *
+  module * { export * }
+}
