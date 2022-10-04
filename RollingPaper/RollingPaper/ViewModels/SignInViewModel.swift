@@ -35,14 +35,14 @@ final class SignInViewModel {
             .sink { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
-                case .signInButtonTap: self.handleSingIn()
+                case .signInButtonTap: self.handleSignIn()
                 }
             }
             .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
-    private func handleSingIn() {
+    private func handleSignIn() {
         email
             .combineLatest(password)
             .map { email, password in

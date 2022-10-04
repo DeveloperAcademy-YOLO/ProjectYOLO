@@ -9,6 +9,7 @@ import UIKit
 import Combine
 import CombineCocoa
 import SnapKit
+import AuthenticationServices
 
 class SignInViewController: UIViewController {
     private let emailLabel: UILabel = {
@@ -45,6 +46,10 @@ class SignInViewController: UIViewController {
         }
         button.setTitle("Sign In", for: .normal)
         button.setTitleColor(.white, for: .normal)
+        return button
+    }()
+    private let appleSignInButton: ASAuthorizationAppleIDButton = {
+        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .whiteOutline)
         return button
     }()
     
@@ -84,6 +89,12 @@ class SignInViewController: UIViewController {
         passwordTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
         signInButton.topAnchor.constraint(equalTo: passwordLabel.bottomAnchor, constant: 30).isActive = true
         signInButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        appleSignInButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(appleSignInButton)
+        appleSignInButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 30).isActive = true
+        appleSignInButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30).isActive = true
+        appleSignInButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
+        appleSignInButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         // TODO: relayout -> fit as HI-FI
     }
     
