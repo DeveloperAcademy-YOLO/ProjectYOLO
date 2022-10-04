@@ -12,9 +12,9 @@ import AuthenticationServices
 import CryptoKit
 
 protocol AuthManager {
-    var socialSignInSubject: PassthroughSubject<Bool, Never> {get set}
+    var socialSignInSubject: PassthroughSubject<Bool, Error> {get set}
     func signIn(email: String, password: String) -> AnyPublisher<Bool, Error>
-    func appleSignIn(window: UIWindow)
+    func appleSignIn()
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error>
     func signOut() -> AnyPublisher<Bool, Error>
     func deleteUser() -> AnyPublisher<Bool, Error>
@@ -22,9 +22,8 @@ protocol AuthManager {
 }
 
 final class FirebaseAuthManager: NSObject, AuthManager {
-    var socialSignInSubject: PassthroughSubject<Bool, Never> = .init()
+    var socialSignInSubject: PassthroughSubject<Bool, Error> = .init()
     private let auth = FirebaseAuth.Auth.auth()
-    private var window: UIWindow?
     private var currentNonce: String?
     
     enum AuthError: LocalizedError {
@@ -99,7 +98,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         .eraseToAnyPublisher()
     }
     
-    func setUserProfile(name: String? = nil, photoURLString: String? = nil) -> Void {
+    func setUserProfile(name: String? = nil, photoURLString: String? = nil) {
         if let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
             if let name = name {
@@ -146,8 +145,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         .eraseToAnyPublisher()
     }
     
-    func appleSignIn(window: UIWindow) {
-        self.window = window
+    func appleSignIn() {
         let nonce = randomNonceString()
         currentNonce = nonce
         let appleIDProvider = ASAuthorizationAppleIDProvider()
@@ -163,7 +161,11 @@ final class FirebaseAuthManager: NSObject, AuthManager {
 
 extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return window ?? UIWindow()
+        if let window = UIApplication.shared.currentWindow {
+            return window
+        } else {
+            return UIWindow()
+        }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
@@ -185,7 +187,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
             guard let self = self else { return }
             if let error = error {
                 print(error.localizedDescription)
-                self.socialSignInSubject.send(false)
+                self.socialSignInSubject.send(completion: .failure(error))
             } else {
                 self.socialSignInSubject.send(true)
                 self.setUserProfile(name: name, photoURLString: nil)
@@ -194,6 +196,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        socialSignInSubject.send(completion: .failure(error))
     }
 }
 

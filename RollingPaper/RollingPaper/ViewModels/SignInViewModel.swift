@@ -29,6 +29,24 @@ final class SignInViewModel {
     
     init(authManager: AuthManager = FirebaseAuthManager()) {
         self.authManager = authManager
+        bind()
+    }
+    
+    private func bind() {
+        authManager
+            .socialSignInSubject
+            .sink { completion in
+                switch completion {
+                case .failure(let error): self.output.send(.signInDidFail(error: error))
+                case .finished: print("Successfully social signed in")
+                }
+            } receiveValue: { [weak self] success in
+                guard let self = self else { return }
+                if success {
+                    self.output.send(.signInDidSuccess)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -37,7 +55,7 @@ final class SignInViewModel {
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
-                case .appleSignInButtonTap: self.handleAppleSignIn()
+                case .appleSignInButtonTap: self.authManager.appleSignIn()
                 }
             }
             .store(in: &cancellables)
@@ -70,9 +88,5 @@ final class SignInViewModel {
                 }
             }
             .store(in: &cancellables)
-    }
-    
-    private func handleAppleSignIn() {
-        
     }
 }
