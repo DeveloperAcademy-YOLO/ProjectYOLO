@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class SignUpViewModel {
+final class SignUpViewModel {
     var email = CurrentValueSubject<String, Never>("")
     var password = CurrentValueSubject<String, Never>("")
     var name = CurrentValueSubject<String, Never>("")
@@ -17,7 +17,7 @@ class SignUpViewModel {
     private var cancellabels = Set<AnyCancellable>()
     
     enum Input {
-        case signInButtonDidTap
+        case signUpButtonDidTap
     }
     enum Output {
         case signInDidFail(error: Error)
@@ -37,7 +37,7 @@ class SignUpViewModel {
             .sink { [weak self] receivedValue in
                     guard let self = self else { return }
                 switch receivedValue {
-                case .signInButtonDidTap: self.handleSignIn()
+                case .signUpButtonDidTap: self.handleSignIn()
                 }
             }
             .store(in: &cancellabels)

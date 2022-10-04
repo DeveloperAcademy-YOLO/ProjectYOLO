@@ -138,7 +138,7 @@ class SignUpViewController: UIViewController {
             .tapPublisher
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                self.input.send(.signInButtonDidTap)
+                self.input.send(.signUpButtonDidTap)
             }
             .store(in: &cancellables)
         

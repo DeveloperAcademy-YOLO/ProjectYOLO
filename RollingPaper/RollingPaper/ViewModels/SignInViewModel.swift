@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class SignInViewModel {
+final class SignInViewModel {
     var email = CurrentValueSubject<String, Never>("")
     var password = CurrentValueSubject<String, Never>("")
     private let authManager: AuthManager
