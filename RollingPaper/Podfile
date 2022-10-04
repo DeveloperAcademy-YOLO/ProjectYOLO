@@ -12,4 +12,5 @@ target 'RollingPaper' do
   pod 'FirebaseFirestore'
   pod 'FirebaseStorage'
   pod 'FirebaseDatabase'
+  pod 'SwiftLint'
 end
