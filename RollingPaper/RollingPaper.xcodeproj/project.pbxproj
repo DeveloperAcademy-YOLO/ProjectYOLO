@@ -3,23 +3,26 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
+		C5AB305328EC0A6300C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305228EC0A6300C2E016 /* GoogleService-Info.plist */; };
+		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA128EBDC72001091DA /* AppDelegate.swift */; };
 		D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA328EBDC72001091DA /* SceneDelegate.swift */; };
 		D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA528EBDC72001091DA /* MainViewController.swift */; };
 		D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AAA28EBDC73001091DA /* Assets.xcassets */; };
 		D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AAC28EBDC73001091DA /* LaunchScreen.storyboard */; };
-		D22E4ABA28EBE317001091DA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AB928EBE317001091DA /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
+		C5AB305228EC0A6300C2E016 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		D22E4A9E28EBDC72001091DA /* RollingPaper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RollingPaper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D22E4AA128EBDC72001091DA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D22E4AA328EBDC72001091DA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -27,7 +30,6 @@
 		D22E4AAA28EBDC73001091DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D22E4AAD28EBDC73001091DA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D22E4AAF28EBDC73001091DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D22E4AB928EBE317001091DA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 		D22E4A9528EBDC72001091DA = {
 			isa = PBXGroup;
 			children = (
+				C5AB305528EC119300C2E016 /* .swiftlint.yml */,
 				D22E4AA028EBDC72001091DA /* RollingPaper */,
 				D22E4A9F28EBDC72001091DA /* Products */,
 				CA4CAED2FDB153E404B2D7F0 /* Pods */,
@@ -72,7 +75,7 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
-				D22E4AB928EBE317001091DA /* GoogleService-Info.plist */,
+				C5AB305228EC0A6300C2E016 /* GoogleService-Info.plist */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
 				D22E4AB728EBDC8B001091DA /* Controllers */,
 				D22E4AB628EBDC86001091DA /* Models */,
@@ -131,6 +134,7 @@
 			buildConfigurationList = D22E4AB228EBDC73001091DA /* Build configuration list for PBXNativeTarget "RollingPaper" */;
 			buildPhases = (
 				9F2E485024D579BEDB6CC43C /* [CP] Check Pods Manifest.lock */,
+				C5AB305428EC0EBB00C2E016 /* Run SwiftLint */,
 				D22E4A9A28EBDC72001091DA /* Sources */,
 				D22E4A9B28EBDC72001091DA /* Frameworks */,
 				D22E4A9C28EBDC72001091DA /* Resources */,
@@ -182,9 +186,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
-				D22E4ABA28EBE317001091DA /* GoogleService-Info.plist in Resources */,
+				C5AB305328EC0A6300C2E016 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +234,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RollingPaper/Pods-RollingPaper-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		C5AB305428EC0EBB00C2E016 /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -379,7 +402,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = 956H2C4NC8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -408,7 +431,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = 956H2C4NC8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
