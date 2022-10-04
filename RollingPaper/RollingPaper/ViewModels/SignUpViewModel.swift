@@ -14,7 +14,7 @@ final class SignUpViewModel {
     var name = CurrentValueSubject<String, Never>("")
     private let authManager: AuthManager
     private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellabels = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     
     enum Input {
         case signUpButtonDidTap
@@ -37,14 +37,14 @@ final class SignUpViewModel {
             .sink { [weak self] receivedValue in
                     guard let self = self else { return }
                 switch receivedValue {
-                case .signUpButtonDidTap: self.handleSignIn()
+                case .signUpButtonDidTap: self.handleSignUp()
                 }
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
-    private func handleSignIn() {
+    private func handleSignUp() {
         email
             .combineLatest(password, name)
             .map { email, password, name in
@@ -69,6 +69,6 @@ final class SignUpViewModel {
                     self.output.send(.signUpDidSuccess)
                 }
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
     }
 }
