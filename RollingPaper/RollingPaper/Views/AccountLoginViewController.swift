@@ -7,10 +7,10 @@
 
 import UIKit
 
-final class MyAccountViewController: UIViewController {
+final class AccountLoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .magenta
-        title = "My Account"
+        title = "My Account" 
     }
 }

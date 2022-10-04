@@ -8,15 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
-		AF0A900428EC639100200E35 /* SideMenuItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900028EC639100200E35 /* SideMenuItemCell.swift */; };
-		AF0A900528EC639100200E35 /* SideMenuDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900128EC639100200E35 /* SideMenuDelegate.swift */; };
-		AF0A900628EC639100200E35 /* SideMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900228EC639100200E35 /* SideMenuItem.swift */; };
-		AF0A900728EC639100200E35 /* SideMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900328EC639100200E35 /* SideMenuViewController.swift */; };
+		AF0A900428EC639100200E35 /* SideBarItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900028EC639100200E35 /* SideBarItemCell.swift */; };
+		AF0A900528EC639100200E35 /* SideBarDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900128EC639100200E35 /* SideBarDelegate.swift */; };
+		AF0A900628EC639100200E35 /* SideBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900228EC639100200E35 /* SideBarItem.swift */; };
+		AF0A900728EC639100200E35 /* SideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900328EC639100200E35 /* SideBarViewController.swift */; };
 		AF0A900B28EC639D00200E35 /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900828EC639D00200E35 /* ContentViewController.swift */; };
 		AF0A900C28EC639D00200E35 /* ContentViewControllerPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900928EC639D00200E35 /* ContentViewControllerPresentation.swift */; };
 		AF0A900D28EC639D00200E35 /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900A28EC639D00200E35 /* ContainerViewController.swift */; };
 		AF0A901228EC63A700200E35 /* PaperTemplateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900E28EC63A600200E35 /* PaperTemplateViewController.swift */; };
-		AF0A901328EC63A700200E35 /* MyAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900F28EC63A600200E35 /* MyAccountViewController.swift */; };
+		AF0A901328EC63A700200E35 /* AccountLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A900F28EC63A600200E35 /* AccountLoginViewController.swift */; };
 		AF0A901428EC63A700200E35 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A901028EC63A700200E35 /* SettingViewController.swift */; };
 		AF0A901528EC63A700200E35 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A901128EC63A700200E35 /* PaperStorageViewController.swift */; };
 		AF0A901728EC63B100200E35 /* ContainerViewComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0A901628EC63B100200E35 /* ContainerViewComposer.swift */; };
@@ -31,15 +31,15 @@
 /* Begin PBXFileReference section */
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
-		AF0A900028EC639100200E35 /* SideMenuItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuItemCell.swift; sourceTree = "<group>"; };
-		AF0A900128EC639100200E35 /* SideMenuDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuDelegate.swift; sourceTree = "<group>"; };
-		AF0A900228EC639100200E35 /* SideMenuItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuItem.swift; sourceTree = "<group>"; };
-		AF0A900328EC639100200E35 /* SideMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenuViewController.swift; sourceTree = "<group>"; };
+		AF0A900028EC639100200E35 /* SideBarItemCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideBarItemCell.swift; sourceTree = "<group>"; };
+		AF0A900128EC639100200E35 /* SideBarDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideBarDelegate.swift; sourceTree = "<group>"; };
+		AF0A900228EC639100200E35 /* SideBarItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideBarItem.swift; sourceTree = "<group>"; };
+		AF0A900328EC639100200E35 /* SideBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideBarViewController.swift; sourceTree = "<group>"; };
 		AF0A900828EC639D00200E35 /* ContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		AF0A900928EC639D00200E35 /* ContentViewControllerPresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentViewControllerPresentation.swift; sourceTree = "<group>"; };
 		AF0A900A28EC639D00200E35 /* ContainerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		AF0A900E28EC63A600200E35 /* PaperTemplateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaperTemplateViewController.swift; sourceTree = "<group>"; };
-		AF0A900F28EC63A600200E35 /* MyAccountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAccountViewController.swift; sourceTree = "<group>"; };
+		AF0A900F28EC63A600200E35 /* AccountLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLoginViewController.swift; sourceTree = "<group>"; };
 		AF0A901028EC63A700200E35 /* SettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		AF0A901128EC63A700200E35 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		AF0A901628EC63B100200E35 /* ContainerViewComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerViewComposer.swift; sourceTree = "<group>"; };
@@ -66,6 +66,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AF0A901A28EC729800200E35 /* SideBarController */ = {
+			isa = PBXGroup;
+			children = (
+				AF0A900328EC639100200E35 /* SideBarViewController.swift */,
+				AF0A900128EC639100200E35 /* SideBarDelegate.swift */,
+				AF0A900228EC639100200E35 /* SideBarItem.swift */,
+				AF0A900028EC639100200E35 /* SideBarItemCell.swift */,
+			);
+			path = SideBarController;
+			sourceTree = "<group>";
+		};
+		AF0A901B28EC733B00200E35 /* SideBarContainer */ = {
+			isa = PBXGroup;
+			children = (
+				AF0A900A28EC639D00200E35 /* ContainerViewController.swift */,
+				AF0A900828EC639D00200E35 /* ContentViewController.swift */,
+				AF0A900928EC639D00200E35 /* ContentViewControllerPresentation.swift */,
+			);
+			path = SideBarContainer;
+			sourceTree = "<group>";
+		};
 		CA4CAED2FDB153E404B2D7F0 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +147,8 @@
 		D22E4AB728EBDC8B001091DA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				AF0A901B28EC733B00200E35 /* SideBarContainer */,
+				AF0A901A28EC729800200E35 /* SideBarController */,
 				D22E4AA528EBDC72001091DA /* MainViewController.swift */,
 			);
 			path = Controllers;
@@ -134,17 +157,10 @@
 		D22E4AB828EBDC9E001091DA /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				AF0A900128EC639100200E35 /* SideMenuDelegate.swift */,
-				AF0A900228EC639100200E35 /* SideMenuItem.swift */,
-				AF0A900028EC639100200E35 /* SideMenuItemCell.swift */,
-				AF0A900328EC639100200E35 /* SideMenuViewController.swift */,
-				AF0A900A28EC639D00200E35 /* ContainerViewController.swift */,
-				AF0A900828EC639D00200E35 /* ContentViewController.swift */,
-				AF0A900928EC639D00200E35 /* ContentViewControllerPresentation.swift */,
-				AF0A901028EC63A700200E35 /* SettingViewController.swift */,
 				AF0A900E28EC63A600200E35 /* PaperTemplateViewController.swift */,
-				AF0A900F28EC63A600200E35 /* MyAccountViewController.swift */,
 				AF0A901128EC63A700200E35 /* PaperStorageViewController.swift */,
+				AF0A901028EC63A700200E35 /* SettingViewController.swift */,
+				AF0A900F28EC63A600200E35 /* AccountLoginViewController.swift */,
 				AF0A901628EC63B100200E35 /* ContainerViewComposer.swift */,
 				D22E4AAC28EBDC73001091DA /* LaunchScreen.storyboard */,
 			);
@@ -275,17 +291,17 @@
 			files = (
 				AF0A900B28EC639D00200E35 /* ContentViewController.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
-				AF0A901328EC63A700200E35 /* MyAccountViewController.swift in Sources */,
+				AF0A901328EC63A700200E35 /* AccountLoginViewController.swift in Sources */,
 				AF0A900D28EC639D00200E35 /* ContainerViewController.swift in Sources */,
 				AF0A901728EC63B100200E35 /* ContainerViewComposer.swift in Sources */,
-				AF0A900528EC639100200E35 /* SideMenuDelegate.swift in Sources */,
-				AF0A900628EC639100200E35 /* SideMenuItem.swift in Sources */,
+				AF0A900528EC639100200E35 /* SideBarDelegate.swift in Sources */,
+				AF0A900628EC639100200E35 /* SideBarItem.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
-				AF0A900728EC639100200E35 /* SideMenuViewController.swift in Sources */,
+				AF0A900728EC639100200E35 /* SideBarViewController.swift in Sources */,
 				AF0A901228EC63A700200E35 /* PaperTemplateViewController.swift in Sources */,
 				AF0A901528EC63A700200E35 /* PaperStorageViewController.swift in Sources */,
 				AF0A900C28EC639D00200E35 /* ContentViewControllerPresentation.swift in Sources */,
-				AF0A900428EC639100200E35 /* SideMenuItemCell.swift in Sources */,
+				AF0A900428EC639100200E35 /* SideBarItemCell.swift in Sources */,
 				AF0A901428EC63A700200E35 /* SettingViewController.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
 			);

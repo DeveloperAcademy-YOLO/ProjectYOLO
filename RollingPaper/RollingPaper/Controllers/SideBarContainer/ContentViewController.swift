@@ -8,7 +8,7 @@
 import UIKit
 
 class ContentViewController: UIViewController {
-    weak var delegate: SideMenuDelegate?
+    weak var delegate: SideBarDelegate?
     var barButtonImage: UIImage? = UIImage(systemName: "sidebar.squares.left")
 
     override func viewDidLoad() {

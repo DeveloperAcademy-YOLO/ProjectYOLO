@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SideMenuViewController: UIViewController {
+final class SideBarViewController: UIViewController {
     private var headerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -34,10 +34,10 @@ final class SideMenuViewController: UIViewController {
 
     private var leadingConstraint: NSLayoutConstraint!
     private var shadowColor: UIColor = UIColor(red: 33/255, green: 33/255, blue: 33/255, alpha: 0.5)
-    private var sideMenuItems: [SideMenuItem] = []
-    weak var delegate: SideMenuDelegate?
+    private var sideMenuItems: [SideBarItem] = []
+    weak var delegate: SideBarDelegate?
 
-    convenience init(sideMenuItems: [SideMenuItem]) {
+    convenience init(sideMenuItems: [SideBarItem]) {
         self.init()
         self.sideMenuItems = sideMenuItems
     }
@@ -82,8 +82,8 @@ final class SideMenuViewController: UIViewController {
     }
 
     private func configureTableView() {
-        tableView.backgroundColor = .lightGray
-        tableView.register(SideMenuItemCell.self, forCellReuseIdentifier: SideMenuItemCell.identifier)
+        tableView.backgroundColor = .white
+        tableView.register(SideBarItemCell.self, forCellReuseIdentifier: SideBarItemCell.identifier)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.bounces = false
@@ -120,7 +120,7 @@ final class SideMenuViewController: UIViewController {
     }
 }
 
-extension SideMenuViewController: UIGestureRecognizerDelegate {
+extension SideBarViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         guard let view = touch.view else { return false }
         if view === headerView || view.isDescendant(of: tableView) {
@@ -130,13 +130,13 @@ extension SideMenuViewController: UIGestureRecognizerDelegate {
     }
 }
 
-extension SideMenuViewController: UITableViewDataSource, UITableViewDelegate {
+extension SideBarViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         sideMenuItems.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: SideMenuItemCell.identifier, for: indexPath) as? SideMenuItemCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: SideBarItemCell.identifier, for: indexPath) as? SideBarItemCell else {
             fatalError("Could not dequeue cell")
         }
         let item = sideMenuItems[indexPath.row]

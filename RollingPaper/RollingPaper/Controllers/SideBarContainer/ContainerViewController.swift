@@ -8,7 +8,7 @@
 import UIKit
 
 final class ContainerViewController: UIViewController {
-    private var sideMenuViewController: SideMenuViewController!
+    private var sideMenuViewController: SideBarViewController!
     private var navigator: UINavigationController!
     private var rootViewController: ContentViewController! {
         didSet {
@@ -17,7 +17,7 @@ final class ContainerViewController: UIViewController {
         }
     }
 
-    convenience init(sideMenuViewController: SideMenuViewController, rootViewController: ContentViewController) {
+    convenience init(sideMenuViewController: SideBarViewController, rootViewController: ContentViewController) {
         self.init()
         self.sideMenuViewController = sideMenuViewController
         self.rootViewController = rootViewController
@@ -75,7 +75,7 @@ final class ContainerViewController: UIViewController {
     }
 }
 
-extension ContainerViewController: SideMenuDelegate {
+extension ContainerViewController: SideBarDelegate {
     func menuButtonTapped() {
         sideMenuViewController.show()
     }

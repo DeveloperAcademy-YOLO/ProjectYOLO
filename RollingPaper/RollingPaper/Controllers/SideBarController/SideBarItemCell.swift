@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SideMenuItemCell: UITableViewCell {
+final class SideBarItemCell: UITableViewCell {
     static var identifier: String {
         String(describing: self)
     }
@@ -25,7 +25,7 @@ final class SideMenuItemCell: UITableViewCell {
     }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .default, reuseIdentifier: SideMenuItemCell.identifier)
+        super.init(style: .default, reuseIdentifier: SideBarItemCell.identifier)
         configureView()
     }
 
@@ -35,7 +35,7 @@ final class SideMenuItemCell: UITableViewCell {
     }
 
     private func configureView() {
-        contentView.backgroundColor = .lightGray
+        contentView.backgroundColor = .white
         contentView.addSubview(itemIcon)
         contentView.addSubview(itemLabel)
     }

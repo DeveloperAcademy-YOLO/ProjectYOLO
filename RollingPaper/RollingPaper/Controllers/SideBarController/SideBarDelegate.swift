@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol SideMenuDelegate: AnyObject {
+protocol SideBarDelegate: AnyObject {
     func menuButtonTapped()
     func itemSelected(item: ContentViewControllerPresentation)
 }

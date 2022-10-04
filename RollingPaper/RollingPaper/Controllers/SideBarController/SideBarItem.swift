@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct SideMenuItem {
+struct SideBarItem {
     let icon: UIImage?
     let name: String
     let viewController: ContentViewControllerPresentation
