@@ -92,10 +92,10 @@ class SignInViewController: UIViewController {
         output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] receivedValue in
-                guard let self = self else { return }
+                guard self != nil else { return }
                 switch receivedValue {
                 case .signInDidFail(error: let error):
-                    break
+                    print(error.localizedDescription)
                 case .emailDidMiss:
                     break
                 case .passwordDidMiss:
@@ -103,7 +103,6 @@ class SignInViewController: UIViewController {
                 // Set alert if not validated
                 case .signInDidSuccess:
                     print("Successfully Signed In")
-                    break
                 // Success -> Into current view flows...
                 }
             }
@@ -118,7 +117,7 @@ class SignInViewController: UIViewController {
         
         emailTextField
             .textPublisher
-            .compactMap{$0}
+            .compactMap({ $0 })
             .sink { [weak self] email in
                 guard let self = self else { return }
                 self.viewModel.email.send(email)
@@ -126,7 +125,7 @@ class SignInViewController: UIViewController {
             .store(in: &cancellables)
         passwordTextField
             .textPublisher
-            .compactMap{$0}
+            .compactMap({ $0 })
             .sink { [weak self] password in
                 guard let self = self else { return }
                 self.viewModel.password.send(password)

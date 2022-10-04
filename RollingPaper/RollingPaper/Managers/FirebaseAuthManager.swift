@@ -19,7 +19,7 @@ final class FirebaseAuthManager: AuthManager {
     
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error> { [weak self] promise in
-            self?.auth.createUser(withEmail: email, password: password, completion: { result, error in
+            self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -32,8 +32,7 @@ final class FirebaseAuthManager: AuthManager {
                                   
     func signIn(email: String, password: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error> { [weak self] promise in
-            self?.auth.signIn(withEmail: email, password: password) { result, error in
-                print(result)
+            self?.auth.signIn(withEmail: email, password: password) { _, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {

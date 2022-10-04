@@ -113,14 +113,12 @@ class SignUpViewController: UIViewController {
         output
             .receive(on: DispatchQueue.main)
             .sink { [weak self] receivedValue in
-                guard let self = self else { return }
+                guard self != nil else { return }
                 switch receivedValue {
                 case .signInDidFail(error: let error):
                     print(error.localizedDescription)
-                    break
                 case .signUpDidFail(error: let error):
                     print(error.localizedDescription)
-                    break
                 case .emailDidMiss:
                     break
                 case .passwordDidMiss:
@@ -130,7 +128,6 @@ class SignUpViewController: UIViewController {
                     // alert -> give info to user
                 case .signUpDidSuccess:
                     print("Successfully Signed Up")
-                    break
                     // success -> switch to current view (navigation dismiss, etc...)
                 }
             }
@@ -145,7 +142,7 @@ class SignUpViewController: UIViewController {
         
         emailTextField
             .textPublisher
-            .compactMap{$0}
+            .compactMap({ $0 })
             .sink { [weak self] email in
                 guard let self = self else { return }
                 self.viewModel.email.send(email)
@@ -153,7 +150,7 @@ class SignUpViewController: UIViewController {
             .store(in: &cancellables)
         passwordTextField
             .textPublisher
-            .compactMap{$0}
+            .compactMap({ $0 })
             .sink { [weak self] password in
                 guard let self = self else { return }
                 self.viewModel.password.send(password)
@@ -161,7 +158,7 @@ class SignUpViewController: UIViewController {
             .store(in: &cancellables)
         nameTextField
             .textPublisher
-            .compactMap{$0}
+            .compactMap({ $0 })
             .sink { [weak self] name in
                 guard let self = self else { return }
                 self.viewModel.name.send(name)
