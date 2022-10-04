@@ -44,6 +44,20 @@ class SignUpViewController: UIViewController {
         textField.borderStyle = .roundedRect
         return textField
     }()
+    private let signUpButton: UIButton = {
+        let button = UIButton()
+        if #available(iOS 15.0, *) {
+            var config = UIButton.Configuration.filled()
+            config.background.backgroundColor = .systemBlue
+            button.configuration = config
+        } else {
+            // Fallback on earlier versions
+            button.backgroundColor = .systemBlue
+        }
+        button.setTitle("Sign Up", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        return button
+    }()
     
     private let viewModel = SignUpViewModel()
     private let input: PassthroughSubject<SignUpViewModel.Input, Never> = .init()
@@ -63,12 +77,14 @@ class SignUpViewController: UIViewController {
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
+        signUpButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(emailLabel)
         view.addSubview(emailTextField)
         view.addSubview(passwordLabel)
         view.addSubview(passwordTextField)
         view.addSubview(nameLabel)
         view.addSubview(nameTextField)
+        view.addSubview(signUpButton)
         emailLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
         emailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30).isActive = true
         emailLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
@@ -86,6 +102,8 @@ class SignUpViewController: UIViewController {
         nameTextField.leadingAnchor.constraint(equalTo: nameLabel.trailingAnchor, constant: 20).isActive = true
         nameTextField.topAnchor.constraint(equalTo: nameLabel.topAnchor).isActive = true
         nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
+        signUpButton.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 30).isActive = true
+        signUpButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         // TODO: relayout -> fit as HI-FI
     }
 }
