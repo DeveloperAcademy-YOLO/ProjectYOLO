@@ -10,4 +10,5 @@ import Combine
 
 protocol LocalDatabaseManager {
     var papersSubject: PassthroughSubject<[PaperModel], Error> {get set}
+    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never>
 }

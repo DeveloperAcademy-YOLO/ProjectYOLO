@@ -53,17 +53,22 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
     }
     
-    private func setData(value: [PaperModel]) {
-        guard
-            let url = getFolderPath(),
-            FileManager.default.fileExists(atPath: url.path) else {
-            return
+    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
+        return Future<Bool, Never> { [weak self] promise in
+            if
+                let url = self?.getFolderPath(),
+                FileManager.default.fileExists(atPath: url.path) {
+                do {
+                    let data = try JSONEncoder().encode(value)
+                    try data.write(to: url)
+                    promise(.success(true))
+                } catch {
+                    promise(.success(false))
+                }
+            } else {
+                promise(.success(false))
+            }
         }
-        do {
-            let data = try JSONEncoder().encode(value)
-            try data.write(to: url)
-        } catch {
-            print(error.localizedDescription)
-        }
+        .eraseToAnyPublisher()
     }
 }
