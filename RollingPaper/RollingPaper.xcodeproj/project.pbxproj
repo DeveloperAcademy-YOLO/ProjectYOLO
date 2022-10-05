@@ -28,6 +28,8 @@
 		D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC628ED29670094ECD9 /* TemplateModel.swift */; };
 		D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */; };
 		D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */; };
+		D251BDCF28ED54A40094ECD9 /* LocalDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */; };
+		D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +59,8 @@
 		D251BDC628ED29670094ECD9 /* TemplateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateModel.swift; sourceTree = "<group>"; };
 		D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEnum.swift; sourceTree = "<group>"; };
 		D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseManager.swift; sourceTree = "<group>"; };
+		D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModelFileManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +166,8 @@
 			children = (
 				D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */,
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
+				D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */,
+				D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -321,6 +327,7 @@
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
+				D251BDCF28ED54A40094ECD9 /* LocalDatabaseManager.swift in Sources */,
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
@@ -330,6 +337,7 @@
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
+				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
 				D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */,
