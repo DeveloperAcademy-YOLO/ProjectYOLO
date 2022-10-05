@@ -27,6 +27,7 @@
 		D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC428ED26EE0094ECD9 /* CardModel.swift */; };
 		D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC628ED29670094ECD9 /* TemplateModel.swift */; };
 		D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */; };
+		D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +56,7 @@
 		D251BDC428ED26EE0094ECD9 /* CardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModel.swift; sourceTree = "<group>"; };
 		D251BDC628ED29670094ECD9 /* TemplateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateModel.swift; sourceTree = "<group>"; };
 		D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEnum.swift; sourceTree = "<group>"; };
+		D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				D22E4AA128EBDC72001091DA /* AppDelegate.swift */,
 				D22E4AA328EBDC72001091DA /* SceneDelegate.swift */,
 				D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */,
+				D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -325,6 +328,7 @@
 				D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */,
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
+				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
