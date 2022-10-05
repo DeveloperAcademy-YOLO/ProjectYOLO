@@ -1,0 +1,24 @@
+name: CI on dev
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: CocoaPod Install
+      run: |
+        cd ./RollingPaper
+        pod install
+    - name: Build & Test (xcodeproj)
+      run: |
+        xcodebuild clean build \
+        -workspace RollingPaper/RollingPaper.xcworkspace \
+        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini,OS=16.0'
