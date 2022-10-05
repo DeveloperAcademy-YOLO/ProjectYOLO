@@ -14,6 +14,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
     private let folderName = "downloaded_papers"
     init() {
         createFolderIfNeeded()
+        loadPapers()
     }
     
     private func createFolderIfNeeded() {
@@ -35,5 +36,20 @@ final class PaperModelFileManager: LocalDatabaseManager {
             .urls(for: .documentDirectory, in: .userDomainMask)
             .first?
             .appendingPathComponent(folderName)
+    }
+    
+    private func loadPapers() {
+        guard
+            let url = getFolderPath(),
+            FileManager.default.fileExists(atPath: url.path) else {
+            return
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            let papers = try JSONDecoder().decode([PaperModel].self, from: data)
+            self.papersSubject.send(papers)
+        } catch {
+            self.papersSubject.send(completion: .failure(error))
+        }
     }
 }
