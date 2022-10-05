@@ -8,16 +8,16 @@
 import Foundation
 
 struct PaperModel: Codable {
+    var paperId = UUID().uuidString
     var creator: UserModel?
     var cards: [CardModel]
     let date: Date
+    let endTime: Date
     let title: String
-    var paperId = UUID().uuidString
     var linkUrl: String?
     let templateString: String
-    let validTime: Date
-    // isClosed -> Computed
-//    var template: TemplateModel {
-//        return TemplateEnum(rawValue: templateString).template
-//    }
+    var template: TemplateModel {
+        return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template
+    }
+    // TODO: 시간 계산, 남은 시간 compuited property로 추가
 }

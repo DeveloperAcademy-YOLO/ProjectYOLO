@@ -15,20 +15,20 @@ enum TemplateEnum: String, CaseIterable {
     case dark
     case sunrise
     
-//    var template: TemplateModel {
-//        switch self {
-//        case .halloween:
-//            return TemplateModel(colors: <#T##[UIColor]#>, templateName: <#T##String#>)
-//        case .school:
-//            <#code#>
-//        case .grid:
-//            <#code#>
-//        case .white:
-//            <#code#>
-//        case .dark:
-//            <#code#>
-//        case .sunrise:
-//            <#code#>
-//        }
-//    }
+    var template: TemplateModel {
+        switch self {
+        case .halloween:
+            return TemplateModel(templateString: "Halloween", colorHexes: [], stickerNames: [])
+        case .school:
+            return TemplateModel(templateString: "School", colorHexes: [], stickerNames: [])
+        case .grid:
+            return TemplateModel(templateString: "Grid", colorHexes: [], stickerNames: [])
+        case .white:
+            return TemplateModel(templateString: "White", colorHexes: [], stickerNames: [])
+        case .dark:
+            return TemplateModel(templateString: "Dark", colorHexes: [], stickerNames: [])
+        case .sunrise:
+            return TemplateModel(templateString: "Sunrise", colorHexes: [], stickerNames: [])
+        }
+    }
 }

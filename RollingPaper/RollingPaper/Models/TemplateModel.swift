@@ -10,21 +10,17 @@ import UIKit
 
 struct TemplateModel: Codable {
     let templateString: String
-    let colorNames: [String]
+    let colorHexes: [Int]
     let stickerNames: [String]
-//    var colors: [UIColor] {
-//        return ~
-//    }
-//    var thumbnail: UIImage {
-//        return ~
-//    }
+    var colors: [UIColor] {
+        return colorHexes.map({ UIColor(rgb: $0) })
+    }
     var thumbnailString: String {
         return "thumnail_\(templateString).jpg"
     }
     var thumbnail: UIImage? {
         return UIImage(named: thumbnailString)
     }
-    
     var template: UIImage? {
         return UIImage(named: templateString)
     }
