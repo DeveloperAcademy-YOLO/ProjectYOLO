@@ -52,4 +52,18 @@ final class PaperModelFileManager: LocalDatabaseManager {
             self.papersSubject.send(completion: .failure(error))
         }
     }
+    
+    private func setData(value: [PaperModel]) {
+        guard
+            let url = getFolderPath(),
+            FileManager.default.fileExists(atPath: url.path) else {
+            return
+        }
+        do {
+            let data = try JSONEncoder().encode(value)
+            try data.write(to: url)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
 }
