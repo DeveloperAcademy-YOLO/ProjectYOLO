@@ -110,15 +110,16 @@ class SignInViewController: UIViewController {
         })
         signInButton.snp.makeConstraints({ make in
             make.top.equalTo(passwordTextField.snp.bottom).offset(28)
-            make.width.equalTo(380)
+            make.width.equalTo(375)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
         })
         appleSignInButton.snp.makeConstraints({ make in
             make.top.equalTo(signInButton.snp.bottom).offset(28)
-            make.centerX.equalToSuperview()
+            make.width.equalTo(375)
+            // TODO: appleSignInButton -> width <= 375
             make.height.equalTo(48)
-            make.width.equalTo(380)
+            make.centerX.equalToSuperview()
         })
     }
     
