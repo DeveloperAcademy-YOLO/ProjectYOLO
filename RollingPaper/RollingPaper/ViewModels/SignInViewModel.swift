@@ -22,9 +22,10 @@ final class SignInViewModel {
     }
     
     enum Output {
-        case signInDidFail(error: Error)
+        case signInDidFail(error: AuthManagerError)
         case emailDidMiss
         case passwordDidMiss
+        case emailIsWrong
         case signInDidSuccess
     }
     
@@ -36,17 +37,20 @@ final class SignInViewModel {
     private func bind() {
         authManager
             .socialSignInSubject
-            .sink { completion in
+            .sink(receiveCompletion: { completion in
                 switch completion {
-                case .failure(let error): self.output.send(.signInDidFail(error: error))
-                case .finished: print("Successfully social signed in")
+                case .failure(let error):
+                    if let authError = error as? AuthManagerError {
+                        self.output.send(.signInDidFail(error: authError))
+                    }
+                case .finished: print("Successfully Signed In")
                 }
-            } receiveValue: { [weak self] success in
+            }, receiveValue: { [weak self] success in
                 guard let self = self else { return }
                 if success {
                     self.output.send(.signInDidSuccess)
                 }
-            }
+            })
             .store(in: &cancellables)
     }
     
@@ -77,10 +81,13 @@ final class SignInViewModel {
             }
             .switchToLatest()
             .receive(on: DispatchQueue.global(qos: .background))
-            .sink { [weak self] completion in
+            .sink { completion in
                 switch completion {
                 case .finished: print("Successfully signed in")
-                case .failure(let error): self?.output.send(.signInDidFail(error: error))
+                case .failure(let error):
+                    if let authError = error as? AuthManagerError {
+                        self.output.send(.signInDidFail(error: authError))
+                    }
                 }
             } receiveValue: { [weak self] success in
                 guard let self = self else { return }

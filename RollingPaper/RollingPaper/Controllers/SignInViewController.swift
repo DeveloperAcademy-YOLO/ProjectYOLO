@@ -118,18 +118,18 @@ class SignInViewController: UIViewController {
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
-                guard self != nil else { return }
+                guard let self = self else { return }
                 switch receivedValue {
                 case .signInDidFail(error: let error):
-                    print(error.localizedDescription)
+                    break
                 case .emailDidMiss:
                     break
                 case .passwordDidMiss:
                     break
-                // Set alert if not validated
+                case .emailIsWrong:
+                    break
                 case .signInDidSuccess:
-                    print("Successfully Signed In")
-                // Success -> Into current view flows...
+                    break
                 }
             })
             .store(in: &cancellables)

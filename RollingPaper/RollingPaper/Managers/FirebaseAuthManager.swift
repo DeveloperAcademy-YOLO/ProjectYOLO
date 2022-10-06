@@ -21,17 +21,22 @@ protocol AuthManager {
     func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
 }
 
+enum AuthManagerError: LocalizedError {
+    case userNotFound
+    case userTokenExpired
+    case emailAlreadyInUse
+    case wrongPassword
+    case invalidEmail
+    case unknownError
+}
+
 final class FirebaseAuthManager: NSObject, AuthManager {
     var socialSignInSubject: PassthroughSubject<Bool, Error> = .init()
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
-    enum AuthError: LocalizedError {
-        case userNotExists
-    }
-    
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
                 if let error = error {
                     promise(.failure(error))
@@ -39,20 +44,41 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     promise(.success(true))
                 }
             })
-        }
+        })
         .eraseToAnyPublisher()
+    }
+    
+    private func handleError(with error: Error?) -> Error? {
+        var result: Error?
+        if let error = error as? NSError {
+            let authError = AuthErrorCode(_nsError: error).code
+            switch authError {
+            case .userNotFound:
+                result = AuthManagerError.userNotFound
+            case .userTokenExpired:
+                result = AuthManagerError.userTokenExpired
+            case .emailAlreadyInUse:
+                result = AuthManagerError.emailAlreadyInUse
+            case .wrongPassword:
+                result = AuthManagerError.wrongPassword
+            case .invalidEmail:
+                result = AuthManagerError.invalidEmail
+            default: result = AuthManagerError.unknownError
+            }
+        }
+        return result
     }
                                   
     func signIn(email: String, password: String) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             self?.auth.signIn(withEmail: email, password: password) { _, error in
-                if let error = error {
+                if let error = self?.handleError(with: error) {
                     promise(.failure(error))
                 } else {
                     promise(.success(true))
                 }
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
     
@@ -92,7 +118,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     }
                 }
             } else {
-                promise(.failure(AuthError.userNotExists))
+                promise(.failure(AuthManagerError.userNotFound))
             }
         }
         .eraseToAnyPublisher()
@@ -139,7 +165,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     }
                 }
             } else {
-                promise(.failure(AuthError.userNotExists))
+                promise(.failure(AuthManagerError.userNotFound))
             }
         }
         .eraseToAnyPublisher()
