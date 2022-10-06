@@ -115,49 +115,18 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
     }
     
-    func removePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
-        return Future { [weak self] promise in
-            if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
-                do {
-                    try FileManager.default.removeItem(at: fileDir)
-                    if let currentPapers = self?.papersSubject.value {
-                        let removedPapers = currentPapers.filter({ $0.paperId != paper.paperId })
-                        self?.papersSubject.send(removedPapers)
-                    }
-                    promise(.success(true))
-                } catch {
-                    promise(.failure(error))
-                }
-            } else {
-                promise(.success(false))
+    func updatePaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paper.paperId }) {
+                currentPapers[index] = paper
+                papersSubject.send(currentPapers)
             }
+            let paperData = try JSONEncoder().encode(paper)
+            try paperData.write(to: fileDir, options: .atomic)
+        } catch {
+            papersSubject.send(completion: .failure(error))
         }
-        .eraseToAnyPublisher()
-    }
-        
-    func updatePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
-        return Future { [weak self] promise in
-            if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
-                do {
-                    let paperData = try JSONEncoder().encode(paper)
-                    try paperData.write(to: fileDir, options: .atomic)
-                    if
-                        var currentPapers = self?.papersSubject.value,
-                        let index = currentPapers.firstIndex(where: {$0.paperId == paper.paperId}) {
-                        currentPapers[index] = paper
-                        self?.papersSubject.send(currentPapers)
-                    }
-                    promise(.success(true))
-                    
-                } catch {
-                    promise(.failure(error))
-                }
-            } else {
-                promise(.success(false))
-            }
-        }
-        .eraseToAnyPublisher()
     }
 }
