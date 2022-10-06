@@ -12,5 +12,5 @@ target 'RollingPaper' do
   pod 'FirebaseFirestore'
   pod 'FirebaseStorage'
   pod 'FirebaseDatabase'
-  pod 'SwiftLint'
+  pod 'SwiftLint', '0.39.1'
 end
