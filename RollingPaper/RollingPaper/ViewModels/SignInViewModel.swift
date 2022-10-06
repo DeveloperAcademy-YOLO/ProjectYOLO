@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SnapKit
 
 final class SignInViewModel {
     var email = CurrentValueSubject<String, Never>("")

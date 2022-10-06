@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -33,6 +33,7 @@
 		D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */; };
 		D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */; };
 		D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308128EE871C008365CB /* Combine+Extensions.swift */; };
+		D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 		D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModelFileManager.swift; sourceTree = "<group>"; };
 		D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308128EE871C008365CB /* Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Extensions.swift"; sourceTree = "<group>"; };
+		D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +165,7 @@
 				D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */,
 				D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */,
 				D2B6308128EE871C008365CB /* Combine+Extensions.swift */,
+				D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -397,6 +400,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
