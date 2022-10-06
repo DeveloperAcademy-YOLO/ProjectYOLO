@@ -19,7 +19,9 @@ final class SignInViewModel {
     enum Input {
         case signInButtonTap
         case appleSignInButtonTap
-        case textFieldFocused
+        case emailFocused
+        case passwordFocused
+        case normalBoundTap
     }
     
     enum Output {
@@ -27,7 +29,9 @@ final class SignInViewModel {
         case emailDidMiss
         case passwordDidMiss
         case signInDidSuccess
-        case textFieldFocused
+        case emailFocused
+        case passwordFocused
+        case normalBoundTap
     }
     
     init(authManager: AuthManager = FirebaseAuthManager()) {
@@ -62,7 +66,9 @@ final class SignInViewModel {
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
                 case .appleSignInButtonTap: self.authManager.appleSignIn()
-                case .textFieldFocused: self.output.send(.textFieldFocused)
+                case .emailFocused: self.output.send(.emailFocused)
+                case .passwordFocused: self.output.send(.passwordFocused)
+                case .normalBoundTap: self.output.send(.normalBoundTap)
                 }
             })
             .store(in: &cancellables)

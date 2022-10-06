@@ -69,6 +69,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             default: result = AuthManagerError.unknownError
             }
         }
+        print(result?.localizedDescription)
         return result
     }
                                   

@@ -11,6 +11,15 @@ import SnapKit
 import AuthenticationServices
 
 class SignInViewController: UIViewController {
+    enum TextFieldFocused {
+        case normal
+        case emailFocused
+        case emailWaring
+        case passwordFocused
+        case passwordWaring
+        case bothWaring
+    }
+    
     private let emailTextField: UITextField = {
         let textField = UITextField()
         textField.layer.masksToBounds = true
@@ -117,18 +126,25 @@ class SignInViewController: UIViewController {
         switch error {
         case .userNotFound:
             setWarningMessage(isShown: true, message: "이메일이 존재하지 않습니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
         case .userTokenExpired:
             setWarningMessage(isShown: true, message: "이메일 토큰이 만료되었습니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
         case .emailAlreadyInUse:
             setWarningMessage(isShown: true, message: "이미 사용 중인 이메일입니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
         case .wrongPassword:
             setWarningMessage(isShown: true, message: "비밀번호가 틀렸습니다")
+            setTextFieldUI(textFieldFocused: .passwordWaring)
         case .invalidEmail:
             setWarningMessage(isShown: true, message: "입력된 이메일 주소를 확인해주세요")
+            setTextFieldUI(textFieldFocused: .emailWaring)
         case .unknownError:
             setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+            setTextFieldUI(textFieldFocused: .bothWaring)
         default:
             setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+            setTextFieldUI(textFieldFocused: .bothWaring)
         }
     }
     
@@ -144,6 +160,41 @@ class SignInViewController: UIViewController {
         view.layoutIfNeeded()
     }
     
+    private func setTextFieldUI(textFieldFocused: TextFieldFocused) {
+        switch textFieldFocused {
+        case .normal:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .emailFocused:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .emailWaring:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .passwordFocused:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .passwordWaring:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
+        case .bothWaring:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
+        }
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -152,47 +203,69 @@ class SignInViewController: UIViewController {
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
-                case .emailDidMiss: self.setWarningMessage(isShown: true, message: "이메일을 입력해주세요")
+                case .emailDidMiss:
+                    self.setWarningMessage(isShown: true, message: "이메일을 입력해주세요")
+                    self.setTextFieldUI(textFieldFocused: .emailWaring)
                 case .passwordDidMiss:
                     self.setWarningMessage(isShown: true, message: "비밀번호를 입력해주세요")
+                    self.setTextFieldUI(textFieldFocused: .passwordWaring)
                 case .signInDidSuccess:
+                    self.setWarningMessage(isShown: false, message: nil)
                     // navigate to current view flow (dismiss, etc...)
+                case .emailFocused:
                     self.setWarningMessage(isShown: false, message: nil)
-                case .textFieldFocused:
+                    self.setTextFieldUI(textFieldFocused: .emailFocused)
+                case .passwordFocused:
                     self.setWarningMessage(isShown: false, message: nil)
+                    self.setTextFieldUI(textFieldFocused: .passwordFocused)
+                case .normalBoundTap:
+                    self.setTextFieldUI(textFieldFocused: .normal)
                 }
             })
             .store(in: &cancellables)
         signInButton
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
-                guard let self = self else { return }
-                self.input.send(.signInButtonTap)
+                self?.input.send(.signInButtonTap)
             })
             .store(in: &cancellables)
         appleSignInButton
             .controlPublisher(for: .touchUpInside)        
             .sink(receiveValue: { [weak self] _ in
-                guard let self = self else { return }
-                self.input.send(.appleSignInButtonTap)
+                self?.input.send(.appleSignInButtonTap)
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .controlPublisher(for: .editingDidBegin)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.emailFocused)
             })
             .store(in: &cancellables)
         emailTextField
             .textPublisher
             .compactMap({ $0 })
             .sink(receiveValue: { [weak self] email in
-                guard let self = self else { return }
-                self.viewModel.email.send(email)
-                self.input.send(.textFieldFocused)
+                self?.viewModel.email.send(email)
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .controlPublisher(for: .editingDidBegin)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.passwordFocused)
             })
             .store(in: &cancellables)
         passwordTextField
             .textPublisher
             .compactMap({ $0 })
             .sink(receiveValue: { [weak self] password in
-                guard let self = self else { return }
-                self.viewModel.password.send(password)
-                self.input.send(.textFieldFocused)
+                self?.viewModel.password.send(password)
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .controlPublisher(for: .editingDidEnd)
+            .combineLatest(passwordTextField.controlPublisher(for: .editingDidEnd))
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
             })
             .store(in: &cancellables)
     }
