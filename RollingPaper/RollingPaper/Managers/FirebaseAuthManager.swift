@@ -27,7 +27,10 @@ enum AuthManagerError: LocalizedError {
     case emailAlreadyInUse
     case wrongPassword
     case invalidEmail
+    case signOutFailed
     case unknownError
+    case profileSetFailed
+    case deleteUserFailed
 }
 
 final class FirebaseAuthManager: NSObject, AuthManager {
@@ -38,7 +41,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error>({ [weak self] promise in
             self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
-                if let error = error {
+                if let error = self?.handleError(with: error) {
                     promise(.failure(error))
                 } else {
                     promise(.success(true))
@@ -83,44 +86,44 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     }
     
     func signIn(credential: AuthCredential) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             self?.auth.signIn(with: credential, completion: { _, error in
-                if let error = error {
+                if let error = self?.handleError(with: error) {
                     promise(.failure(error))
                 } else {
                     promise(.success(true))
                 }
             })
-        }
+        })
         .eraseToAnyPublisher()
     }
     
     func signOut() -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             do {
                 try self?.auth.signOut()
                 promise(.success(true))
             } catch {
-                promise(.failure(error))
+                promise(.failure(AuthManagerError.signOutFailed))
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
     
     func deleteUser() -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             if let user = self?.auth.currentUser {
-                user.delete { error in
-                    if let error = error {
-                        promise(.failure(error))
+                user.delete(completion: { error in
+                    if error != nil {
+                        promise(.failure(AuthManagerError.deleteUserFailed))
                     } else {
                         promise(.success(true))
                     }
-                }
+                })
             } else {
                 promise(.failure(AuthManagerError.userNotFound))
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
     
@@ -135,18 +138,18 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 let photoURL = URL(string: photoURLString) {
                 changeRequest.photoURL = photoURL
             }
-            changeRequest.commitChanges { error in
+            changeRequest.commitChanges(completion: { error in
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
                     print("Setting user name and photo")
                 }
-            }
+            })
         }
     }
     
     func updateUserProfile(name: String? = nil, photoURLString: String? = nil) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error> { [weak self] promise in
+        return Future<Bool, Error>({ [weak self] promise in
             if let user = self?.auth.currentUser {
                 let changeRequest = user.createProfileChangeRequest()
                 if let name = name {
@@ -157,17 +160,17 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     let photoURL = URL(string: photoURLString) {
                     changeRequest.photoURL = photoURL
                 }
-                changeRequest.commitChanges { error in
-                    if let error = error {
-                        promise(.failure(error))
+                changeRequest.commitChanges(completion: { error in
+                    if error != nil {
+                        promise(.failure(AuthManagerError.profileSetFailed))
                     } else {
                         promise(.success(true))
                     }
-                }
+                })
             } else {
                 promise(.failure(AuthManagerError.userNotFound))
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
     
@@ -228,45 +231,44 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
 
 extension FirebaseAuthManager {
     private func randomNonceString(length: Int = 32) -> String {
-      precondition(length > 0)
-      let charset: [Character] =
+        precondition(length > 0)
+        let charset: [Character] =
         Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-      var result = ""
-      var remainingLength = length
-
-      while remainingLength > 0 {
-        let randoms: [UInt8] = (0 ..< 16).map { _ in
-          var random: UInt8 = 0
-          let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-          if errorCode != errSecSuccess {
-            fatalError(
-              "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
-          }
-          return random
+        var result = ""
+        var remainingLength = length
+        
+        while remainingLength > 0 {
+            let randoms: [UInt8] = (0 ..< 16).map({ _ in
+                var random: UInt8 = 0
+                let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+                if errorCode != errSecSuccess {
+                    fatalError(
+                        "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+                    )
+                }
+                return random
+            })
+            
+            randoms.forEach({ random in
+                if remainingLength == 0 {
+                    return
+                }
+                if random < charset.count {
+                    result.append(charset[Int(random)])
+                    remainingLength -= 1
+                }
+            })
         }
-
-        randoms.forEach { random in
-          if remainingLength == 0 {
-            return
-          }
-
-          if random < charset.count {
-            result.append(charset[Int(random)])
-            remainingLength -= 1
-          }
-        }
-      }
-      return result
+        return result
     }
-    
+        
     @available(iOS 13, *)
     private func sha256(_ input: String) -> String {
       let inputData = Data(input.utf8)
       let hashedData = SHA256.hash(data: inputData)
-      let hashString = hashedData.compactMap {
+      let hashString = hashedData.compactMap({
         String(format: "%02x", $0)
-      }.joined()
+      }).joined()
 
       return hashString
     }
