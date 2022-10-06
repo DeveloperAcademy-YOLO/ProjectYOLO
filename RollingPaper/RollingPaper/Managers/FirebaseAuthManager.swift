@@ -59,7 +59,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     func signIn(credential: AuthCredential) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error> { [weak self] promise in
             self?.auth.signIn(with: credential, completion: { _, error in
-                if let error {
+                if let error = error {
                     promise(.failure(error))
                 } else {
                     promise(.success(true))
