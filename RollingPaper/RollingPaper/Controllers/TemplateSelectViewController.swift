@@ -9,52 +9,51 @@ import UIKit
 import SnapKit
 
 class TemplateSelectViewController: UIViewController {
-    
     private let viewModel = TemplateSelectViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        setMainView()
         setCollectionView()
     }
     
-    /// CollectionView 초기화
+    // 메인 뷰 초기화
+    private func setMainView() {
+        view.backgroundColor = .white
+    }
+    
+    // 컬렉션 뷰 초기화
     private func setCollectionView() {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets.zero
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: 27, left: 50, bottom: 0, right: 50)
         collectionViewLayer.minimumInteritemSpacing = 30
         collectionViewLayer.minimumLineSpacing = 30
-        collectionViewLayer.headerReferenceSize = .init(width: 200, height: 50)
+        collectionViewLayer.headerReferenceSize = .init(width: 200, height: 90)
         
-        let myCollectionView = MyCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
-        myCollectionView.backgroundColor = .secondarySystemBackground
-        
-        myCollectionView.register(MyCollectionViewCell.self, forCellWithReuseIdentifier: MyCollectionViewCell.id)
-        myCollectionView.register(
-            CollectionHeaderView.self,
-          forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-          withReuseIdentifier: CollectionHeaderView.id
-        )
-        
+        let myCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
+        myCollectionView.backgroundColor = .white
+        myCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.id)
+        myCollectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.id)
         myCollectionView.dataSource = self
         myCollectionView.delegate = self
         
         view.addSubview(myCollectionView)
-        
         myCollectionView.snp.makeConstraints { make in
-            make.left.right.top.bottom.equalToSuperview().offset(50)
+            make.left.right.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
         }
     }
 }
 
+// 컬렉션 뷰에 대한 여러 설정들을 해줌
 extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    /// sizeForItemAt
+    // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 240, height: 200)
     }
     
-    /// numberOfItemsInSection
+    // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
             return 1
@@ -63,116 +62,121 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
         }
     }
     
+    // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
     
-    /// cellForItemAt
+    // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MyCollectionViewCell.id, for: indexPath) as? MyCollectionViewCell
-        
-        var currentTemplate: TemplateModel
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.id, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
+
         if indexPath.section == 0 {
-            currentTemplate = viewModel.getRecentTemplate()!.template
+            cell.setCell(template: viewModel.getRecentTemplate()!.template)
         } else {
-            currentTemplate = viewModel.getTemplates()[indexPath.item].template
+            cell.setCell(template: viewModel.getTemplates()[indexPath.item].template)
         }
-        cell?.imageView.image = currentTemplate.thumbnail
-        cell?.title.text = currentTemplate.templateString
-        
-        return cell!
+    
+        return cell
     }
     
+    // 특정 위치의 헤더
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
-            let supplementaryView = collectionView.dequeueReusableSupplementaryView(
+            guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: CollectionHeaderView.id,
+                withReuseIdentifier: CollectionHeader.id,
                 for: indexPath
-            ) as? CollectionHeaderView
+            ) as? CollectionHeader else {return UICollectionReusableView()}
+            
             if indexPath.section == 0 {
-                supplementaryView?.prepare(title: "최근 사용한")
+                supplementaryView.setHeader(text: "최근 사용한")
             } else {
-                supplementaryView?.prepare(title: "모두")
+                supplementaryView.setHeader(text: "모두")
             }
-            return supplementaryView!
+            
+            return supplementaryView
         } else {
             return UICollectionReusableView()
         }
     }
-}
+    
+    // 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
+    private class CollectionView: UICollectionView {}
 
-class MyCollectionViewCell: UICollectionViewCell {
-    
-    static var id: String {
-        return NSStringFromClass(Self.self).components(separatedBy: ".").last!
-    }
-    
-    let thumbnail = UIView()
-    let title = UILabel()
-    let imageView = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        configure()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Not implemented required init?(coder: NSCoder)")
-    }
-    
-    private func configure() {
-        contentView.addSubview(thumbnail)
-        thumbnail.addSubview(imageView)
-        thumbnail.addSubview(title)
+    // 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
+    private class CollectionHeader: UICollectionReusableView {
+        static let id = "CollectionHeader"
+        private let title = UILabel()
         
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 12
-        imageView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.left.equalToSuperview()
-            make.width.equalTo(240)
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            configure()
         }
         
-        title.font = .systemFont(ofSize: 20)
-        title.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(10)
-            make.centerX.equalTo(imageView)
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
         
-        thumbnail.snp.makeConstraints { make in
-            make.top.bottom.left.right.equalToSuperview()
+        private func configure() {
+            addSubview(title)
+            
+            title.font = .systemFont(ofSize: 32)
+            title.snp.makeConstraints { make in
+                make.top.equalToSuperview().offset(50)
+                make.left.equalToSuperview().offset(50)
+            }
+        }
+        
+        func setHeader(text: String) {
+            title.text = text
         }
     }
-    
-}
 
-class MyCollectionView: UICollectionView {
-    // Nothing todo
-}
-
-class CollectionHeaderView: UICollectionReusableView {
-    static let id = "CollectionHeaderView"
-    private let title = UILabel()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
+    private class CollectionCell: UICollectionViewCell {
+        static let id = "CollectionCell"
+        private let thumbnail = UIView()
+        private let title = UILabel()
+        private let imageView = UIImageView()
         
-        addSubview(title)
-        title.font = .systemFont(ofSize: 32)
-        title.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            configure()
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        private func configure() {
+            addSubview(thumbnail)
+            thumbnail.addSubview(imageView)
+            thumbnail.addSubview(title)
+            
+            imageView.layer.masksToBounds = true
+            imageView.layer.cornerRadius = 12
+            imageView.snp.makeConstraints { make in
+                make.top.equalToSuperview()
+                make.left.equalToSuperview()
+                make.width.equalTo(240)
+            }
+            
+            title.font = .systemFont(ofSize: 20)
+            title.snp.makeConstraints { make in
+                make.top.equalTo(imageView.snp.bottom).offset(10)
+                make.centerX.equalTo(imageView)
+            }
+            
+            thumbnail.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        }
+        
+        func setCell(template: TemplateModel) {
+            imageView.image = template.thumbnail
+            title.text = template.templateString
         }
     }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        self.prepare(title: nil)
-    }
-    
-    func prepare(title: String?) {
-        self.title.text = title
-    }
+
 }
