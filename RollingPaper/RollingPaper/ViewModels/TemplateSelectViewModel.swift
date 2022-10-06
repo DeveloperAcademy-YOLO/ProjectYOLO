@@ -17,7 +17,7 @@ final class TemplateSelectViewModel {
     
     func getTemplates() -> [TemplateEnum] {
         // TODO: 현재 존재하는 템플릿 받아오기
-        let templates: [TemplateEnum] = [.halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, ]
+        let templates: [TemplateEnum] = [.halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween, .grid, .sunrise, .halloween]
         return templates
     }
 }
