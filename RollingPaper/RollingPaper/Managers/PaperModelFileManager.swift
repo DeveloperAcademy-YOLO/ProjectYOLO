@@ -12,7 +12,7 @@ import UIKit
 final class PaperModelFileManager: LocalDatabaseManager {
     static let shared: LocalDatabaseManager = PaperModelFileManager()
     
-    var papersSubject: CurrentValueSubject<[PaperModel], Error> = .init([])
+    var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
     private let folderName = "/downloaded_papers"
     private init() {
         createFolderIfNeeded()
@@ -74,7 +74,6 @@ final class PaperModelFileManager: LocalDatabaseManager {
             let currentPapers = papersSubject.value
             papersSubject.send(currentPapers + [paper])
         } catch {
-            papersSubject.send(completion: .failure(error))
             print(error.localizedDescription)
         }
     }
@@ -92,7 +91,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
                 try paperData.write(to: fileDir)
             }
         } catch {
-            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
@@ -106,7 +105,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
                 papersSubject.send(currentPapers)
             }
         } catch {
-            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
@@ -125,7 +124,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
                 }
             }
         } catch {
-            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
@@ -140,7 +139,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
             let paperData = try JSONEncoder().encode(paper)
             try paperData.write(to: fileDir, options: .atomic)
         } catch {
-            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
@@ -159,7 +158,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
                 }
             }
         } catch {
-            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
 }
