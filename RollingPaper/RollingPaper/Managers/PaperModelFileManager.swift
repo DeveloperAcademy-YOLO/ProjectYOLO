@@ -101,6 +101,20 @@ final class PaperModelFileManager: LocalDatabaseManager {
         .eraseToAnyPublisher()
     }
     
+    func removePaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            try FileManager.default.removeItem(at: fileDir)
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paper.paperId }) {
+                currentPapers.remove(at: index)
+                papersSubject.send(currentPapers)
+            }
+        } catch {
+            papersSubject.send(completion: .failure(error))
+        }
+    }
+    
     func removePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
         return Future { [weak self] promise in
             if let paperDir = self?.getPaperDirectoryPath() {
