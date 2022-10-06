@@ -12,7 +12,7 @@ import AuthenticationServices
 import CryptoKit
 
 protocol AuthManager {
-    var signedInSubject: PassthroughSubject<Bool, Error> {get set}
+    var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> {get set}
     func signIn(email: String, password: String)
     func appleSignIn()
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error>
@@ -21,7 +21,7 @@ protocol AuthManager {
     func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
 }
 
-enum AuthManagerError: LocalizedError {
+enum AuthManagerEnum: String, CaseIterable {
     case userNotFound
     case userTokenExpired
     case emailAlreadyInUse
@@ -31,17 +31,22 @@ enum AuthManagerError: LocalizedError {
     case unknownError
     case profileSetFailed
     case deleteUserFailed
+    case signInSucceed
+    case signUpSucceed
+    case signOutSucceed
+    case profileSetSucceed
+    case deleteUserSucceed
 }
 
 final class FirebaseAuthManager: NSObject, AuthManager {
-    var signedInSubject: PassthroughSubject<Bool, Error> = .init()
+    var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
         return Future<Bool, Error>({ [weak self] promise in
             self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
-                if let error = self?.handleError(with: error) {
+                if let error = error {
                     promise(.failure(error))
                 } else {
                     promise(.success(true))
@@ -51,34 +56,33 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         .eraseToAnyPublisher()
     }
     
-    private func handleError(with error: Error?) -> Error? {
-        var result: Error?
+    private func handleError(with error: Error?) -> AuthManagerEnum? {
+        var result: AuthManagerEnum?
         if let error = error as? NSError {
             let authError = AuthErrorCode(_nsError: error).code
             switch authError {
             case .userNotFound:
-                result = AuthManagerError.userNotFound
+                result = .userNotFound
             case .userTokenExpired:
-                result = AuthManagerError.userTokenExpired
+                result = .userTokenExpired
             case .emailAlreadyInUse:
-                result = AuthManagerError.emailAlreadyInUse
+                result = .emailAlreadyInUse
             case .wrongPassword:
-                result = AuthManagerError.wrongPassword
+                result = .wrongPassword
             case .invalidEmail:
-                result = AuthManagerError.invalidEmail
-            default: result = AuthManagerError.unknownError
+                result = .invalidEmail
+            default: result = .unknownError
             }
         }
-        print(result?.localizedDescription)
         return result
     }
                                   
     func signIn(email: String, password: String) {
         auth.signIn(withEmail: email, password: password, completion: { [weak self] _, error in
             if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(completion: .failure(error))
+                self?.signedInSubject.send(error)
             } else {
-                self?.signedInSubject.send(true)
+                self?.signedInSubject.send(.signInSucceed)
             }
         })
     }
@@ -86,9 +90,9 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     func signIn(credential: AuthCredential) {
         auth.signIn(with: credential) { [weak self] _, error in
             if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(completion: .failure(error))
+                self?.signedInSubject.send(error)
             } else {
-                self?.signedInSubject.send(true)
+                self?.signedInSubject.send(.signInSucceed)
             }
         }
     }
@@ -96,9 +100,9 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     func signOut() {
         do {
             try auth.signOut()
-            signedInSubject.send(false)
+            signedInSubject.send(.signOutFailed)
         } catch {
-            signedInSubject.send(completion: .failure(AuthManagerError.signOutFailed))
+            signedInSubject.send(.signOutSucceed)
         }
     }
     
@@ -107,14 +111,16 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             if let user = self?.auth.currentUser {
                 user.delete(completion: { error in
                     if error != nil {
-                        promise(.failure(AuthManagerError.deleteUserFailed))
+                        promise(.success(false))
+                        self?.signedInSubject.send(.deleteUserFailed)
                     } else {
                         promise(.success(true))
-                        self?.signedInSubject.send(false)
+                        self?.signedInSubject.send(.deleteUserFailed)
                     }
                 })
             } else {
-                promise(.failure(AuthManagerError.userNotFound))
+                promise(.success(false))
+                self?.signedInSubject.send(.userNotFound)
             }
         })
         .eraseToAnyPublisher()
@@ -155,13 +161,13 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 }
                 changeRequest.commitChanges(completion: { error in
                     if error != nil {
-                        promise(.failure(AuthManagerError.profileSetFailed))
+                        promise(.success(false))
                     } else {
                         promise(.success(true))
                     }
                 })
             } else {
-                promise(.failure(AuthManagerError.userNotFound))
+                promise(.success(false))
             }
         })
         .eraseToAnyPublisher()
@@ -207,18 +213,16 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
         
         auth.signIn(with: credential) { [weak self] _, error in
             guard let self = self else { return }
-            if let error = error {
-                print(error.localizedDescription)
-                self.signedInSubject.send(completion: .failure(error))
+            if let error = self.handleError(with: error) {
+                self.signedInSubject.send(error)
             } else {
-                self.signedInSubject.send(true)
                 self.setUserProfile(name: name, photoURLString: nil)
             }
         }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        signedInSubject.send(completion: .failure(error))
+        signedInSubject.send(.unknownError)
     }
 }
 

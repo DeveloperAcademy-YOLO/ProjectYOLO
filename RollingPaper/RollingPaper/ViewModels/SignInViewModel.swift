@@ -25,7 +25,7 @@ final class SignInViewModel {
     }
     
     enum Output {
-        case signInDidFail(error: AuthManagerError)
+        case signInDidFail(error: AuthManagerEnum)
         case emailDidMiss
         case passwordDidMiss
         case signInDidSuccess
@@ -42,18 +42,22 @@ final class SignInViewModel {
     private func bind() {
         authManager
             .signedInSubject
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .failure(let error):
-                    if let authError = error as? AuthManagerError {
-                        self.output.send(.signInDidFail(error: authError))
-                    }
-                case .finished: print("Successfully Signed In")
-                }
-            }, receiveValue: { [weak self] success in
+            .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
-                if success {
+                switch receivedValue {
+                case .userNotFound:
+                    self.output.send(.signInDidFail(error: .userNotFound))
+                case .userTokenExpired:
+                    self.output.send(.signInDidFail(error: .userTokenExpired))
+                case .emailAlreadyInUse:
+                    self.output.send(.signInDidFail(error: .emailAlreadyInUse))
+                case .wrongPassword:
+                    self.output.send(.signInDidFail(error: .wrongPassword))
+                case .invalidEmail:
+                    self.output.send(.signInDidFail(error: .invalidEmail))
+                case .signInSucceed:
                     self.output.send(.signInDidSuccess)
+                default: self.output.send(.signInDidFail(error: .unknownError))
                 }
             })
             .store(in: &cancellables)
@@ -66,8 +70,10 @@ final class SignInViewModel {
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
                 case .appleSignInButtonTap: self.authManager.appleSignIn()
-                case .emailFocused: self.output.send(.emailFocused)
-                case .passwordFocused: self.output.send(.passwordFocused)
+                case .emailFocused:
+                    self.output.send(.emailFocused)
+                case .passwordFocused:
+                    self.output.send(.passwordFocused)
                 case .normalBoundTap: self.output.send(.normalBoundTap)
                 }
             })
@@ -80,9 +86,11 @@ final class SignInViewModel {
         let password = password.replacingOccurrences(of: " ", with: "")
         if password.isEmpty {
             self.output.send(.passwordDidMiss)
+            return nil
         }
         if email.isEmpty {
             self.output.send(.emailDidMiss)
+            return nil
         }
         if !email.isEmpty && !password.isEmpty {
             return (email, password)
@@ -92,16 +100,8 @@ final class SignInViewModel {
     }
     
     private func handleSignIn() {
-        email
-            .combineLatest(password)
-            .compactMap({ [weak self] email, password in
-                // handle email and password validation
-                return self?.handleText(email: email, password: password)
-            })
-            .sink(receiveValue: { [weak self] email, password in
-                guard let self = self else { return }
-                self.authManager.signIn(email: email, password: password)
-            })
-            .store(in: &cancellables)
+        if let (email, password) = handleText(email: email.value, password: password.value) {
+            authManager.signIn(email: email, password: password)
+        }
     }
 }

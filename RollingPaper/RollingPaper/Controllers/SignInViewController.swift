@@ -122,7 +122,7 @@ class SignInViewController: UIViewController {
         })
     }
     
-    private func handleError(error: AuthManagerError) {
+    private func handleError(error: AuthManagerEnum) {
         switch error {
         case .userNotFound:
             setWarningMessage(isShown: true, message: "이메일이 존재하지 않습니다")
@@ -236,7 +236,7 @@ class SignInViewController: UIViewController {
             })
             .store(in: &cancellables)
         emailTextField
-            .controlPublisher(for: .editingDidBegin)
+            .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.emailFocused)
             })
@@ -249,7 +249,7 @@ class SignInViewController: UIViewController {
             })
             .store(in: &cancellables)
         passwordTextField
-            .controlPublisher(for: .editingDidBegin)
+            .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.passwordFocused)
             })
