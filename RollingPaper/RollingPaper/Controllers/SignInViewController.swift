@@ -18,6 +18,9 @@ class SignInViewController: UIViewController {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
         textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
         return textField
     }()
     private let passwordTextField: UITextField = {
@@ -27,6 +30,9 @@ class SignInViewController: UIViewController {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
         textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
+        textField.leftView = paddingView
+        textField.leftViewMode = .always
         return textField
     }()
     private let signInButton: UIButton = {
@@ -40,6 +46,7 @@ class SignInViewController: UIViewController {
     }()
     private let appleSignInButton: ASAuthorizationAppleIDButton = {
         let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+        button.cornerRadius = 12
         return button
     }()
     private let waringImage: UIImageView = {
