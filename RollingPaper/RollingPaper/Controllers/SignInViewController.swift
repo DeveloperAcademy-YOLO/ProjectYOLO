@@ -30,6 +30,7 @@ class SignInViewController: UIViewController {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
         textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        textField.isSecureTextEntry = true
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -52,11 +53,14 @@ class SignInViewController: UIViewController {
     private let waringImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .center
+        imageView.image = UIImage(systemName: "exclamationmark.bubble")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
+        imageView.isHidden = true
         return imageView
     }()
     private let waringLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
+        label.isHidden = true
         return label
     }()
     
@@ -72,7 +76,7 @@ class SignInViewController: UIViewController {
     
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, signInButton, appleSignInButton])
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signInButton, appleSignInButton])
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset((view.frame.height - 246) / 2)
             make.centerX.equalToSuperview()
@@ -84,6 +88,16 @@ class SignInViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.height.equalTo(38)
             make.width.equalTo(380)
+        })
+        waringImage.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(19)
+            make.leading.equalTo(passwordTextField.snp.leading).offset(16)
+            make.height.equalTo(21.52)
+            make.width.equalTo(21.57)
+        })
+        waringLabel.snp.makeConstraints({ make in
+            make.top.equalTo(waringImage.snp.top)
+            make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
         })
         signInButton.snp.makeConstraints({ make in
             make.top.equalTo(passwordTextField.snp.bottom).offset(28)
