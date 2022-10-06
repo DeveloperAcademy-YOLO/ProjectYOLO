@@ -40,7 +40,8 @@ final class SignUpViewModel {
                 case .signUpButtonDidTap: self.handleSignUp()
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &cancellables)        
+        
         return output.eraseToAnyPublisher()
     }
     

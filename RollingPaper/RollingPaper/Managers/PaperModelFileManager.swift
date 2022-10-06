@@ -10,60 +10,66 @@ import Combine
 import UIKit
 
 final class PaperModelFileManager: LocalDatabaseManager {
-    var papersSubject: PassthroughSubject<[PaperModel], Error> = .init()
-    private let folderName = "downloaded_papers"
-    init() {
+    static let shared: LocalDatabaseManager = PaperModelFileManager()
+    
+    var papersSubject: CurrentValueSubject<[PaperModel], Error> = .init([])
+    private let folderName = "/downloaded_papers"
+    private init() {
         createFolderIfNeeded()
         loadPapers()
     }
     
+    private func getDocumentDirectoryPath() -> URL? {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    }
+    
+    private func getPaperDirectoryPath() -> URL? {
+        guard let documentDir = getDocumentDirectoryPath() else {
+            return nil
+        }
+        return documentDir.appendingPathComponent(folderName).absoluteURL
+    }
+    
     private func createFolderIfNeeded() {
-        guard let url = getFolderPath() else { return }
-        if !FileManager.default.fileExists(atPath: url.path) {
+        guard let paperDirectory = getPaperDirectoryPath() else { return }
+        if !FileManager.default.fileExists(atPath: paperDirectory.relativePath) {
             do {
-                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(atPath: paperDirectory.relativePath, withIntermediateDirectories: true, attributes: nil)
                 print("Created Folder")
             } catch {
-                print("Error Created Folder")
+                print("Error Creating Folder")
                 print(error.localizedDescription)
             }
         }
     }
     
-    private func getFolderPath() -> URL? {
-        return FileManager
-            .default
-            .urls(for: .documentDirectory, in: .userDomainMask)
-            .first?
-            .appendingPathComponent(folderName)
-    }
-    
     private func loadPapers() {
-        guard
-            let url = getFolderPath(),
-            FileManager.default.fileExists(atPath: url.path) else {
-            return
-        }
+        guard let paperDir = getPaperDirectoryPath() else { return }
         do {
-            let data = try Data(contentsOf: url)
-            let papers = try JSONDecoder().decode([PaperModel].self, from: data)
-            self.papersSubject.send(papers)
+            let paperContents = try FileManager.default.contentsOfDirectory(at: paperDir, includingPropertiesForKeys: nil, options: [])
+            let papers = try paperContents.map({ url in
+                let paperData = try Data(contentsOf: url)
+                let paper = try JSONDecoder().decode(PaperModel.self, from: paperData)
+                return paper
+            })
+            papersSubject.send(papers)
         } catch {
-            self.papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
-    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
-        return Future<Bool, Never> { [weak self] promise in
-            if
-                let url = self?.getFolderPath(),
-                FileManager.default.fileExists(atPath: url.path) {
+    func addPaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
+        return Future { [weak self] promise in
+            if let paperDir = self?.getPaperDirectoryPath() {
+                let fileDir = paperDir.appendingPathComponent(paper.paperId)
                 do {
-                    let data = try JSONEncoder().encode(value)
-                    try data.write(to: url)
+                    let paperData = try JSONEncoder().encode(paper)
+                    try paperData.write(to: fileDir)
+                    let currentPapers = self?.papersSubject.value ?? []
+                    self?.papersSubject.send(currentPapers + [paper])
                     promise(.success(true))
                 } catch {
-                    promise(.success(false))
+                    promise(.failure(error))
                 }
             } else {
                 promise(.success(false))
@@ -71,4 +77,46 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
         .eraseToAnyPublisher()
     }
+    
+    func removePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
+        return Future { [weak self] promise in
+            if let paperDir = self?.getPaperDirectoryPath() {
+                let fileDir = paperDir.appendingPathComponent(paper.paperId)
+                do {
+                    try FileManager.default.removeItem(at: fileDir)
+                    if let currentPapers = self?.papersSubject.value {
+                        let removedPapers = currentPapers.filter({ $0.paperId != paper.paperId })
+                        self?.papersSubject.send(removedPapers)
+                    }
+                    promise(.success(true))
+                } catch {
+                    promise(.failure(error))
+                }
+            } else {
+                promise(.success(false))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    
+    
+//    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
+//        return Future<Bool, Never> { [weak self] promise in
+//            if
+//                let url = self?.getFolderPath(),
+//                FileManager.default.fileExists(atPath: url.path) {
+//                do {
+//                    let data = try JSONEncoder().encode(value)
+//                    try data.write(to: url)
+//                    promise(.success(true))
+//                } catch {
+//                    promise(.success(false))
+//                }
+//            } else {
+//                promise(.success(false))
+//            }
+//        }
+//        .eraseToAnyPublisher()
+//    }
 }

@@ -9,6 +9,6 @@ import Foundation
 import Combine
 
 protocol LocalDatabaseManager {
-    var papersSubject: PassthroughSubject<[PaperModel], Error> {get set}
-    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never>
+    static var shared: LocalDatabaseManager { get }
+    var papersSubject: CurrentValueSubject<[PaperModel], Error> { get set }
 }
