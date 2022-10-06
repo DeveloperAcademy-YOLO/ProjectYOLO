@@ -19,6 +19,7 @@ final class SignInViewModel {
     enum Input {
         case signInButtonTap
         case appleSignInButtonTap
+        case textFieldFocused
     }
     
     enum Output {
@@ -26,6 +27,7 @@ final class SignInViewModel {
         case emailDidMiss
         case passwordDidMiss
         case signInDidSuccess
+        case textFieldFocused
     }
     
     init(authManager: AuthManager = FirebaseAuthManager()) {
@@ -60,6 +62,7 @@ final class SignInViewModel {
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
                 case .appleSignInButtonTap: self.authManager.appleSignIn()
+                case .textFieldFocused: self.output.send(.textFieldFocused)
                 }
             })
             .store(in: &cancellables)
@@ -69,11 +72,11 @@ final class SignInViewModel {
     private func handleText(email: String, password: String) -> (String, String)? {
         let email = email.replacingOccurrences(of: " ", with: "")
         let password = password.replacingOccurrences(of: " ", with: "")
-        if email.isEmpty {
-            self.output.send(.emailDidMiss)
-        }
         if password.isEmpty {
             self.output.send(.passwordDidMiss)
+        }
+        if email.isEmpty {
+            self.output.send(.emailDidMiss)
         }
         if !email.isEmpty && !password.isEmpty {
             return (email, password)

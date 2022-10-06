@@ -53,7 +53,7 @@ class SignInViewController: UIViewController {
     private let waringImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .center
-        imageView.image = UIImage(systemName: "exclamationmark.bubble")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
+        imageView.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
         imageView.isHidden = true
         return imageView
     }()
@@ -158,6 +158,8 @@ class SignInViewController: UIViewController {
                 case .signInDidSuccess:
                     // navigate to current view flow (dismiss, etc...)
                     self.setWarningMessage(isShown: false, message: nil)
+                case .textFieldFocused:
+                    self.setWarningMessage(isShown: false, message: nil)
                 }
             })
             .store(in: &cancellables)
@@ -181,6 +183,7 @@ class SignInViewController: UIViewController {
             .sink(receiveValue: { [weak self] email in
                 guard let self = self else { return }
                 self.viewModel.email.send(email)
+                self.input.send(.textFieldFocused)
             })
             .store(in: &cancellables)
         passwordTextField
@@ -189,6 +192,7 @@ class SignInViewController: UIViewController {
             .sink(receiveValue: { [weak self] password in
                 guard let self = self else { return }
                 self.viewModel.password.send(password)
+                self.input.send(.textFieldFocused)
             })
             .store(in: &cancellables)
     }
