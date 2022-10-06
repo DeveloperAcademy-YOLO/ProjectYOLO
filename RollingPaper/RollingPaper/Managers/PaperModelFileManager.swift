@@ -110,6 +110,25 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
     }
     
+    func removeCard(paperId: String, card: CardModel) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: {$0.paperId == paperId}) {
+                var paper = currentPapers[index]
+                if let cardIndex = paper.cards.firstIndex(where: {$0.cardId == card.cardId}) {
+                    paper.cards.remove(at: cardIndex)
+                    currentPapers[index] = paper
+                    papersSubject.send(currentPapers)
+                    let paperData = try JSONEncoder().encode(paper)
+                    try paperData.write(to: fileDir, options: .atomic)
+                }
+            }
+        } catch {
+            papersSubject.send(completion: .failure(error))
+        }
+    }
+    
     func updatePaper(paper: PaperModel) {
         guard let fileDir = getFilePath(paper: paper) else { return }
         do {
