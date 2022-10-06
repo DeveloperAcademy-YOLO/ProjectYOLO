@@ -101,6 +101,19 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
         }
     }
     
+    // 특정 셀 눌렀을 떄의 동작
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        // TODO: 해당 템플릿으로 이동하기
+        if indexPath.section == 0 {
+            let selectedTemplate = viewModel.getRecentTemplate()
+            print(selectedTemplate!.template.templateString)
+        } else {
+            let selectedTemplate = viewModel.getTemplates()[indexPath.item]
+            print(selectedTemplate.template.templateString)
+        }
+        return true
+    }
+    
     // 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
     private class CollectionView: UICollectionView {}
 
