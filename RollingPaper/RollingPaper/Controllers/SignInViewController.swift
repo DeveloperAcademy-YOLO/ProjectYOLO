@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import CombineCocoa
 import SnapKit
 import AuthenticationServices
 
@@ -49,7 +48,7 @@ class SignInViewController: UIViewController {
         return button
     }()
     private let appleSignInButton: ASAuthorizationAppleIDButton = {
-        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .whiteOutline)
+        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
         return button
     }()
     
@@ -126,7 +125,7 @@ class SignInViewController: UIViewController {
             }
             .store(in: &cancellables)
         appleSignInButton
-            .controlEventPublisher(for: .touchUpInside)
+            .controlPublisher(for: .touchUpInside)        
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 self.input.send(.appleSignInButtonTap)

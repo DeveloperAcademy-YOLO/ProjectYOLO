@@ -7,7 +7,6 @@ target 'RollingPaper' do
 
   # Pods for RollingPaper
   pod 'SnapKit'
-  pod 'CombineCocoa'
   pod 'FirebaseAuth'
   pod 'FirebaseFirestore'
   pod 'FirebaseStorage'
