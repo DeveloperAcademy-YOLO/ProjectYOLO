@@ -36,7 +36,7 @@ final class SignInViewModel {
     
     private func bind() {
         authManager
-            .socialSignInSubject
+            .signedInSubject
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):
@@ -56,45 +56,44 @@ final class SignInViewModel {
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-            .sink { [weak self] receivedValue in
+            .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
                 case .appleSignInButtonTap: self.authManager.appleSignIn()
                 }
-            }
+            })
             .store(in: &cancellables)
         return output.eraseToAnyPublisher()
+    }
+    
+    private func handleText(email: String, password: String) -> (String, String)? {
+        let email = email.replacingOccurrences(of: " ", with: "")
+        let password = password.replacingOccurrences(of: " ", with: "")
+        if email.isEmpty {
+            self.output.send(.emailDidMiss)
+        }
+        if password.isEmpty {
+            self.output.send(.passwordDidMiss)
+        }
+        if !email.isEmpty && !password.isEmpty {
+            return (email, password)
+        } else {
+            return nil
+        }
     }
     
     private func handleSignIn() {
         email
             .combineLatest(password)
-            .map { email, password in
-                // TODO: Validate email, password
-                // if not valiadated, then output.send(errors)
-                return (email, password)
-            }
-            .map { email, password in
-                self.authManager
-                    .signIn(email: email, password: password)
-            }
-            .switchToLatest()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { completion in
-                switch completion {
-                case .finished: print("Successfully signed in")
-                case .failure(let error):
-                    if let authError = error as? AuthManagerError {
-                        self.output.send(.signInDidFail(error: authError))
-                    }
-                }
-            } receiveValue: { [weak self] success in
+            .compactMap({ [weak self] email, password in
+                // handle email and password validation
+                return self?.handleText(email: email, password: password)
+            })
+            .sink(receiveValue: { [weak self] email, password in
                 guard let self = self else { return }
-                if success {
-                    self.output.send(.signInDidSuccess)
-                }
-            }
+                self.authManager.signIn(email: email, password: password)
+            })
             .store(in: &cancellables)
     }
 }

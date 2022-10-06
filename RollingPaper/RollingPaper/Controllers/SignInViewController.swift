@@ -113,6 +113,10 @@ class SignInViewController: UIViewController {
         })
     }
     
+    private func handleError(error: AuthManagerError) {
+        
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -120,8 +124,7 @@ class SignInViewController: UIViewController {
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
-                case .signInDidFail(error: let error):
-                    break
+                case .signInDidFail(error: let error): self.handleError(error: error)
                 case .emailDidMiss:
                     break
                 case .passwordDidMiss:
@@ -129,6 +132,7 @@ class SignInViewController: UIViewController {
                 case .emailIsWrong:
                     break
                 case .signInDidSuccess:
+                    // navigate to current view flow (dismiss, etc...)
                     break
                 }
             })

@@ -12,11 +12,11 @@ import AuthenticationServices
 import CryptoKit
 
 protocol AuthManager {
-    var socialSignInSubject: PassthroughSubject<Bool, Error> {get set}
-    func signIn(email: String, password: String) -> AnyPublisher<Bool, Error>
+    var signedInSubject: PassthroughSubject<Bool, Error> {get set}
+    func signIn(email: String, password: String)
     func appleSignIn()
     func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error>
-    func signOut() -> AnyPublisher<Bool, Error>
+    func signOut()
     func deleteUser() -> AnyPublisher<Bool, Error>
     func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
 }
@@ -34,7 +34,7 @@ enum AuthManagerError: LocalizedError {
 }
 
 final class FirebaseAuthManager: NSObject, AuthManager {
-    var socialSignInSubject: PassthroughSubject<Bool, Error> = .init()
+    var signedInSubject: PassthroughSubject<Bool, Error> = .init()
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
@@ -72,42 +72,33 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         return result
     }
                                   
-    func signIn(email: String, password: String) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            self?.auth.signIn(withEmail: email, password: password) { _, error in
-                if let error = self?.handleError(with: error) {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(true))
-                }
+    func signIn(email: String, password: String) {
+        auth.signIn(withEmail: email, password: password, completion: { [weak self] _, error in
+            if let error = self?.handleError(with: error) {
+                self?.signedInSubject.send(completion: .failure(error))
+            } else {
+                self?.signedInSubject.send(true)
             }
         })
-        .eraseToAnyPublisher()
     }
     
-    func signIn(credential: AuthCredential) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            self?.auth.signIn(with: credential, completion: { _, error in
-                if let error = self?.handleError(with: error) {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(true))
-                }
-            })
-        })
-        .eraseToAnyPublisher()
-    }
-    
-    func signOut() -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            do {
-                try self?.auth.signOut()
-                promise(.success(true))
-            } catch {
-                promise(.failure(AuthManagerError.signOutFailed))
+    func signIn(credential: AuthCredential) {
+        auth.signIn(with: credential) { [weak self] _, error in
+            if let error = self?.handleError(with: error) {
+                self?.signedInSubject.send(completion: .failure(error))
+            } else {
+                self?.signedInSubject.send(true)
             }
-        })
-        .eraseToAnyPublisher()
+        }
+    }
+    
+    func signOut() {
+        do {
+            try auth.signOut()
+            signedInSubject.send(false)
+        } catch {
+            signedInSubject.send(completion: .failure(AuthManagerError.signOutFailed))
+        }
     }
     
     func deleteUser() -> AnyPublisher<Bool, Error> {
@@ -118,6 +109,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                         promise(.failure(AuthManagerError.deleteUserFailed))
                     } else {
                         promise(.success(true))
+                        self?.signedInSubject.send(false)
                     }
                 })
             } else {
@@ -216,16 +208,16 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
             guard let self = self else { return }
             if let error = error {
                 print(error.localizedDescription)
-                self.socialSignInSubject.send(completion: .failure(error))
+                self.signedInSubject.send(completion: .failure(error))
             } else {
-                self.socialSignInSubject.send(true)
+                self.signedInSubject.send(true)
                 self.setUserProfile(name: name, photoURLString: nil)
             }
         }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        socialSignInSubject.send(completion: .failure(error))
+        signedInSubject.send(completion: .failure(error))
     }
 }
 
