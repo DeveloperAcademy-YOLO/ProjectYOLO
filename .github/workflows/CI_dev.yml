@@ -21,4 +21,4 @@ jobs:
       run: |
         xcodebuild clean build \
         -workspace RollingPaper/RollingPaper.xcworkspace \
-        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=14.0'
+        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=15.2'
