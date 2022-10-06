@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
+		BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */; };
+		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA128EBDC72001091DA /* AppDelegate.swift */; };
 		D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA328EBDC72001091DA /* SceneDelegate.swift */; };
@@ -34,6 +36,8 @@
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
+		BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewController.swift; sourceTree = "<group>"; };
+		BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewModel.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		D22E4A9E28EBDC72001091DA /* RollingPaper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RollingPaper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D22E4AA128EBDC72001091DA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -145,6 +149,7 @@
 				D22E4AA528EBDC72001091DA /* MainViewController.swift */,
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
+				BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -171,6 +176,7 @@
 			children = (
 				D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */,
 				D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */,
+				BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -319,7 +325,9 @@
 			files = (
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
+				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
+				BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
