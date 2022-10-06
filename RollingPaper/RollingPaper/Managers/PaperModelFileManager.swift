@@ -61,10 +61,10 @@ final class PaperModelFileManager: LocalDatabaseManager {
     func addPaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
         return Future { [weak self] promise in
             if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paper.paperId)
+                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
                 do {
                     let paperData = try JSONEncoder().encode(paper)
-                    try paperData.write(to: fileDir)
+                    try paperData.write(to: fileDir, options: .atomic)
                     let currentPapers = self?.papersSubject.value ?? []
                     self?.papersSubject.send(currentPapers + [paper])
                     promise(.success(true))
@@ -81,7 +81,7 @@ final class PaperModelFileManager: LocalDatabaseManager {
     func removePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
         return Future { [weak self] promise in
             if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paper.paperId)
+                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
                 do {
                     try FileManager.default.removeItem(at: fileDir)
                     if let currentPapers = self?.papersSubject.value {
@@ -98,8 +98,35 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
         .eraseToAnyPublisher()
     }
-    
-    
+        
+    func updatePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
+        return Future { [weak self] promise in
+            if let paperDir = self?.getPaperDirectoryPath() {
+                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
+                do {
+                    let paperData = try JSONEncoder().encode(paper)
+                    try paperData.write(to: fileDir, options: .atomic)
+                    if let currentPapers = self?.papersSubject.value {
+                        let updatePapers = currentPapers.map { curPaper in
+                            if curPaper.paperId == paper.paperId {
+                                return paper
+                            } else {
+                                return curPaper
+                            }
+                        }
+                        self?.papersSubject.send(updatePapers)
+                    }
+                    promise(.success(true))
+                    
+                } catch {
+                    promise(.failure(error))
+                }
+            } else {
+                promise(.success(false))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
     
 //    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
 //        return Future<Bool, Never> { [weak self] promise in
