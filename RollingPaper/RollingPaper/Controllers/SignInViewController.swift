@@ -17,23 +17,23 @@ class SignInViewController: UIViewController {
         textField.layer.cornerRadius = 12
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
+        textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         return textField
     }()
     private let passwordTextField: UITextField = {
         let textField = UITextField()
-        textField.borderStyle = .roundedRect
+        textField.layer.masksToBounds = true
+        textField.layer.cornerRadius = 12
+        textField.layer.borderWidth = 1.0
+        textField.layer.borderColor = UIColor.systemGray.cgColor
+        textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         return textField
     }()
     private let signInButton: UIButton = {
         let button = UIButton()
-        if #available(iOS 15.0, *) {
-            var config = UIButton.Configuration.filled()
-            config.background.backgroundColor = .systemBlue
-            button.configuration = config
-        } else {
-            // Fallback on earlier versions
-            button.backgroundColor = .systemBlue
-        }
+        button.backgroundColor = UIColor(rgb: 0x007AFF)
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
         button.setTitle("로그인", for: .normal)
         button.setTitleColor(.white, for: .normal)
         return button
