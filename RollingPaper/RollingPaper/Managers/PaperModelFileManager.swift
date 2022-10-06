@@ -78,6 +78,33 @@ final class PaperModelFileManager: LocalDatabaseManager {
         .eraseToAnyPublisher()
     }
     
+    func addCard(paperId: String, card: CardModel) -> AnyPublisher<Bool, Error> {
+        return Future { [weak self] promise in
+            if let paperDir = self?.getPaperDirectoryPath() {
+                let fileDir = paperDir.appendingPathComponent(paperId + ".json")
+                do {
+                    if
+                        var currentPapers = self?.papersSubject.value,
+                        let index = currentPapers.firstIndex(where: { $0.paperId == paperId }) {
+                        currentPapers[index].cards.append(card)
+                        self?.papersSubject.send(currentPapers)
+                        let updatedPaper = currentPapers[index]
+                        let paperData = try JSONEncoder().encode(updatedPaper)
+                        try paperData.write(to: fileDir)
+                        promise(.success(true))
+                    } else {
+                        promise(.success(false))
+                    }
+                } catch {
+                    promise(.failure(error))
+                }
+            } else {
+                promise(.success(false))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
     func removePaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
         return Future { [weak self] promise in
             if let paperDir = self?.getPaperDirectoryPath() {
@@ -106,15 +133,11 @@ final class PaperModelFileManager: LocalDatabaseManager {
                 do {
                     let paperData = try JSONEncoder().encode(paper)
                     try paperData.write(to: fileDir, options: .atomic)
-                    if let currentPapers = self?.papersSubject.value {
-                        let updatePapers = currentPapers.map { curPaper in
-                            if curPaper.paperId == paper.paperId {
-                                return paper
-                            } else {
-                                return curPaper
-                            }
-                        }
-                        self?.papersSubject.send(updatePapers)
+                    if
+                        var currentPapers = self?.papersSubject.value,
+                        let index = currentPapers.firstIndex(where: {$0.paperId == paper.paperId}) {
+                        currentPapers[index] = paper
+                        self?.papersSubject.send(currentPapers)
                     }
                     promise(.success(true))
                     
@@ -127,23 +150,4 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
         .eraseToAnyPublisher()
     }
-    
-//    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
-//        return Future<Bool, Never> { [weak self] promise in
-//            if
-//                let url = self?.getFolderPath(),
-//                FileManager.default.fileExists(atPath: url.path) {
-//                do {
-//                    let data = try JSONEncoder().encode(value)
-//                    try data.write(to: url)
-//                    promise(.success(true))
-//                } catch {
-//                    promise(.success(false))
-//                }
-//            } else {
-//                promise(.success(false))
-//            }
-//        }
-//        .eraseToAnyPublisher()
-//    }
 }
