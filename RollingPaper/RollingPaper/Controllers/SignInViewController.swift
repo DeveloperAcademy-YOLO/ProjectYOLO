@@ -13,8 +13,10 @@ import AuthenticationServices
 class SignInViewController: UIViewController {
     private let emailTextField: UITextField = {
         let textField = UITextField()
+        textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 12
-        textField.borderRect(forBounds: <#T##CGRect#>)
+        textField.layer.borderWidth = 1.0
+        textField.layer.borderColor = UIColor.systemGray.cgColor
         return textField
     }()
     private let passwordTextField: UITextField = {
@@ -32,7 +34,7 @@ class SignInViewController: UIViewController {
             // Fallback on earlier versions
             button.backgroundColor = .systemBlue
         }
-        button.setTitle("Sign In", for: .normal)
+        button.setTitle("로그인", for: .normal)
         button.setTitleColor(.white, for: .normal)
         return button
     }()
