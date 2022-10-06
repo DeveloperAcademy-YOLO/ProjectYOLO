@@ -733,7 +733,7 @@ PODS:
   - nanopb/encode (2.30909.0)
   - PromisesObjC (2.1.1)
   - SnapKit (5.6.0)
-  - SwiftLint (0.49.1)
+  - SwiftLint (0.39.1)
 
 DEPENDENCIES:
   - FirebaseAuth
@@ -741,7 +741,7 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - SnapKit
-  - SwiftLint
+  - SwiftLint (= 0.39.1)
 
 SPEC REPOS:
   trunk:
@@ -794,8 +794,8 @@ SPEC CHECKSUMS:
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  SwiftLint: 32ee33ded0636d0905ef6911b2b67bbaeeedafa5
+  SwiftLint: 55e96a4a4d537d4a3156859fc1c54bd24851a046
 
-PODFILE CHECKSUM: 4dd0f704904fb3a231c83821028b5e1f5ea90444
+PODFILE CHECKSUM: 2f381c2ba2ebf379a00e359ba7a27e2c3f4dd836
 
 COCOAPODS: 1.11.3
