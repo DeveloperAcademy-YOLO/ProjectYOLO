@@ -114,7 +114,34 @@ class SignInViewController: UIViewController {
     }
     
     private func handleError(error: AuthManagerError) {
-        
+        switch error {
+        case .userNotFound:
+            setWarningMessage(isShown: true, message: "이메일이 존재하지 않습니다")
+        case .userTokenExpired:
+            setWarningMessage(isShown: true, message: "이메일 토큰이 만료되었습니다")
+        case .emailAlreadyInUse:
+            setWarningMessage(isShown: true, message: "이미 사용 중인 이메일입니다")
+        case .wrongPassword:
+            setWarningMessage(isShown: true, message: "비밀번호가 틀렸습니다")
+        case .invalidEmail:
+            setWarningMessage(isShown: true, message: "입력된 이메일 주소를 확인해주세요")
+        case .unknownError:
+            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+        default:
+            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+        }
+    }
+    
+    private func setWarningMessage(isShown: Bool, message: String?) {
+        waringLabel.isHidden = !isShown
+        waringImage.isHidden = !isShown
+        if let message = message {
+            waringLabel.text = message
+        }
+        signInButton.snp.updateConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 80 : 28)
+        })
+        view.layoutIfNeeded()
     }
     
     private func bind() {
@@ -125,15 +152,12 @@ class SignInViewController: UIViewController {
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
-                case .emailDidMiss:
-                    break
+                case .emailDidMiss: self.setWarningMessage(isShown: true, message: "이메일을 입력해주세요")
                 case .passwordDidMiss:
-                    break
-                case .emailIsWrong:
-                    break
+                    self.setWarningMessage(isShown: true, message: "비밀번호를 입력해주세요")
                 case .signInDidSuccess:
                     // navigate to current view flow (dismiss, etc...)
-                    break
+                    self.setWarningMessage(isShown: false, message: nil)
                 }
             })
             .store(in: &cancellables)

@@ -25,7 +25,6 @@ final class SignInViewModel {
         case signInDidFail(error: AuthManagerError)
         case emailDidMiss
         case passwordDidMiss
-        case emailIsWrong
         case signInDidSuccess
     }
     
