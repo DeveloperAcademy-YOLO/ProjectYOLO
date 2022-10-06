@@ -33,6 +33,11 @@ final class PaperModelFileManager: LocalDatabaseManager {
         return paperDir.appendingPathComponent(paper.paperId + ".json")
     }
     
+    private func getFilePath(paperId: String) -> URL? {
+        guard let paperDir = getPaperDirectoryPath() else { return nil }
+        return paperDir.appendingPathComponent(paperId + ".json")
+    }
+    
     private func createFolderIfNeeded() {
         guard let paperDirectory = getPaperDirectoryPath() else { return }
         if !FileManager.default.fileExists(atPath: paperDirectory.relativePath) {
@@ -74,31 +79,21 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
     }
     
-    func addCard(paperId: String, card: CardModel) -> AnyPublisher<Bool, Error> {
-        return Future { [weak self] promise in
-            if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paperId + ".json")
-                do {
-                    if
-                        var currentPapers = self?.papersSubject.value,
-                        let index = currentPapers.firstIndex(where: { $0.paperId == paperId }) {
-                        currentPapers[index].cards.append(card)
-                        self?.papersSubject.send(currentPapers)
-                        let updatedPaper = currentPapers[index]
-                        let paperData = try JSONEncoder().encode(updatedPaper)
-                        try paperData.write(to: fileDir)
-                        promise(.success(true))
-                    } else {
-                        promise(.success(false))
-                    }
-                } catch {
-                    promise(.failure(error))
-                }
-            } else {
-                promise(.success(false))
+    func addCard(paperId: String, card: CardModel) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paperId }) {
+                var paper = currentPapers[index]
+                paper.cards.append(card)
+                currentPapers[index] = paper
+                papersSubject.send(currentPapers)
+                let paperData = try JSONEncoder().encode(paper)
+                try paperData.write(to: fileDir)
             }
+        } catch {
+            papersSubject.send(completion: .failure(error))
         }
-        .eraseToAnyPublisher()
     }
     
     func removePaper(paper: PaperModel) {
