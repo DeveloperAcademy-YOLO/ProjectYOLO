@@ -24,10 +24,13 @@ final class PaperModelFileManager: LocalDatabaseManager {
     }
     
     private func getPaperDirectoryPath() -> URL? {
-        guard let documentDir = getDocumentDirectoryPath() else {
-            return nil
-        }
+        guard let documentDir = getDocumentDirectoryPath() else { return nil }
         return documentDir.appendingPathComponent(folderName).absoluteURL
+    }
+    
+    private func getFilePath(paper: PaperModel) -> URL? {
+        guard let paperDir = getPaperDirectoryPath() else { return nil}
+        return paperDir.appendingPathComponent(paper.paperId + ".json")
     }
     
     private func createFolderIfNeeded() {
@@ -58,24 +61,17 @@ final class PaperModelFileManager: LocalDatabaseManager {
         }
     }
     
-    func addPaper(paper: PaperModel) -> AnyPublisher<Bool, Error> {
-        return Future { [weak self] promise in
-            if let paperDir = self?.getPaperDirectoryPath() {
-                let fileDir = paperDir.appendingPathComponent(paper.paperId + ".json")
-                do {
-                    let paperData = try JSONEncoder().encode(paper)
-                    try paperData.write(to: fileDir, options: .atomic)
-                    let currentPapers = self?.papersSubject.value ?? []
-                    self?.papersSubject.send(currentPapers + [paper])
-                    promise(.success(true))
-                } catch {
-                    promise(.failure(error))
-                }
-            } else {
-                promise(.success(false))
-            }
+    func addPaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            let paperData = try JSONEncoder().encode(paper)
+            try paperData.write(to: fileDir, options: .atomic)
+            let currentPapers = papersSubject.value
+            papersSubject.send(currentPapers + [paper])
+        } catch {
+            papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
-        .eraseToAnyPublisher()
     }
     
     func addCard(paperId: String, card: CardModel) -> AnyPublisher<Bool, Error> {
