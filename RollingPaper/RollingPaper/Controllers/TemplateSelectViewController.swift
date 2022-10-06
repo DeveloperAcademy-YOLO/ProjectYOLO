@@ -55,7 +55,7 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
+        if viewModel.isRecentExist && section == 0 {
             return 1
         } else {
             return viewModel.getTemplates().count
@@ -64,15 +64,20 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
+        if viewModel.isRecentExist {
+            return 2
+        } else {
+            return 1
+        }
     }
     
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.id, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
 
-        if indexPath.section == 0 {
-            cell.setCell(template: viewModel.getRecentTemplate()!.template)
+        if viewModel.isRecentExist && indexPath.section == 0 {
+            guard let recentTemplate = viewModel.getRecentTemplate()?.template else {return UICollectionViewCell()}
+            cell.setCell(template: recentTemplate)
         } else {
             cell.setCell(template: viewModel.getTemplates()[indexPath.item].template)
         }
@@ -89,7 +94,7 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
                 for: indexPath
             ) as? CollectionHeader else {return UICollectionReusableView()}
             
-            if indexPath.section == 0 {
+            if viewModel.isRecentExist && indexPath.section == 0 {
                 supplementaryView.setHeader(text: "최근 사용한")
             } else {
                 supplementaryView.setHeader(text: "모두")
@@ -104,12 +109,12 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         // TODO: 해당 템플릿으로 이동하기
-        if indexPath.section == 0 {
-            let selectedTemplate = viewModel.getRecentTemplate()
-            print(selectedTemplate!.template.templateString)
+        if viewModel.isRecentExist && indexPath.section == 0 {
+            guard let selectedTemplate = viewModel.getRecentTemplate()?.template else {return false}
+            print(selectedTemplate.templateString)
         } else {
-            let selectedTemplate = viewModel.getTemplates()[indexPath.item]
-            print(selectedTemplate.template.templateString)
+            let selectedTemplate = viewModel.getTemplates()[indexPath.item].template
+            print(selectedTemplate.templateString)
         }
         return true
     }

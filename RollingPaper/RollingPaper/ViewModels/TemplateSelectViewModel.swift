@@ -9,6 +9,13 @@ import UIKit
 
 final class TemplateSelectViewModel {
     
+    var isRecentExist: Bool
+    
+    init() {
+        // TODO: 최근 템플릿 존재하는지 확인하기
+        isRecentExist = true
+    }
+    
     func getRecentTemplate() -> TemplateEnum? {
         // TODO: 최근 템플릿 받아오기
         let recentTemplate: TemplateEnum = .grid
