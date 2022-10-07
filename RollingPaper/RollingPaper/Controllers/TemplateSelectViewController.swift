@@ -118,83 +118,82 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
         }
         return true
     }
+}
+
+// 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
+private class CollectionView: UICollectionView {}
+
+// 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
+private class CollectionHeader: UICollectionReusableView {
+    static let id = "CollectionHeader"
+    private let title = UILabel()
     
-    // 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
-    private class CollectionView: UICollectionView {}
-
-    // 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
-    private class CollectionHeader: UICollectionReusableView {
-        static let id = "CollectionHeader"
-        private let title = UILabel()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configure()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func configure() {
+        addSubview(title)
         
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            configure()
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
-        private func configure() {
-            addSubview(title)
-            
-            title.font = .systemFont(ofSize: 32)
-            title.snp.makeConstraints { make in
-                make.top.equalToSuperview().offset(50)
-                make.left.equalToSuperview().offset(50)
-            }
-        }
-        
-        func setHeader(text: String) {
-            title.text = text
+        title.font = .systemFont(ofSize: 32)
+        title.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(50)
+            make.left.equalToSuperview().offset(50)
         }
     }
+    
+    func setHeader(text: String) {
+        title.text = text
+    }
+}
 
-    // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
-    private class CollectionCell: UICollectionViewCell {
-        static let id = "CollectionCell"
-        private let thumbnail = UIView()
-        private let title = UILabel()
-        private let imageView = UIImageView()
+// 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
+private class CollectionCell: UICollectionViewCell {
+    static let id = "CollectionCell"
+    private let thumbnail = UIView()
+    private let title = UILabel()
+    private let imageView = UIImageView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configure()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func configure() {
+        addSubview(thumbnail)
+        thumbnail.addSubview(imageView)
+        thumbnail.addSubview(title)
         
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            configure()
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 12
+        imageView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.equalToSuperview()
+            make.width.equalTo(240)
         }
         
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
+        title.font = .systemFont(ofSize: 20)
+        title.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom).offset(10)
+            make.centerX.equalTo(imageView)
         }
         
-        private func configure() {
-            addSubview(thumbnail)
-            thumbnail.addSubview(imageView)
-            thumbnail.addSubview(title)
-            
-            imageView.layer.masksToBounds = true
-            imageView.layer.cornerRadius = 12
-            imageView.snp.makeConstraints { make in
-                make.top.equalToSuperview()
-                make.left.equalToSuperview()
-                make.width.equalTo(240)
-            }
-            
-            title.font = .systemFont(ofSize: 20)
-            title.snp.makeConstraints { make in
-                make.top.equalTo(imageView.snp.bottom).offset(10)
-                make.centerX.equalTo(imageView)
-            }
-            
-            thumbnail.snp.makeConstraints { make in
-                make.edges.equalToSuperview()
-            }
-        }
-        
-        func setCell(template: TemplateModel) {
-            imageView.image = template.thumbnail
-            title.text = template.templateString
+        thumbnail.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
-
+    
+    func setCell(template: TemplateModel) {
+        imageView.image = template.thumbnail
+        title.text = template.templateString
+    }
 }
