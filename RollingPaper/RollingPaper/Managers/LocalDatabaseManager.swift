@@ -9,6 +9,12 @@ import Foundation
 import Combine
 
 protocol LocalDatabaseManager {
-    var papersSubject: PassthroughSubject<[PaperModel], Error> {get set}
-    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never>
+    static var shared: LocalDatabaseManager { get }
+    var papersSubject: CurrentValueSubject<[PaperModel], Never> { get set }
+    func addPaper(paper: PaperModel)
+    func addCard(paperId: String, card: CardModel)
+    func removePaper(paper: PaperModel)
+    func removeCard(paperId: String, card: CardModel)
+    func updatePaper(paper: PaperModel)
+    func updateCard(paperId: String, card: CardModel)
 }
