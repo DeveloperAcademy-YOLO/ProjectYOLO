@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SnapKit
 
 final class SignInViewModel {
     var email = CurrentValueSubject<String, Never>("")
@@ -18,13 +19,19 @@ final class SignInViewModel {
     enum Input {
         case signInButtonTap
         case appleSignInButtonTap
+        case emailFocused
+        case passwordFocused
+        case normalBoundTap
     }
     
     enum Output {
-        case signInDidFail(error: Error)
+        case signInDidFail(error: AuthManagerEnum)
         case emailDidMiss
         case passwordDidMiss
         case signInDidSuccess
+        case emailFocused
+        case passwordFocused
+        case normalBoundTap
     }
     
     init(authManager: AuthManager = FirebaseAuthManager()) {
@@ -34,59 +41,67 @@ final class SignInViewModel {
     
     private func bind() {
         authManager
-            .socialSignInSubject
-            .sink { completion in
-                switch completion {
-                case .failure(let error): self.output.send(.signInDidFail(error: error))
-                case .finished: print("Successfully social signed in")
-                }
-            } receiveValue: { [weak self] success in
+            .signedInSubject
+            .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
-                if success {
+                switch receivedValue {
+                case .userNotFound:
+                    self.output.send(.signInDidFail(error: .userNotFound))
+                case .userTokenExpired:
+                    self.output.send(.signInDidFail(error: .userTokenExpired))
+                case .emailAlreadyInUse:
+                    self.output.send(.signInDidFail(error: .emailAlreadyInUse))
+                case .wrongPassword:
+                    self.output.send(.signInDidFail(error: .wrongPassword))
+                case .invalidEmail:
+                    self.output.send(.signInDidFail(error: .invalidEmail))
+                case .signInSucceed:
                     self.output.send(.signInDidSuccess)
+                default: self.output.send(.signInDidFail(error: .unknownError))
                 }
-            }
+            })
             .store(in: &cancellables)
     }
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-            .sink { [weak self] receivedValue in
+            .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
                 case .signInButtonTap: self.handleSignIn()
                 case .appleSignInButtonTap: self.authManager.appleSignIn()
+                case .emailFocused:
+                    self.output.send(.emailFocused)
+                case .passwordFocused:
+                    self.output.send(.passwordFocused)
+                case .normalBoundTap: self.output.send(.normalBoundTap)
                 }
-            }
+            })
             .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
+    private func handleText(email: String, password: String) -> (String, String)? {
+        let email = email.replacingOccurrences(of: " ", with: "")
+        let password = password.replacingOccurrences(of: " ", with: "")
+        if password.isEmpty {
+            self.output.send(.passwordDidMiss)
+            return nil
+        }
+        if email.isEmpty {
+            self.output.send(.emailDidMiss)
+            return nil
+        }
+        if !email.isEmpty && !password.isEmpty {
+            return (email, password)
+        } else {
+            return nil
+        }
+    }
+    
     private func handleSignIn() {
-        email
-            .combineLatest(password)
-            .map { email, password in
-                // TODO: Validate email, password
-                // if not valiadated, then output.send(errors)
-                return (email, password)
-            }
-            .map { email, password in
-                self.authManager
-                    .signIn(email: email, password: password)
-            }
-            .switchToLatest()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { [weak self] completion in
-                switch completion {
-                case .finished: print("Successfully signed in")
-                case .failure(let error): self?.output.send(.signInDidFail(error: error))
-                }
-            } receiveValue: { [weak self] success in
-                guard let self = self else { return }
-                if success {
-                    self.output.send(.signInDidSuccess)
-                }
-            }
-            .store(in: &cancellables)
+        if let (email, password) = handleText(email: email.value, password: password.value) {
+            authManager.signIn(email: email, password: password)
+        }
     }
 }
