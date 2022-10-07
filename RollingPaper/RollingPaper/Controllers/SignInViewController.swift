@@ -83,11 +83,18 @@ class SignInViewController: UIViewController {
         bind()
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        emailTextField.snp.updateConstraints({ make in
+            make.top.equalToSuperview().offset(UIDevice.current.orientation == .landscapeLeft ? (view.frame.height - 246) / 2 : (view.frame.width - 246) / 2)
+        })
+        view.layoutIfNeeded()
+    }
+    
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signInButton, appleSignInButton])
         emailTextField.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset((view.frame.height - 246) / 2)
+            make.top.equalToSuperview().offset(UIDevice.current.orientation == .landscapeLeft ? (view.frame.height - 246) / 2 : (view.frame.width - 246) / 2)
             make.centerX.equalToSuperview()
             make.height.equalTo(38)
             make.width.equalTo(380)
