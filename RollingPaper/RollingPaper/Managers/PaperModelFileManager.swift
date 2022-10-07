@@ -55,15 +55,9 @@ final class PaperModelFileManager: LocalDatabaseManager {
         guard let paperDir = getPaperDirectoryPath() else { return }
         do {
             let paperContents = try FileManager.default.contentsOfDirectory(at: paperDir, includingPropertiesForKeys: nil, options: [])
-            let papers = paperContents.compactMap({ url in
-                    if
-                        let paperData = try? Data(contentsOf: url),
-                        let paper = try? JSONDecoder().decode(PaperModel.self, from: paperData) {
-                        return paper
-                    } else {
-                        return nil
-                    }
-                })
+            let papers = paperContents
+                .compactMap({try? Data(contentsOf: $0)})
+                .compactMap({try? JSONDecoder().decode(PaperModel.self, from: $0)})
             papersSubject.send(papers)
         } catch {
             print(error.localizedDescription)
