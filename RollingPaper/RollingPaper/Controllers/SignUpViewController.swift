@@ -48,12 +48,54 @@ class SignUpViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignUpViewUI()
-        bind()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let topOffset = (UIScreen.main.bounds.height - 380) / 2
+        emailTextField.snp.updateConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+        })
+        view.layoutIfNeeded()
     }
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, emailWaringView, passwordTextField, passwordWaringView, nameTextField, nameWaringView, signUpButton])
+        let topOffset = (UIScreen.main.bounds.height - 380) / 2
+        emailTextField.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
+        passwordTextField.snp.makeConstraints({ make in
+            make.top.equalTo(emailTextField.snp.bottom).offset(28)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
+        passwordWaringView.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(18)
+            make.leading.equalTo(passwordTextField.snp.leading).offset(16)
+        })
+        nameTextField.snp.makeConstraints({ make in
+            make.top.equalTo(passwordWaringView.snp.bottom).offset(30)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
+        nameWaringView.snp.makeConstraints({ make in
+            make.top.equalTo(nameTextField.snp.bottom).offset(18)
+            make.leading.equalTo(passwordTextField.snp.leading).offset(16)
+        })
+        signUpButton.snp.makeConstraints({ make in
+            make.top.equalTo(nameWaringView.snp.bottom).offset(32)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
+        passwordWaringView.showWarning(isShown: true, text: "비밀번호는 6자리 이상이어야 합니다")
+        nameWaringView.showWarning(isShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
     }
     
     private func bind() {

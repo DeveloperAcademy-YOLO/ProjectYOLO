@@ -21,7 +21,7 @@ class WaringView: UIView {
         label.textColor = .systemGray
         return label
     }()
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         setWaringViewLayout()
@@ -40,8 +40,8 @@ class WaringView: UIView {
             make.width.equalTo(21.57)
         })
         label.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalTo(image.snp.trailing).offset(11.48)
+            make.top.equalToSuperview().offset(1.7)
+            make.leading.equalToSuperview().offset(33.05)
         })
     }
     
@@ -50,15 +50,15 @@ class WaringView: UIView {
             label.text = text
         }
         if isShown {
+            label.snp.updateConstraints({ make in
+                make.leading.equalToSuperview().offset(33.05)
+            })
             image.isHidden = false
+        } else {
             label.snp.updateConstraints({ make in
                 make.leading.equalToSuperview()
             })
-        } else {
             image.isHidden = true
-            label.snp.updateConstraints({ make in
-                make.leading.equalTo(image.snp.trailing).offset(11.48)
-            })
         }
         layoutIfNeeded()
     }
