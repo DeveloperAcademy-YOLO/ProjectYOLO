@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -37,6 +37,7 @@
 		D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308128EE871C008365CB /* Combine+Extensions.swift */; };
 		D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */; };
 		D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */; };
+		D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		D2B6308128EE871C008365CB /* Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
+		D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseMockManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
 				D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */,
 				D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */,
+				D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -413,6 +416,7 @@
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
+				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
