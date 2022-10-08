@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class SignInTextField: UIView {
     enum SignInTextFieldEnum {
@@ -50,8 +51,13 @@ class SignInTextField: UIView {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+        textField.layer.shadowColor = UIColor.systemGray.cgColor
+        textField.layer.shadowOpacity = 0.0
+        textField.layer.shadowOffset = .zero
         return textField
     }()
+    
+    private var cancellabels = Set<AnyCancellable>()
         
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -65,29 +71,34 @@ class SignInTextField: UIView {
     
     func setTextFieldType(type: SignInTextFieldEnum) {
         self.textFieldEnum = type
+        addSubview(checkImageView)
+        checkImageView.snp.makeConstraints({ make in
+            make.top.equalTo(snp.top).offset(9)
+            make.width.height.equalTo(19.92)
+            make.trailing.equalTo(snp.trailing).offset(9.08)
+        })
+        checkImageView.isHidden = true
         switch type {
         case .email:
-            addSubview(checkImageView)
-            checkImageView.snp.makeConstraints({ make in
-                make.top.equalTo(snp.top).offset(9)
-                make.width.height.equalTo(19.92)
-                make.trailing.equalTo(snp.trailing).offset(9.08)
-            })
+            textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         case .password:
-            addSubview(checkImageView)
-            checkImageView.snp.makeConstraints({ make in
-                make.top.equalTo(snp.top).offset(9)
-                make.width.height.equalTo(19.92)
-                make.trailing.equalTo(snp.trailing).offset(9.08)
-            })
+            textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.isSecureTextEntry = true
         case .name:
+            textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalTo(snp.top).offset(5)
                 make.width.equalTo(44)
                 make.bottom.equalTo(snp.bottom).offset(5)
             })
+            textField
+                .textPublisher
+                .compactMap({ $0 })
+                .sink(receiveValue: { [weak self] text in
+                    self?.nameCountView.text = "\(text.count)/8"
+                })
+                .store(in: &cancellabels)
         }
     }
     
@@ -96,17 +107,53 @@ class SignInTextField: UIView {
         switch currentTextField {
         case .email, .password:
             switch state {
-            case .normal: break
-            case .focused: break
-            case .waring: break
-            case .passed: break
+            case .normal:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = true
+            case .focused:
+                textField.layer.borderColor = UIColor.systemBlue.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+            case .waring:
+                textField.layer.borderColor = UIColor.systemRed.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+            case .passed:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = false
             }
         case .name:
             switch state {
-            case .normal: break
-            case .focused: break
-            case .waring: break
-            case .passed: break
+            case .normal:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = true
+                nameCountView.isHidden = false
+            case .focused:
+                textField.layer.borderColor = UIColor.systemBlue.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+                nameCountView.isHidden = false
+            case .waring:
+                textField.layer.borderColor = UIColor.systemRed.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+                nameCountView.isHidden = false
+            case .passed:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = false
+                nameCountView.isHidden = true
             }
         }
     }
