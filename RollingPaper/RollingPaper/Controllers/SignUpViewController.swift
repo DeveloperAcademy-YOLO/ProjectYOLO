@@ -94,7 +94,8 @@ class SignUpViewController: UIViewController {
             make.width.equalTo(380)
             make.height.equalTo(38)
         })
-        passwordWaringView.showWarning(isShown: true, text: "비밀번호는 6자리 이상이어야 합니다")
+        emailWaringView.showWarning(isShown: false)
+        passwordWaringView.showWarning(isShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
         nameWaringView.showWarning(isShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
     }
     
