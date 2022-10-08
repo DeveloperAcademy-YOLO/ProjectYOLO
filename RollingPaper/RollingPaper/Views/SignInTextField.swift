@@ -55,26 +55,39 @@ class SignInTextField: UIView {
         
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setTextfieldUI()
+        addSubview(textField)
+        textField.frame = self.bounds
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setTextFieldUI() {
-        addSubview(textField)
-        addSubview(checkImageView)
-        addSubview(nameCountView)
-        textField.frame = self.bounds
-    }
-    
     func setTextFieldType(type: SignInTextFieldEnum) {
         self.textFieldEnum = type
         switch type {
-        case .email: break
-        case .password: break
-        case .name: break
+        case .email:
+            addSubview(checkImageView)
+            checkImageView.snp.makeConstraints({ make in
+                make.top.equalTo(snp.top).offset(9)
+                make.width.height.equalTo(19.92)
+                make.trailing.equalTo(snp.trailing).offset(9.08)
+            })
+        case .password:
+            addSubview(checkImageView)
+            checkImageView.snp.makeConstraints({ make in
+                make.top.equalTo(snp.top).offset(9)
+                make.width.height.equalTo(19.92)
+                make.trailing.equalTo(snp.trailing).offset(9.08)
+            })
+            textField.isSecureTextEntry = true
+        case .name:
+            addSubview(nameCountView)
+            nameCountView.snp.makeConstraints({ make in
+                make.top.equalTo(snp.top).offset(5)
+                make.width.equalTo(44)
+                make.bottom.equalTo(snp.bottom).offset(5)
+            })
         }
     }
     
