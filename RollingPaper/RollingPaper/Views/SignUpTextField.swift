@@ -9,8 +9,8 @@ import UIKit
 import SnapKit
 import Combine
 
-class SignInTextField: UIView {
-    enum SignInTextFieldEnum {
+class SignUpTextField: UIView {
+    enum SignUpTextFieldEnum {
         case email
         case password
         case name
@@ -23,7 +23,7 @@ class SignInTextField: UIView {
         case passed
     }
     
-    private var textFieldEnum: SignInTextFieldEnum?
+    private var textFieldEnum: SignUpTextFieldEnum?
     
     private let checkImageView: UIImageView = {
         let imageView = UIImageView()
@@ -69,7 +69,7 @@ class SignInTextField: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setTextFieldType(type: SignInTextFieldEnum) {
+    func setTextFieldType(type: SignUpTextFieldEnum) {
         self.textFieldEnum = type
         addSubview(checkImageView)
         checkImageView.snp.makeConstraints({ make in
