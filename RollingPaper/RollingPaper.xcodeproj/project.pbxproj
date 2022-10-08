@@ -10,8 +10,8 @@
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */; };
 		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
-		BCF2481728EFC499008CD0F9 /* SetRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetRoomViewController.swift */; };
-		BCF2481928EFC4CF008CD0F9 /* SetRoomViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetRoomViewModel.swift */; };
+		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
+		BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */; };
@@ -57,8 +57,8 @@
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewController.swift; sourceTree = "<group>"; };
 		BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewModel.swift; sourceTree = "<group>"; };
-		BCF2481628EFC499008CD0F9 /* SetRoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRoomViewController.swift; sourceTree = "<group>"; };
-		BCF2481828EFC4CF008CD0F9 /* SetRoomViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRoomViewModel.swift; sourceTree = "<group>"; };
+		BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewController.swift; sourceTree = "<group>"; };
+		BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewModel.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
@@ -200,7 +200,7 @@
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
 				BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */,
-				BCF2481628EFC499008CD0F9 /* SetRoomViewController.swift */,
+				BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -230,7 +230,7 @@
 				D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */,
 				D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */,
 				BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */,
-				BCF2481828EFC4CF008CD0F9 /* SetRoomViewModel.swift */,
+				BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -436,10 +436,10 @@
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
-				BCF2481728EFC499008CD0F9 /* SetRoomViewController.swift in Sources */,
+				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
-				BCF2481928EFC4CF008CD0F9 /* SetRoomViewModel.swift in Sources */,
+				BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */,
 				D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
