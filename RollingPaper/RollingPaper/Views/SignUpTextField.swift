@@ -42,7 +42,7 @@ class SignUpTextField: UIView {
         return label
     }()
     
-    private let textField: UITextField = {
+    let textField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .none
         textField.layer.masksToBounds = true
@@ -62,7 +62,12 @@ class SignUpTextField: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(textField)
-        textField.frame = self.bounds
+        textField.snp.makeConstraints({ make in
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+        })
     }
     
     required init?(coder: NSCoder) {
@@ -88,9 +93,10 @@ class SignUpTextField: UIView {
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
-                make.top.equalTo(snp.top).offset(5)
+                make.top.equalToSuperview().offset(5)
+                make.trailing.equalToSuperview().offset(5)
                 make.width.equalTo(44)
-                make.bottom.equalTo(snp.bottom).offset(5)
+                make.bottom.equalToSuperview().offset(5)
             })
             textField
                 .textPublisher

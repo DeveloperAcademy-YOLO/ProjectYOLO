@@ -10,24 +10,27 @@ import Combine
 import SnapKit
 
 class SignUpViewController: UIViewController {
-    private let emailTextField: UITextField = {
-        let textField = UITextField()
+    private let emailTextField: SignUpTextField = {
+        let textField = SignUpTextField()
+        textField.setTextFieldType(type: .email)
         return textField
     }()
     private let emailWaringView: WaringView = {
         let waringView = WaringView()
         return waringView
     }()
-    private let passwordTextField: UITextField = {
-        let textField = UITextField()
+    private let passwordTextField: SignUpTextField = {
+        let textField = SignUpTextField()
+        textField.setTextFieldType(type: .password)
         return textField
     }()
     private let passwordWaringView: WaringView = {
         let waringView = WaringView()
         return waringView
     }()
-    private let nameTextField: UITextField = {
-        let textField = UITextField()
+    private let nameTextField: SignUpTextField = {
+        let textField = SignUpTextField()
+        textField.setTextFieldType(type: .name)
         return textField
     }()
     private let nameWaringView: WaringView = {
@@ -132,6 +135,7 @@ class SignUpViewController: UIViewController {
             .store(in: &cancellables)
         
         emailTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
             .sink { [weak self] email in
@@ -140,6 +144,7 @@ class SignUpViewController: UIViewController {
             }
             .store(in: &cancellables)
         passwordTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
             .sink { [weak self] password in
@@ -148,6 +153,7 @@ class SignUpViewController: UIViewController {
             }
             .store(in: &cancellables)
         nameTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
             .sink { [weak self] name in
