@@ -23,8 +23,8 @@ final class LocalDatabaseMockManager: LocalDatabaseManager {
         var papers = [PaperModel]()
         let today = Date()
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        var paper1 = PaperModel(cards: [], date: Date(), endTime: tomorrow, title: "MockPaper1", templateString: TemplateEnum.halloween.rawValue)
-        var paper2 = PaperModel(cards: [], date: Date(), endTime: tomorrow, title: "MockPaper2", templateString: TemplateEnum.grid.rawValue)
+        var paper1 = PaperModel(cards: [], date: today, endTime: tomorrow, title: "MockPaper1", templateString: TemplateEnum.halloween.rawValue)
+        var paper2 = PaperModel(cards: [], date: today, endTime: tomorrow, title: "MockPaper2", templateString: TemplateEnum.grid.rawValue)
         if
             let mockImage = UIImage(systemName: "person"),
             let mockData = mockImage.jpegData(compressionQuality: 0.8) {
