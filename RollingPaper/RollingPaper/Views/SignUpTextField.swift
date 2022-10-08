@@ -35,8 +35,10 @@ class SignUpTextField: UIView {
     private let nameCountView: UILabel = {
         let label = UILabel()
         label.text = "0/8"
+        label.font = UIFont.preferredFont(for: .body, weight: .semibold)
+        label.textAlignment = .center
         label.textColor = .white
-        label.backgroundColor = .systemGray
+        label.backgroundColor = UIColor(red: 0.851, green: 0.851, blue: 0.851, alpha: 1)
         label.layer.cornerRadius = 9
         label.layer.masksToBounds = true
         return label
@@ -45,9 +47,11 @@ class SignUpTextField: UIView {
     let textField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .none
+        textField.backgroundColor = .white
         textField.layer.masksToBounds = true
         textField.layer.cornerRadius = 12
         textField.layer.borderColor = UIColor.systemGray.cgColor
+        textField.layer.borderWidth = 1.0
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -63,10 +67,7 @@ class SignUpTextField: UIView {
         super.init(frame: frame)
         addSubview(textField)
         textField.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.top.leading.trailing.bottom.equalToSuperview()
         })
     }
     
@@ -94,9 +95,9 @@ class SignUpTextField: UIView {
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
-                make.trailing.equalToSuperview().offset(5)
+                make.trailing.equalTo(textField.snp.trailing).offset(-5)
                 make.width.equalTo(44)
-                make.bottom.equalToSuperview().offset(5)
+                make.height.equalTo(28)
             })
             textField
                 .textPublisher

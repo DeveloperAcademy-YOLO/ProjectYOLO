@@ -39,8 +39,11 @@ class SignUpViewController: UIViewController {
     }()
     private let signUpButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Sign Up", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemGray
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
+        let title = NSAttributedString(string: "가입", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.preferredFont(for: .body, weight: .semibold)])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
     
