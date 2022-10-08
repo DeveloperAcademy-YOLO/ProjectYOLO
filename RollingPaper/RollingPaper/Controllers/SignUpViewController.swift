@@ -14,13 +14,25 @@ class SignUpViewController: UIViewController {
         let textField = UITextField()
         return textField
     }()
+    private let emailWaringView: WaringView = {
+        let waringView = WaringView()
+        return waringView
+    }()
     private let passwordTextField: UITextField = {
         let textField = UITextField()
         return textField
     }()
+    private let passwordWaringView: WaringView = {
+        let waringView = WaringView()
+        return waringView
+    }()
     private let nameTextField: UITextField = {
-       let textField = UITextField()
+        let textField = UITextField()
         return textField
+    }()
+    private let nameWaringView: WaringView = {
+        let waringView = WaringView()
+        return waringView
     }()
     private let signUpButton: UIButton = {
         let button = UIButton()
@@ -41,10 +53,7 @@ class SignUpViewController: UIViewController {
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubview(emailTextField)
-        view.addSubview(passwordTextField)
-        view.addSubview(nameTextField)
-        view.addSubview(signUpButton)
+        view.addSubviews([emailTextField, emailWaringView, passwordTextField, passwordWaringView, nameTextField, nameWaringView, signUpButton])
     }
     
     private func bind() {
