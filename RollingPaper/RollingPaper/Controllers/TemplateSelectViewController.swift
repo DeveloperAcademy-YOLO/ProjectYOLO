@@ -7,14 +7,47 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class TemplateSelectViewController: UIViewController {
     private let viewModel = TemplateSelectViewModel()
+    private let input: PassthroughSubject<TemplateSelectViewModel.Input, Never> = .init()
+    private var cancellabels = Set<AnyCancellable>()
+    private var recentTemplate: TemplateEnum?
+    private var templateCollectionView: CollectionView?
+    private var isRecentExist: Bool {
+        return recentTemplate == nil ? false : true
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setMainView()
         setCollectionView()
+        bind()
+    }
+    
+    // view가 나타날때마다 최근 템플릿 확인하기 위해 input에 값 설정하기
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        input.send(.viewDidAppear)
+    }
+    
+    // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentTemplateSuccess(let template):
+                    self.recentTemplate = template
+                case .getRecentTemplateFail:
+                    self.recentTemplate = nil
+                }
+                self.templateCollectionView?.reloadData()
+            }
+            .store(in: &cancellabels)
     }
     
     // 메인 뷰 초기화
@@ -30,10 +63,11 @@ class TemplateSelectViewController: UIViewController {
         collectionViewLayer.minimumLineSpacing = 30
         collectionViewLayer.headerReferenceSize = .init(width: 200, height: 90)
         
-        let myCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
+        templateCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
+        guard let myCollectionView = templateCollectionView else {return}
         myCollectionView.backgroundColor = .white
-        myCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.id)
-        myCollectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.id)
+        myCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.identifier)
+        myCollectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
         myCollectionView.dataSource = self
         myCollectionView.delegate = self
         
@@ -47,7 +81,6 @@ class TemplateSelectViewController: UIViewController {
 
 // 컬렉션 뷰에 대한 여러 설정들을 해줌
 extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 240, height: 200)
@@ -55,7 +88,7 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if viewModel.isRecentExist && section == 0 {
+        if isRecentExist && section == 0 {
             return 1
         } else {
             return viewModel.getTemplates().count
@@ -64,7 +97,7 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if viewModel.isRecentExist {
+        if isRecentExist {
             return 2
         } else {
             return 1
@@ -73,15 +106,14 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.id, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
-
-        if viewModel.isRecentExist && indexPath.section == 0 {
-            guard let recentTemplate = viewModel.getRecentTemplate()?.template else {return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.identifier, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
+        if isRecentExist && indexPath.section == 0 {
+            guard let recentTemplate = recentTemplate?.template else {return UICollectionViewCell()}
             cell.setCell(template: recentTemplate)
         } else {
             cell.setCell(template: viewModel.getTemplates()[indexPath.item].template)
         }
-    
+        
         return cell
     }
     
@@ -90,16 +122,15 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
         if kind == UICollectionView.elementKindSectionHeader {
             guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: CollectionHeader.id,
+                withReuseIdentifier: CollectionHeader.identifier,
                 for: indexPath
             ) as? CollectionHeader else {return UICollectionReusableView()}
             
-            if viewModel.isRecentExist && indexPath.section == 0 {
+            if isRecentExist && indexPath.section == 0 {
                 supplementaryView.setHeader(text: "최근 사용한")
             } else {
                 supplementaryView.setHeader(text: "모두")
             }
-            
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -109,12 +140,13 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         // TODO: 해당 템플릿으로 이동하기
-        if viewModel.isRecentExist && indexPath.section == 0 {
-            guard let selectedTemplate = viewModel.getRecentTemplate()?.template else {return false}
-            print(selectedTemplate.templateString)
+        // 템플릿을 터치하는 순간 최근 템플릿으로 설정하기 위해 input에 값 설정하기
+        if isRecentExist && indexPath.section == 0 {
+            guard let recentTemplate = recentTemplate else {return false}
+            input.send(.newTemplateTap(template: recentTemplate))
         } else {
-            let selectedTemplate = viewModel.getTemplates()[indexPath.item].template
-            print(selectedTemplate.templateString)
+            let selectedTemplate = viewModel.getTemplates()[indexPath.item]
+            input.send(.newTemplateTap(template: selectedTemplate))
         }
         return true
     }
@@ -125,7 +157,7 @@ private class CollectionView: UICollectionView {}
 
 // 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
 private class CollectionHeader: UICollectionReusableView {
-    static let id = "CollectionHeader"
+    static let identifier = "CollectionHeader"
     private let title = UILabel()
     
     override init(frame: CGRect) {
@@ -154,7 +186,7 @@ private class CollectionHeader: UICollectionReusableView {
 
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
 private class CollectionCell: UICollectionViewCell {
-    static let id = "CollectionCell"
+    static let identifier = "CollectionCell"
     private let thumbnail = UIView()
     private let title = UILabel()
     private let imageView = UIImageView()
