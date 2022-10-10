@@ -56,8 +56,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         self.sidebarViewController = SidebarViewController()
         self.sidebarViewController.delegate = self
         let navController = UINavigationController(rootViewController: self.sidebarViewController)
-        let detail = MainViewController()
+        let detail = TemplateSelectViewController()
         self.viewControllers = [navController, detail]
     }
 }
-
