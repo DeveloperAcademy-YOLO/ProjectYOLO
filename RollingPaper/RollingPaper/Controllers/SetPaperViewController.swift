@@ -12,7 +12,7 @@ import Combine
 class SetPaperViewController: UIViewController {
     private let viewModel = SetPaperViewModel()
     private let input: PassthroughSubject<SetPaperViewModel.Input, Never> = .init()
-    private var cancellabels = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
@@ -44,7 +44,7 @@ class SetPaperViewController: UIViewController {
                     self.paper = nil
                 }
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
     }
     
     // 메인 뷰 초기화
@@ -91,7 +91,7 @@ class SetPaperViewController: UIViewController {
     private func getTitle(text: String) -> UILabel {
         let title = UILabel()
         title.text = text
-        title.font = .systemFont(ofSize: 28)
+        title.font = .preferredFont(forTextStyle: .title1)
         return title
     }
     
@@ -99,7 +99,7 @@ class SetPaperViewController: UIViewController {
     private func getSubTitle(text: String) -> UILabel {
         let title = UILabel()
         title.text = text
-        title.font = .systemFont(ofSize: 18)
+        title.font = .preferredFont(forTextStyle: .title3)
         return title
     }
     
@@ -110,7 +110,13 @@ class SetPaperViewController: UIViewController {
         
         textField.addSubview(border)
         textField.placeholder = placeHolder
-        textField.delegate = self
+        
+        textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink { _ in
+                self.input.send(.setPaperTitle(title: textField.text ?? ""))
+            }
+            .store(in: &cancellables)
     
         border.backgroundColor = .black
         border.snp.makeConstraints { make in
@@ -123,14 +129,4 @@ class SetPaperViewController: UIViewController {
     }
     
     // TODO: 네이게이션 바에 있는 생성하기 버튼을 눌렀을 때 input 값 설정 및 뷰 이동하기
-}
-
-// 텍스트필드 뷰에 대한 여러 설정을 해줌
-extension SetPaperViewController: UITextFieldDelegate {
-    // 페이퍼 제목 편집을 마치면 input에 값 설정하기
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        input.send(.setPaperTitle(title: textField.text ?? ""))
-        return true
-    }
 }

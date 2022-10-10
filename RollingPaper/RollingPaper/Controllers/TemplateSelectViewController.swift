@@ -12,7 +12,7 @@ import Combine
 class TemplateSelectViewController: UIViewController {
     private let viewModel = TemplateSelectViewModel()
     private let input: PassthroughSubject<TemplateSelectViewModel.Input, Never> = .init()
-    private var cancellabels = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     private var recentTemplate: TemplateEnum?
     private var templateCollectionView: CollectionView?
     private var isRecentExist: Bool {
@@ -47,7 +47,7 @@ class TemplateSelectViewController: UIViewController {
                 }
                 self.templateCollectionView?.reloadData()
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
     }
     
     // 메인 뷰 초기화
@@ -172,7 +172,7 @@ private class CollectionHeader: UICollectionReusableView {
     private func configure() {
         addSubview(title)
         
-        title.font = .systemFont(ofSize: 32)
+        title.font = .preferredFont(forTextStyle: .largeTitle)
         title.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(50)
             make.left.equalToSuperview().offset(50)
@@ -213,7 +213,7 @@ private class CollectionCell: UICollectionViewCell {
             make.width.equalTo(240)
         }
         
-        title.font = .systemFont(ofSize: 20)
+        title.font = .preferredFont(forTextStyle: .title3)
         title.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(10)
             make.centerX.equalTo(imageView)
