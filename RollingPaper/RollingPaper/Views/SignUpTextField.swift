@@ -19,7 +19,7 @@ class SignUpTextField: UIView {
     enum SignInTextFieldState {
         case normal
         case focused
-        case waring
+        case waring(error: AuthManagerEnum)
         case passed
     }
     
@@ -73,8 +73,6 @@ class SignUpTextField: UIView {
         label.textColor = .systemGray
         return label
     }()
-    private var isWaringShown: Bool = true
-    private var textFieldBottomConstraint: ConstraintMakerEditable?
     private var cancellabels = Set<AnyCancellable>()
         
     override init(frame: CGRect) {
@@ -91,9 +89,7 @@ class SignUpTextField: UIView {
         textField.snp.makeConstraints({ make in
             make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(38)
-            textFieldBottomConstraint = make.bottom.equalToSuperview()
         })
-        textFieldBottomConstraint?.constraint.deactivate()
         waringImage.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(56)
             make.leading.equalToSuperview().offset(16)
@@ -109,56 +105,12 @@ class SignUpTextField: UIView {
         waringLabel.backgroundColor = .orange
     }
     
-    private func showWarning(isShown: Bool, text: String? = nil) {
-        if let text = text {
-            waringLabel.text = text
-        }
-        if isShown {
-            waringLabel.snp.updateConstraints({ make in
-                make.leading.equalToSuperview().offset(49.05)
-            })
-            waringImage.isHidden = false
-        } else {
-            waringLabel.snp.updateConstraints({ make in
-                make.leading.equalToSuperview().offset(16)
-            })
-            waringImage.isHidden = true
-        }
-        layoutIfNeeded()
-    }
-    
-    private func resetWaring(isShown: Bool, waringShown: Bool = false, text: String? = nil) {
-        // waringImage & waringView Hidden and reset its bottom view constraint
-        if isShown {
-            if isWaringShown {
-                waringImage.isHidden = false
-                waringLabel.isHidden = false
-                showWarning(isShown: true, text: text)
-            } else {
-                addSubviews([waringImage, waringLabel])
-                textFieldBottomConstraint?.constraint.deactivate()
-                waringImage.snp.makeConstraints({ make in
-                    make.top.equalToSuperview().offset(56)
-                    make.leading.equalToSuperview().offset(16)
-                    make.height.equalTo(21.52)
-                    make.width.equalTo(20.26)
-                    make.bottom.equalToSuperview()
-                })
-                waringLabel.snp.makeConstraints({ make in
-                    make.top.equalTo(waringImage.snp.top)
-                    make.leading.equalToSuperview().offset(49.05)
-                })
-            }
-        } else {
-            if isWaringShown {
-                waringImage.snp.removeConstraints()
-                waringLabel.snp.removeConstraints()
-                waringImage.removeFromSuperview()
-                waringLabel.removeFromSuperview()
-                textFieldBottomConstraint?.constraint.activate()
-            }
-        }
-        isWaringShown = isShown
+    private func setWaringView(waringShown: Bool, text: String?) {
+        waringImage.isHidden = !waringShown
+        waringLabel.text = text
+        waringLabel.snp.updateConstraints({ make in
+            make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
+        })
         layoutIfNeeded()
     }
     
@@ -174,14 +126,11 @@ class SignUpTextField: UIView {
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-            resetWaring(isShown: false)
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.isSecureTextEntry = true
-            showWarning(isShown: false, text: "비밀번호는 6자 이상이어야 합니다")
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-            showWarning(isShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
@@ -194,6 +143,7 @@ class SignUpTextField: UIView {
                 .compactMap({ $0 })
                 .sink(receiveValue: { [weak self] text in
                     self?.nameCountView.text = "\(text.count)/8"
+                    self?.nameCountView.backgroundColor = text.count <= 8 ? .systemGray : .systemRed
                 })
                 .store(in: &cancellabels)
         }
@@ -202,28 +152,79 @@ class SignUpTextField: UIView {
     func setTextFieldState(state: SignInTextFieldState) {
         guard let currentTextField = textFieldEnum else { return }
         switch currentTextField {
-        case .email, .password:
+        case .email:
             switch state {
             case .normal:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = true
+                setWaringView(waringShown: false, text: nil)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
                 checkImageView.isHidden = true
-            case .waring:
+                setWaringView(waringShown: false, text: nil)
+            case .waring(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
                 checkImageView.isHidden = true
+                let text: String
+                switch error {
+                case .emailAlreadyInUse:
+                    text = "이미 사용 중인 이메일입니다"
+                case .invalidEmail:
+                    text = "유효하지 않은 이메일입니다"
+                case .emailDidMiss:
+                    text = "이메일을 입력해주세요"
+                default:
+                    text = "이메일을 다시 입력해주세요"
+                }
+                setWaringView(waringShown: true, text: text)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = false
+                setWaringView(waringShown: false, text: nil)
+            }
+        case .password:
+            switch state {
+            case .normal:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = true
+                setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다f")
+            case .focused:
+                textField.layer.borderColor = UIColor.systemBlue.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+                setWaringView(waringShown: false, text: nil)
+            case .waring(error: let error):
+                textField.layer.borderColor = UIColor.systemRed.cgColor
+                textField.layer.borderWidth = 2.0
+                textField.layer.shadowOpacity = 1.0
+                checkImageView.isHidden = true
+                let text: String
+                switch error {
+                case .passwordDidMiss:
+                    text = "6자리 이상의 비밀번호를 사용해주세요"
+                case .wrongPassword:
+                    text = "6자리 이상의 비밀번호를 사용해주세요"
+                default:
+                    text = "비밀번호를 다시 입력해주세요"
+                }
+                setWaringView(waringShown: true, text: text)
+            case .passed:
+                textField.layer.borderColor = UIColor.systemGray.cgColor
+                textField.layer.borderWidth = 1.0
+                textField.layer.shadowOpacity = 0.0
+                checkImageView.isHidden = false
+                setWaringView(waringShown: false, text: nil)
             }
         case .name:
             switch state {
@@ -231,26 +232,37 @@ class SignUpTextField: UIView {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                checkImageView.isHidden = true
                 nameCountView.isHidden = false
+                checkImageView.isHidden = true
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                checkImageView.isHidden = true
                 nameCountView.isHidden = false
-            case .waring:
+                checkImageView.isHidden = true
+            case .waring(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                checkImageView.isHidden = true
                 nameCountView.isHidden = false
+                checkImageView.isHidden = true
+                let text: String
+                switch error {
+                case .nameAlreadyInUse:
+                    text = "이미 사용 중인 닉네임입니다"
+                case .invalidName:
+                    text = "닉네임 길이는 8자리 이하입니다"
+                default:
+                    text = "닉네임을 다시 입력해주세요"
+                }
+                setWaringView(waringShown: true, text: text)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                checkImageView.isHidden = false
                 nameCountView.isHidden = true
+                checkImageView.isHidden = false
+                setWaringView(waringShown: false, text: nil)
             }
         }
     }

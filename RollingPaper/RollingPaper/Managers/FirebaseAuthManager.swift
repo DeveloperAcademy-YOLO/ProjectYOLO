@@ -36,6 +36,10 @@ enum AuthManagerEnum: String, CaseIterable {
     case signOutSucceed
     case profileSetSucceed
     case deleteUserSucceed
+    case emailDidMiss
+    case passwordDidMiss
+    case nameAlreadyInUse
+    case invalidName
 }
 
 final class FirebaseAuthManager: NSObject, AuthManager {
