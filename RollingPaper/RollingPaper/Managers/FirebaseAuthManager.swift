@@ -42,6 +42,8 @@ enum AuthManagerEnum: String, CaseIterable {
     case invalidName
 }
 
+// TODO: Name Already In User -> With DatabaseManager
+
 final class FirebaseAuthManager: NSObject, AuthManager {
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     private let auth = FirebaseAuth.Auth.auth()

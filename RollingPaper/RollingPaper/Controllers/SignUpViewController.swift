@@ -35,11 +35,13 @@ class SignUpViewController: UIViewController {
     private let viewModel = SignUpViewModel()
     private let input: PassthroughSubject<SignUpViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
+    private var currentFocusedTextfieldY: CGFloat = .zero
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignUpViewUI()
         bind()
+        setKeyboardObserver()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -55,17 +57,31 @@ class SignUpViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            if self.view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= keyboardSize.height
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            if currentFocusedTextfieldY + 38 > keyboardY {
+                self.view.frame.origin.y =  keyboardY - currentFocusedTextfieldY - 38
             }
         }
+//        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+//            print("Keyboard Will Show")
+//            print("CurrentFocusedFieldY: \(currentFocusedTextfieldY)")
+//            print(currentFocusedTextfieldY + 38)
+//            print(keyboardSize.origin.y)
+//            if currentFocusedTextfieldY + 38 > keyboardSize.origin.y {
+//                view.frame.origin.y =  keyboardSize.origin.y - currentFocusedTextfieldY - 38
+//            }
+//            print(view.frame.origin.y)
+//        }
     }
 
-    @objc func keyboardWillHide(notification: NSNotification) {
-        if self.view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
         }
     }
     
@@ -148,6 +164,15 @@ class SignUpViewController: UIViewController {
                 self.viewModel.email.send(email)
             })
             .store(in: &cancellables)
+        emailTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                if let yPosition = self?.emailTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            }
+            .store(in: &cancellables)
         passwordTextField
             .textField
             .textPublisher
@@ -157,6 +182,15 @@ class SignUpViewController: UIViewController {
                 self.viewModel.password.send(password)
             })
             .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                if let yPosition = self?.passwordTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            }
+            .store(in: &cancellables)
         nameTextField
             .textField
             .textPublisher
@@ -165,6 +199,15 @@ class SignUpViewController: UIViewController {
                 guard let self = self else { return }
                 self.viewModel.name.send(name)
             })
+            .store(in: &cancellables)
+        nameTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                if let yPosition = self?.nameTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            }
             .store(in: &cancellables)
         emailTextField.passedSubject
             .combineLatest(passwordTextField.passedSubject, nameTextField.passedSubject)
