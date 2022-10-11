@@ -80,7 +80,7 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
         let setCollectionView: UICollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         setCollectionView.dataSource = self
         setCollectionView.delegate = self
-        setCollectionView.register(StickerCollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
+        setCollectionView.register(StickerCollectionViewCell.self, forCellWithReuseIdentifier: "StickerCollectionViewCell")
         setCollectionView.backgroundColor = .white
         return setCollectionView
     }()
@@ -244,7 +244,7 @@ extension PencilKitViewController: UICollectionViewDelegate, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let aCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath) as? StickerCollectionViewCell else {return UICollectionViewCell()}
+        guard let aCell = collectionView.dequeueReusableCell(withReuseIdentifier: "StickerCollectionViewCell", for: indexPath) as? StickerCollectionViewCell else {return UICollectionViewCell()}
         aCell.myImage.image = UIImage(named: self.arrStickers[indexPath.item])
         return aCell
     }
@@ -309,7 +309,7 @@ extension PencilKitViewController: StickerViewDelegate {
 
 private class StickerCollectionViewCell: UICollectionViewCell {
     
-    static let identifier = "MyCell"
+    static let identifier = "StickerCollectionViewCell"
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -331,11 +331,16 @@ private class StickerCollectionViewCell: UICollectionViewCell {
     func setupView() {
         // 셀에 위에서 만든 이미지 뷰 객체를 넣어준다.
         addSubview(myImage)
-        // 제약조건 설정하기
-        myImage.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        myImage.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-        myImage.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-        myImage.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        myImageConstraints()
+    }
+    
+    func myImageConstraints() {
+        myImage.snp.makeConstraints({ make in
+            make.top.equalTo(self.myImage)
+            make.left.equalTo(self.myImage)
+            make.right.equalTo(self.myImage)
+            make.bottom.equalTo(self.myImage)
+        })
     }
 }
 

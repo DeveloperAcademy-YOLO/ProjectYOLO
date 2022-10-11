@@ -152,15 +152,15 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
         
         let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async(execute: {
                 self.presentImagePicker(withType: .camera)
-            }
+            })
         }
         
         let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async(execute: {
                 self.presentImagePicker(withType: .photoLibrary)
-            }
+            })
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
