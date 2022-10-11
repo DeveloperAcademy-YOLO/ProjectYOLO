@@ -78,6 +78,7 @@ class SignInViewController: UIViewController {
     private let viewModel = SignInViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
+    private var currentFocusedTextfieldY: CGFloat = .zero
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,6 +92,29 @@ class SignInViewController: UIViewController {
             make.top.equalToSuperview().offset(topOffset)
         })
         view.layoutIfNeeded()
+    }
+    
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            if currentFocusedTextfieldY + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
         
     private func setSignInViewUI() {
