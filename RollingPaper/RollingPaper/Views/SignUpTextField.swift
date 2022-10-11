@@ -86,7 +86,7 @@ class SignUpTextField: UIView {
     }
     
     private func setDefaultLayout() {
-        addSubviews([textField, waringImage, waringLabel])
+        addSubviews([textField, waringImage, waringLabel, checkImageView])
         textField.snp.makeConstraints({ make in
             make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(38)
@@ -103,7 +103,12 @@ class SignUpTextField: UIView {
             make.leading.equalToSuperview().offset(49.05)
             make.bottom.equalTo(waringImage.snp.bottom)
         })
-        waringLabel.backgroundColor = .orange
+        checkImageView.snp.makeConstraints({ make in
+            make.top.equalTo(snp.top).offset(9)
+            make.width.height.equalTo(19.92)
+            make.trailing.equalTo(snp.trailing).offset(-9.08)
+        })
+        checkImageView.isHidden = true
     }
     
     private func setWaringView(waringShown: Bool, text: String?) {
@@ -117,21 +122,17 @@ class SignUpTextField: UIView {
     
     func setTextFieldType(type: SignUpTextFieldEnum) {
         self.textFieldEnum = type
-        addSubview(checkImageView)
-        checkImageView.snp.makeConstraints({ make in
-            make.top.equalTo(snp.top).offset(9)
-            make.width.height.equalTo(19.92)
-            make.trailing.equalTo(snp.trailing).offset(-9.08)
-        })
-        checkImageView.isHidden = true
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            setWaringView(waringShown: false, text: nil)
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.isSecureTextEntry = true
+            setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            setWaringView(waringShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
