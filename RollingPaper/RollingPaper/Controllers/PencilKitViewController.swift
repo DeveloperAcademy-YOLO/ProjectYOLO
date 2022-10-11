@@ -93,7 +93,7 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
     
     lazy var pencilToggleButton: UIButton = {
         let button = UIButton()
-        button.setImage(systemName: "pencil.and.outline")
+        button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .lightGray
         button.addTarget(self, action: #selector(toggleToolKit(_:)), for: .touchUpInside)
         return button
@@ -101,7 +101,7 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
     
     lazy var stickerToggleButton: UIButton = {
         let button = UIButton()
-        button.setImage(systemName: "sparkles")
+        button.setUIImage(systemName: "sparkles")
         button.tintColor = .lightGray
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
@@ -340,7 +340,7 @@ private class StickerCollectionViewCell: UICollectionViewCell {
 }
 
 extension UIButton {
-    func setImage(systemName: String) {
+    func setUIImage(systemName: String) {
         contentHorizontalAlignment = .fill
         contentVerticalAlignment = .fill
         imageView?.contentMode = .scaleAspectFit
