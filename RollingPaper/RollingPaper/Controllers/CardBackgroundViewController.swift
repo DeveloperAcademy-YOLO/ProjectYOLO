@@ -126,22 +126,22 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: firstColorName)!, renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: firstColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: secondColorName)!, renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: secondColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("thirdImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: thirdColorName)!, renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: thirdColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: fourthColorName)!, renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: fourthColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
@@ -212,66 +212,66 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     }
     
     func someImageViewConstraints() {
-        someImageView.snp.makeConstraints { (make) in
+        someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
             make.height.equalTo(515)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
-        }
+        })
     }
     
     func buttonLabelConstraints() {
-        buttonLabel.snp.makeConstraints { (make) in
+        buttonLabel.snp.makeConstraints({ make in
             make.width.equalTo(250)
             make.height.equalTo(450)
             make.leading.equalTo(-160)
             make.centerY.equalTo(self.view)
-        }
+        })
     }
     
     func cameraButtonConstraints() {
-        photoBackgroundButton.snp.makeConstraints { (make) in
+        photoBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(buttonLabel.snp.top).offset(50)
-        }
+        })
     }
     
     func firstColorButtonConstraints() {
-        firstColorBackgroundButton.snp.makeConstraints { (make) in
+        firstColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(photoBackgroundButton.snp.bottom).offset(20)
-        }
+        })
     }
     
     func secondColorButtonConstraints() {
-        secondColorBackgroundButton.snp.makeConstraints { (make) in
+        secondColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
-        }
+        })
     }
     
     func thirdColorButtonConstraints() {
-        thirdColorBackgroundButton.snp.makeConstraints { (make) in
+        thirdColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
-        }
+        })
     }
     
     func fourthColorButtonConstraints() {
-        fourthColorBackgroundButton.snp.makeConstraints { (make) in
+        fourthColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
-        }
+        })
     }
 }
 

@@ -183,58 +183,58 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
     }
     
     func someImageViewConstraints() {
-        someImageView.snp.makeConstraints { (make) in
+        someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
             make.height.equalTo(515)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
-        }
+        })
     }
     
     func collectionViewConstraints() {
-        collectionView.snp.makeConstraints { (make) in
+        collectionView.snp.makeConstraints({ make in
             make.width.equalTo(730)
             make.height.equalTo(100)
             make.centerX.equalTo(self.view)
             make.top.equalTo(someImageView.snp.bottom).offset(10)
-        }
+        })
     }
     
     func canvasViewConstraints() {
-        canvasView.snp.makeConstraints { (make) in
+        canvasView.snp.makeConstraints({ make in
             make.width.equalTo(813)
             make.height.equalTo(515)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
-        }
+        })
     }
     
     func buttonLabelConstraints() {
-        buttonLabel.snp.makeConstraints { (make) in
+        buttonLabel.snp.makeConstraints({ make in
             make.width.equalTo(250)
             make.height.equalTo(450)
             make.leading.equalTo(-160)
             make.centerY.equalTo(self.view)
-        }
+        })
     }
     
     func pencilToggleButtonConstraints() {
-        pencilToggleButton.snp.makeConstraints { (make) in
+        pencilToggleButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(buttonLabel.snp.top).offset(20)
-        }
+        })
     }
     
     func stickerToggleButtonConstraints() {
-        stickerToggleButton.snp.makeConstraints { (make) in
+        stickerToggleButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-        }
+        })
     }
 }
 
