@@ -10,65 +10,154 @@ import Combine
 import UIKit
 
 final class PaperModelFileManager: LocalDatabaseManager {
-    var papersSubject: PassthroughSubject<[PaperModel], Error> = .init()
-    private let folderName = "downloaded_papers"
-    init() {
+    static let shared: LocalDatabaseManager = PaperModelFileManager()
+    
+    var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
+    private let folderName = "/downloaded_papers"
+    private init() {
         createFolderIfNeeded()
         loadPapers()
     }
     
+    private func getDocumentDirectoryPath() -> URL? {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    }
+    
+    private func getPaperDirectoryPath() -> URL? {
+        guard let documentDir = getDocumentDirectoryPath() else { return nil }
+        return documentDir.appendingPathComponent(folderName).absoluteURL
+    }
+    
+    private func getFilePath(paper: PaperModel) -> URL? {
+        guard let paperDir = getPaperDirectoryPath() else { return nil}
+        return paperDir.appendingPathComponent(paper.paperId + ".json")
+    }
+    
+    private func getFilePath(paperId: String) -> URL? {
+        guard let paperDir = getPaperDirectoryPath() else { return nil }
+        return paperDir.appendingPathComponent(paperId + ".json")
+    }
+    
     private func createFolderIfNeeded() {
-        guard let url = getFolderPath() else { return }
-        if !FileManager.default.fileExists(atPath: url.path) {
+        guard let paperDirectory = getPaperDirectoryPath() else { return }
+        if !FileManager.default.fileExists(atPath: paperDirectory.relativePath) {
             do {
-                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(atPath: paperDirectory.relativePath, withIntermediateDirectories: true, attributes: nil)
                 print("Created Folder")
             } catch {
-                print("Error Created Folder")
+                print("Error Creating Folder")
                 print(error.localizedDescription)
             }
         }
     }
     
-    private func getFolderPath() -> URL? {
-        return FileManager
-            .default
-            .urls(for: .documentDirectory, in: .userDomainMask)
-            .first?
-            .appendingPathComponent(folderName)
-    }
-    
     private func loadPapers() {
-        guard
-            let url = getFolderPath(),
-            FileManager.default.fileExists(atPath: url.path) else {
-            return
-        }
+        guard let paperDir = getPaperDirectoryPath() else { return }
         do {
-            let data = try Data(contentsOf: url)
-            let papers = try JSONDecoder().decode([PaperModel].self, from: data)
-            self.papersSubject.send(papers)
+            let paperContents = try FileManager.default.contentsOfDirectory(at: paperDir, includingPropertiesForKeys: nil, options: [])
+            let papers = paperContents
+                .compactMap({try? Data(contentsOf: $0)})
+                .compactMap({try? JSONDecoder().decode(PaperModel.self, from: $0)})
+            papersSubject.send(papers)
         } catch {
-            self.papersSubject.send(completion: .failure(error))
+            print(error.localizedDescription)
         }
     }
     
-    func setData(value: [PaperModel]) -> AnyPublisher<Bool, Never> {
-        return Future<Bool, Never> { [weak self] promise in
-            if
-                let url = self?.getFolderPath(),
-                FileManager.default.fileExists(atPath: url.path) {
-                do {
-                    let data = try JSONEncoder().encode(value)
-                    try data.write(to: url)
-                    promise(.success(true))
-                } catch {
-                    promise(.success(false))
-                }
-            } else {
-                promise(.success(false))
-            }
+    func addPaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            let paperData = try JSONEncoder().encode(paper)
+            try paperData.write(to: fileDir, options: .atomic)
+            let currentPapers = papersSubject.value
+            papersSubject.send(currentPapers + [paper])
+        } catch {
+            print(error.localizedDescription)
         }
-        .eraseToAnyPublisher()
+    }
+    
+    func addCard(paperId: String, card: CardModel) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paperId }) {
+                var paper = currentPapers[index]
+                paper.cards.append(card)
+                currentPapers[index] = paper
+                papersSubject.send(currentPapers)
+                let paperData = try JSONEncoder().encode(paper)
+                try paperData.write(to: fileDir)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func removePaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            try FileManager.default.removeItem(at: fileDir)
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paper.paperId }) {
+                currentPapers.remove(at: index)
+                papersSubject.send(currentPapers)
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func removeCard(paperId: String, card: CardModel) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: {$0.paperId == paperId}) {
+                var paper = currentPapers[index]
+                if let cardIndex = paper.cards.firstIndex(where: {$0.cardId == card.cardId}) {
+                    paper.cards.remove(at: cardIndex)
+                    currentPapers[index] = paper
+                    papersSubject.send(currentPapers)
+                    let paperData = try JSONEncoder().encode(paper)
+                    try paperData.write(to: fileDir, options: .atomic)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func updatePaper(paper: PaperModel) {
+        guard let fileDir = getFilePath(paper: paper) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paper.paperId }) {
+                currentPapers[index] = paper
+                papersSubject.send(currentPapers)
+            }
+            let paperData = try JSONEncoder().encode(paper)
+            try paperData.write(to: fileDir, options: .atomic)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func updateCard(paperId: String, card: CardModel) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            var currentPapers = papersSubject.value
+            if let index = currentPapers.firstIndex(where: { $0.paperId == paperId }) {
+                var paper = currentPapers[index]
+                if let cardIndex = paper.cards.firstIndex(where: { $0.cardId == card.cardId }) {
+                    paper.cards[cardIndex] = card
+                    currentPapers[index] = paper
+                    papersSubject.send(currentPapers)
+                    let paperData = try JSONEncoder().encode(paper)
+                    try paperData.write(to: fileDir, options: .atomic)
+                }
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
+

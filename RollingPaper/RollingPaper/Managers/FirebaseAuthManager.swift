@@ -58,8 +58,8 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     
     private func handleError(with error: Error?) -> AuthManagerEnum? {
         var result: AuthManagerEnum?
-        if let error = error as? NSError {
-            let authError = AuthErrorCode(_nsError: error).code
+        if let error = error {
+            let authError = AuthErrorCode(_nsError: error as NSError).code
             switch authError {
             case .userNotFound:
                 result = .userNotFound
