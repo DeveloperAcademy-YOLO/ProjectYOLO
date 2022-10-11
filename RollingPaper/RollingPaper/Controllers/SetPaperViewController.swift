@@ -10,6 +10,7 @@ import SnapKit
 import Combine
 
 class SetPaperViewController: UIViewController {
+    private let paperTitleTextField = UITextField()
     private let viewModel = SetPaperViewModel()
     private let input: PassthroughSubject<SetPaperViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
@@ -96,6 +97,9 @@ class SetPaperViewController: UIViewController {
             make.top.equalTo(title2.snp.bottom).offset(15)
             make.left.equalTo(title2)
         })
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
+        view.addGestureRecognizer(gesture)
     }
     
     // 제목 뷰 가져오기
@@ -116,40 +120,44 @@ class SetPaperViewController: UIViewController {
     
     // 텍스트필드 뷰 가져오기
     private func getTextField(placeHolder: String) -> UITextField {
-        let textField = UITextField()
         let border = UIView()
         
-        textField.addSubview(border)
-        textField.placeholder = placeHolder
+        paperTitleTextField.addSubview(border)
+        paperTitleTextField.placeholder = placeHolder
         
         // 제목 입력할때마다 입력한 글자 저장
-        textField
+        paperTitleTextField
             .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { _ in
-                self.input.send(.setPaperTitle(title: textField.text ?? ""))
+                self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
             })
             .store(in: &cancellables)
         
         // 엔터 누르면 포커스 해제하고 키보드 내리기
-        textField
+        paperTitleTextField
             .controlPublisher(for: .editingDidEndOnExit)
             .sink(receiveValue: { _ in
-                textField.resignFirstResponder()
+                self.paperTitleTextField.resignFirstResponder()
             })
             .store(in: &cancellables)
     
         border.backgroundColor = .black
         border.snp.makeConstraints({ make in
-            make.top.equalTo(textField.snp.bottom)
+            make.top.equalTo(paperTitleTextField.snp.bottom)
             make.left.right.equalToSuperview()
             make.height.equalTo(2)
         })
         
-        return textField
+        return paperTitleTextField
     }
     
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
         input.send(.endSettingPaper)
+    }
+    
+    // 배경 눌렀을 때 동작
+    @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
+        paperTitleTextField.resignFirstResponder()
     }
 }
