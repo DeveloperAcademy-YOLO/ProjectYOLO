@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Combine
+import CombineCocoa
 
 class SignUpTextField: UIView {
     enum SignUpTextFieldEnum {
@@ -120,7 +121,7 @@ class SignUpTextField: UIView {
         checkImageView.snp.makeConstraints({ make in
             make.top.equalTo(snp.top).offset(9)
             make.width.height.equalTo(19.92)
-            make.trailing.equalTo(snp.trailing).offset(9.08)
+            make.trailing.equalTo(snp.trailing).offset(-9.08)
         })
         checkImageView.isHidden = true
         switch type {
@@ -147,6 +148,53 @@ class SignUpTextField: UIView {
                 })
                 .store(in: &cancellabels)
         }
+        textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                self?.setTextFieldState(state: .focused)
+            }
+            .store(in: &cancellabels)
+        textField.controlPublisher(for: .editingDidEnd)
+            .sink { [weak self] _ in
+                if
+                    let currentTextField = self?.textFieldEnum,
+                    let currentState = self?.handleTextfieldText(currentTextField: currentTextField, text: self?.textField.text ?? "") {
+                    self?.setTextFieldState(state: currentState)
+                }
+            }
+            .store(in: &cancellabels)
+        textField.controlPublisher(for: .editingDidEndOnExit)
+            .sink { [weak self] _ in
+                if
+                    let currentTextField = self?.textFieldEnum,
+                    let currentState = self?.handleTextfieldText(currentTextField: currentTextField, text: self?.textField.text ?? "") {
+                    self?.setTextFieldState(state: currentState)
+                }
+            }
+            .store(in: &cancellabels)
+    }
+    
+    private func isValidEmail(text: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: text)
+    }
+    
+    private func handleTextfieldText(currentTextField: SignUpTextFieldEnum, text: String) -> SignInTextFieldState {
+        let state: SignInTextFieldState
+        switch currentTextField {
+        case .email:
+            if text.isEmpty {
+                state = .waring(error: .emailDidMiss)
+            } else {
+                state = isValidEmail(text: text) ? .passed : .waring(error: .invalidEmail)
+            }
+        case .password:
+            state = text.count < 6 ? .waring(error: .wrongPassword) : .passed
+        case .name:
+            state = text.count <= 8 ? .passed : .waring(error: .invalidName)
+        }
+        return state
     }
     
     func setTextFieldState(state: SignInTextFieldState) {
