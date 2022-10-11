@@ -75,6 +75,7 @@ class SignUpTextField: UIView {
         return label
     }()
     private var cancellabels = Set<AnyCancellable>()
+    let currentWaringState: PassthroughSubject<Bool, Never> = .init()
         
     override init(frame: CGRect) {
         super.init(frame: frame)

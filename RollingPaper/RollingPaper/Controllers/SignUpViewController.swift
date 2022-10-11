@@ -51,7 +51,7 @@ class SignUpViewController: UIViewController {
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField])
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
         let topOffset = (UIScreen.main.bounds.height - 380) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -65,20 +65,18 @@ class SignUpViewController: UIViewController {
             make.width.equalTo(380)
         })
         passwordTextField.setTextFieldType(type: .password)
-//        nameTextField.snp.makeConstraints({ make in
-//            make.top.equalTo(passwordTextField.snp.bottom).offset(28)
-//            make.centerX.equalToSuperview()
-//            make.width.equalTo(380)
-//        })
-//        signUpButton.snp.makeConstraints({ make in
-//            make.top.equalTo(nameTextField.snp.bottom).offset(32)
-//            make.centerX.equalToSuperview()
-//            make.width.equalTo(380)
-//            make.height.equalTo(38)
-//        })
-//        emailTextField.setTextFieldType(type: .email)
-//        passwordTextField.setTextFieldType(type: .password)
-//        nameTextField.setTextFieldType(type: .name)
+        nameTextField.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(28)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        nameTextField.setTextFieldType(type: .name)
+        signUpButton.snp.makeConstraints({ make in
+            make.top.equalTo(nameTextField.snp.bottom).offset(32)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
     }
     
     private func bind() {
