@@ -76,7 +76,6 @@ final class SignUpTextField: UIView {
         return label
     }()
     private var cancellabels = Set<AnyCancellable>()
-    let currentWaringState: PassthroughSubject<Bool, Never> = .init()
         
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -112,16 +111,9 @@ final class SignUpTextField: UIView {
         })
         checkImageView.isHidden = true
     }
-    
-    private func setWaringView(waringShown: Bool, text: String?) {
-        waringImage.isHidden = !waringShown
-        waringLabel.text = text
-        waringLabel.snp.updateConstraints({ make in
-            make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
-        })
-        layoutIfNeeded()
-    }
-    
+}
+
+extension SignUpTextField {
     func setTextFieldType(type: SignUpTextFieldEnum) {
         self.textFieldEnum = type
         switch type {
@@ -173,29 +165,6 @@ final class SignUpTextField: UIView {
             })
             .store(in: &cancellabels)
         setTextFieldState(state: .normal)
-    }
-    
-    private func isValidEmail(text: String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: text)
-    }
-    
-    private func handleTextfieldText(currentTextField: SignUpTextFieldEnum, text: String) -> SignInTextFieldState {
-        let state: SignInTextFieldState
-        switch currentTextField {
-        case .email:
-            if text.isEmpty {
-                state = .waring(error: .emailDidMiss)
-            } else {
-                state = isValidEmail(text: text) ? .passed : .waring(error: .invalidEmail)
-            }
-        case .password:
-            state = text.count < 6 ? .waring(error: .wrongPassword) : .passed
-        case .name:
-            state = text.isEmpty ? .waring(error: .invalidName) : text.count <= 8 ? .passed : .waring(error: .invalidName)
-        }
-        return state
     }
     
     func setTextFieldState(state: SignInTextFieldState) {
@@ -340,5 +309,39 @@ final class SignUpTextField: UIView {
                 waringShownSubject.send(false)
             }
         }
+    }
+}
+
+extension SignUpTextField {
+    private func setWaringView(waringShown: Bool, text: String?) {
+        waringImage.isHidden = !waringShown
+        waringLabel.text = text
+        waringLabel.snp.updateConstraints({ make in
+            make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
+        })
+        layoutIfNeeded()
+    }
+    
+    private func isValidEmail(text: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: text)
+    }
+    
+    private func handleTextfieldText(currentTextField: SignUpTextFieldEnum, text: String) -> SignInTextFieldState {
+        let state: SignInTextFieldState
+        switch currentTextField {
+        case .email:
+            if text.isEmpty {
+                state = .waring(error: .emailDidMiss)
+            } else {
+                state = isValidEmail(text: text) ? .passed : .waring(error: .invalidEmail)
+            }
+        case .password:
+            state = text.count < 6 ? .waring(error: .wrongPassword) : .passed
+        case .name:
+            state = text.isEmpty ? .waring(error: .invalidName) : text.count <= 8 ? .passed : .waring(error: .invalidName)
+        }
+        return state
     }
 }

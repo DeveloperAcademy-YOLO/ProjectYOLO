@@ -21,9 +21,6 @@ final class SignUpViewModel {
     }
     enum Output {
         case signUpDidFail(error: AuthManagerEnum)
-        case emailDidMiss
-        case passwordDidMiss
-        case ninknameDidMiss
         case signUpDidSuccess
     }
     
@@ -63,14 +60,7 @@ final class SignUpViewModel {
         return output.eraseToAnyPublisher()
     }
     
-    private func handleText(email: String, password: String, name: String) -> (String, String, String)? {
-        return nil
-    }
-    
     private func handleSignUp() {
-        if let (email, password, name) = handleText(email: email.value, password: password.value, name: name.value) {
-            authManager
-                .signUp(email: email, password: password, name: name)
-        }
+        authManager.signUp(email: email.value, password: password.value, name: name.value)
     }
 }

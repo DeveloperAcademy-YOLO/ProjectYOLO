@@ -99,22 +99,36 @@ class SignUpViewController: UIViewController {
         })
     }
     
+    private func handleError(error: AuthManagerEnum) {
+        switch error {
+        case .emailAlreadyInUse:
+            emailTextField.setTextFieldState(state: .waring(error: .emailAlreadyInUse))
+        case .wrongPassword:
+            passwordTextField.setTextFieldState(state: .waring(error: .wrongPassword))
+        case .invalidEmail:
+            emailTextField.setTextFieldState(state: .waring(error: .invalidEmail))
+        case .emailDidMiss:
+            emailTextField.setTextFieldState(state: .waring(error: .emailDidMiss))
+        case .passwordDidMiss:
+            passwordTextField.setTextFieldState(state: .waring(error: .passwordDidMiss))
+        case .nameAlreadyInUse:
+            nameTextField.setTextFieldState(state: .waring(error: .nameAlreadyInUse))
+        case .invalidName:
+            nameTextField.setTextFieldState(state: .waring(error: .invalidName))
+        default: break
+        }
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
-                guard self != nil else { return }
                 switch receivedValue {
                 case .signUpDidFail(error: let error):
-                    break
-                case .emailDidMiss:
-                    break
-                case .passwordDidMiss:
-                    break
-                case .ninknameDidMiss:
-                    break
-                case .signUpDidSuccess: break
+                    self?.handleError(error: error)
+                case .signUpDidSuccess:
+                    print("Successfully Signed Up")
                 }
             })
             .store(in: &cancellables)
@@ -125,7 +139,6 @@ class SignUpViewController: UIViewController {
                 self.input.send(.signUpButtonDidTap)
             })
             .store(in: &cancellables)
-        
         emailTextField
             .textField
             .textPublisher
