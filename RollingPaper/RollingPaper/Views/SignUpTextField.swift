@@ -119,11 +119,14 @@ extension SignUpTextField {
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            textField.textContentType = .emailAddress
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-//            textField.isSecureTextEntry = true
+            textField.textContentType = .newPassword
+            textField.isSecureTextEntry = true
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            textField.textContentType = .name
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
