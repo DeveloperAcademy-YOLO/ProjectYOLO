@@ -39,7 +39,7 @@ class SignUpViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignUpViewUI()
-        setKeyboardObserver()
+        bind()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -80,19 +80,19 @@ class SignUpViewController: UIViewController {
         })
         emailTextField.setTextFieldType(type: .email)
         passwordTextField.snp.makeConstraints({ make in
-            make.top.equalTo(emailTextField.snp.bottom).offset(28)
+            make.top.equalTo(emailTextField.snp.top).offset(66)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
         })
         passwordTextField.setTextFieldType(type: .password)
         nameTextField.snp.makeConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(28)
+            make.top.equalTo(passwordTextField.snp.top).offset(passwordTextField.frame.height + 28)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
         })
         nameTextField.setTextFieldType(type: .name)
         signUpButton.snp.makeConstraints({ make in
-            make.top.equalTo(nameTextField.snp.bottom).offset(32)
+            make.top.equalTo(nameTextField.snp.top).offset(passwordTextField.frame.height + 32)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
             make.height.equalTo(38)
@@ -103,7 +103,7 @@ class SignUpViewController: UIViewController {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] receivedValue in
+            .sink(receiveValue: { [weak self] receivedValue in
                 guard self != nil else { return }
                 switch receivedValue {
                 case .signUpDidFail(error: let error):
@@ -116,44 +116,95 @@ class SignUpViewController: UIViewController {
                     break
                 case .signUpDidSuccess: break
                 }
-            }
+            })
             .store(in: &cancellables)
         signUpButton
             .tapPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self = self else { return }
                 self.input.send(.signUpButtonDidTap)
-            }
+            })
             .store(in: &cancellables)
         
         emailTextField
             .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] email in
+            .sink(receiveValue: { [weak self] email in
                 guard let self = self else { return }
                 self.viewModel.email.send(email)
-            }
+            })
             .store(in: &cancellables)
         passwordTextField
             .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] password in
+            .sink(receiveValue: { [weak self] password in
                 guard let self = self else { return }
                 self.viewModel.password.send(password)
-            }
+            })
             .store(in: &cancellables)
         nameTextField
             .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] name in
+            .sink(receiveValue: { [weak self] name in
                 guard let self = self else { return }
                 self.viewModel.name.send(name)
-            }
+            })
+            .store(in: &cancellables)
+        emailTextField.passedSubject
+            .combineLatest(passwordTextField.passedSubject, nameTextField.passedSubject)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] passed in
+                let (emailPassed, passwordPassed, namePassed) = passed
+                if emailPassed && passwordPassed && namePassed {
+                    self?.signUpButton.backgroundColor = .systemBlue
+                    self?.signUpButton.isUserInteractionEnabled = true
+                } else {
+                    self?.signUpButton.backgroundColor = .systemGray
+                    self?.signUpButton.isUserInteractionEnabled = false
+                }
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .waringShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .email, isWaringShown: isWaringShown)
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .waringShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .password, isWaringShown: isWaringShown)
+            })
             .store(in: &cancellables)
         nameTextField
-            .textField.controlPublisher(for: .editingDidEnd)
+            .waringShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .name, isWaringShown: isWaringShown)
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
+        switch textFieldType {
+        case .email:
+            passwordTextField.snp.updateConstraints({ make in
+                make.top.equalTo(emailTextField.snp.top).offset(isWaringShown ? emailTextField.frame.height + 28 : 66)
+            })
+        case .password:
+            nameTextField.snp.updateConstraints({ make in
+                make.top.equalTo(passwordTextField.snp.top).offset(isWaringShown ? passwordTextField.frame.height + 28 : 66)
+            })
+        case .name:
+            signUpButton.snp.updateConstraints({ make in
+                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 70)
+            })
+        }
+        view.layoutIfNeeded()
     }
 }

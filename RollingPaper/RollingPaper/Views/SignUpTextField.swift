@@ -127,14 +127,11 @@ final class SignUpTextField: UIView {
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-            setWaringView(waringShown: false, text: nil)
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.isSecureTextEntry = true
-            setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-            setWaringView(waringShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
@@ -175,6 +172,7 @@ final class SignUpTextField: UIView {
                 }
             })
             .store(in: &cancellabels)
+        setTextFieldState(state: .normal)
     }
     
     private func isValidEmail(text: String) -> Bool {
@@ -195,7 +193,7 @@ final class SignUpTextField: UIView {
         case .password:
             state = text.count < 6 ? .waring(error: .wrongPassword) : .passed
         case .name:
-            state = text.count <= 8 ? .passed : .waring(error: .invalidName)
+            state = text.isEmpty ? .waring(error: .invalidName) : text.count <= 8 ? .passed : .waring(error: .invalidName)
         }
         return state
     }
