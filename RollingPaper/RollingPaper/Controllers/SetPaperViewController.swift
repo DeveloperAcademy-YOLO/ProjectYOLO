@@ -28,6 +28,7 @@ class SetPaperViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setMainView()
+        setNavigationBar()
         bind()
     }
     
@@ -40,11 +41,21 @@ class SetPaperViewController: UIViewController {
                 switch event {
                 case .createPaperSuccess(let paper):
                     self.paper = paper
+                    print("페이퍼 생성 성공")
+                    // TODO: 페이퍼 객체 넘겨주면서 네비게이션 연결
+                    // navigationController?.pushViewController(, animated: true)
                 case .createPaperFail:
                     self.paper = nil
+                    print("페이퍼 생성 실패")
                 }
             })
             .store(in: &cancellables)
+    }
+    
+    // 네비게이션 바 초기화
+    private func setNavigationBar() {
+        let createBtn = UIBarButtonItem(title: "생성하기", style: .plain, target: self, action: #selector(createBtnPressed))
+        navigationItem.rightBarButtonItem = createBtn
     }
     
     // 메인 뷰 초기화
@@ -111,10 +122,19 @@ class SetPaperViewController: UIViewController {
         textField.addSubview(border)
         textField.placeholder = placeHolder
         
+        // 제목 입력할때마다 입력한 글자 저장
+        textField
+            .controlPublisher(for: .editingChanged)
+            .sink(receiveValue: { _ in
+                self.input.send(.setPaperTitle(title: textField.text ?? ""))
+            })
+            .store(in: &cancellables)
+        
+        // 엔터 누르면 포커스 해제하고 키보드 내리기
         textField
             .controlPublisher(for: .editingDidEndOnExit)
             .sink(receiveValue: { _ in
-                self.input.send(.setPaperTitle(title: textField.text ?? ""))
+                textField.resignFirstResponder()
             })
             .store(in: &cancellables)
     
@@ -128,5 +148,8 @@ class SetPaperViewController: UIViewController {
         return textField
     }
     
-    // TODO: 네이게이션 바에 있는 생성하기 버튼을 눌렀을 때 input 값 설정 및 뷰 이동하기
+    // 생성하기 버튼 눌렀을 때 동작
+    @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+        input.send(.endSettingPaper)
+    }
 }

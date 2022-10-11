@@ -12,6 +12,11 @@ class SetPaperViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
     var template: TemplateEnum?
+    private let databaseManager: LocalDatabaseManager
+    
+    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared) {
+        self.databaseManager = databaseManager
+    }
     
     enum Input {
         case setPaperTitle(title: String)
@@ -57,6 +62,7 @@ class SetPaperViewModel {
             return
         }
         let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template.template.templateString)
+        databaseManager.addPaper(paper: paper)
         output.send(.createPaperSuccess(paper: paper))
     }
 }
