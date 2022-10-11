@@ -35,7 +35,7 @@ class SetPaperViewController: UIViewController {
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
                 case .createPaperSuccess(let paper):
@@ -43,7 +43,7 @@ class SetPaperViewController: UIViewController {
                 case .createPaperFail:
                     self.paper = nil
                 }
-            }
+            })
             .store(in: &cancellables)
     }
     
@@ -63,28 +63,28 @@ class SetPaperViewController: UIViewController {
         view.addSubview(title2)
         view.addSubview(subtitle2)
         
-        title1.snp.makeConstraints { make in
+        title1.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(76)
             make.left.equalToSuperview().offset(76)
-        }
-        subtitle1.snp.makeConstraints { make in
+        })
+        subtitle1.snp.makeConstraints({ make in
             make.top.equalTo(title1.snp.bottom).offset(15)
             make.left.equalTo(title1)
-        }
-        textField.snp.makeConstraints { make in
+        })
+        textField.snp.makeConstraints({ make in
             make.top.equalTo(subtitle1.snp.bottom).offset(30)
             make.left.equalTo(subtitle1)
             make.right.equalToSuperview().offset(-76)
             make.height.equalTo(40)
-        }
-        title2.snp.makeConstraints { make in
+        })
+        title2.snp.makeConstraints({ make in
             make.top.equalTo(textField.snp.bottom).offset(60)
             make.left.equalTo(textField)
-        }
-        subtitle2.snp.makeConstraints { make in
+        })
+        subtitle2.snp.makeConstraints({ make in
             make.top.equalTo(title2.snp.bottom).offset(15)
             make.left.equalTo(title2)
-        }
+        })
     }
     
     // 제목 뷰 가져오기
@@ -113,17 +113,17 @@ class SetPaperViewController: UIViewController {
         
         textField
             .controlPublisher(for: .editingDidEndOnExit)
-            .sink { _ in
+            .sink(receiveValue: { _ in
                 self.input.send(.setPaperTitle(title: textField.text ?? ""))
-            }
+            })
             .store(in: &cancellables)
     
         border.backgroundColor = .black
-        border.snp.makeConstraints { make in
+        border.snp.makeConstraints({ make in
             make.top.equalTo(textField.snp.bottom)
             make.left.right.equalToSuperview()
             make.height.equalTo(2)
-        }
+        })
         
         return textField
     }

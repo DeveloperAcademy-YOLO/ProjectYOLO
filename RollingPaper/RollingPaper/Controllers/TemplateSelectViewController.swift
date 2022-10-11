@@ -37,7 +37,7 @@ class TemplateSelectViewController: UIViewController {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
                 case .getRecentTemplateSuccess(let template):
@@ -46,7 +46,7 @@ class TemplateSelectViewController: UIViewController {
                     self.recentTemplate = nil
                 }
                 self.templateCollectionView?.reloadData()
-            }
+            })
             .store(in: &cancellables)
     }
     
@@ -72,10 +72,10 @@ class TemplateSelectViewController: UIViewController {
         myCollectionView.delegate = self
         
         view.addSubview(myCollectionView)
-        myCollectionView.snp.makeConstraints { make in
+        myCollectionView.snp.makeConstraints({ make in
             make.left.right.bottom.equalToSuperview()
             make.top.equalTo(view.safeAreaLayoutGuide)
-        }
+        })
     }
 }
 
@@ -173,10 +173,10 @@ private class CollectionHeader: UICollectionReusableView {
         addSubview(title)
         
         title.font = .preferredFont(forTextStyle: .largeTitle)
-        title.snp.makeConstraints { make in
+        title.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(50)
             make.left.equalToSuperview().offset(50)
-        }
+        })
     }
     
     func setHeader(text: String) {
@@ -207,21 +207,21 @@ private class CollectionCell: UICollectionViewCell {
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 12
-        imageView.snp.makeConstraints { make in
+        imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.left.equalToSuperview()
             make.width.equalTo(240)
-        }
+        })
         
         title.font = .preferredFont(forTextStyle: .title3)
-        title.snp.makeConstraints { make in
+        title.snp.makeConstraints({ make in
             make.top.equalTo(imageView.snp.bottom).offset(10)
             make.centerX.equalTo(imageView)
-        }
+        })
         
-        thumbnail.snp.makeConstraints { make in
+        thumbnail.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
-        }
+        })
     }
     
     func setCell(template: TemplateModel) {
