@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
+		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
+		AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */; };
 		BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */; };
 		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
 		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
@@ -58,6 +60,8 @@
 /* Begin PBXFileReference section */
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
+		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
+		AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PencilKitViewController.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewController.swift; sourceTree = "<group>"; };
 		BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewModel.swift; sourceTree = "<group>"; };
@@ -212,6 +216,8 @@
 				BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */,
 				CFDA52C228F48D41006774E2 /* SplitViewController.swift */,
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
+				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -432,6 +438,7 @@
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
+				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
@@ -452,6 +459,7 @@
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
+				AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
