@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.makeKeyAndVisible()
-        window.rootViewController = SignInViewController()
+        window.rootViewController = SplitViewController(style: UISplitViewController.Style.doubleColumn)
         self.window = window
         return true
     }
