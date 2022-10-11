@@ -20,8 +20,7 @@ final class SignUpViewModel {
         case signUpButtonDidTap
     }
     enum Output {
-        case signInDidFail(error: Error)
-        case signUpDidFail(error: Error)
+        case signUpDidFail(error: AuthManagerEnum)
         case emailDidMiss
         case passwordDidMiss
         case ninknameDidMiss
@@ -30,45 +29,48 @@ final class SignUpViewModel {
     
     init(authManager: AuthManager = FirebaseAuthManager()) {
         self.authManager = authManager
+        bind()
+    }
+    
+    private func bind() {
+        authManager
+            .signedInSubject
+            .sink(receiveValue: { [weak self] receivedValue in
+                guard let self = self else { return }
+                switch receivedValue {
+                case .emailAlreadyInUse:
+                    self.output.send(.signUpDidFail(error: .emailAlreadyInUse))
+                case .invalidEmail:
+                    self.output.send(.signUpDidFail(error: .invalidEmail))
+                case .signUpSucceed:
+                    self.output.send(.signUpDidSuccess)
+                default:
+                    self.output.send(.signUpDidFail(error: .unknownError))
+                }
+            })
+            .store(in: &cancellables)
     }
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-            .sink { [weak self] receivedValue in
-                    guard let self = self else { return }
+            .sink(receiveValue: { [weak self] receivedValue in
+                guard let self = self else { return }
                 switch receivedValue {
                 case .signUpButtonDidTap: self.handleSignUp()
                 }
-            }
+            })
             .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
+    private func handleText(email: String, password: String, name: String) -> (String, String, String)? {
+        return nil
+    }
+    
     private func handleSignUp() {
-        email
-            .combineLatest(password, name)
-            .map { email, password, name in
-                // TODO: Validate email, password, name
-                // if not valiadated, then output.send(errors)
-                return (email, password, name)
-            }
-            .map { email, password, name in
-                self.authManager
-                    .signUp(email: email, password: password, name: name)
-            }
-            .switchToLatest()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { [weak self] completion in
-                switch completion {
-                case .finished: print("Successfully signed up")
-                case .failure(let error): self?.output.send(.signUpDidFail(error: error))
-                }
-            } receiveValue: { [weak self] success in
-                guard let self = self else { return }
-                if success {
-                    self.output.send(.signUpDidSuccess)
-                }
-            }
-            .store(in: &cancellables)
+        if let (email, password, name) = handleText(email: email.value, password: password.value, name: name.value) {
+            authManager
+                .signUp(email: email, password: password, name: name)
+        }
     }
 }

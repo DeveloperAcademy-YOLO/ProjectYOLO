@@ -61,18 +61,105 @@ class SignUpTextField: UIView {
         return textField
     }()
     
+    private let waringImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .center
+        imageView.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
+        return imageView
+    }()
+    
+    private let waringLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .systemGray
+        return label
+    }()
+    private var isWaringShown: Bool = true
+    private var textFieldBottomConstraint: ConstraintMakerEditable?
     private var cancellabels = Set<AnyCancellable>()
         
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(textField)
-        textField.snp.makeConstraints({ make in
-            make.top.leading.trailing.bottom.equalToSuperview()
-        })
+        setDefaultLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setDefaultLayout() {
+        addSubviews([textField, waringImage, waringLabel])
+        textField.snp.makeConstraints({ make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(38)
+            textFieldBottomConstraint = make.bottom.equalToSuperview()
+        })
+        textFieldBottomConstraint?.constraint.deactivate()
+        waringImage.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(56)
+            make.leading.equalToSuperview().offset(16)
+            make.height.equalTo(21.52)
+            make.width.equalTo(20.26)
+            make.bottom.equalToSuperview()
+        })
+        waringLabel.snp.makeConstraints({ make in
+            make.top.equalTo(waringImage.snp.top)
+            make.leading.equalToSuperview().offset(49.05)
+            make.bottom.equalTo(waringImage.snp.bottom)
+        })
+        waringLabel.backgroundColor = .orange
+    }
+    
+    private func showWarning(isShown: Bool, text: String? = nil) {
+        if let text = text {
+            waringLabel.text = text
+        }
+        if isShown {
+            waringLabel.snp.updateConstraints({ make in
+                make.leading.equalToSuperview().offset(49.05)
+            })
+            waringImage.isHidden = false
+        } else {
+            waringLabel.snp.updateConstraints({ make in
+                make.leading.equalToSuperview().offset(16)
+            })
+            waringImage.isHidden = true
+        }
+        layoutIfNeeded()
+    }
+    
+    private func resetWaring(isShown: Bool, waringShown: Bool = false, text: String? = nil) {
+        // waringImage & waringView Hidden and reset its bottom view constraint
+        if isShown {
+            if isWaringShown {
+                waringImage.isHidden = false
+                waringLabel.isHidden = false
+                showWarning(isShown: true, text: text)
+            } else {
+                addSubviews([waringImage, waringLabel])
+                textFieldBottomConstraint?.constraint.deactivate()
+                waringImage.snp.makeConstraints({ make in
+                    make.top.equalToSuperview().offset(56)
+                    make.leading.equalToSuperview().offset(16)
+                    make.height.equalTo(21.52)
+                    make.width.equalTo(20.26)
+                    make.bottom.equalToSuperview()
+                })
+                waringLabel.snp.makeConstraints({ make in
+                    make.top.equalTo(waringImage.snp.top)
+                    make.leading.equalToSuperview().offset(49.05)
+                })
+            }
+        } else {
+            if isWaringShown {
+                waringImage.snp.removeConstraints()
+                waringLabel.snp.removeConstraints()
+                waringImage.removeFromSuperview()
+                waringLabel.removeFromSuperview()
+                textFieldBottomConstraint?.constraint.activate()
+            }
+        }
+        isWaringShown = isShown
+        layoutIfNeeded()
     }
     
     func setTextFieldType(type: SignUpTextFieldEnum) {
@@ -87,11 +174,14 @@ class SignUpTextField: UIView {
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            resetWaring(isShown: false)
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.isSecureTextEntry = true
+            showWarning(isShown: false, text: "비밀번호는 6자 이상이어야 합니다")
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+            showWarning(isShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
