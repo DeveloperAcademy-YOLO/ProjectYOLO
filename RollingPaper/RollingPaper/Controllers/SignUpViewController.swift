@@ -67,16 +67,6 @@ class SignUpViewController: UIViewController {
                 self.view.frame.origin.y =  keyboardY - currentFocusedTextfieldY - 38
             }
         }
-//        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-//            print("Keyboard Will Show")
-//            print("CurrentFocusedFieldY: \(currentFocusedTextfieldY)")
-//            print(currentFocusedTextfieldY + 38)
-//            print(keyboardSize.origin.y)
-//            if currentFocusedTextfieldY + 38 > keyboardSize.origin.y {
-//                view.frame.origin.y =  keyboardSize.origin.y - currentFocusedTextfieldY - 38
-//            }
-//            print(view.frame.origin.y)
-//        }
     }
 
     @objc private func keyboardWillHide(notification: NSNotification) {
@@ -167,11 +157,11 @@ class SignUpViewController: UIViewController {
         emailTextField
             .textField
             .didBeginEditingPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 if let yPosition = self?.emailTextField.frame.origin.y {
                     self?.currentFocusedTextfieldY = yPosition
                 }
-            }
+            })
             .store(in: &cancellables)
         passwordTextField
             .textField
@@ -185,11 +175,11 @@ class SignUpViewController: UIViewController {
         passwordTextField
             .textField
             .didBeginEditingPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 if let yPosition = self?.passwordTextField.frame.origin.y {
                     self?.currentFocusedTextfieldY = yPosition
                 }
-            }
+            })
             .store(in: &cancellables)
         nameTextField
             .textField
@@ -203,11 +193,11 @@ class SignUpViewController: UIViewController {
         nameTextField
             .textField
             .didBeginEditingPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 if let yPosition = self?.nameTextField.frame.origin.y {
                     self?.currentFocusedTextfieldY = yPosition
                 }
-            }
+            })
             .store(in: &cancellables)
         emailTextField.passedSubject
             .combineLatest(passwordTextField.passedSubject, nameTextField.passedSubject)
