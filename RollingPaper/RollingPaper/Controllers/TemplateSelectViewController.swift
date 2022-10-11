@@ -139,14 +139,17 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        // TODO: 해당 템플릿으로 이동하기
         // 템플릿을 터치하는 순간 최근 템플릿으로 설정하기 위해 input에 값 설정하기
         if isRecentExist && indexPath.section == 0 {
             guard let recentTemplate = recentTemplate else {return false}
-            input.send(.newTemplateTap(template: recentTemplate))
+            navigationController?.pushViewController(SetPaperViewController(template: recentTemplate), animated: true) {
+                self.input.send(.newTemplateTap(template: recentTemplate))
+            }
         } else {
             let selectedTemplate = viewModel.getTemplates()[indexPath.item]
-            input.send(.newTemplateTap(template: selectedTemplate))
+            navigationController?.pushViewController(SetPaperViewController(template: selectedTemplate), animated: true) {
+                self.input.send(.newTemplateTap(template: selectedTemplate))
+            }
         }
         return true
     }

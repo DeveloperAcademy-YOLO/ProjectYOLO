@@ -16,7 +16,7 @@ class SetPaperViewController: UIViewController {
     private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
-    init(template: String) {
+    init(template: TemplateEnum) {
         super.init(nibName: nil, bundle: nil)
         viewModel.template = template
     }

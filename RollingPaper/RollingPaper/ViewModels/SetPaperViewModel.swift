@@ -11,7 +11,7 @@ import Combine
 class SetPaperViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
-    var template: String?
+    var template: TemplateEnum?
     
     enum Input {
         case setPaperTitle(title: String)
@@ -56,7 +56,7 @@ class SetPaperViewModel {
             output.send(.createPaperFail)
             return
         }
-        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template)
+        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template.template.templateString)
         output.send(.createPaperSuccess(paper: paper))
     }
 }
