@@ -734,6 +734,7 @@ PODS:
   - nanopb/encode (2.30909.0)
   - PromisesObjC (2.1.1)
   - SnapKit (5.6.0)
+  - StickerView (1.0)
   - SwiftLint (0.39.1)
 
 DEPENDENCIES:
@@ -743,6 +744,7 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - SnapKit
+  - StickerView
   - SwiftLint (= 0.39.1)
 
 SPEC REPOS:
@@ -771,6 +773,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - SnapKit
+    - StickerView
     - SwiftLint
 
 SPEC CHECKSUMS:
@@ -798,8 +801,9 @@ SPEC CHECKSUMS:
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  StickerView: c486fbc722bddaff4f521afd9028ea4dc3e25a62
   SwiftLint: 55e96a4a4d537d4a3156859fc1c54bd24851a046
 
-PODFILE CHECKSUM: 5f47d67add45a53b8ac1ba5f40acf9a7b476d7c6
+PODFILE CHECKSUM: 99a37cf3c3cec86873bb45367973a4dac21f494c
 
 COCOAPODS: 1.11.3
