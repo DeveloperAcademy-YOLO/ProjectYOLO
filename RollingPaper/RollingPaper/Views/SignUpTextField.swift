@@ -10,7 +10,7 @@ import SnapKit
 import Combine
 import CombineCocoa
 
-class SignUpTextField: UIView {
+final class SignUpTextField: UIView {
     enum SignUpTextFieldEnum {
         case email
         case password
@@ -25,7 +25,8 @@ class SignUpTextField: UIView {
     }
     
     private var textFieldEnum: SignUpTextFieldEnum?
-    
+    let passedSubject: CurrentValueSubject<Bool, Never> = .init(false)
+    let waringShownSubject: CurrentValueSubject<Bool, Never> = .init(false)
     private let checkImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .center
@@ -152,27 +153,27 @@ class SignUpTextField: UIView {
         }
         textField
             .didBeginEditingPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 self?.setTextFieldState(state: .focused)
-            }
+            })
             .store(in: &cancellabels)
         textField.controlPublisher(for: .editingDidEnd)
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 if
                     let currentTextField = self?.textFieldEnum,
                     let currentState = self?.handleTextfieldText(currentTextField: currentTextField, text: self?.textField.text ?? "") {
                     self?.setTextFieldState(state: currentState)
                 }
-            }
+            })
             .store(in: &cancellabels)
         textField.controlPublisher(for: .editingDidEndOnExit)
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 if
                     let currentTextField = self?.textFieldEnum,
                     let currentState = self?.handleTextfieldText(currentTextField: currentTextField, text: self?.textField.text ?? "") {
                     self?.setTextFieldState(state: currentState)
                 }
-            }
+            })
             .store(in: &cancellabels)
     }
     
@@ -210,12 +211,16 @@ class SignUpTextField: UIView {
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(false)
+                waringShownSubject.send(false)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(false)
+                waringShownSubject.send(false)
             case .waring(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -233,12 +238,16 @@ class SignUpTextField: UIView {
                     text = "이메일을 다시 입력해주세요"
                 }
                 setWaringView(waringShown: true, text: text)
+                passedSubject.send(false)
+                waringShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(true)
+                waringShownSubject.send(false)
             }
         case .password:
             switch state {
@@ -248,12 +257,16 @@ class SignUpTextField: UIView {
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다f")
+                passedSubject.send(false)
+                waringShownSubject.send(true)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(false)
+                waringShownSubject.send(false)
             case .waring(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -269,12 +282,16 @@ class SignUpTextField: UIView {
                     text = "비밀번호를 다시 입력해주세요"
                 }
                 setWaringView(waringShown: true, text: text)
+                passedSubject.send(false)
+                waringShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(true)
+                waringShownSubject.send(false)
             }
         case .name:
             switch state {
@@ -284,12 +301,18 @@ class SignUpTextField: UIView {
                 textField.layer.shadowOpacity = 0.0
                 nameCountView.isHidden = false
                 checkImageView.isHidden = true
+                setWaringView(waringShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
+                passedSubject.send(false)
+                waringShownSubject.send(true)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
                 nameCountView.isHidden = false
                 checkImageView.isHidden = true
+                setWaringView(waringShown: false, text: nil)
+                passedSubject.send(false)
+                waringShownSubject.send(false)
             case .waring(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -306,6 +329,8 @@ class SignUpTextField: UIView {
                     text = "닉네임을 다시 입력해주세요"
                 }
                 setWaringView(waringShown: true, text: text)
+                passedSubject.send(false)
+                waringShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
@@ -313,6 +338,8 @@ class SignUpTextField: UIView {
                 nameCountView.isHidden = true
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
+                passedSubject.send(true)
+                waringShownSubject.send(false)
             }
         }
     }
