@@ -29,6 +29,7 @@ class TemplateSelectViewController: UIViewController {
     // view가 나타날때마다 최근 템플릿 확인하기 위해 input에 값 설정하기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        self.navigationItem.hidesBackButton = true
         input.send(.viewDidAppear)
     }
     
