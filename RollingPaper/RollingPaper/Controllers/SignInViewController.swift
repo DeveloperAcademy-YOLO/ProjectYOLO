@@ -27,8 +27,9 @@ class SignInViewController: UIViewController {
         textField.layer.cornerRadius = 12
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
         textField.textContentType = .emailAddress
+        textField.font = .preferredFont(forTextStyle: .body)
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -40,7 +41,8 @@ class SignInViewController: UIViewController {
         textField.layer.cornerRadius = 12
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+        textField.font = .preferredFont(forTextStyle: .body)
         textField.textContentType = .oneTimeCode
         textField.isSecureTextEntry = false
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
@@ -53,8 +55,8 @@ class SignInViewController: UIViewController {
         button.backgroundColor = UIColor(rgb: 0x007AFF)
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
-        button.setTitle("로그인", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.white])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
     private let appleSignInButton: ASAuthorizationAppleIDButton = {
@@ -72,6 +74,7 @@ class SignInViewController: UIViewController {
     private let waringLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
+        label.font = .preferredFont(forTextStyle: .body)
         label.isHidden = true
         return label
     }()
