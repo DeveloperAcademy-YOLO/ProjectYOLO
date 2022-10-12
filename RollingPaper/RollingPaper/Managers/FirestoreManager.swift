@@ -14,7 +14,7 @@ final class FirestoreManager: DatabaseManager {
     enum Constants: String {
         case usersCollectionPath = "rollingpaper_users"
         case userPaperPath = "user_papers"
-        case PapersPath = "rollingpaper_papers"
+        case papersPath = "rollingpaper_papers"
     }
     
     static let shared: DatabaseManager = FirestoreManager()
@@ -28,7 +28,6 @@ final class FirestoreManager: DatabaseManager {
     private init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
         bind()
-        loadPapers()
     }
     
     private func loadPapers() {
@@ -53,38 +52,57 @@ final class FirestoreManager: DatabaseManager {
     private func bind() {
         authManager
             .userProfileSubject
-            .compactMap({ $0 })
             .sink(receiveValue: { [weak self] userProfile in
-                self?.currentUserEmail = userProfile.email
+                self?.currentUserEmail = userProfile?.email
+                self?.loadPapers()
             })
             .store(in: &cancellables)
     }
     
     func addPaper(paper: PaperModel) {
-        
+        guard
+            let currentUserEmail = currentUserEmail,
+            let paperData = try? JSONEncoder().encode(paper),
+            let paperDict = (try? JSONSerialization.jsonObject(with: paperData, options: .allowFragments)).flatMap({ $0 as? [String:Any] }) else { return }
+        database
+            .collection(Constants.papersPath.rawValue)
+            .document(paper.paperId)
+            .setData(paperDict)
+        database
+            .collection(Constants.usersCollectionPath.rawValue)
+            .document(currentUserEmail)
+            .collection(Constants.userPaperPath.rawValue)
+            .document(paper.paperId)
+            .setData(paperDict)
     }
     
     func addCard(paperId: String, card: CardModel) {
-        
+        guard let currentUserEmail = currentUserEmail else { return }
+
     }
     
     func removePaper(paper: PaperModel) {
-        
+        guard let currentUserEmail = currentUserEmail else { return }
+
     }
     
     func removeCard(paperId: String, card: CardModel) {
-        
+        guard let currentUserEmail = currentUserEmail else { return }
+
     }
     
     func updatePaper(paper: PaperModel) {
-        
+        guard let currentUserEmail = currentUserEmail else { return }
+
     }
     
     func updateCard(paperId: String, card: CardModel) {
-        
+        guard let currentUserEmail = currentUserEmail else { return }
+
     }
     
     func addPaperObserver(paperId: String) {
+        guard let currentUserEmail = currentUserEmail else { return }
         // 특정 document (특정 페이퍼 데이터를 가지고 있는 파이어베이스 파이어스토어) 데이터 변경을 감지
     }
 }
