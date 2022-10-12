@@ -10,21 +10,22 @@ import SnapKit
 
 class CardRootViewController: UIViewController {
     
-    let items = ["배경 고르기", "꾸미기"]
+    private let items = ["배경 고르기", "꾸미기"]
     
-    var firstStepView: UIView!
-    var secondStepView: UIView!
+    private var firstStepView: UIView!
+    private var secondStepView: UIView!
     
-    let firstViewController = CardBackgroundViewController()
-    let secondViewController = CardPencilKitViewController()
+    private let firstViewController = CardBackgroundViewController()
+    private let secondViewController = CardPencilKitViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         instantiateSegmentedViewControllers()
-
     }
-    fileprivate func setupViews() {
+    
+    private func setupViews() {
+        view.backgroundColor = .white
         view.addSubview(segmentedControl)
         segmentedControlConstraints()
     }
@@ -55,7 +56,7 @@ class CardRootViewController: UIViewController {
         }
     }
     
-    func segmentedControlConstraints() {
+    private func segmentedControlConstraints() {
         segmentedControl.snp.makeConstraints({ make in
             make.width.equalTo(200)
             make.height.equalTo(35)
@@ -65,20 +66,18 @@ class CardRootViewController: UIViewController {
     }
     
     private func instantiateSegmentedViewControllers() {
-         let firstStepViewVC = firstViewController
-           // else { fatalError("can't find firstStepViewVC") }
-         let secondStepViewVC = secondViewController
-        
-            
-            self.addChild(firstStepViewVC)
-            self.addChild(secondStepViewVC)
+        let firstStepViewVC = firstViewController
+        let secondStepViewVC = secondViewController
+          
+        self.addChild(secondStepViewVC)
+        self.addChild(firstStepViewVC)
         
         firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-            
-            self.view.addSubview(firstStepViewVC.view)
-            self.view.addSubview(secondStepViewVC.view)
-            
+        
+        self.view.addSubview(secondStepViewVC.view)
+        self.view.addSubview(firstStepViewVC.view)
+           
             NSLayoutConstraint.activate([
                 firstStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
                 firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
@@ -88,9 +87,8 @@ class CardRootViewController: UIViewController {
                 secondStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
                 secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-                secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+                secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
             ])
-            
             
             self.firstStepView = firstStepViewVC.view
             self.secondStepView = secondStepViewVC.view

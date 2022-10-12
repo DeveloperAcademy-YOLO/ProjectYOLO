@@ -47,10 +47,11 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         checkAlbumPermission()
     }
     
-    private var firstColorName: String = "customYellow"  // template로 부터 받아온 데이터로 대체
-    private var secondColorName: String = "customRed" // template로 부터 받아온 데이터로 대체
-    private var thirdColorName: String = "customBlack" // template로 부터 받아온 데이터로 대체
-    private var fourthColorName: String = "darkGray" // template로 부터 받아온 데이터로 대체
+    private var backgroundColor: [String] = ["customYellow","customRed","customBlack","darkGray"]
+//    private var backgroundColor[0]: String = "customYellow"  // template로 부터 받아온 데이터로 대체
+//    private var backgroundColor[1]: String = "customRed" // template로 부터 받아온 데이터로 대체
+//    private var backgroundColor[2]: String = "customBlack" // template로 부터 받아온 데이터로 대체
+//    private var backgroundColor[3]: String = "darkGray" // template로 부터 받아온 데이터로 대체
     
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
@@ -69,7 +70,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: firstColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[0])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -82,7 +83,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var secondColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: secondColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[1])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -95,7 +96,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var thirdColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: thirdColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[2])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -108,7 +109,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var fourthColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: fourthColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[3])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -128,22 +129,22 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: firstColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: backgroundColor[0]) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: secondColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: backgroundColor[1]) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("thirdImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: thirdColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: backgroundColor[2]) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: fourthColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: backgroundColor[3]) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
