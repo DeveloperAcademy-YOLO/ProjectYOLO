@@ -16,11 +16,17 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         
         switch category.name {
         case "페이퍼 템플릿":
-            self.viewControllers[1] = templateViewController
+            if !(self.viewControllers[1] is TemplateSelectViewController) {
+                self.viewControllers[1] = templateViewController
+            }
         case "페이퍼 보관함":
-            self.viewControllers[1] = mainViewController
+            if !(self.viewControllers[1] is MainViewController) {
+                self.viewControllers[1] = mainViewController
+            }
         case "설정":
-            self.viewControllers[1] = mainViewController
+            if !(self.viewControllers[1] is MainViewController) {
+                self.viewControllers[1] = mainViewController
+            }
         default:
             self.viewControllers[1] = mainViewController
         }
