@@ -20,15 +20,15 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     var backgroundImg = UIImage(named: "Rectangle")
     
-    private let viewModel: CardRootViewModel
-    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+    private let viewModel: CardBackgroundViewModel
+    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToggle: Bool = true
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
-    init(viewModel: CardRootViewModel) {
+    init(viewModel: CardBackgroundViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }

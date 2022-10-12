@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class CardRootViewModel {
+class CardBackgroundViewModel {
     var cardBackgroundImg = UIImage(named: "Rectangle")
     
     enum Input {
@@ -50,10 +50,10 @@ class CardRootViewModel {
     }
     
     private func getRecentCardBackgroundImg() {
-        if let recentBackgroundImg = UserDefaults.standard.data(forKey: "cardBackgroundImg"){
+        if let recentBackgroundImg = UserDefaults.standard.data(forKey: "cardBackgroundImg") {
             let backImg = UIImage(data: recentBackgroundImg)
             print("나올때 \(recentBackgroundImg)")
-            print("나올때 \(backImg)")
+            print("나올때 \(String(describing: backImg))")
             output.send(.getRecentCardBackgroundImgSuccess(background: backImg!))
         } else {
             output.send(.getRecentCardBackgroundImgFail)

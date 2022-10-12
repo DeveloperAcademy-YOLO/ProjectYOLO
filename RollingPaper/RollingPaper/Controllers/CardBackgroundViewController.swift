@@ -48,11 +48,11 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     }
     
     
-    private let viewModel: CardRootViewModel
-    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+    private let viewModel: CardBackgroundViewModel
+    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardRootViewModel) {
+    init(viewModel: CardBackgroundViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
