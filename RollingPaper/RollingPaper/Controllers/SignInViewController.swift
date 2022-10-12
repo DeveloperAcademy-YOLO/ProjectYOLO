@@ -9,6 +9,7 @@ import UIKit
 import Combine
 import SnapKit
 import AuthenticationServices
+import CombineCocoa
 
 class SignInViewController: UIViewController {
     enum TextFieldFocused {
@@ -40,8 +41,8 @@ class SignInViewController: UIViewController {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
         textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-        textField.textContentType = .newPassword
-        textField.isSecureTextEntry = true
+//        textField.textContentType = .newPassword
+//        textField.isSecureTextEntry = true
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -84,6 +85,7 @@ class SignInViewController: UIViewController {
         super.viewDidLoad()
         setSignInViewUI()
         bind()
+        setKeyboardObserver()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -152,7 +154,6 @@ class SignInViewController: UIViewController {
         appleSignInButton.snp.makeConstraints({ make in
             make.top.equalTo(signInButton.snp.bottom).offset(28)
             make.width.equalTo(375)
-            // TODO: appleSignInButton -> width <= 375
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
         })
@@ -284,10 +285,26 @@ class SignInViewController: UIViewController {
                 self?.viewModel.email.send(email)
             })
             .store(in: &cancellables)
+        emailTextField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.emailTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            })
+            .store(in: &cancellables)
         passwordTextField
             .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.passwordFocused)
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.passwordTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
             })
             .store(in: &cancellables)
         passwordTextField
