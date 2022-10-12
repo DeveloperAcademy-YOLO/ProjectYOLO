@@ -12,13 +12,16 @@ import AuthenticationServices
 import CryptoKit
 
 protocol AuthManager {
+    static var shared: AuthManager { get }
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> {get set}
+    var userProfileSubject: PassthroughSubject<UserModel?, Never> { get set }
     func signIn(email: String, password: String)
     func appleSignIn()
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser() -> AnyPublisher<Bool, Error>
     func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
+    func fetchUserProfile()
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -45,7 +48,9 @@ enum AuthManagerEnum: String, CaseIterable {
 // TODO: Name Already In User -> With DatabaseManager
 
 final class FirebaseAuthManager: NSObject, AuthManager {
+    static let shared: AuthManager = FirebaseAuthManager()
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
+    var userProfileSubject: PassthroughSubject<UserModel?, Never> = .init()
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
@@ -188,6 +193,20 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
+    }
+    
+    func fetchUserProfile() {
+        if let user = auth.currentUser {
+            let email = user.email ?? "Default Email"
+            let name = user.displayName ?? "Default Name"
+            var userProfile = UserModel(email: email, name: name)
+            if let photoUrl = user.photoURL {
+                userProfile.profileUrl = photoUrl.absoluteString
+            }
+            userProfileSubject.send(userProfile)
+        } else {
+            userProfileSubject.send(nil)
+        }
     }
 }
 
