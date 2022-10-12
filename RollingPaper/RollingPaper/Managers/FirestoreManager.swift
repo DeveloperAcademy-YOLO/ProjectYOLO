@@ -31,6 +31,18 @@ final class FirestoreManager: DatabaseManager {
         bind()
     }
     
+    /// 현재 로그인된 유저 프로필 데이터 퍼블리셔 구독: (1). 유저 프로필이 변경될 때 감지 가능 (2). 로드 시 자동으로 현재 로그인된 유저가 작성한 페이퍼 프리뷰 배열을 로드
+    private func bind() {
+        authManager
+            .userProfileSubject
+            .sink(receiveValue: { [weak self] userProfile in
+                self?.currentUserEmail = userProfile?.email
+                self?.loadPaperPreviews()
+            })
+            .store(in: &cancellables)
+    }
+    
+    /// (1). 페이퍼 아이디를 통해 파이어베이스 내 저장된 페이퍼 탐색 및 페이퍼 퍼블리셔에 로드 (2). 페이퍼 아이디에 대한 페이퍼 데이터가 존재하지 않을 때 유저의 페이퍼 프리뷰 배열 업데이트
     func fetchPaper(paperId: String) {
         database
             .collection(Constants.papersPath.rawValue)
@@ -40,8 +52,8 @@ final class FirestoreManager: DatabaseManager {
                     let data = document?.data(),
                     let paper = self?.getPaper(from: data),
                     error == nil else {
-                    self?.loadPaperPreviews()
-                    // 페이퍼 아이디에 대한 페이퍼가 존재하지 않을 때 현재 프리뷰 업데이트
+                    self?.removePaperPreview(paperId: paperId)
+                    self?.removeUsersPaperId(paperId: paperId)
                     self?.paperSubject.send(nil)
                     return
                 }
@@ -49,6 +61,11 @@ final class FirestoreManager: DatabaseManager {
             })
     }
     
+    func resetPaper() {
+        paperSubject.send(nil)
+    }
+    
+    /// (1). 파이어베이스 내 페이퍼 데이터 추가 (2). 현재 유저가 작성한 페이퍼 아이디 목록에 추가 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 추가
     func addPaper(paper: PaperModel) {
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
         guard
@@ -69,6 +86,7 @@ final class FirestoreManager: DatabaseManager {
             }
     }
     
+    /// 현재 작성 중 페이퍼가 있을 때(페이퍼 데이터 퍼블리셔 값이 유효할 때): (1). 파이어베이스 내 페이퍼 데이터 변경 (2). 로컬 페이퍼 데이터 퍼블리셔의 데이터 변경
     func addCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
@@ -86,6 +104,7 @@ final class FirestoreManager: DatabaseManager {
             }
     }
     
+    /// (1). 파이어베이스 내 페이퍼 데이터 삭제 (2). 현재 유저가 작성한 페이퍼 아이디 목록 중 해당 페이퍼 아이디 삭제 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 삭제
     func removePaper(paperId: String) {
         database
             .collection(Constants.papersPath.rawValue)
@@ -101,6 +120,7 @@ final class FirestoreManager: DatabaseManager {
             })
     }
     
+    /// 현재 작성 중 페이퍼가 있을 때(페이퍼 데이터 퍼블리셔 값이 유효할 때): (1). 파이어베이스 내 데이터 변경 (2). 로컬 페이퍼 데이터 퍼블리셔 데이터 변경
     func removeCard(paperId: String, card: CardModel) {
         database
             .collection(Constants.papersPath.rawValue)
@@ -118,6 +138,8 @@ final class FirestoreManager: DatabaseManager {
             })
     }
     
+    
+    /// (1). 파이어베이스 내 데이터 업데이트 (2). 프리뷰가 변경되었을 때를 대비, 프리뷰 데이터 업데이트
     func updatePaper(paper: PaperModel) {
         guard let paperDict = getPaperDict(with: paper) else { return }
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
@@ -134,16 +156,13 @@ final class FirestoreManager: DatabaseManager {
             }
     }
     
+    /// 현재 작성 중 페이퍼가 있을 때(페이퍼 데이터 퍼블리셔 값이 유효할 때): (1). 파이어베이스 내 페이퍼 업데이트 (2). 로컬 페이퍼 데이터 퍼블리셔 데이터 업데이트
     func updateCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         if let index = currentPaper.cards.firstIndex(where: { $0.cardId == card.cardId }) {
             currentPaper.cards[index] = card
             updatePaper(paper: currentPaper)
         }
-    }
-    
-    func savePaper() {
-        
     }
 }
 
@@ -240,16 +259,6 @@ extension FirestoreManager {
                     self?.fetchPaperPreview(paperId: paperId)
                 })
             })
-    }
-    
-    private func bind() {
-        authManager
-            .userProfileSubject
-            .sink(receiveValue: { [weak self] userProfile in
-                self?.currentUserEmail = userProfile?.email
-                self?.loadPaperPreviews()
-            })
-            .store(in: &cancellables)
     }
     
     private func getPaperDict(with paper: PaperModel) -> [String: Any]? {

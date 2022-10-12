@@ -22,7 +22,7 @@ final class LocalDatabaseMockManager: DatabaseManager {
         loadPapers()
     }
     
-    private func loadPapers() {
+    private func downloadMockdata() -> [PaperPreviewModel] {
         let today = Date()
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         var paper1 = PaperModel(cards: [], date: today, endTime: tomorrow, title: "MockPaper1", templateString: TemplateEnum.halloween.rawValue)
@@ -43,6 +43,11 @@ final class LocalDatabaseMockManager: DatabaseManager {
             let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString)
             paperPreviews.append(paperPreview)
         }
+        return paperPreviews
+    }
+    
+    private func loadPapers() {
+        let paperPreviews = downloadMockdata()
         papersSubject.send(paperPreviews)
     }
     
@@ -111,5 +116,9 @@ final class LocalDatabaseMockManager: DatabaseManager {
             let currentPaper = papersMockData[index]
             paperSubject.send(currentPaper)
         }
+    }
+    
+    func resetPaper() {
+        paperSubject.send(nil)
     }
 }

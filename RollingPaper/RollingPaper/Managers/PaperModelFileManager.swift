@@ -186,4 +186,8 @@ final class PaperModelFileManager: DatabaseManager {
             print(error.localizedDescription)
         }
     }
+    
+    func resetPaper() {
+        paperSubject.send(nil)
+    }
 }
