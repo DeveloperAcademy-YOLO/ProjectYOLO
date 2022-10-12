@@ -64,7 +64,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
-      //  input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
         bind()
     }
     
@@ -168,27 +167,21 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
         selectedColor = backgroundColor[0]
-        
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
-//        self.someImageView.image = image
-//        print("button clicked: \(image)")
-        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))    }
+        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
+    }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
         selectedColor = backgroundColor[1]
         let image = UIImage(named: "Halloween_Candy")
         self.someImageView.image = image
-        print("button clicked: \(image)")
-
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
-//        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("thirdImageViewColor clicked")
         selectedColor = backgroundColor[2]
-//        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
 
@@ -197,7 +190,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
         selectedColor = backgroundColor[3]
-//        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }

@@ -90,34 +90,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         bind()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-       // bind()
-    }
-    
-//    private func bind() {
-//        print("Second View Bind Init!")
-//        let output = viewModel.transform(input: input.eraseToAnyPublisher())
-//        output
-//            .sink { event in
-//                print("Second View Called!")
-//                switch event {
-//                case .getRecentCardBackgroundImgSuccess(let background):
-//                    self.backgroundImg = background
-//                case .getRecentCardBackgroundImgFail:
-//                    self.backgroundImg = UIImage(named: "Rectangle")
-//                }
-//            }
-//            .store(in: &cancellables)
-//        viewModel.backgroundSubject
-//            .compactMap({ $0 })
-//            .sink { image in
-//                print("Image Changed!")
-//                self.backgroundImg = image
-//            }
-//            .store(in: &cancellables)
-//    }
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -127,9 +99,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
                     print(background)
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
-                    }
+                    })
                 case .getRecentCardBackgroundImgFail:
                     print("fail")
                     self.someImageView.image = UIImage(named: "Rectangle")
@@ -239,11 +211,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         canvasView.becomeFirstResponder()
         canvasViewConstraints()
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-////        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "customYellow") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
-//    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
