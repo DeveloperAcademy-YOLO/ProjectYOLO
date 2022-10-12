@@ -11,15 +11,16 @@ import Combine
 import CombineCocoa
 
 final class FirestoreManager: DatabaseManager {
+    
     enum Constants: String {
         case usersCollectionPath = "rollingpaper_users"
-        case userPaperPath = "user_papers"
         case papersPath = "rollingpaper_papers"
+        case paperPreviewsPath = "rollingpaper_paperPreviews"
     }
     
     static let shared: DatabaseManager = FirestoreManager()
-    var cardsSubject: CurrentValueSubject<[CardModel], Never> = .init([])
-    var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
+    var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> = .init([])
+    var paperSubject: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     private let database = Firestore.firestore()
     private let authManager: AuthManager
     private var cancellables = Set<AnyCancellable>()
@@ -30,22 +31,33 @@ final class FirestoreManager: DatabaseManager {
         bind()
     }
     
-    private func loadPapers() {
+    private func fetchPaperPreview(paperId: String) {
+        database
+            .collection(Constants.paperPreviewsPath.rawValue)
+            .document(paperId)
+            .getDocument(completion: { [weak self] document, error in
+                guard
+                    let data = document?.data(),
+                    let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed),
+                    let paperPreview = try? JSONDecoder().decode(PaperPreviewModel.self, from: jsonData),
+                    error == nil else { return }
+                self?.papersSubject.send(self?.papersSubject.value ?? [] + [paperPreview])
+            })
+    }
+        
+    private func loadPaperPreviews() {
         guard let currentUserEmail = currentUserEmail else { return }
         database
             .collection(Constants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
-            .collection(Constants.userPaperPath.rawValue)
-            .getDocuments(completion: { [weak self] querySnapshot, error in
-                guard let self = self else { return }
+            .getDocument(completion: { snapshot, error in
                 guard
-                    let documents = querySnapshot?.documents,
-                    error == nil else { return }
-                let papers = documents
-                    .map({ $0.data() })
-                    .compactMap({ try? JSONSerialization.data(withJSONObject: $0, options: [.fragmentsAllowed])})
-                    .compactMap({ try? JSONDecoder().decode(PaperModel.self, from: $0)})
-                self.papersSubject.send(papers)
+                    error == nil,
+                    let dictionary = snapshot?.data() as? [String: [String]],
+                    let paperIds = dictionary["paperIds"] else { return }
+                paperIds.forEach({ paperId in
+                    self.fetchPaperPreview(paperId: paperId)
+                })
             })
     }
     
@@ -54,7 +66,7 @@ final class FirestoreManager: DatabaseManager {
             .userProfileSubject
             .sink(receiveValue: { [weak self] userProfile in
                 self?.currentUserEmail = userProfile?.email
-                self?.loadPapers()
+                self?.loadPaperPreviews()
             })
             .store(in: &cancellables)
     }
@@ -81,9 +93,8 @@ final class FirestoreManager: DatabaseManager {
 
     }
     
-    func removePaper(paper: PaperModel) {
-        guard let currentUserEmail = currentUserEmail else { return }
-
+    func removePaper(paperId: String) {
+        
     }
     
     func removeCard(paperId: String, card: CardModel) {
