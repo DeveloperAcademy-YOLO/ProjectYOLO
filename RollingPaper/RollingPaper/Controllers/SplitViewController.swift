@@ -15,7 +15,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         case "페이퍼 템플릿":
             secondaryVC = TemplateSelectViewController()
         case "페이퍼 보관함":
-            secondaryVC = MainViewController()
+            secondaryVC = PaperStorageViewController()
         case "설정":
             secondaryVC = MainViewController()
         default:
