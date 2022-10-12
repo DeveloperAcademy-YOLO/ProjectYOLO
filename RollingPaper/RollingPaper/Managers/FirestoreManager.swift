@@ -44,19 +44,55 @@ final class FirestoreManager: DatabaseManager {
                 self?.papersSubject.send(self?.papersSubject.value ?? [] + [paperPreview])
             })
     }
+    
+    private func addPaperIdInFirebase(paperId: String) {
+        guard let currentUserEmail = currentUserEmail else { return }
+        database
+            .collection(Constants.usersCollectionPath.rawValue)
+            .document(currentUserEmail)
+            .getDocument(completion: { [weak self] snapshot, error in
+                guard
+                    error == nil,
+                    var dictionary = snapshot?.data() as? [String: [String]],
+                    var paperIds = dictionary["paperIds"] else { return }
+                paperIds.append(paperId)
+                dictionary["paperIds"] = paperIds
+                self?.database
+                    .collection(Constants.usersCollectionPath.rawValue)
+                    .document(currentUserEmail)
+                    .setData(dictionary)
+            })
+    }
+    
+    func fetchPaper(paperId: String) {
+        database
+            .collection(Constants.papersPath.rawValue)
+            .document(paperId)
+            .getDocument(completion: { [weak self] document, error in
+                guard
+                    let data = document?.data(),
+                    let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed),
+                    let paper = try? JSONDecoder().decode(PaperModel.self, from: jsonData),
+                    error == nil else {
+                    self?.paperSubject.send(nil)
+                    return
+                }
+                self?.paperSubject.send(paper)
+            })
+    }
         
     private func loadPaperPreviews() {
         guard let currentUserEmail = currentUserEmail else { return }
         database
             .collection(Constants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
-            .getDocument(completion: { snapshot, error in
+            .getDocument(completion: { [weak self] snapshot, error in
                 guard
                     error == nil,
                     let dictionary = snapshot?.data() as? [String: [String]],
                     let paperIds = dictionary["paperIds"] else { return }
                 paperIds.forEach({ paperId in
-                    self.fetchPaperPreview(paperId: paperId)
+                    self?.fetchPaperPreview(paperId: paperId)
                 })
             })
     }
@@ -72,20 +108,23 @@ final class FirestoreManager: DatabaseManager {
     }
     
     func addPaper(paper: PaperModel) {
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
         guard
             let currentUserEmail = currentUserEmail,
             let paperData = try? JSONEncoder().encode(paper),
-            let paperDict = (try? JSONSerialization.jsonObject(with: paperData, options: .allowFragments)).flatMap({ $0 as? [String:Any] }) else { return }
+            let paperPreviewData = try? JSONEncoder().encode(paperPreview),
+            let paperDict = (try? JSONSerialization.jsonObject(with: paperData, options: .fragmentsAllowed)).flatMap({ $0 as? [String: Any] }),
+            let paperPreviewDict = (try? JSONSerialization.jsonObject(with: paperPreviewData, options: .fragmentsAllowed)).flatMap({ $0 as? [String: Any]}) else { return }
         database
             .collection(Constants.papersPath.rawValue)
             .document(paper.paperId)
             .setData(paperDict)
         database
-            .collection(Constants.usersCollectionPath.rawValue)
-            .document(currentUserEmail)
-            .collection(Constants.userPaperPath.rawValue)
+            .collection(Constants.paperPreviewsPath.rawValue)
             .document(paper.paperId)
-            .setData(paperDict)
+            .setData(paperPreviewDict)
+        addPaperIdInFirebase(paperId: paper.paperId)
+        papersSubject.send(papersSubject.value + [paperPreview])
     }
     
     func addCard(paperId: String, card: CardModel) {
