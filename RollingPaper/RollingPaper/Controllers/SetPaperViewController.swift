@@ -11,15 +11,16 @@ import Combine
 
 class SetPaperViewController: UIViewController {
     private let paperTitleTextField = UITextField()
-    private let viewModel = SetPaperViewModel()
+    private var viewModel: SetPaperViewModel
     private let input: PassthroughSubject<SetPaperViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
+        viewModel = SetPaperViewModel(template: template)
         super.init(nibName: nil, bundle: nil)
-        viewModel.template = template
+        
     }
     
     required init?(coder: NSCoder) {
@@ -45,6 +46,7 @@ class SetPaperViewController: UIViewController {
                     print("페이퍼 생성 성공")
                     // TODO: 페이퍼 객체 넘겨주면서 네비게이션 연결
                     // navigationController?.pushViewController(, animated: true)
+                    print(paper)
                 case .createPaperFail:
                     self.paper = nil
                     print("페이퍼 생성 실패")

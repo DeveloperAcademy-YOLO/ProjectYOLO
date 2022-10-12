@@ -11,11 +11,12 @@ import Combine
 class SetPaperViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
-    var template: TemplateEnum?
+    private var template: TemplateEnum
     private let databaseManager: LocalDatabaseManager
     
-    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared) {
+    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
+        self.template = template
     }
     
     enum Input {
@@ -54,10 +55,7 @@ class SetPaperViewModel {
     // 페이퍼 만들기
     private func createPaper() {
         let currentTime = Date()
-        guard
-            let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime),
-            let template = template
-        else {
+        guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
             output.send(.createPaperFail)
             return
         }
