@@ -266,23 +266,22 @@ extension SignUpViewController {
     private func handleError(error: AuthManagerEnum) {
         switch error {
         case .emailAlreadyInUse:
-            emailTextField.setTextFieldState(state: .waring(error: .emailAlreadyInUse))
+            emailTextField.setTextFieldState(state: .warning(error: .emailAlreadyInUse))
         case .wrongPassword:
-            passwordTextField.setTextFieldState(state: .waring(error: .wrongPassword))
+            passwordTextField.setTextFieldState(state: .warning(error: .wrongPassword))
         case .invalidEmail:
-            emailTextField.setTextFieldState(state: .waring(error: .invalidEmail))
+            emailTextField.setTextFieldState(state: .warning(error: .invalidEmail))
         case .emailDidMiss:
-            emailTextField.setTextFieldState(state: .waring(error: .emailDidMiss))
+            emailTextField.setTextFieldState(state: .warning(error: .emailDidMiss))
         case .passwordDidMiss:
-            passwordTextField.setTextFieldState(state: .waring(error: .passwordDidMiss))
+            passwordTextField.setTextFieldState(state: .warning(error: .passwordDidMiss))
         case .nameAlreadyInUse:
-            nameTextField.setTextFieldState(state: .waring(error: .nameAlreadyInUse))
+            nameTextField.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
         case .invalidName:
-            nameTextField.setTextFieldState(state: .waring(error: .invalidName))
+            nameTextField.setTextFieldState(state: .warning(error: .invalidName))
         default: break
         }
     }
-
     
     private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
         switch textFieldType {

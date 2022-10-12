@@ -20,7 +20,7 @@ final class SignUpTextField: UIView {
     enum SignInTextFieldState {
         case normal
         case focused
-        case waring(error: AuthManagerEnum)
+        case warning(error: AuthManagerEnum)
         case passed
     }
     
@@ -192,7 +192,7 @@ extension SignUpTextField {
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
                 waringShownSubject.send(false)
-            case .waring(error: let error):
+            case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
@@ -238,7 +238,7 @@ extension SignUpTextField {
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
                 waringShownSubject.send(false)
-            case .waring(error: let error):
+            case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
@@ -284,7 +284,7 @@ extension SignUpTextField {
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
                 waringShownSubject.send(false)
-            case .waring(error: let error):
+            case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
@@ -337,14 +337,14 @@ extension SignUpTextField {
         switch currentTextField {
         case .email:
             if text.isEmpty {
-                state = .waring(error: .emailDidMiss)
+                state = .warning(error: .emailDidMiss)
             } else {
-                state = isValidEmail(text: text) ? .passed : .waring(error: .invalidEmail)
+                state = isValidEmail(text: text) ? .passed : .warning(error: .invalidEmail)
             }
         case .password:
-            state = text.count < 6 ? .waring(error: .wrongPassword) : .passed
+            state = text.count < 6 ? .warning(error: .wrongPassword) : .passed
         case .name:
-            state = text.isEmpty ? .waring(error: .invalidName) : text.count <= 8 ? .passed : .waring(error: .invalidName)
+            state = text.isEmpty ? .warning(error: .invalidName) : text.count <= 8 ? .passed : .warning(error: .invalidName)
         }
         return state
     }
