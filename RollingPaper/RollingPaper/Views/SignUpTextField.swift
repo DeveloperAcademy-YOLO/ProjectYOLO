@@ -122,8 +122,8 @@ extension SignUpTextField {
             textField.textContentType = .emailAddress
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-            textField.textContentType = .newPassword
-            textField.isSecureTextEntry = true
+            textField.textContentType = .oneTimeCode
+            textField.isSecureTextEntry = false
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
             textField.textContentType = .name
@@ -146,6 +146,7 @@ extension SignUpTextField {
         textField
             .didBeginEditingPublisher
             .sink(receiveValue: { [weak self] _ in
+                self?.textField.isSecureTextEntry = true
                 self?.setTextFieldState(state: .focused)
             })
             .store(in: &cancellabels)
