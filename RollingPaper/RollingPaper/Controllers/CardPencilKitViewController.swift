@@ -11,12 +11,13 @@ import StickerView
 import SnapKit
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
-    static let identifier = "CardPencilKitViewController"
+    
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
     
     var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
-    var arrBGImage: String = "Rectangle"
+    
+    var backgroundImg = UIImage(named: "Rectangle")
     
     private var isCanvasToggle: Bool = true
     private var isStickerToggle: Bool = true
@@ -46,12 +47,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
-        
+
         view.addSubview(someImageView)
         someImageView.backgroundColor = .gray
         someImageView.layer.masksToBounds = true
         someImageView.layer.cornerRadius = 50
         someImageView.contentMode = .scaleAspectFill
+        someImageView.image = backgroundImg
         someImageViewConstraints()
         
         someImageView.addSubview(canvasView)
@@ -176,8 +178,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        someImageView.image = UIImage(named: arrBGImage)
-        
+        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "darkGray") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     override func viewDidLayoutSubviews() {
