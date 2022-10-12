@@ -26,7 +26,7 @@ final class SignUpTextField: UIView {
     
     private var textFieldEnum: SignUpTextFieldEnum?
     let passedSubject: CurrentValueSubject<Bool, Never> = .init(false)
-    let waringShownSubject: CurrentValueSubject<Bool, Never> = .init(false)
+    let warningShownSubject: CurrentValueSubject<Bool, Never> = .init(false)
     private let checkImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .center
@@ -183,7 +183,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
@@ -191,7 +191,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -210,7 +210,7 @@ extension SignUpTextField {
                 }
                 setWaringView(waringShown: true, text: text)
                 passedSubject.send(false)
-                waringShownSubject.send(true)
+                warningShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
@@ -218,7 +218,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             }
         case .password:
             switch state {
@@ -229,7 +229,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다f")
                 passedSubject.send(false)
-                waringShownSubject.send(true)
+                warningShownSubject.send(true)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
@@ -237,7 +237,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -254,7 +254,7 @@ extension SignUpTextField {
                 }
                 setWaringView(waringShown: true, text: text)
                 passedSubject.send(false)
-                waringShownSubject.send(true)
+                warningShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
@@ -262,7 +262,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             }
         case .name:
             switch state {
@@ -274,7 +274,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: "닉네임은 가입 이후에도 수정이 가능합니다")
                 passedSubject.send(false)
-                waringShownSubject.send(true)
+                warningShownSubject.send(true)
             case .focused:
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
@@ -283,7 +283,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             case .warning(error: let error):
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
@@ -301,7 +301,7 @@ extension SignUpTextField {
                 }
                 setWaringView(waringShown: true, text: text)
                 passedSubject.send(false)
-                waringShownSubject.send(true)
+                warningShownSubject.send(true)
             case .passed:
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
@@ -310,7 +310,7 @@ extension SignUpTextField {
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
-                waringShownSubject.send(false)
+                warningShownSubject.send(false)
             }
         }
     }

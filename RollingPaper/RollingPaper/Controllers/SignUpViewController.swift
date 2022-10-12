@@ -237,21 +237,21 @@ class SignUpViewController: UIViewController {
             })
             .store(in: &cancellables)
         emailTextField
-            .waringShownSubject
+            .warningShownSubject
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] isWaringShown in
                 self?.setTextfieldLayout(textFieldType: .email, isWaringShown: isWaringShown)
             })
             .store(in: &cancellables)
         passwordTextField
-            .waringShownSubject
+            .warningShownSubject
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] isWaringShown in
                 self?.setTextfieldLayout(textFieldType: .password, isWaringShown: isWaringShown)
             })
             .store(in: &cancellables)
         nameTextField
-            .waringShownSubject
+            .warningShownSubject
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] isWaringShown in
                 self?.setTextfieldLayout(textFieldType: .name, isWaringShown: isWaringShown)
