@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import AVFoundation
 import Photos
+import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -44,6 +45,33 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         
         checkCameraPermission()
         checkAlbumPermission()
+    }
+    
+    
+    private let viewModel = CardRootViewModel()
+    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        input.send(.viewDidAppear)
+        input.send(.setCardBackgroundImg(background: someImageView.image!))
+        bind()
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    self.someImageView.image = background
+                case .getRecentCardBackgroundImgFail:
+                    self.someImageView.image = UIImage(named: "Rectangle")
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]

@@ -21,21 +21,22 @@ class CardRootViewController: UIViewController {
     private let firstViewController = CardBackgroundViewController()
     private let secondViewController = CardPencilKitViewController()
     
-    private let viewModel = CardRootViewModel()
-    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
+//    private let viewModel = CardRootViewModel()
+//    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+//    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         instantiateSegmentedViewControllers()
-        bind()
+       // bind()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        input.send(.viewDidAppear)
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        input.send(.viewDidAppear)
+//        input.send(.setCardBackgroundImg(background: <#T##UIImage#>))
+//    }
     
     private func setupViews() {
         view.backgroundColor = .white
@@ -55,20 +56,20 @@ class CardRootViewController: UIViewController {
         return control
     }()
     
-    private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher())
-        output
-            .sink { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .getRecentCardBackgroundImgSuccess(let background):
-                    self.backgroundImg = background
-                case .getRecentCardBackgroundImgFail:
-                    self.backgroundImg = UIImage(named: "Rectangle")
-                }
-            }
-            .store(in: &cancellables)
-    }
+//    private func bind() {
+//        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+//        output
+//            .sink { [weak self] event in
+//                guard let self = self else {return}
+//                switch event {
+//                case .getRecentCardBackgroundImgSuccess(let background):
+//                    self.backgroundImg = background
+//                case .getRecentCardBackgroundImgFail:
+//                    self.backgroundImg = UIImage(named: "Rectangle")
+//                }
+//            }
+//            .store(in: &cancellables)
+//    }
     
     @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {

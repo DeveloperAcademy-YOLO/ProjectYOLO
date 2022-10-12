@@ -9,6 +9,7 @@ import UIKit
 import PencilKit
 import StickerView
 import SnapKit
+import Combine
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
     
@@ -18,6 +19,10 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
     
     var backgroundImg = UIImage(named: "Rectangle")
+    
+    private let viewModel = CardRootViewModel()
+    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToggle: Bool = true
     private var isStickerToggle: Bool = true
@@ -72,6 +77,28 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
+        
+      //  bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        bind()
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    self.backgroundImg = background
+                case .getRecentCardBackgroundImgFail:
+                    self.backgroundImg = UIImage(named: "Rectangle")
+                }
+            }
+            .store(in: &cancellables)
     }
     
     lazy var someImageView: UIImageView = {
