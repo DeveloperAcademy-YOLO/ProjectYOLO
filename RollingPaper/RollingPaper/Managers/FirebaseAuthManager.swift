@@ -45,8 +45,6 @@ enum AuthManagerEnum: String, CaseIterable {
     case invalidName
 }
 
-// TODO: Name Already In User -> With DatabaseManager
-
 final class FirebaseAuthManager: NSObject, AuthManager {
     static let shared: AuthManager = FirebaseAuthManager()
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
@@ -142,7 +140,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 let photoURL = URL(string: photoURLString) {
                 changeRequest.photoURL = photoURL
                 currentUser.profileUrl = photoURLString
-                
             }
             changeRequest.commitChanges(completion: { [weak self] error in
                 guard let self = self else { return }
@@ -172,10 +169,13 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 currentUser.profileUrl = photoURLString
             }
             
-            changeRequest.commitChanges { [weak self] error in
-                guard let self = self else { return }
-                self.userProfileSubject.send(currentUser)
-            }
+            changeRequest.commitChanges(completion: { [weak self] error in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else {
+                    self?.userProfileSubject.send(currentUser)
+                }
+            })
         }
     }
     

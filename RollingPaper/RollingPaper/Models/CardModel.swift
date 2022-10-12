@@ -13,6 +13,7 @@ struct CardModel: Codable {
     let date: Date
     var cardId = UUID().uuidString
     var content: Data
+//    var contentType: String
     // URLString: String
     var convertedImage: UIImage? {
         return UIImage(data: content)
