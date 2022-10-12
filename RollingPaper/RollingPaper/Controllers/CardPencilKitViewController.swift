@@ -11,7 +11,7 @@ import StickerView
 import SnapKit
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
-    
+    static let identifier = "CardPencilKitViewController"
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
     
@@ -45,6 +45,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .lightGray
         
         view.addSubview(someImageView)
         someImageView.backgroundColor = .gray

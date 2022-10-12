@@ -11,6 +11,8 @@ import AVFoundation
 import Photos
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    static let identifier = "CardBackgroundViewController"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
