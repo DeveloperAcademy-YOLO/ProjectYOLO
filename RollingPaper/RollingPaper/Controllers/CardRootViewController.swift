@@ -7,10 +7,13 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 class CardRootViewController: UIViewController {
     // TODO: CardRootViewModel 만들어서 ImageView에 있는 데이터 저장하고, Step1, Step2에 뿌려 준다.
     private let items = ["배경 고르기", "꾸미기"]
+    
+    var backgroundImg = UIImage(named: "Rectangle")
     
     private var firstStepView: UIView!
     private var secondStepView: UIView!
@@ -18,10 +21,20 @@ class CardRootViewController: UIViewController {
     private let firstViewController = CardBackgroundViewController()
     private let secondViewController = CardPencilKitViewController()
     
+    private let viewModel = CardRootViewModel()
+    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         instantiateSegmentedViewControllers()
+        bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        input.send(.viewDidAppear)
     }
     
     private func setupViews() {
@@ -41,6 +54,21 @@ class CardRootViewController: UIViewController {
         control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
         return control
     }()
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    self.backgroundImg = background
+                case .getRecentCardBackgroundImgFail:
+                    self.backgroundImg = UIImage(named: "Rectangle")
+                }
+            }
+            .store(in: &cancellables)
+    }
     
     @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
