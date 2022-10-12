@@ -48,6 +48,7 @@
 		D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */; };
 		D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308D28F16493008365CB /* SignUpTextField.swift */; };
 		D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */; };
+		D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,6 +109,7 @@
 		D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseMockManager.swift; sourceTree = "<group>"; };
 		D2B6308D28F16493008365CB /* SignUpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpTextField.swift; sourceTree = "<group>"; };
 		D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperPreviewModel.swift; sourceTree = "<group>"; };
+		D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */,
+				D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */,
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
 				D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */,
 				D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */,
@@ -446,6 +449,7 @@
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
+				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,

@@ -104,7 +104,7 @@ final class FirestoreManager: DatabaseManager {
             }
     }
     
-    /// (1). 파이어베이스 내 페이퍼 데이터 삭제 (2). 현재 유저가 작성한 페이퍼 아이디 목록 중 해당 페이퍼 아이디 삭제 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 삭제
+    /// (1). 파이어베이스 내 페이퍼 데이터 삭제 (2). 현재 유저가 작성한 페이퍼 아이디 목록 중 해당 페이퍼 아이디 삭제 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 삭제 (4). 현재 유저의 로컬 페이퍼 프리뷰 데이터 중 해당 페이퍼 삭제
     func removePaper(paperId: String) {
         database
             .collection(Constants.papersPath.rawValue)
@@ -167,6 +167,7 @@ final class FirestoreManager: DatabaseManager {
 }
 
 extension FirestoreManager {
+    /// 파이어베이스 내 페이퍼 프리뷰 로드, 페이퍼 프리뷰가 존재하지 않을 경우 현재 유저의 페이퍼 목록 중 페이퍼 아이디를 삭제
     private func fetchPaperPreview(paperId: String) {
         database
             .collection(Constants.paperPreviewsPath.rawValue)
@@ -175,11 +176,15 @@ extension FirestoreManager {
                 guard
                     let data = document?.data(),
                     let paperPreview = self?.getPaperPreview(from: data),
-                    error == nil else { return }
+                    error == nil else {
+                    self?.removeUsersPaperId(paperId: paperId)
+                    return
+                }
                 self?.papersSubject.send(self?.papersSubject.value ?? [] + [paperPreview])
             })
     }
     
+    /// (1). 파이어베이스 내 페이퍼 프리뷰 삭제 (2). 유저 로컬 페이퍼 프리뷰 데이터 중 해당 페이퍼 프리뷰 데이터 삭제
     private func removePaperPreview(paperId: String) {
         database
             .collection(Constants.paperPreviewsPath.rawValue)
@@ -188,11 +193,16 @@ extension FirestoreManager {
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
+                    if var currentPapers = self?.papersSubject.value {
+                        currentPapers.removeAll(where: { $0.paperId == paperId })
+                        self?.papersSubject.send(currentPapers)
+                    }
                     print("PaperPreview Successfully Removed")
                 }
             })
     }
     
+    /// 파이어베이스 내 프리뷰를 세팅 (설정 및 추가 동일 로직 사용)
     private func setPaperPreview(paperPreview: PaperPreviewModel) {
         guard let paperPreviewDict = getPaperPreviewDict(with: paperPreview) else { return }
         database
@@ -207,6 +217,7 @@ extension FirestoreManager {
             }
     }
     
+    /// 현재 유저의 페이퍼 아이디 딕셔너리에 해당 페이퍼 아이디를 추가
     private func addUsersPaperId(paperId: String) {
         guard let currentUserEmail = currentUserEmail else { return }
         database
@@ -222,10 +233,17 @@ extension FirestoreManager {
                 self?.database
                     .collection(Constants.usersCollectionPath.rawValue)
                     .document(currentUserEmail)
-                    .setData(dictionary)
+                    .setData(dictionary, completion: { error in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        } else {
+                            print("User's PaperId Added Successfully")
+                        }
+                    })
             })
     }
     
+    /// 현재 유저의 페이퍼 아이디 딕셔너리 내에서 해당 페이퍼 아이디를 삭제
     private func removeUsersPaperId(paperId: String) {
         guard let currentUserEmail = currentUserEmail else { return }
         database
@@ -241,10 +259,17 @@ extension FirestoreManager {
                 self?.database
                     .collection(Constants.usersCollectionPath.rawValue)
                     .document(currentUserEmail)
-                    .setData(dictionary)
+                    .setData(dictionary, completion: { error in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        } else {
+                            print("User's PaperId Removed Successfully")
+                        }
+                    })
             })
     }
     
+    /// 현재 유저의 페이퍼 아이디 배열을 바탕으로 페이퍼 프리뷰 데이터를 로드, 데이터 퍼블리셔 내 데이터 추가
     private func loadPaperPreviews() {
         guard let currentUserEmail = currentUserEmail else { return }
         database
@@ -261,6 +286,7 @@ extension FirestoreManager {
             })
     }
     
+    /// 페이퍼 모델 데이터를 파이어베이스가 사용하는 딕셔너리 타입으로 인코딩
     private func getPaperDict(with paper: PaperModel) -> [String: Any]? {
         guard
             let paperData = try? JSONEncoder().encode(paper),
@@ -270,6 +296,7 @@ extension FirestoreManager {
         return paperDict
     }
     
+    /// 페이퍼 프리뷰 모델 데이터를 파이어베이스가 사용하는 딕셔너리 타입으로 인코딩
     private func getPaperPreviewDict(with paperPreview: PaperPreviewModel) -> [String: Any]? {
         guard
             let paperPreviewData = try? JSONEncoder().encode(paperPreview),
@@ -279,6 +306,7 @@ extension FirestoreManager {
         return paperPreviewDict
     }
     
+    /// 딕셔너리 데이터를 페이퍼 데이터로 디코딩
     private func getPaper(from paperDict: [String: Any]) -> PaperModel? {
         guard
             let jsonData = try? JSONSerialization.data(withJSONObject: paperDict, options: .fragmentsAllowed),
@@ -288,6 +316,7 @@ extension FirestoreManager {
         return paper
     }
     
+    /// 딕셔너리 데이터를 페이퍼 프리뷰 데이터로 디코딩
     private func getPaperPreview(from paperPreviewDict: [String: Any]) -> PaperPreviewModel? {
         guard
             let jsonData = try? JSONSerialization.data(withJSONObject: paperPreviewDict, options: .fragmentsAllowed),

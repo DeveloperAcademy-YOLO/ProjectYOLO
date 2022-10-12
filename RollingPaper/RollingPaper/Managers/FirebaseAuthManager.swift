@@ -142,6 +142,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 let photoURL = URL(string: photoURLString) {
                 changeRequest.photoURL = photoURL
                 currentUser.profileUrl = photoURLString
+                
             }
             changeRequest.commitChanges(completion: { [weak self] error in
                 guard let self = self else { return }

@@ -8,8 +8,6 @@
 import Foundation
 import Combine
 
-// TODO: cardSubject transaction timing issue with papersSubject
-
 protocol DatabaseManager {
     static var shared: DatabaseManager { get }
     var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> { get set }
