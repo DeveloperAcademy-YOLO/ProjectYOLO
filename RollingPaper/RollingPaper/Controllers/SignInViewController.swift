@@ -41,8 +41,8 @@ class SignInViewController: UIViewController, UIGestureRecognizerDelegate {
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
         textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-        textField.textContentType = .newPassword
-        textField.isSecureTextEntry = true
+        textField.textContentType = .oneTimeCode
+        textField.isSecureTextEntry = false
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -305,6 +305,7 @@ class SignInViewController: UIViewController, UIGestureRecognizerDelegate {
                 if let yPosition = self?.passwordTextField.frame.origin.y {
                     self?.currentFocusedTextfieldY = yPosition
                 }
+                self?.passwordTextField.isSecureTextEntry = true
             })
             .store(in: &cancellables)
         passwordTextField
