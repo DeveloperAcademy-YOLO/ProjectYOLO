@@ -1,9 +1,16 @@
+//
+//  PencilKitViewController.swift
+//  RollingPaper
+//
+//  Created by Yosep on 2022/10/05.
+//
+
 import UIKit
 import PencilKit
 import StickerView
 import SnapKit
 
-class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
+class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
     
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
@@ -238,7 +245,7 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
     }
 }
 
-extension PencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }
@@ -273,7 +280,7 @@ extension PencilKitViewController: UICollectionViewDelegate, UICollectionViewDat
     }
 }
 
-extension PencilKitViewController: StickerViewDelegate {
+extension CardPencilKitViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
         self.selectedStickerView = stickerView
     }
