@@ -14,13 +14,13 @@ import CryptoKit
 protocol AuthManager {
     static var shared: AuthManager { get }
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> {get set}
-    var userProfileSubject: PassthroughSubject<UserModel?, Never> { get set }
+    var userProfileSubject: CurrentValueSubject<UserModel?, Never> { get set }
     func signIn(email: String, password: String)
     func appleSignIn()
     func signUp(email: String, password: String, name: String)
     func signOut()
-    func deleteUser() -> AnyPublisher<Bool, Error>
-    func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
+    func deleteUser()
+    func updateUserProfile(name: String?, photoURLString: String?)
     func fetchUserProfile()
 }
 
@@ -50,7 +50,7 @@ enum AuthManagerEnum: String, CaseIterable {
 final class FirebaseAuthManager: NSObject, AuthManager {
     static let shared: AuthManager = FirebaseAuthManager()
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
-    var userProfileSubject: PassthroughSubject<UserModel?, Never> = .init()
+    var userProfileSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
@@ -115,71 +115,67 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func deleteUser() -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            if let user = self?.auth.currentUser {
-                user.delete(completion: { error in
-                    if error != nil {
-                        promise(.success(false))
-                        self?.signedInSubject.send(.deleteUserFailed)
-                    } else {
-                        promise(.success(true))
-                        self?.signedInSubject.send(.deleteUserFailed)
-                    }
-                })
-            } else {
-                promise(.success(false))
-                self?.signedInSubject.send(.userNotFound)
-            }
-        })
-        .eraseToAnyPublisher()
+    func deleteUser() {
+        if let user = auth.currentUser {
+            user.delete(completion: { [weak self] error in
+                if error != nil {
+                    self?.signedInSubject.send(.deleteUserFailed)
+                } else {
+                    self?.signedInSubject.send(.deleteUserSucceed)
+                    self?.userProfileSubject.send(nil)
+                }
+            })
+        }
     }
     
     func setUserProfile(name: String? = nil, photoURLString: String? = nil) {
-        if let user = auth.currentUser {
+        if
+            let user = auth.currentUser,
+            var currentUser = userProfileSubject.value {
             let changeRequest = user.createProfileChangeRequest()
             if let name = name {
                 changeRequest.displayName = name
+                currentUser.name = name
             }
             if
                 let photoURLString = photoURLString,
                 let photoURL = URL(string: photoURLString) {
                 changeRequest.photoURL = photoURL
+                currentUser.profileUrl = photoURLString
             }
-            changeRequest.commitChanges(completion: { error in
+            changeRequest.commitChanges(completion: { [weak self] error in
+                guard let self = self else { return }
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
+                    self.userProfileSubject.send(currentUser)
                     print("Setting user name and photo")
                 }
             })
         }
     }
     
-    func updateUserProfile(name: String? = nil, photoURLString: String? = nil) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            if let user = self?.auth.currentUser {
-                let changeRequest = user.createProfileChangeRequest()
-                if let name = name {
-                    changeRequest.displayName = name
-                }
-                if
-                    let photoURLString = photoURLString,
-                    let photoURL = URL(string: photoURLString) {
-                    changeRequest.photoURL = photoURL
-                }
-                changeRequest.commitChanges(completion: { error in
-                    if error != nil {
-                        promise(.success(false))
-                    } else {
-                        promise(.success(true))
-                    }
-                })
-            } else {
-                promise(.success(false))
+    func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
+        if
+            let user = auth.currentUser,
+            var currentUser = userProfileSubject.value {
+            let changeRequest = user.createProfileChangeRequest()
+            if let name = name {
+                changeRequest.displayName = name
+                currentUser.name = name
             }
-        })
-        .eraseToAnyPublisher()
+            if
+                let photoURLString = photoURLString,
+                let photoUrl = URL(string: photoURLString) {
+                changeRequest.photoURL = photoUrl
+                currentUser.profileUrl = photoURLString
+            }
+            
+            changeRequest.commitChanges { [weak self] error in
+                guard let self = self else { return }
+                self.userProfileSubject.send(currentUser)
+            }
+        }
     }
     
     func appleSignIn() {
