@@ -148,7 +148,11 @@ extension SignUpTextField {
         textField
             .didBeginEditingPublisher
             .sink(receiveValue: { [weak self] _ in
-                self?.textField.isSecureTextEntry = true
+                if
+                    let currentTextField = self?.textFieldEnum,
+                    currentTextField == .password {
+                    self?.textField.isSecureTextEntry = true 
+                }
                 self?.setTextFieldState(state: .focused)
             })
             .store(in: &cancellabels)

@@ -24,7 +24,7 @@ final class SignUpViewModel {
         case signUpDidSuccess
     }
     
-    init(authManager: AuthManager = FirebaseAuthManager()) {
+    init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
         bind()
     }
