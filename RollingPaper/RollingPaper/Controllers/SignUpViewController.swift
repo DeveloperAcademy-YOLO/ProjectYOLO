@@ -164,6 +164,20 @@ class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
                 }
             })
             .store(in: &cancellables)
+        emailTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.emailTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.emailTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
         passwordTextField
             .textField
             .textPublisher
@@ -182,6 +196,20 @@ class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
                 }
             })
             .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.passwordTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.passwordTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
         nameTextField
             .textField
             .textPublisher
@@ -198,6 +226,20 @@ class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
                 if let yPosition = self?.nameTextField.frame.origin.y {
                     self?.currentFocusedTextfieldY = yPosition
                 }
+            })
+            .store(in: &cancellables)
+        nameTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.nameTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        nameTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.nameTextField.textField.resignFirstResponder()
             })
             .store(in: &cancellables)
         emailTextField.passedSubject
@@ -242,6 +284,9 @@ class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc private func backgroundDidTap() {
         view.endEditing(true)
+        emailTextField.textField.resignFirstResponder()
+        passwordTextField.textField.resignFirstResponder()
+        nameTextField.textField.resignFirstResponder()
     }
     
     private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
