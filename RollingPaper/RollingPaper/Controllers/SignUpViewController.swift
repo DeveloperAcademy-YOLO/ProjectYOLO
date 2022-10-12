@@ -106,26 +106,6 @@ class SignUpViewController: UIViewController {
         })
     }
     
-    private func handleError(error: AuthManagerEnum) {
-        switch error {
-        case .emailAlreadyInUse:
-            emailTextField.setTextFieldState(state: .waring(error: .emailAlreadyInUse))
-        case .wrongPassword:
-            passwordTextField.setTextFieldState(state: .waring(error: .wrongPassword))
-        case .invalidEmail:
-            emailTextField.setTextFieldState(state: .waring(error: .invalidEmail))
-        case .emailDidMiss:
-            emailTextField.setTextFieldState(state: .waring(error: .emailDidMiss))
-        case .passwordDidMiss:
-            passwordTextField.setTextFieldState(state: .waring(error: .passwordDidMiss))
-        case .nameAlreadyInUse:
-            nameTextField.setTextFieldState(state: .waring(error: .nameAlreadyInUse))
-        case .invalidName:
-            nameTextField.setTextFieldState(state: .waring(error: .invalidName))
-        default: break
-        }
-    }
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -280,13 +260,29 @@ class SignUpViewController: UIViewController {
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
     }
-    
-    @objc private func backgroundDidTap() {
-        view.endEditing(true)
-        emailTextField.textField.resignFirstResponder()
-        passwordTextField.textField.resignFirstResponder()
-        nameTextField.textField.resignFirstResponder()
+}
+
+extension SignUpViewController {
+    private func handleError(error: AuthManagerEnum) {
+        switch error {
+        case .emailAlreadyInUse:
+            emailTextField.setTextFieldState(state: .waring(error: .emailAlreadyInUse))
+        case .wrongPassword:
+            passwordTextField.setTextFieldState(state: .waring(error: .wrongPassword))
+        case .invalidEmail:
+            emailTextField.setTextFieldState(state: .waring(error: .invalidEmail))
+        case .emailDidMiss:
+            emailTextField.setTextFieldState(state: .waring(error: .emailDidMiss))
+        case .passwordDidMiss:
+            passwordTextField.setTextFieldState(state: .waring(error: .passwordDidMiss))
+        case .nameAlreadyInUse:
+            nameTextField.setTextFieldState(state: .waring(error: .nameAlreadyInUse))
+        case .invalidName:
+            nameTextField.setTextFieldState(state: .waring(error: .invalidName))
+        default: break
+        }
     }
+
     
     private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
         switch textFieldType {
@@ -305,6 +301,12 @@ class SignUpViewController: UIViewController {
         }
         view.layoutIfNeeded()
     }
+
     
-    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
+        emailTextField.textField.resignFirstResponder()
+        passwordTextField.textField.resignFirstResponder()
+        nameTextField.textField.resignFirstResponder()
+    }
 }
