@@ -12,11 +12,11 @@ import Combine
 
 protocol DatabaseManager {
     static var shared: DatabaseManager { get }
-    var papersSubject: CurrentValueSubject<[PaperModel], Never> { get set }
-    var cardsSubject: CurrentValueSubject<[CardModel], Never> { get set }
+    var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> { get set }
+    var paperSubject: CurrentValueSubject<PaperModel?, Never> { get set }
     func addPaper(paper: PaperModel)
     func addCard(paperId: String, card: CardModel)
-    func removePaper(paper: PaperModel)
+    func removePaper(paperId: String)
     func removeCard(paperId: String, card: CardModel)
     func updatePaper(paper: PaperModel)
     func updateCard(paperId: String, card: CardModel)

@@ -10,10 +10,11 @@ import Combine
 import UIKit
 
 final class PaperModelFileManager: DatabaseManager {
+    
     static let shared: DatabaseManager = PaperModelFileManager()
     
-    var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
-    var cardsSubject: CurrentValueSubject<[CardModel], Never> = .init([])
+    var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> = .init([])
+    var paperSubject: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     private let folderName = "/downloaded_papers"
     private init() {
         createFolderIfNeeded()
@@ -94,7 +95,7 @@ final class PaperModelFileManager: DatabaseManager {
         }
     }
     
-    func removePaper(paper: PaperModel) {
+    func removePaper(paperId: String) {
         guard let fileDir = getFilePath(paper: paper) else { return }
         do {
             try FileManager.default.removeItem(at: fileDir)

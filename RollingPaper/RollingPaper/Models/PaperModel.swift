@@ -19,5 +19,6 @@ struct PaperModel: Codable {
     var template: TemplateModel {
         return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template
     }
+    var thumbnailURLString: String?
     // TODO: 시간 계산, 남은 시간 compuited property로 추가
 }
