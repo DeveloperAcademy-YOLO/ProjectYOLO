@@ -76,9 +76,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
                     print(background)
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
-                    }
+                    })
                 case .getRecentCardBackgroundImgFail:
                     print("fail")
                     self.someImageView.image = UIImage(named: "Rectangle")

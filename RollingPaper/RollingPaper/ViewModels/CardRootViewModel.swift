@@ -21,7 +21,6 @@ class CardRootViewModel {
         case getRecentCardBackgroundImgFail
     }
     
-    //let backgroundSubject: CurrentValueSubject<UIImage?, Never> = .init(nil)
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
@@ -35,7 +34,6 @@ class CardRootViewModel {
                 print("viewModel's setCarBackgroundImg selected")
                 print(background)
                 self.setCardBackgroundImg(background: background)
-              //  self.backgroundSubject.send(background)
                 self.getRecentCardBackgroundImg()
             }
         }
@@ -43,14 +41,12 @@ class CardRootViewModel {
         return output.eraseToAnyPublisher()
     }
 
-    
     private func setCardBackgroundImg(background: UIImage) {
         print("집어넣을때 \(background)")
         guard let png = background.pngData()
         else { return }// png로 바꿔서 넣어 버린다.
         print("집어넣을때 \(png)")
         UserDefaults.standard.set(png, forKey: "cardBackgroundImg")
-//        UserDefaults.standard.set(jpeg, forKey: "cardBackgroundImg")
     }
     
     private func getRecentCardBackgroundImg() {
@@ -62,7 +58,5 @@ class CardRootViewModel {
         } else {
             output.send(.getRecentCardBackgroundImgFail)
         }
-//        if let jpeg = UserDefaults.standard.value(forKey: "cardBackgroundImg") as? Data,
-//           let jpegImage = UIImage(d)
     }
 }
