@@ -11,7 +11,7 @@ import SnapKit
 import AuthenticationServices
 import CombineCocoa
 
-class SignInViewController: UIViewController {
+class SignInViewController: UIViewController, UIGestureRecognizerDelegate {
     enum TextFieldFocused {
         case normal
         case emailFocused
@@ -321,5 +321,12 @@ class SignInViewController: UIViewController {
                 self?.input.send(.normalBoundTap)
             })
             .store(in: &cancellables)
+        let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
+        backgroundGesture.delegate = self
+        view.addGestureRecognizer(backgroundGesture)
+    }
+    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
     }
 }
