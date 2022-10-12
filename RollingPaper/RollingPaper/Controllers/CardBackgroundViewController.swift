@@ -65,9 +65,8 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
-        selectedColor = backgroundColor[0]
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: selectedColor)
+        button.backgroundColor = UIColor(named: backgroundColor[0])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -79,9 +78,8 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     lazy var secondColorBackgroundButton: UIButton = {
         let button = UIButton()
-        selectedColor = backgroundColor[1]
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: selectedColor)
+        button.backgroundColor = UIColor(named: backgroundColor[1])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -95,7 +93,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         let button = UIButton()
         selectedColor = backgroundColor[2]
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: selectedColor)
+        button.backgroundColor = UIColor(named: backgroundColor[2])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -107,9 +105,8 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     lazy var fourthColorBackgroundButton: UIButton = {
         let button = UIButton()
-        selectedColor = backgroundColor[3]
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: selectedColor)
+        button.backgroundColor = UIColor(named: backgroundColor[3])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor

@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 class CardRootViewController: UIViewController {
-    
+    // TODO: CardRootViewModel 만들어서 ImageView에 있는 데이터 저장하고, Step1, Step2에 뿌려 준다.
     private let items = ["배경 고르기", "꾸미기"]
     
     private var firstStepView: UIView!
