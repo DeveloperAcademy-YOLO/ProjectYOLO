@@ -60,6 +60,7 @@ final class SignUpTextField: UIView {
         textField.layer.shadowColor = UIColor.systemGray.cgColor
         textField.layer.shadowOpacity = 0.0
         textField.layer.shadowOffset = .zero
+        textField.font = .preferredFont(forTextStyle: .body)
         return textField
     }()
     
@@ -73,6 +74,7 @@ final class SignUpTextField: UIView {
     private let waringLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
+        label.font = .preferredFont(forTextStyle: .body)
         return label
     }()
     private var cancellabels = Set<AnyCancellable>()
