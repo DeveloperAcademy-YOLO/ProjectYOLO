@@ -224,7 +224,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            someImageView.image = pickedImage
+            let image = pickedImage
+            self.someImageView.image = image
+            input.send(.setCardBackgroundImg(background: image))
         }
         dismiss(animated: true, completion: nil)
     }
