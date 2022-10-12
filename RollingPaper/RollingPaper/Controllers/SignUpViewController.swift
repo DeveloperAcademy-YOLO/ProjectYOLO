@@ -10,7 +10,7 @@ import Combine
 import CombineCocoa
 import SnapKit
 
-class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
+class SignUpViewController: UIViewController {
     private let emailTextField: SignUpTextField = {
         let textField = SignUpTextField()
         return textField
@@ -278,8 +278,7 @@ class SignUpViewController: UIViewController, UIGestureRecognizerDelegate {
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
-        backgroundGesture.delegate = self
-        self.view.addGestureRecognizer(backgroundGesture)
+        view.addGestureRecognizer(backgroundGesture)
     }
     
     @objc private func backgroundDidTap() {
