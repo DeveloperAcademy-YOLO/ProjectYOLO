@@ -37,7 +37,7 @@ class TemplateSelectViewController: UIViewController {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
                 case .getRecentTemplateSuccess(let template):
@@ -46,7 +46,7 @@ class TemplateSelectViewController: UIViewController {
                     self.recentTemplate = nil
                 }
                 self.templateCollectionView?.reloadData()
-            }
+            })
             .store(in: &cancellables)
     }
     
@@ -72,10 +72,10 @@ class TemplateSelectViewController: UIViewController {
         myCollectionView.delegate = self
         
         view.addSubview(myCollectionView)
-        myCollectionView.snp.makeConstraints { make in
+        myCollectionView.snp.makeConstraints({ make in
             make.left.right.bottom.equalToSuperview()
             make.top.equalTo(view.safeAreaLayoutGuide)
-        }
+        })
     }
 }
 
@@ -139,14 +139,17 @@ extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionVi
     
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        // TODO: 해당 템플릿으로 이동하기
         // 템플릿을 터치하는 순간 최근 템플릿으로 설정하기 위해 input에 값 설정하기
         if isRecentExist && indexPath.section == 0 {
             guard let recentTemplate = recentTemplate else {return false}
-            input.send(.newTemplateTap(template: recentTemplate))
+            navigationController?.pushViewController(SetPaperViewController(template: recentTemplate), animated: true) {
+                self.input.send(.newTemplateTap(template: recentTemplate))
+            }
         } else {
             let selectedTemplate = viewModel.getTemplates()[indexPath.item]
-            input.send(.newTemplateTap(template: selectedTemplate))
+            navigationController?.pushViewController(SetPaperViewController(template: selectedTemplate), animated: true) {
+                self.input.send(.newTemplateTap(template: selectedTemplate))
+            }
         }
         return true
     }
@@ -173,10 +176,10 @@ private class CollectionHeader: UICollectionReusableView {
         addSubview(title)
         
         title.font = .preferredFont(forTextStyle: .largeTitle)
-        title.snp.makeConstraints { make in
+        title.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(50)
             make.left.equalToSuperview().offset(50)
-        }
+        })
     }
     
     func setHeader(text: String) {
@@ -207,21 +210,21 @@ private class CollectionCell: UICollectionViewCell {
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 12
-        imageView.snp.makeConstraints { make in
+        imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.left.equalToSuperview()
             make.width.equalTo(240)
-        }
+        })
         
         title.font = .preferredFont(forTextStyle: .title3)
-        title.snp.makeConstraints { make in
+        title.snp.makeConstraints({ make in
             make.top.equalTo(imageView.snp.bottom).offset(10)
             make.centerX.equalTo(imageView)
-        }
+        })
         
-        thumbnail.snp.makeConstraints { make in
+        thumbnail.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
-        }
+        })
     }
     
     func setCell(template: TemplateModel) {

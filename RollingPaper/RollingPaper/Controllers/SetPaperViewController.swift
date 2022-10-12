@@ -10,15 +10,17 @@ import SnapKit
 import Combine
 
 class SetPaperViewController: UIViewController {
-    private let viewModel = SetPaperViewModel()
+    private let paperTitleTextField = UITextField()
+    private var viewModel: SetPaperViewModel
     private let input: PassthroughSubject<SetPaperViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
-    init(template: String) {
+    init(template: TemplateEnum) {
+        viewModel = SetPaperViewModel(template: template)
         super.init(nibName: nil, bundle: nil)
-        viewModel.template = template
+        
     }
     
     required init?(coder: NSCoder) {
@@ -28,6 +30,7 @@ class SetPaperViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setMainView()
+        setNavigationBar()
         bind()
     }
     
@@ -35,16 +38,27 @@ class SetPaperViewController: UIViewController {
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
                 case .createPaperSuccess(let paper):
                     self.paper = paper
+                    print("페이퍼 생성 성공")
+                    // TODO: 페이퍼 객체 넘겨주면서 네비게이션 연결
+                    // navigationController?.pushViewController(, animated: true)
+                    print(paper)
                 case .createPaperFail:
                     self.paper = nil
+                    print("페이퍼 생성 실패")
                 }
-            }
+            })
             .store(in: &cancellables)
+    }
+    
+    // 네비게이션 바 초기화
+    private func setNavigationBar() {
+        let createBtn = UIBarButtonItem(title: "생성하기", style: .plain, target: self, action: #selector(createBtnPressed))
+        navigationItem.rightBarButtonItem = createBtn
     }
     
     // 메인 뷰 초기화
@@ -63,28 +77,31 @@ class SetPaperViewController: UIViewController {
         view.addSubview(title2)
         view.addSubview(subtitle2)
         
-        title1.snp.makeConstraints { make in
+        title1.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(76)
             make.left.equalToSuperview().offset(76)
-        }
-        subtitle1.snp.makeConstraints { make in
+        })
+        subtitle1.snp.makeConstraints({ make in
             make.top.equalTo(title1.snp.bottom).offset(15)
             make.left.equalTo(title1)
-        }
-        textField.snp.makeConstraints { make in
+        })
+        textField.snp.makeConstraints({ make in
             make.top.equalTo(subtitle1.snp.bottom).offset(30)
             make.left.equalTo(subtitle1)
             make.right.equalToSuperview().offset(-76)
             make.height.equalTo(40)
-        }
-        title2.snp.makeConstraints { make in
+        })
+        title2.snp.makeConstraints({ make in
             make.top.equalTo(textField.snp.bottom).offset(60)
             make.left.equalTo(textField)
-        }
-        subtitle2.snp.makeConstraints { make in
+        })
+        subtitle2.snp.makeConstraints({ make in
             make.top.equalTo(title2.snp.bottom).offset(15)
             make.left.equalTo(title2)
-        }
+        })
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
+        view.addGestureRecognizer(gesture)
     }
     
     // 제목 뷰 가져오기
@@ -105,28 +122,44 @@ class SetPaperViewController: UIViewController {
     
     // 텍스트필드 뷰 가져오기
     private func getTextField(placeHolder: String) -> UITextField {
-        let textField = UITextField()
         let border = UIView()
         
-        textField.addSubview(border)
-        textField.placeholder = placeHolder
+        paperTitleTextField.addSubview(border)
+        paperTitleTextField.placeholder = placeHolder
         
-        textField
+        // 제목 입력할때마다 입력한 글자 저장
+        paperTitleTextField
+            .controlPublisher(for: .editingChanged)
+            .sink(receiveValue: { _ in
+                self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
+            })
+            .store(in: &cancellables)
+        
+        // 엔터 누르면 포커스 해제하고 키보드 내리기
+        paperTitleTextField
             .controlPublisher(for: .editingDidEndOnExit)
-            .sink { _ in
-                self.input.send(.setPaperTitle(title: textField.text ?? ""))
-            }
+            .sink(receiveValue: { _ in
+                self.paperTitleTextField.resignFirstResponder()
+            })
             .store(in: &cancellables)
     
         border.backgroundColor = .black
-        border.snp.makeConstraints { make in
-            make.top.equalTo(textField.snp.bottom)
+        border.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom)
             make.left.right.equalToSuperview()
             make.height.equalTo(2)
-        }
+        })
         
-        return textField
+        return paperTitleTextField
     }
     
-    // TODO: 네이게이션 바에 있는 생성하기 버튼을 눌렀을 때 input 값 설정 및 뷰 이동하기
+    // 생성하기 버튼 눌렀을 때 동작
+    @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+        input.send(.endSettingPaper)
+    }
+    
+    // 배경 눌렀을 때 동작
+    @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
+        paperTitleTextField.resignFirstResponder()
+    }
 }

@@ -11,7 +11,13 @@ import Combine
 class SetPaperViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
-    var template: String?
+    private var template: TemplateEnum
+    private let databaseManager: LocalDatabaseManager
+    
+    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
+        self.databaseManager = databaseManager
+        self.template = template
+    }
     
     enum Input {
         case setPaperTitle(title: String)
@@ -28,7 +34,7 @@ class SetPaperViewModel {
     
     // 어떤 행동이 Input으로 들어오면 그것에 맞는 행동을 Output에 저장한 뒤 반환해주기
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
-        input.sink { [weak self] event in
+        input.sink(receiveValue: { [weak self] event in
             guard let self = self else {return}
             switch event {
             case .setPaperTitle(let title):
@@ -36,7 +42,7 @@ class SetPaperViewModel {
             case .endSettingPaper:
                 self.createPaper()
             }
-        }
+        })
         .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
@@ -49,14 +55,12 @@ class SetPaperViewModel {
     // 페이퍼 만들기
     private func createPaper() {
         let currentTime = Date()
-        guard
-            let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime),
-            let template = template
-        else {
+        guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
             output.send(.createPaperFail)
             return
         }
-        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template)
+        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template.template.templateString)
+        databaseManager.addPaper(paper: paper)
         output.send(.createPaperSuccess(paper: paper))
     }
 }
