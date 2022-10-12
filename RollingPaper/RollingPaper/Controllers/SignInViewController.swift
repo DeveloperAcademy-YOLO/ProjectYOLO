@@ -316,9 +316,30 @@ class SignInViewController: UIViewController, UIGestureRecognizerDelegate {
             .store(in: &cancellables)
         emailTextField
             .controlPublisher(for: .editingDidEnd)
-            .combineLatest(passwordTextField.controlPublisher(for: .editingDidEnd))
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.normalBoundTap)
+                self?.emailTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.emailTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.passwordTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.passwordTextField.resignFirstResponder()
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
@@ -328,5 +349,7 @@ class SignInViewController: UIViewController, UIGestureRecognizerDelegate {
     
     @objc private func backgroundDidTap() {
         view.endEditing(true)
+        emailTextField.resignFirstResponder()
+        passwordTextField.resignFirstResponder()
     }
 }
