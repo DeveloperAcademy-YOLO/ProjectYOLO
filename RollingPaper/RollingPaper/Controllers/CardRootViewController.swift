@@ -28,6 +28,9 @@ class CardRootViewController: UIViewController {
         control.selectedSegmentIndex = 0
         control.layer.cornerRadius = 9
         control.layer.masksToBounds = true
+        control.selectedSegmentTintColor = .darkGray
+        control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
+        control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         return control
     }()
     
