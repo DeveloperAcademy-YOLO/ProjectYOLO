@@ -20,13 +20,22 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     var backgroundImg = UIImage(named: "Rectangle")
     
-    private let viewModel = CardRootViewModel()
+    private let viewModel: CardRootViewModel
     private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToggle: Bool = true
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
+    
+    init(viewModel: CardRootViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private var _selectedStickerView: StickerView?
     var selectedStickerView: StickerView? {
@@ -54,7 +63,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.backgroundColor = .lightGray
 
         view.addSubview(someImageView)
-        someImageView.backgroundColor = .gray
+        someImageView.backgroundColor = .white
         someImageView.layer.masksToBounds = true
         someImageView.layer.cornerRadius = 50
         someImageView.contentMode = .scaleAspectFill
@@ -78,24 +87,52 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
         
-      //  bind()
+        bind()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        bind()
+       // bind()
     }
+    
+//    private func bind() {
+//        print("Second View Bind Init!")
+//        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+//        output
+//            .sink { event in
+//                print("Second View Called!")
+//                switch event {
+//                case .getRecentCardBackgroundImgSuccess(let background):
+//                    self.backgroundImg = background
+//                case .getRecentCardBackgroundImgFail:
+//                    self.backgroundImg = UIImage(named: "Rectangle")
+//                }
+//            }
+//            .store(in: &cancellables)
+//        viewModel.backgroundSubject
+//            .compactMap({ $0 })
+//            .sink { image in
+//                print("Image Changed!")
+//                self.backgroundImg = image
+//            }
+//            .store(in: &cancellables)
+//    }
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .sink { [weak self] event in
                 guard let self = self else {return}
+                print("event sinked")
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
-                    self.backgroundImg = background
+                    print(background)
+                    DispatchQueue.main.async {
+                        self.someImageView.image = background
+                    }
                 case .getRecentCardBackgroundImgFail:
-                    self.backgroundImg = UIImage(named: "Rectangle")
+                    print("fail")
+                    self.someImageView.image = UIImage(named: "Rectangle")
                 }
             }
             .store(in: &cancellables)
@@ -203,18 +240,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         canvasViewConstraints()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "customYellow") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+////        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "customYellow") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+//    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         
     }
     

@@ -18,8 +18,9 @@ class CardRootViewController: UIViewController {
     private var firstStepView: UIView!
     private var secondStepView: UIView!
     
-    private let firstViewController = CardBackgroundViewController()
-    private let secondViewController = CardPencilKitViewController()
+    private let viewModel = CardRootViewModel()
+//    private let firstViewController = CardBackgroundViewController(viewModel: viewModel)
+//    private let secondViewController = CardPencilKitViewController()
     
 //    private let viewModel = CardRootViewModel()
 //    private let input: PassthroughSubject<CardRootViewModel.Input, Never> = .init()
@@ -95,8 +96,8 @@ class CardRootViewController: UIViewController {
     }
     
     private func instantiateSegmentedViewControllers() {
-        let firstStepViewVC = firstViewController
-        let secondStepViewVC = secondViewController
+        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
+        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
           
         self.addChild(secondStepViewVC)
         self.addChild(firstStepViewVC)
