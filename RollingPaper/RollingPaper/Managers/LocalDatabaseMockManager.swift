@@ -9,10 +9,11 @@ import Foundation
 import Combine
 import UIKit
 
-final class LocalDatabaseMockManager: LocalDatabaseManager {
-    static let shared: LocalDatabaseManager = LocalDatabaseMockManager()
+final class LocalDatabaseMockManager: DatabaseManager {
+    static let shared: DatabaseManager = LocalDatabaseMockManager()
     
     var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
+    var cardsSubject: CurrentValueSubject<[CardModel], Never> = .init([])
     
     private init() {
         // Set originally set data as default paper data

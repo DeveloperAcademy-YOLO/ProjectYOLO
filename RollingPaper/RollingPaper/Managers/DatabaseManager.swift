@@ -8,9 +8,12 @@
 import Foundation
 import Combine
 
-protocol LocalDatabaseManager {
-    static var shared: LocalDatabaseManager { get }
+// TODO: cardSubject transaction timing issue with papersSubject
+
+protocol DatabaseManager {
+    static var shared: DatabaseManager { get }
     var papersSubject: CurrentValueSubject<[PaperModel], Never> { get set }
+    var cardsSubject: CurrentValueSubject<[CardModel], Never> { get set }
     func addPaper(paper: PaperModel)
     func addCard(paperId: String, card: CardModel)
     func removePaper(paper: PaperModel)

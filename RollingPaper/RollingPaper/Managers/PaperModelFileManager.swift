@@ -9,10 +9,11 @@ import Foundation
 import Combine
 import UIKit
 
-final class PaperModelFileManager: LocalDatabaseManager {
-    static let shared: LocalDatabaseManager = PaperModelFileManager()
+final class PaperModelFileManager: DatabaseManager {
+    static let shared: DatabaseManager = PaperModelFileManager()
     
     var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
+    var cardsSubject: CurrentValueSubject<[CardModel], Never> = .init([])
     private let folderName = "/downloaded_papers"
     private init() {
         createFolderIfNeeded()
