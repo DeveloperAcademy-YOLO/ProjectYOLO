@@ -6,27 +6,20 @@
 //
 
 import Foundation
+import FirebaseFirestore
 import Combine
 
 final class FirestoreManager: DatabaseManager {
-        
     static let shared: DatabaseManager = FirestoreManager()
-    
     var cardsSubject: CurrentValueSubject<[CardModel], Never> = .init([])
-
     var papersSubject: CurrentValueSubject<[PaperModel], Never> = .init([])
+    private let database = Firestore.firestore()
     
     private init() {
         loadPapers()
-        addObserverListener()
     }
     
     private func loadPapers() {
-        
-    }
-    
-    private func addObserverListener() {
-        
     }
     
     func addPaper(paper: PaperModel) {
@@ -53,5 +46,7 @@ final class FirestoreManager: DatabaseManager {
         
     }
     
-    
+    func addPaperObserver(paperId: String) {
+        // 특정 document (특정 페이퍼 데이터를 가지고 있는 파이어베이스 파이어스토어) 데이터 변경을 감지
+    }
 }

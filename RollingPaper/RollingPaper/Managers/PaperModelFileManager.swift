@@ -160,5 +160,9 @@ final class PaperModelFileManager: DatabaseManager {
             print(error.localizedDescription)
         }
     }
+    
+    func addPaperObserver(paperId: String) {
+        // 특정 페이퍼 값 변경을 감지 -> 로직 구현
+    }
 }
 

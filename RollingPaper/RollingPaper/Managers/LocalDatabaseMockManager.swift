@@ -93,4 +93,8 @@ final class LocalDatabaseMockManager: DatabaseManager {
             }
         }
     }
+    
+    func addPaperObserver(paperId: String) {
+        // 특정 페이퍼의 값 변경을 감지 -> 로직 구현
+    }
 }

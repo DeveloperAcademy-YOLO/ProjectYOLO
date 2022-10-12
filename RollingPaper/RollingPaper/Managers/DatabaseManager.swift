@@ -20,4 +20,5 @@ protocol DatabaseManager {
     func removeCard(paperId: String, card: CardModel)
     func updatePaper(paper: PaperModel)
     func updateCard(paperId: String, card: CardModel)
+    func addPaperObserver(paperId: String)
 }
