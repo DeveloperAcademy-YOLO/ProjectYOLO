@@ -164,8 +164,16 @@ final class PaperModelFileManager: DatabaseManager {
         }
     }
     
-    func addPaperObserver(paperId: String) {
-        // 특정 페이퍼 값 변경을 감지 -> 로직 구현
+    func savePaper() {
+        guard let currentPaper = paperSubject.value else { return }
+        let paperId = currentPaper.paperId
+        let currentPapers = papersSubject.value
+        if currentPapers.firstIndex(where: {$0.paperId == paperId }) != nil {
+            updatePaper(paper: currentPaper)
+        } else {
+            addPaper(paper: currentPaper)
+        }
+        paperSubject.send(nil)
     }
     
     func fetchPaper(paperId: String) {

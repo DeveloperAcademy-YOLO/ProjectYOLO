@@ -151,8 +151,7 @@ final class FirestoreManager: DatabaseManager {
 
     }
     
-    func addPaperObserver(paperId: String) {
-        guard let currentUserEmail = currentUserEmail else { return }
-        // 특정 document (특정 페이퍼 데이터를 가지고 있는 파이어베이스 파이어스토어) 데이터 변경을 감지
+    func savePaper() {
+        
     }
 }
