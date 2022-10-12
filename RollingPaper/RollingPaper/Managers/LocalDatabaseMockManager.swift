@@ -96,4 +96,11 @@ final class LocalDatabaseMockManager: DatabaseManager {
     func addPaperObserver(paperId: String) {
         // 특정 페이퍼의 값 변경을 감지 -> 로직 구현
     }
+    
+    func fetchPaper(paperId: String) {
+        if let index = papersMockData.firstIndex(where: {$0.paperId == paperId }) {
+            let currentPaper = papersMockData[index]
+            paperSubject.send(currentPaper)
+        }
+    }
 }

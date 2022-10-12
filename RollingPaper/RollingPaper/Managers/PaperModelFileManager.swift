@@ -167,5 +167,15 @@ final class PaperModelFileManager: DatabaseManager {
     func addPaperObserver(paperId: String) {
         // 특정 페이퍼 값 변경을 감지 -> 로직 구현
     }
+    
+    func fetchPaper(paperId: String) {
+        guard let fileDir = getFilePath(paperId: paperId) else { return }
+        do {
+            let paperData = try Data(contentsOf: fileDir)
+            let paper = try JSONDecoder().decode(PaperModel.self, from: paperData)
+            paperSubject.send(paper)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
 }
-
