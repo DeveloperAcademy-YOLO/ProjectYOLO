@@ -15,7 +15,7 @@ protocol AuthManager {
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> {get set}
     func signIn(email: String, password: String)
     func appleSignIn()
-    func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error>
+    func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser() -> AnyPublisher<Bool, Error>
     func updateUserProfile(name: String?, photoURLString: String?) -> AnyPublisher<Bool, Error>
@@ -36,24 +36,28 @@ enum AuthManagerEnum: String, CaseIterable {
     case signOutSucceed
     case profileSetSucceed
     case deleteUserSucceed
+    case emailDidMiss
+    case passwordDidMiss
+    case nameAlreadyInUse
+    case invalidName
 }
+
+// TODO: Name Already In User -> With DatabaseManager
 
 final class FirebaseAuthManager: NSObject, AuthManager {
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
     
-    func signUp(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
-        return Future<Bool, Error>({ [weak self] promise in
-            self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(true))
-                }
-            })
-        })
-        .eraseToAnyPublisher()
+    func signUp(email: String, password: String, name: String) {
+        auth.createUser(withEmail: email, password: password) { [weak self] _, error in
+            if let error = self?.handleError(with: error) {
+                self?.signedInSubject.send(error)
+            } else {
+                self?.signedInSubject.send(.signUpSucceed)
+                self?.setUserProfile(name: name)
+            }
+        }
     }
     
     private func handleError(with error: Error?) -> AuthManagerEnum? {

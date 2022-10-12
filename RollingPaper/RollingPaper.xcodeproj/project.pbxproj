@@ -46,6 +46,7 @@
 		D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */; };
 		D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */; };
 		D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */; };
+		D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308D28F16493008365CB /* SignUpTextField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +105,7 @@
 		D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseMockManager.swift; sourceTree = "<group>"; };
+		D2B6308D28F16493008365CB /* SignUpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpTextField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +231,7 @@
 			isa = PBXGroup;
 			children = (
 				D22E4AAC28EBDC73001091DA /* LaunchScreen.storyboard */,
+				D2B6308D28F16493008365CB /* SignUpTextField.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
+				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
 				CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */,

@@ -5,6 +5,7 @@ disabled_rules: # 실행에서 제외할 룰 식별자
     - trailing_whitespace
     - vertical_whitespace
     - function_body_length
+    - cyclomatic_complexity
 
 included: # 린트 과정에 포함할 파일 경로. 이 항목이 존재하면 `--path`는 무시됨
 
