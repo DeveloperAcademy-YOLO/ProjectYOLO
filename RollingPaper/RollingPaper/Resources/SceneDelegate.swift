@@ -15,7 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = SignUpViewController()
+        let splitVC = SplitViewController(style: UISplitViewController.Style.doubleColumn)
+        window.rootViewController = splitVC
         window.makeKeyAndVisible()
         self.window = window
     }
