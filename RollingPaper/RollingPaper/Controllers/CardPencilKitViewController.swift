@@ -178,7 +178,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "darkGray") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        someImageView.image = backgroundImg?.withTintColor(UIColor(named: "customYellow") ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
     }
     
     override func viewDidLayoutSubviews() {
