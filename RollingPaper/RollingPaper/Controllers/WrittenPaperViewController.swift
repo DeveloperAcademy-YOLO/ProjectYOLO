@@ -124,6 +124,7 @@ class WrittenPaperViewController: UIViewController {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 0, right: 0)
         layout.itemSize = CGSize(width: 300, height: 230)
+        layout.scrollDirection = .horizontal
         
         cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 150, width: self.view.frame.width*0.87, height: self.view.frame.height-230), collectionViewLayout: layout)
 //        let indexPath = IndexPath(item: indexes.currentPage, section: 0)
