@@ -64,7 +64,7 @@ class WrittenPaperViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        hideSideBar()
+        self.splitViewController?.hide(.primary)
     }
     
     func setCustomNavBarButtons() {
