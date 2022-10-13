@@ -30,6 +30,7 @@ class TemplateSelectViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
+        
     }
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
@@ -64,15 +65,16 @@ class TemplateSelectViewController: UIViewController {
         collectionViewLayer.headerReferenceSize = .init(width: 200, height: 90)
         
         templateCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
-        guard let myCollectionView = templateCollectionView else {return}
-        myCollectionView.backgroundColor = .white
-        myCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.identifier)
-        myCollectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
-        myCollectionView.dataSource = self
-        myCollectionView.delegate = self
+        guard let collectionView = templateCollectionView else {return}
+        collectionView.backgroundColor = .white
+        collectionView.alwaysBounceVertical = true
+        collectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.identifier)
+        collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
+        collectionView.dataSource = self
+        collectionView.delegate = self
         
-        view.addSubview(myCollectionView)
-        myCollectionView.snp.makeConstraints({ make in
+        view.addSubview(collectionView)
+        collectionView.snp.makeConstraints({ make in
             make.left.right.bottom.equalToSuperview()
             make.top.equalTo(view.safeAreaLayoutGuide)
         })
