@@ -49,17 +49,28 @@ class WrittenPaperViewController: UIViewController {
         return timeLabel
     }()
     
-    private var asd = UIView(frame: CGRect(x: 0, y: 0, width: 730, height: 50))
+    private let indexes: UIPageControl = UIPageControl(frame: CGRect(x: 0, y: 500, width: 100, height: 20))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         self.splitViewController?.hide(.primary)
         setCustomNavBarButtons()
-        asd.addSubview(titleLabel)
-        asd.addSubview(timeLabel)
-        asd.center.x = self.view.center.x
-        view.addSubview(asd)
+        setPaperTitle()
+        setCollectionView()
+        
+        indexes.numberOfPages = 30
+        indexes.currentPage = 0
+        
+        indexes.pageIndicatorTintColor = UIColor.systemGray
+        indexes.currentPageIndicatorTintColor = UIColor.black
+        
+        indexes.center = self.view.center
+        
+        self.view.addSubview(indexes)
+        
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,8 +79,6 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func setCustomNavBarButtons() {
-        let img = UIImage(named: "square.and.arrow.up")?.withRenderingMode(.alwaysOriginal)
-        
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("보관함", for: .normal)
@@ -96,11 +105,40 @@ class WrittenPaperViewController: UIViewController {
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
+    func setPaperTitle() {
+        let asd = UIView(frame: CGRect(x: 0, y: 0, width: 730, height: 50))
+        asd.addSubview(titleLabel)
+        asd.addSubview(timeLabel)
+        asd.center.x = self.view.center.x
+        view.addSubview(asd)
+    }
+    
     func move() {
         if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is TemplateSelectViewController }).first {
             self.navigationController?.popToViewController(templateSelectVC, animated: true)
         }
+    }
+    
+    func setCollectionView() {
+        var cardsCollection: UICollectionView?
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 0, right: 0)
+        layout.itemSize = CGSize(width: 300, height: 230)
         
+        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 150, width: self.view.frame.width*0.87, height: self.view.frame.height-230), collectionViewLayout: layout)
+//        let indexPath = IndexPath(item: indexes.currentPage, section: 0)
+//        cardsCollection?.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        cardsCollection?.center.x = view.center.x
+        
+        cardsCollection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
+        cardsCollection?.backgroundColor = .green
+        
+        cardsCollection?.dataSource = self
+        cardsCollection?.delegate = self
+        
+        cardsCollection?.reloadData()
+        
+        view.addSubview(cardsCollection ?? UICollectionView())
     }
     
 }
@@ -109,5 +147,37 @@ extension UIButton {
     func addLeftPadding(_ padding: CGFloat) {
         titleEdgeInsets = UIEdgeInsets(top: 0.0, left: padding, bottom: 0.0, right: -padding)
         contentEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: padding)
+    }
+}
+
+extension WrittenPaperViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 200 // How many cells to display
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
+        myCell.backgroundColor = UIColor.blue
+        return myCell
+    }
+}
+extension WrittenPaperViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("User tapped on item \(indexPath.row)")
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+    }
+}
+
+extension WrittenPaperViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let width = scrollView.bounds.size.width
+        // 좌표보정을 위해 절반의 너비를 더해줌
+        let xxxx = scrollView.contentOffset.x + (width/2)
+        
+        let newPage = Int(xxxx / width)
+        if indexes.currentPage != newPage {
+            indexes.currentPage = newPage
+        }
     }
 }
