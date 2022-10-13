@@ -14,8 +14,7 @@ class PaperStorageViewController: UIViewController {
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var paperCollectionView: CollectionView?
-    private var closedPapers: [PaperModel]?
-    private var openedPapers: [PaperModel]?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,10 +23,16 @@ class PaperStorageViewController: UIViewController {
         setCollectionView()
     }
     
-    // view가 나타날때마다 페이퍼 목록 확인하기 위해 input에 값 설정하기
+    // view가 나타나면 알려주기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
+    }
+    
+    // view가 사라지면 알려주기
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        input.send(.viewDidDisappear)
     }
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
@@ -39,11 +44,9 @@ class PaperStorageViewController: UIViewController {
                 guard let self = self else {return}
                 switch event {
                 // 페이퍼에 변화가 있으면 UI 업데이트 하기
-                case .papersAreUpdated(let openedPapers, let closedPapers):
-                    self.openedPapers = openedPapers
-                    self.closedPapers = closedPapers
+                case .initPapers, .papersAreUpdatedInDatabase, .papersAreUpdatedByTimer:
+                    self.paperCollectionView?.reloadData()
                 }
-                self.paperCollectionView?.reloadData()
             })
             .store(in: &cancellables)
     }
@@ -65,6 +68,7 @@ class PaperStorageViewController: UIViewController {
         guard let collectionView = paperCollectionView else {return}
         
         collectionView.backgroundColor = .white
+        collectionView.alwaysBounceVertical = true
         collectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.identifier)
         collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
         collectionView.dataSource = self
@@ -88,9 +92,9 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return openedPapers?.count ?? 0
+            return viewModel.openedPapers.count
         } else {
-            return closedPapers?.count ?? 0
+            return viewModel.closedPapers.count
         }
     }
     // 섹션의 개수
@@ -100,12 +104,11 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.identifier, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
+        
         if indexPath.section == 0 {
-            guard let openedPapers = openedPapers else {return cell}
-            cell.setCell(paper: openedPapers[indexPath.item], isOpened: true)
+            cell.setCell(paper: viewModel.openedPapers[indexPath.item], now: viewModel.currentTime)
         } else {
-            guard let closedPapers = closedPapers else {return cell}
-            cell.setCell(paper: closedPapers[indexPath.item], isOpened: false)
+            cell.setCell(paper: viewModel.closedPapers[indexPath.item], now: viewModel.currentTime)
         }
         return cell
     }
@@ -177,7 +180,6 @@ private class CollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
     private let cell = UIView()
     private let preview = UIView()
-    private let descr = UIStackView()
     private let timer = UIStackView()
     private let clock = UIImageView()
     private let time = UILabel()
@@ -195,20 +197,14 @@ private class CollectionCell: UICollectionViewCell {
     private func configure() {
         addSubview(cell)
         cell.addSubview(preview)
-        cell.addSubview(descr)
-        
-        descr.addArrangedSubview(timer)
-        descr.addArrangedSubview(title)
-        
+        cell.addSubview(title)
+        cell.addSubview(timer)
         timer.addArrangedSubview(clock)
         timer.addArrangedSubview(time)
         
-        time.font = .preferredFont(forTextStyle: .headline)
-        time.textColor = .white
-        clock.image = UIImage(systemName: "timer")
-        clock.tintColor = .white
-        clock.contentMode = .scaleAspectFit
-        title.font = .preferredFont(forTextStyle: .title3)
+        cell.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
         
         preview.backgroundColor = .yellow
         preview.snp.makeConstraints({ make in
@@ -216,38 +212,66 @@ private class CollectionCell: UICollectionViewCell {
             make.height.equalTo(160)
         })
         
-        descr.distribution = .equalSpacing
-        descr.spacing = 10
-        descr.snp.makeConstraints({ make in
+        title.font = .preferredFont(forTextStyle: .title3)
+        title.textAlignment = .center
+        title.snp.makeConstraints({ make in
             make.top.equalTo(preview.snp.bottom).offset(10)
-            make.centerX.equalTo(preview)
-            make.width.equalTo(preview)
+            make.centerX.equalToSuperview()
+            make.width.equalToSuperview()
         })
         
         timer.distribution = .equalSpacing
-        timer.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        timer.layoutMargins = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
         timer.isLayoutMarginsRelativeArrangement = true
         timer.layer.cornerRadius = 12
-        
+        timer.spacing = 5
         timer.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalToSuperview()
-            make.width.equalTo(90)
+            make.top.equalTo(title.snp.bottom).offset(10)
+            make.centerX.equalToSuperview()
         })
         
-        cell.snp.makeConstraints({ make in
-            make.edges.equalToSuperview()
+        clock.image = UIImage(systemName: "timer")
+        clock.tintColor = .white
+        clock.contentMode = .scaleAspectFit
+        clock.snp.makeConstraints({ make in
+            make.width.equalTo(15)
+            make.height.equalTo(15)
         })
+        
+        time.font = .preferredFont(forTextStyle: .headline)
+        time.textColor = .white
     }
     
-    func setCell(paper: PaperModel, isOpened: Bool) {
+    func setCell(paper: PaperModel, now: Date) {
         // TODO: 타이머 구현, 프리뷰 구현
-        time.text = "02:34"
-        title.text = paper.title
-        if isOpened {
+        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
+        
+        if timeInterval > 0 {
             timer.backgroundColor = .red
+            time.text = changeTimeFormat(second: timeInterval)
         } else {
             timer.backgroundColor = .gray
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "y.M.d"
+            time.text = dateFormatter.string(from: now)
         }
+        
+        title.text = paper.title
+    }
+    
+    // 초를 00:00 형식으로 바꾸기
+    func changeTimeFormat(second: Int) -> String {
+        let hour = Int(second/3600)
+        let minute = Int((second - (hour*3600))/60)
+        var hourString = String(hour)
+        var minuteString = String(minute)
+        if hourString.count == 1 {
+            hourString = "0" + hourString
+        }
+        if minuteString.count == 1 {
+            minuteString = "0" + minuteString
+        }
+        
+        return hourString + ":" + minuteString
     }
 }
