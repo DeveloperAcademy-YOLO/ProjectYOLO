@@ -59,10 +59,10 @@ class TemplateSelectViewController: UIViewController {
     // 컬렉션 뷰 초기화
     private func setCollectionView() {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: 27, left: 50, bottom: 0, right: 50)
-        collectionViewLayer.minimumInteritemSpacing = 30
-        collectionViewLayer.minimumLineSpacing = 30
-        collectionViewLayer.headerReferenceSize = .init(width: 200, height: 90)
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: 28, left: 28, bottom: 48, right: 28)
+        collectionViewLayer.minimumInteritemSpacing = 20
+        collectionViewLayer.minimumLineSpacing = 28
+        collectionViewLayer.headerReferenceSize = .init(width: 116, height: 29)
         
         templateCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = templateCollectionView else {return}
@@ -76,16 +76,16 @@ class TemplateSelectViewController: UIViewController {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
             make.left.right.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(60)
         })
     }
 }
 
 // 컬렉션 뷰에 대한 여러 설정들을 해줌
 extension TemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    // 셀의 사이즈
+    // 셀 크기
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 240, height: 200)
+        return CGSize(width: 200, height: 169)
     }
     
     // 섹션별 셀 개수
@@ -177,10 +177,10 @@ private class CollectionHeader: UICollectionReusableView {
     private func configure() {
         addSubview(title)
         
-        title.font = .preferredFont(forTextStyle: .largeTitle)
+        title.font = .preferredFont(forTextStyle: .title2)
         title.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset(50)
-            make.left.equalToSuperview().offset(50)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(34)
         })
     }
     
@@ -192,7 +192,7 @@ private class CollectionHeader: UICollectionReusableView {
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
 private class CollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
-    private let thumbnail = UIView()
+    private let thumbnail = UIStackView()
     private let title = UILabel()
     private let imageView = UIImageView()
     
@@ -207,23 +207,27 @@ private class CollectionCell: UICollectionViewCell {
     
     private func configure() {
         addSubview(thumbnail)
-        thumbnail.addSubview(imageView)
-        thumbnail.addSubview(title)
+        thumbnail.addArrangedSubview(imageView)
+        thumbnail.addArrangedSubview(title)
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 12
         imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.left.equalToSuperview()
-            make.width.equalTo(240)
+            make.width.equalTo(196)
+            make.height.equalTo(134)
         })
         
-        title.font = .preferredFont(forTextStyle: .title3)
+        title.font = .preferredFont(forTextStyle: .body)
+        title.textColor = UIColor(rgb: 0x808080)
+        title.textAlignment = .center
         title.snp.makeConstraints({ make in
-            make.top.equalTo(imageView.snp.bottom).offset(10)
             make.centerX.equalTo(imageView)
         })
         
+        thumbnail.spacing = 16
+        thumbnail.axis = .vertical
         thumbnail.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
         })
