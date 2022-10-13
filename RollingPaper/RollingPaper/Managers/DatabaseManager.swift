@@ -8,12 +8,15 @@
 import Foundation
 import Combine
 
-protocol LocalDatabaseManager {
-    static var shared: LocalDatabaseManager { get }
-    var papersSubject: CurrentValueSubject<[PaperModel], Never> { get set }
+protocol DatabaseManager {
+    static var shared: DatabaseManager { get }
+    var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> { get set }
+    var paperSubject: CurrentValueSubject<PaperModel?, Never> { get set }
+    func fetchPaper(paperId: String)
+    func resetPaper()
     func addPaper(paper: PaperModel)
     func addCard(paperId: String, card: CardModel)
-    func removePaper(paper: PaperModel)
+    func removePaper(paperId: String)
     func removeCard(paperId: String, card: CardModel)
     func updatePaper(paper: PaperModel)
     func updateCard(paperId: String, card: CardModel)
