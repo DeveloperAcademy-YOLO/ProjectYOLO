@@ -242,7 +242,7 @@ private class CollectionCell: UICollectionViewCell {
         time.textColor = .white
     }
     
-    func setCell(paper: PaperModel, now: Date) {
+    func setCell(paper: PaperPreviewModel, now: Date) {
         // TODO: 타이머 구현, 프리뷰 구현
         let timeInterval = Int(paper.endTime.timeIntervalSince(now))
         

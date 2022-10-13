@@ -9,6 +9,7 @@ import UIKit
 import Combine
 import SnapKit
 import AuthenticationServices
+import CombineCocoa
 
 class SignInViewController: UIViewController {
     enum TextFieldFocused {
@@ -26,7 +27,9 @@ class SignInViewController: UIViewController {
         textField.layer.cornerRadius = 12
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+        textField.textContentType = .emailAddress
+        textField.font = .preferredFont(forTextStyle: .body)
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -38,8 +41,10 @@ class SignInViewController: UIViewController {
         textField.layer.cornerRadius = 12
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-        textField.isSecureTextEntry = true
+        textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+        textField.font = .preferredFont(forTextStyle: .body)
+        textField.textContentType = .oneTimeCode
+        textField.isSecureTextEntry = false
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
@@ -50,8 +55,8 @@ class SignInViewController: UIViewController {
         button.backgroundColor = UIColor(rgb: 0x007AFF)
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
-        button.setTitle("로그인", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.white])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
     private let appleSignInButton: ASAuthorizationAppleIDButton = {
@@ -69,6 +74,7 @@ class SignInViewController: UIViewController {
     private let waringLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
+        label.font = .preferredFont(forTextStyle: .body)
         label.isHidden = true
         return label
     }()
@@ -76,11 +82,13 @@ class SignInViewController: UIViewController {
     private let viewModel = SignInViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
+    private var currentFocusedTextfieldY: CGFloat = .zero
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignInViewUI()
         bind()
+        setKeyboardObserver()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -89,6 +97,29 @@ class SignInViewController: UIViewController {
             make.top.equalToSuperview().offset(topOffset)
         })
         view.layoutIfNeeded()
+    }
+    
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            if currentFocusedTextfieldY + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
         
     private func setSignInViewUI() {
@@ -126,7 +157,6 @@ class SignInViewController: UIViewController {
         appleSignInButton.snp.makeConstraints({ make in
             make.top.equalTo(signInButton.snp.bottom).offset(28)
             make.width.equalTo(375)
-            // TODO: appleSignInButton -> width <= 375
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
         })
@@ -258,10 +288,27 @@ class SignInViewController: UIViewController {
                 self?.viewModel.email.send(email)
             })
             .store(in: &cancellables)
+        emailTextField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.emailTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            })
+            .store(in: &cancellables)
         passwordTextField
             .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.passwordFocused)
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.passwordTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+                self?.passwordTextField.isSecureTextEntry = true
             })
             .store(in: &cancellables)
         passwordTextField
@@ -273,10 +320,40 @@ class SignInViewController: UIViewController {
             .store(in: &cancellables)
         emailTextField
             .controlPublisher(for: .editingDidEnd)
-            .combineLatest(passwordTextField.controlPublisher(for: .editingDidEnd))
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.normalBoundTap)
+                self?.emailTextField.resignFirstResponder()
             })
             .store(in: &cancellables)
+        emailTextField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.emailTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.passwordTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.input.send(.normalBoundTap)
+                self?.passwordTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
+//        backgroundGesture.delegate = self
+        view.addGestureRecognizer(backgroundGesture)
+    }
+    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
+        emailTextField.resignFirstResponder()
+        passwordTextField.resignFirstResponder()
     }
 }

@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
-		AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */; };
+		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
+		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
+		AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */; };
 		BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */; };
 		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
 		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
@@ -41,13 +43,16 @@
 		D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC628ED29670094ECD9 /* TemplateModel.swift */; };
 		D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */; };
 		D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */; };
-		D251BDCF28ED54A40094ECD9 /* LocalDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */; };
+		D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */; };
 		D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */; };
 		D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */; };
 		D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308128EE871C008365CB /* Combine+Extensions.swift */; };
 		D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */; };
 		D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */; };
 		D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */; };
+		D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308D28F16493008365CB /* SignUpTextField.swift */; };
+		D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */; };
+		D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,7 +69,9 @@
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
-		AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PencilKitViewController.swift; sourceTree = "<group>"; };
+		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
+		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
+		AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewController.swift; sourceTree = "<group>"; };
 		BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewModel.swift; sourceTree = "<group>"; };
@@ -101,13 +108,16 @@
 		D251BDC628ED29670094ECD9 /* TemplateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateModel.swift; sourceTree = "<group>"; };
 		D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEnum.swift; sourceTree = "<group>"; };
 		D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
-		D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseManager.swift; sourceTree = "<group>"; };
+		D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModelFileManager.swift; sourceTree = "<group>"; };
 		D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308128EE871C008365CB /* Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseMockManager.swift; sourceTree = "<group>"; };
+		D2B6308D28F16493008365CB /* SignUpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpTextField.swift; sourceTree = "<group>"; };
+		D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperPreviewModel.swift; sourceTree = "<group>"; };
+		D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +219,7 @@
 				D251BDC628ED29670094ECD9 /* TemplateModel.swift */,
 				D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */,
 				CFDA52C028F48D08006774E2 /* CategoryModel.swift */,
+				D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -226,6 +237,8 @@
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
 				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
+				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -234,6 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				D22E4AAC28EBDC73001091DA /* LaunchScreen.storyboard */,
+				D2B6308D28F16493008365CB /* SignUpTextField.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -242,8 +256,9 @@
 			isa = PBXGroup;
 			children = (
 				D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */,
+				D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */,
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
-				D251BDCE28ED54A40094ECD9 /* LocalDatabaseManager.swift */,
+				D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */,
 				D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */,
 				D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */,
 			);
@@ -258,6 +273,7 @@
 				BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */,
 				BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */,
 				BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */,
+				AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -446,6 +462,7 @@
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
+				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
@@ -453,15 +470,18 @@
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* LocalDatabaseManager.swift in Sources */,
 				BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */,
+				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
+				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
 				CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */,
 				D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */,
 				CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */,
+				D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */,
 				D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */,
 				D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */,
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
@@ -471,7 +491,10 @@
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
+				AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */,
+				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
+				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,

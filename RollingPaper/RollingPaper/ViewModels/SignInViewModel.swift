@@ -34,7 +34,7 @@ final class SignInViewModel {
         case normalBoundTap
     }
     
-    init(authManager: AuthManager = FirebaseAuthManager()) {
+    init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
         bind()
     }

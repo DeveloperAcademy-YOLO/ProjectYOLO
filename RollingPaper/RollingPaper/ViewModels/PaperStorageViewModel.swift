@@ -19,17 +19,17 @@ class PaperStorageViewModel {
         case papersAreUpdatedByTimer
     }
     
-    private let databaseManager: LocalDatabaseManager
+    private let databaseManager: DatabaseManager
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var papers: [PaperModel]?
+    private var papers: [PaperPreviewModel]?
     var currentTime: Date = Date()
     
     // 현재 시간과 끝나는 시간 비교해서, 진행중인 페이퍼와 끝난 페이퍼 구분하기
-    var openedPapers: [PaperModel] {
+    var openedPapers: [PaperPreviewModel] {
         guard let papers = papers else {return []}
         
-        var opened = [PaperModel]()
+        var opened = [PaperPreviewModel]()
         for paper in papers {
             let timeInterval = Int(paper.endTime.timeIntervalSince(currentTime))
             if timeInterval > 0 {
@@ -38,10 +38,10 @@ class PaperStorageViewModel {
         }
         return opened
     }
-    var closedPapers: [PaperModel] {
+    var closedPapers: [PaperPreviewModel] {
         guard let papers = papers else {return []}
         
-        var closed = [PaperModel]()
+        var closed = [PaperPreviewModel]()
         for paper in papers {
             let timeInterval = Int(paper.endTime.timeIntervalSince(currentTime))
             if timeInterval <= 0 {
@@ -51,7 +51,7 @@ class PaperStorageViewModel {
         return closed
     }
     
-    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared) {
+    init(databaseManager: DatabaseManager = LocalDatabaseMockManager.shared) {
         self.databaseManager = databaseManager
         bind()
     }
@@ -77,9 +77,9 @@ class PaperStorageViewModel {
     // 데이터베이스 메니저와 타이머 연동
     private func bind() {
         databaseManager.papersSubject
-            .sink(receiveValue: { [weak self] papers in
+            .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
-                self.papers = papers
+                self.papers = paperPreviews
                 self.output.send(.papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)
