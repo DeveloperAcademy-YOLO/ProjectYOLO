@@ -86,23 +86,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .store(in: &cancellables)
     }
     
-//    private func convertURL(from urlString: String?, ) -> UIImage? {
-//        guard let urlString = urlString else { return nil }
-//        FirebaseStorageManager.downloadData(urlString: urlString) { result in
-//            switch result {
-//            case .success(let data):
-//                if
-//                    let data = data,
-//                    let image = UIImage(data: data) {
-//                    return image
-//                }
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//                return nil
-//            }
-//        }
-//    }
-    
     func show(categories: [CategoryModel]) {
         self.categories = categories
         self.tableView.reloadData()
