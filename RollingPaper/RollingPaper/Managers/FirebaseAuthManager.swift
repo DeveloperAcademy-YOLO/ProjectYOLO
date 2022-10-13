@@ -100,6 +100,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 self?.signedInSubject.send(error)
             } else {
                 self?.signedInSubject.send(.signInSucceed)
+                self?.fetchUserProfile()
             }
         }
     }
@@ -110,6 +111,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             signedInSubject.send(.signOutFailed)
         } catch {
             signedInSubject.send(.signOutSucceed)
+            fetchUserProfile()
         }
     }
     
@@ -120,7 +122,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     self?.signedInSubject.send(.deleteUserFailed)
                 } else {
                     self?.signedInSubject.send(.deleteUserSucceed)
-                    self?.userProfileSubject.send(nil)
+                    self?.fetchUserProfile()
                 }
             })
         }
@@ -173,7 +175,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
-                    self?.userProfileSubject.send(currentUser)
+                    self?.fetchUserProfile()
                 }
             })
         }
@@ -190,6 +192,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
+        fetchUserProfile()
     }
     
     func fetchUserProfile() {

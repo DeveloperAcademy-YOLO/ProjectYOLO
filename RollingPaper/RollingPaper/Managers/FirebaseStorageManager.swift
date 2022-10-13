@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseStorage
+import Combine
 
 final class FirebaseStorageManager {
     enum CardContentType: String {
@@ -46,5 +47,19 @@ final class FirebaseStorageManager {
                 completion(.success(data))
             }
         })
+    }
+    
+    static func downloadData(urlString: String, maxSize: Int64 = Int64(1 * 1024 * 1024)) -> AnyPublisher<Data?, Never> {
+        let reference = Storage.storage().reference(forURL: urlString)
+        return Future { promise in
+            reference.getData(maxSize: maxSize) { data, error in
+                if let error = error {
+                    promise(.success(nil))
+                } else {
+                    promise(.success(data))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }
