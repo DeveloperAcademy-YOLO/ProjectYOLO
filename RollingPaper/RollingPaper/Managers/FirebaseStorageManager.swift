@@ -10,16 +10,21 @@ import FirebaseStorage
 import Combine
 
 final class FirebaseStorageManager {
-    enum CardContentType: String {
+    enum DataContentType: String {
         case jpeg = "image/jpeg"
         case png = "image/png"
         case data = "data"
     }
     
-    static func uploadData(dataId: String, data: Data, contentType: CardContentType, pathRoot: String, completion: @escaping (Result<URL?, Error>) -> Void) {
+    enum DataPathRoot: String {
+        case profile
+        case card
+    }
+    
+    static func uploadData(dataId: String, data: Data, contentType: DataContentType, pathRoot: DataPathRoot, completion: @escaping (Result<URL?, Error>) -> Void) {
         let metadata = StorageMetadata()
         metadata.contentType = contentType.rawValue
-        let reference = Storage.storage().reference().child("\(dataId)")
+        let reference = Storage.storage().reference().child("\(pathRoot.rawValue)/\(dataId)")
         reference.putData(data, metadata: metadata, completion: { _, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -38,10 +43,10 @@ final class FirebaseStorageManager {
         })
     }
     
-    static func uploadData(dataId: String, data: Data, contentType: CardContentType, pathRoot: String) -> AnyPublisher<URL?, Error> {
+    static func uploadData(dataId: String, data: Data, contentType: DataContentType, pathRoot: DataPathRoot) -> AnyPublisher<URL?, Error> {
         let metadata = StorageMetadata()
         metadata.contentType = contentType.rawValue
-        let reference = Storage.storage().reference().child("\(dataId)")
+        let reference = Storage.storage().reference().child("\(pathRoot.rawValue)/\(dataId)")
         return Future({ promise in
             reference.putData(data, metadata: metadata, completion: { _, error in
                 if let error = error {

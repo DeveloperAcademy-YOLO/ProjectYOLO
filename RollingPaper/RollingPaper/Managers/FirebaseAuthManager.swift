@@ -20,8 +20,7 @@ protocol AuthManager {
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser()
-    func updateUserProfile(name: String?, photoURLString: String?)
-    func fetchUserProfile()
+    func updateUserProfile(name: String?, photoData: Data?)
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -51,6 +50,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     var userProfileSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     private let auth = FirebaseAuth.Auth.auth()
     private var currentNonce: String?
+    private var cancellables = Set<AnyCancellable>()
     
     func signUp(email: String, password: String, name: String) {
         auth.createUser(withEmail: email, password: password) { [weak self] _, error in
@@ -58,7 +58,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 self?.signedInSubject.send(error)
             } else {
                 self?.signedInSubject.send(.signUpSucceed)
-                self?.setUserProfile(name: name)
+                self?.updateUserProfile(name: name)
             }
         }
     }
@@ -136,9 +136,9 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     func signOut() {
         do {
             try auth.signOut()
-            signedInSubject.send(.signOutFailed)
-        } catch {
             signedInSubject.send(.signOutSucceed)
+        } catch {
+            signedInSubject.send(.signOutFailed)
         }
         fetchUserProfile()
     }
@@ -156,34 +156,43 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func setUserProfile(name: String? = nil, photoURLString: String? = nil) {
+    func updateUserProfile(name: String?, photoData: Data?) {
         if
-            let user = auth.currentUser,
-            var currentUser = userProfileSubject.value {
+            let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
+            let dataId = user.uid
             if let name = name {
                 changeRequest.displayName = name
-                currentUser.name = name
             }
-            if
-                let photoURLString = photoURLString,
-                let photoURL = URL(string: photoURLString) {
-                changeRequest.photoURL = photoURL
-                currentUser.profileUrl = photoURLString
+            if let photoData = photoData {
+                FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: .png, pathRoot: .profile)
+                    .receive(on: DispatchQueue.global(qos: .background))
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .finished:
+                            print("Photo Upload Succeed")
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                        }
+                    }, receiveValue: { [weak self] url in
+                        if let url = url {
+                            changeRequest.photoURL = url
+                            changeRequest.commitChanges(completion: { [weak self] error in
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                } else {
+                                    self?.fetchUserProfile()
+                                }
+                            })
+                        }
+                    })
+                    .store(in: &cancellables)
+
             }
-            changeRequest.commitChanges(completion: { [weak self] error in
-                guard let self = self else { return }
-                if let error = error {
-                    print(error.localizedDescription)
-                } else {
-                    self.fetchUserProfile()
-                    print("Setting user name and photo")
-                }
-            })
         }
     }
     
-    func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
+    private func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
         if
             let user = auth.currentUser,
             var currentUser = userProfileSubject.value {
@@ -222,7 +231,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         authorizationController.performRequests()
     }
     
-    func fetchUserProfile() {
+    private func fetchUserProfile() {
         if let user = auth.currentUser {
             let email = user.email ?? "Default Email"
             let name = user.displayName ?? "Default Name"
