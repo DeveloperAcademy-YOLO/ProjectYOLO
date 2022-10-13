@@ -10,20 +10,27 @@ import UIKit
 class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
     
     func didSelectCategory(_ category: CategoryModel) {
-        var secondaryVC = UIViewController()
+        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
+        let templateViewController = UINavigationController(rootViewController: self.templateViewController)
+        let mainViewController = UINavigationController(rootViewController: self.mainViewController)
+        
         switch category.name {
         case "페이퍼 템플릿":
-            secondaryVC = TemplateSelectViewController()
+            if !(self.viewControllers[1] is TemplateSelectViewController) {
+                self.viewControllers[1] = templateViewController
+            }
         case "페이퍼 보관함":
-            secondaryVC = MainViewController()
+            if !(self.viewControllers[1] is MainViewController) {
+                self.viewControllers[1] = mainViewController
+            }
         case "설정":
-            secondaryVC = MainViewController()
+            if !(self.viewControllers[1] is MainViewController) {
+                self.viewControllers[1] = mainViewController
+            }
         default:
-            secondaryVC = MainViewController()
+            self.viewControllers[1] = mainViewController
         }
-        self.showDetailViewController(secondaryVC, sender: nil)
     }
-    
     
     var sideBarCategories: [CategoryModel] = [
         CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
@@ -31,6 +38,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         CategoryModel(name: "설정", icon: "gearshape")
     ]
     private var sidebarViewController: SidebarViewController!
+    private var templateViewController: TemplateSelectViewController!
+    private var mainViewController: MainViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,9 +63,11 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     private func loadViewControllers() {
         self.sidebarViewController = SidebarViewController()
+        self.templateViewController = TemplateSelectViewController()
+        self.mainViewController = MainViewController()
         self.sidebarViewController.delegate = self
-        let navController = UINavigationController(rootViewController: self.sidebarViewController)
-        let detail = TemplateSelectViewController()
-        self.viewControllers = [navController, detail]
+        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
+        let templateViewController = UINavigationController(rootViewController: self.templateViewController)
+        self.viewControllers = [sidebar, templateViewController]
     }
 }
