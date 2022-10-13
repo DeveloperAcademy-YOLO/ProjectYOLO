@@ -16,8 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
         let window = UIWindow(frame: UIScreen.main.bounds)
+        let splitVC = SplitViewController(style: UISplitViewController.Style.doubleColumn)
         window.makeKeyAndVisible()
-        window.rootViewController = SignUpViewController()
+        window.rootViewController = splitVC
         self.window = window
         return true
     }

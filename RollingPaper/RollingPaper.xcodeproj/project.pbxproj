@@ -15,6 +15,8 @@
 		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
 		BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */; };
 		BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */; };
+		C5A7198728F69E110003D593 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */; };
+		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */; };
@@ -70,6 +72,8 @@
 		BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewController.swift; sourceTree = "<group>"; };
 		BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewModel.swift; sourceTree = "<group>"; };
 		BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extensions.swift"; sourceTree = "<group>"; };
+		C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
+		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
@@ -127,6 +131,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C5A7198828F8837D0003D593 /* CustomUIComponents */ = {
+			isa = PBXGroup;
+			children = (
+				C5A7198A28F883D40003D593 /* UILabel+Padding.swift */,
+			);
+			path = CustomUIComponents;
+			sourceTree = "<group>";
+		};
 		C5AB30BA28ED655200C2E016 /* RollingPaperTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,6 +185,7 @@
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
+				C5A7198828F8837D0003D593 /* CustomUIComponents */,
 				D22E4AB728EBDC8B001091DA /* Controllers */,
 				D22E4AB628EBDC86001091DA /* Models */,
 				D22E4AAA28EBDC73001091DA /* Assets.xcassets */,
@@ -223,6 +236,7 @@
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
+				C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -439,9 +453,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
+				C5A7198728F69E110003D593 /* WrittenPaperViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
