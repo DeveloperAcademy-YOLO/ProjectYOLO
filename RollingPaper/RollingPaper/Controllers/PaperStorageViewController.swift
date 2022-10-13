@@ -284,7 +284,8 @@ private class CollectionCell: UICollectionViewCell {
         }
         
         title.text = paper.title
-        // TODO: 프리뷰 구현해서 이미지에 넣어주기
+        // TODO: 프리뷰 구현해서 이미지에 넣어주기 (FirebaseStorageManager)
+        // preview.image = (paper.thumbnailURLString 으로 썸네일 다운) ?? paper.template.thumbnail
         preview.image = paper.template.thumbnail
     }
 }
