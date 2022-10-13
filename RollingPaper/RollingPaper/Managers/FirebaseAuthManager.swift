@@ -53,6 +53,8 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     private var cancellables = Set<AnyCancellable>()
     
     func signUp(email: String, password: String, name: String) {
+        
+        
         auth.createUser(withEmail: email, password: password) { [weak self] _, error in
             if let error = self?.handleError(with: error) {
                 self?.signedInSubject.send(error)
