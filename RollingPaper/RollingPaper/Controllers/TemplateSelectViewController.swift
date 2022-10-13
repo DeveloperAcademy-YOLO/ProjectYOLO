@@ -30,7 +30,6 @@ class TemplateSelectViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
-        
     }
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
@@ -76,7 +75,9 @@ class TemplateSelectViewController: UIViewController {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
             make.left.right.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(60)
+            
+            // 물어볼 것
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(0)
         })
     }
 }
@@ -192,7 +193,7 @@ private class CollectionHeader: UICollectionReusableView {
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
 private class CollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
-    private let thumbnail = UIStackView()
+    private let cell = UIStackView()
     private let title = UILabel()
     private let imageView = UIImageView()
     
@@ -206,15 +207,21 @@ private class CollectionCell: UICollectionViewCell {
     }
     
     private func configure() {
-        addSubview(thumbnail)
-        thumbnail.addArrangedSubview(imageView)
-        thumbnail.addArrangedSubview(title)
+        addSubview(cell)
+        cell.addArrangedSubview(imageView)
+        cell.addArrangedSubview(title)
+        
+        cell.spacing = 16
+        cell.axis = .vertical
+        cell.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 12
         imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
-            make.left.equalToSuperview()
+            make.leading.equalToSuperview()
             make.width.equalTo(196)
             make.height.equalTo(134)
         })
@@ -224,12 +231,7 @@ private class CollectionCell: UICollectionViewCell {
         title.textAlignment = .center
         title.snp.makeConstraints({ make in
             make.centerX.equalTo(imageView)
-        })
-        
-        thumbnail.spacing = 16
-        thumbnail.axis = .vertical
-        thumbnail.snp.makeConstraints({ make in
-            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
         })
     }
     

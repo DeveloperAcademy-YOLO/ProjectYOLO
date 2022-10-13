@@ -59,10 +59,10 @@ class PaperStorageViewController: UIViewController {
     // 컬렉션 뷰 초기화
     private func setCollectionView() {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: 27, left: 50, bottom: 0, right: 50)
-        collectionViewLayer.minimumInteritemSpacing = 30
-        collectionViewLayer.minimumLineSpacing = 30
-        collectionViewLayer.headerReferenceSize = .init(width: 200, height: 90)
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: 28, left: 28, bottom: 48, right: 28)
+        collectionViewLayer.minimumInteritemSpacing = 20
+        collectionViewLayer.minimumLineSpacing = 28
+        collectionViewLayer.headerReferenceSize = .init(width: 116, height: 29)
         
         paperCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = paperCollectionView else {return}
@@ -76,18 +76,17 @@ class PaperStorageViewController: UIViewController {
         
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
-            make.left.right.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(0)
         })
     }
 }
 
 // 컬렉션 뷰에 대한 여러 설정들을 해줌
 extension PaperStorageViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 240, height: 200)
+        return CGSize(width: 200, height: 200)
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -163,10 +162,10 @@ private class CollectionHeader: UICollectionReusableView {
     private func configure() {
         addSubview(title)
         
-        title.font = .preferredFont(forTextStyle: .largeTitle)
+        title.font = .preferredFont(forTextStyle: .title2)
         title.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset(50)
-            make.left.equalToSuperview().offset(50)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(34)
         })
     }
     
@@ -207,12 +206,16 @@ private class CollectionCell: UICollectionViewCell {
         })
         
         preview.backgroundColor = .yellow
+        preview.layer.cornerRadius = 12
         preview.snp.makeConstraints({ make in
-            make.width.equalTo(240)
-            make.height.equalTo(160)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.width.equalTo(196)
+            make.height.equalTo(134)
         })
         
-        title.font = .preferredFont(forTextStyle: .title3)
+        title.font = .preferredFont(forTextStyle: .body)
+        title.textColor = UIColor(rgb: 0x808080)
         title.textAlignment = .center
         title.snp.makeConstraints({ make in
             make.top.equalTo(preview.snp.bottom).offset(10)
@@ -238,22 +241,25 @@ private class CollectionCell: UICollectionViewCell {
             make.height.equalTo(15)
         })
         
-        time.font = .preferredFont(forTextStyle: .headline)
+        time.font = .preferredFont(forTextStyle: .body)
+        time.textAlignment = .right
         time.textColor = .white
     }
     
     func setCell(paper: PaperPreviewModel, now: Date) {
         // TODO: 타이머 구현, 프리뷰 구현
-        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
         
+        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
         if timeInterval > 0 {
-            timer.backgroundColor = .red
+            timer.backgroundColor = UIColor(rgb: 0xFF3B30)
             time.text = changeTimeFormat(second: timeInterval)
+            clock.isHidden = false
         } else {
-            timer.backgroundColor = .gray
+            timer.backgroundColor = UIColor(rgb: 0xADADAD)
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "y.M.d"
             time.text = dateFormatter.string(from: now)
+            clock.isHidden = true
         }
         
         title.text = paper.title
