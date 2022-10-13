@@ -375,7 +375,7 @@ extension FirestoreManager {
                         .collection(Constants.usersNamePath.rawValue)
                         .document(Constants.usersNamePath.rawValue)
                         .setData(userNamesDict, completion: { error in
-                            if let error {
+                            if let error = error {
                                 print(error.localizedDescription)
                                 promise(.success(false))
                             } else {
