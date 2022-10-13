@@ -92,6 +92,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 self?.signedInSubject.send(.signInSucceed)
             }
         })
+        fetchUserProfile()
     }
     
     func signIn(credential: AuthCredential) {
@@ -100,6 +101,34 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 self?.signedInSubject.send(error)
             } else {
                 self?.signedInSubject.send(.signInSucceed)
+            }
+        }
+        fetchUserProfile()
+    }
+    
+    private func socialSignIn(credential: AuthCredential, name: String, photoURLString: String? = nil) {
+        auth.signIn(with: credential) { [weak self] _, error in
+            if let error = self?.handleError(with: error) {
+                self?.signedInSubject.send(error)
+            } else {
+                if let user = self?.auth.currentUser {
+                    self?.signedInSubject.send(.signInSucceed)
+                    let changeRequest = user.createProfileChangeRequest()
+                    changeRequest.displayName = name
+                    if let photoURLString = photoURLString {
+                        changeRequest.photoURL = URL(string: photoURLString)
+                    }
+                    changeRequest.commitChanges(completion: { [weak self] error in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        } else {
+                            self?.fetchUserProfile()
+                            print("First Signed In and Set User Profile")
+                        }
+                    })
+                } else {
+                    self?.signedInSubject.send(.userNotFound)
+                }
             }
         }
     }
@@ -111,6 +140,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         } catch {
             signedInSubject.send(.signOutSucceed)
         }
+        fetchUserProfile()
     }
     
     func deleteUser() {
@@ -120,7 +150,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     self?.signedInSubject.send(.deleteUserFailed)
                 } else {
                     self?.signedInSubject.send(.deleteUserSucceed)
-                    self?.userProfileSubject.send(nil)
+                    self?.fetchUserProfile()
                 }
             })
         }
@@ -146,7 +176,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
-                    self.userProfileSubject.send(currentUser)
+                    self.fetchUserProfile()
                     print("Setting user name and photo")
                 }
             })
@@ -173,7 +203,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 if let error = error {
                     print(error.localizedDescription)
                 } else {
-                    self?.userProfileSubject.send(currentUser)
+                    self?.fetchUserProfile()
                 }
             })
         }
@@ -230,15 +260,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
         let name = lastName + firstName
 
         let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
-        
-        auth.signIn(with: credential) { [weak self] _, error in
-            guard let self = self else { return }
-            if let error = self.handleError(with: error) {
-                self.signedInSubject.send(error)
-            } else {
-                self.setUserProfile(name: name, photoURLString: nil)
-            }
-        }
+        socialSignIn(credential: credential, name: name)
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
