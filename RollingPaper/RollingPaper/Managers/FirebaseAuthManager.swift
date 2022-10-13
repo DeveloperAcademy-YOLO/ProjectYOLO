@@ -20,7 +20,7 @@ protocol AuthManager {
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser()
-    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType)
+    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType?)
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -53,16 +53,35 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     private var cancellables = Set<AnyCancellable>()
     
     func signUp(email: String, password: String, name: String) {
-        
-        
-        auth.createUser(withEmail: email, password: password) { [weak self] _, error in
-            if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(error)
-            } else {
-                self?.signedInSubject.send(.signUpSucceed)
-                self?.updateUserProfile(name: name)
-            }
-        }
+        FirestoreManager.shared.isValidUserName(with: name)
+            .sink(receiveValue: { [weak self] isValid in
+                guard let self = self else { return }
+                if isValid {
+                    print("THIS IS VALID!")
+                    self.auth.createUser(withEmail: email, password: password) { [weak self] _, error in
+                        guard let self = self else { return }
+                        if let error = self.handleError(with: error) {
+                            self.signedInSubject.send(error)
+                        } else {
+                            FirestoreManager.shared.setUserName(from: nil, to: name)
+                                .sink(receiveValue: { [weak self] isNameSet in
+                                    guard let self = self else { return }
+                                    if isNameSet {
+                                        self.signedInSubject.send(.signUpSucceed)
+                                        self.updateUserProfile(name: name)
+                                    } else {
+                                        self.signedInSubject.send(.unknownError)
+                                    }
+                                })
+                                .store(in: &self.cancellables)
+                        }
+                    }
+                } else {
+                    print("THIS IS INVALID!")
+                    self.signedInSubject.send(.nameAlreadyInUse)
+                }
+            })
+            .store(in: &cancellables)
     }
     
     private func handleError(with error: Error?) -> AuthManagerEnum? {
@@ -158,7 +177,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType) {
+    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType?) {
         if
             let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
@@ -166,7 +185,9 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             if let name = name {
                 changeRequest.displayName = name
             }
-            if let photoData = photoData {
+            if
+                let photoData = photoData,
+                let contentType = contentType {
                 FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
                     .receive(on: DispatchQueue.global(qos: .background))
                     .sink(receiveCompletion: { completion in

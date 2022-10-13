@@ -340,9 +340,9 @@ extension FirestoreManager {
                         let userNames = data["userNames"] as? [String] {
                         let userNamesSet = Set(userNames)
                         if userNamesSet.contains(userName) {
-                            promise(.success(true))
-                        } else {
                             promise(.success(false))
+                        } else {
+                            promise(.success(true))
                         }
                     } else {
                         promise(.success(true))
