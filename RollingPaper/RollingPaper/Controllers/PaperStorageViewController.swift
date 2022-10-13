@@ -178,7 +178,7 @@ private class CollectionHeader: UICollectionReusableView {
 private class CollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
     private let cell = UIView()
-    private let preview = UIView()
+    private let preview = UIImageView()
     private let timer = UIStackView()
     private let clock = UIImageView()
     private let time = UILabel()
@@ -205,7 +205,7 @@ private class CollectionCell: UICollectionViewCell {
             make.edges.equalToSuperview()
         })
         
-        preview.backgroundColor = .yellow
+        preview.layer.masksToBounds = true
         preview.layer.cornerRadius = 12
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
@@ -246,27 +246,8 @@ private class CollectionCell: UICollectionViewCell {
         time.textColor = .white
     }
     
-    func setCell(paper: PaperPreviewModel, now: Date) {
-        // TODO: 타이머 구현, 프리뷰 구현
-        
-        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
-        if timeInterval > 0 {
-            timer.backgroundColor = UIColor(rgb: 0xFF3B30)
-            time.text = changeTimeFormat(second: timeInterval)
-            clock.isHidden = false
-        } else {
-            timer.backgroundColor = UIColor(rgb: 0xADADAD)
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "y.M.d"
-            time.text = dateFormatter.string(from: now)
-            clock.isHidden = true
-        }
-        
-        title.text = paper.title
-    }
-    
-    // 초를 00:00 형식으로 바꾸기
-    func changeTimeFormat(second: Int) -> String {
+    // 초를 05:17(시간:분) 형식으로 바꾸기
+    private func changeTimeFormat(second: Int) -> String {
         let hour = Int(second/3600)
         let minute = Int((second - (hour*3600))/60)
         var hourString = String(hour)
@@ -279,5 +260,31 @@ private class CollectionCell: UICollectionViewCell {
         }
         
         return hourString + ":" + minuteString
+    }
+    
+    // 날짜를 2022.10.13 같은 형식으로 바꾸기
+    private func changeDateFormat(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "y.M.d"
+        return dateFormatter.string(from: date)
+    }
+    
+    func setCell(paper: PaperPreviewModel, now: Date) {
+        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
+        if timeInterval > 0 {
+            // 진행중인 페이퍼라면
+            timer.backgroundColor = UIColor(rgb: 0xFF3B30)
+            time.text = changeTimeFormat(second: timeInterval)
+            clock.isHidden = false
+        } else {
+            // 종료된 페이퍼라면
+            timer.backgroundColor = UIColor(rgb: 0xADADAD)
+            time.text = changeDateFormat(date: now)
+            clock.isHidden = true
+        }
+        
+        title.text = paper.title
+        // TODO: 프리뷰 구현해서 이미지에 넣어주기
+        preview.image = paper.template.thumbnail
     }
 }
