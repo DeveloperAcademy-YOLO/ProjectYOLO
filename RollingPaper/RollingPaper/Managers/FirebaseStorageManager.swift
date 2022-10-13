@@ -9,17 +9,18 @@ import Foundation
 import FirebaseStorage
 import Combine
 
+enum DataContentType: String {
+    case jpeg = "image/jpeg"
+    case png = "image/png"
+    case data = "data"
+}
+
+enum DataPathRoot: String {
+    case profile
+    case card
+}
+
 final class FirebaseStorageManager {
-    enum DataContentType: String {
-        case jpeg = "image/jpeg"
-        case png = "image/png"
-        case data = "data"
-    }
-    
-    enum DataPathRoot: String {
-        case profile
-        case card
-    }
     
     static func uploadData(dataId: String, data: Data, contentType: DataContentType, pathRoot: DataPathRoot, completion: @escaping (Result<URL?, Error>) -> Void) {
         let metadata = StorageMetadata()

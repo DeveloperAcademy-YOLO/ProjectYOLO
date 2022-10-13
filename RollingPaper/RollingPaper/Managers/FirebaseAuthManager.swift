@@ -20,7 +20,7 @@ protocol AuthManager {
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser()
-    func updateUserProfile(name: String?, photoData: Data?)
+    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType)
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -156,7 +156,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func updateUserProfile(name: String?, photoData: Data?) {
+    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType) {
         if
             let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
@@ -165,7 +165,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 changeRequest.displayName = name
             }
             if let photoData = photoData {
-                FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: .png, pathRoot: .profile)
+                FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
                     .receive(on: DispatchQueue.global(qos: .background))
                     .sink(receiveCompletion: { completion in
                         switch completion {
@@ -187,7 +187,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                         }
                     })
                     .store(in: &cancellables)
-
             }
         }
     }
