@@ -84,7 +84,7 @@ class PaperStorageViewModel {
             })
             .store(in: &cancellables)
         
-        Timer.publish(every: 1, on: .main, in: .common)
+        Timer.publish(every: 60, on: .main, in: .common)
             .autoconnect()
             .sink(receiveValue: { [weak self] date in
                 guard let self = self else {return}
