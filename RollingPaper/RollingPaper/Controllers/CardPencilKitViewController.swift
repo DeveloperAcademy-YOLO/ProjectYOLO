@@ -56,7 +56,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                 selectedStickerView.superview?.bringSubviewToFront(selectedStickerView)
             }
         }
-    }
+    } 
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,25 +88,26 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerToggleButtonConstraints()
         
         bind()
+        
+       // view.layer.transform = CATransform3DMakeRotation(45.0, 0, 1.0, 1.0)
     }
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
-                print("event sinked")
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
-                    print(background)
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
                     })
                 case .getRecentCardBackgroundImgFail:
-                    print("fail")
-                    self.someImageView.image = UIImage(named: "Rectangle")
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                    })
                 }
-            }
+            })
             .store(in: &cancellables)
     }
     

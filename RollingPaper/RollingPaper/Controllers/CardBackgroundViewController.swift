@@ -45,8 +45,10 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         
         checkCameraPermission()
         checkAlbumPermission()
-    }
     
+        input.send(.viewDidLoad)
+        bind()
+    }
     
     private let viewModel: CardBackgroundViewModel
     private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
@@ -61,28 +63,26 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        input.send(.viewDidAppear)
-        bind()
-    }
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
-            .sink { [weak self] event in
+            .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
-                print("event sinked")
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
-                    print(background)
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
                     })
                 case .getRecentCardBackgroundImgFail:
-                    print("fail")
-                    self.someImageView.image = UIImage(named: "Rectangle")
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                    })
                 }
+            })
+            .store(in: &cancellables)
+        secondColorBackgroundButton.tapPublisher
+            .sink { [weak self] _ in
+                self?.secondImageViewColor()
             }
             .store(in: &cancellables)
     }
@@ -126,7 +126,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-        button.addTarget(self, action: #selector(secondImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -140,7 +139,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
+//        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -160,7 +159,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
         return theImageView
     }()
     
@@ -171,15 +169,15 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
     
-    @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
+    func secondImageViewColor() {
         print("secondImageViewColor clicked")
         selectedColor = backgroundColor[1]
-        let image = UIImage(named: "Halloween_Candy")
+        guard let image = UIImage(named: "Halloween_Candy") else { return }
         self.someImageView.image = image
-        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
+        input.send(.setCardBackgroundImg(background: image))
     }
     
-    @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
+    func thirdImageViewColor() {
         print("thirdImageViewColor clicked")
         selectedColor = backgroundColor[2]
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
