@@ -7,161 +7,305 @@
 
 import UIKit
 import Combine
+import CombineCocoa
 import SnapKit
 
 class SignUpViewController: UIViewController {
-    private let emailLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Email"
-        label.font = .preferredFont(forTextStyle: .headline)
-        return label
-    }()
-    private let emailTextField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
+    private let emailTextField: SignUpTextField = {
+        let textField = SignUpTextField()
         return textField
     }()
-    private let passwordLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Password"
-        label.font = .preferredFont(forTextStyle: .headline)
-        return label
-    }()
-    private let passwordTextField: UITextField = {
-        let textField = UITextField()
-        textField.borderStyle = .roundedRect
+    private let passwordTextField: SignUpTextField = {
+        let textField = SignUpTextField()
         return textField
     }()
-    private let nameLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Name"
-        label.font = .preferredFont(forTextStyle: .headline)
-        return label
-    }()
-    private let nameTextField: UITextField = {
-       let textField = UITextField()
-        textField.borderStyle = .roundedRect
+    private let nameTextField: SignUpTextField = {
+        let textField = SignUpTextField()
         return textField
     }()
     private let signUpButton: UIButton = {
         let button = UIButton()
-        if #available(iOS 15.0, *) {
-            var config = UIButton.Configuration.filled()
-            config.background.backgroundColor = .systemBlue
-            button.configuration = config
-        } else {
-            // Fallback on earlier versions
-            button.backgroundColor = .systemBlue
-        }
-        button.setTitle("Sign Up", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemGray
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
+        let title = NSAttributedString(string: "가입", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3)])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
     
     private let viewModel = SignUpViewModel()
     private let input: PassthroughSubject<SignUpViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
+    private var currentFocusedTextfieldY: CGFloat = .zero
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignUpViewUI()
         bind()
+        setKeyboardObserver()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let topOffset = (UIScreen.main.bounds.height - 380) / 2
+        emailTextField.snp.updateConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+        })
+        view.layoutIfNeeded()
+    }
+    
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            if currentFocusedTextfieldY + 38 > keyboardY {
+                self.view.frame.origin.y =  keyboardY - currentFocusedTextfieldY - 38
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
     }
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        // TODO: auto layout using snapkit
-        emailLabel.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        passwordLabel.translatesAutoresizingMaskIntoConstraints = false
-        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameTextField.translatesAutoresizingMaskIntoConstraints = false
-        signUpButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(emailLabel)
-        view.addSubview(emailTextField)
-        view.addSubview(passwordLabel)
-        view.addSubview(passwordTextField)
-        view.addSubview(nameLabel)
-        view.addSubview(nameTextField)
-        view.addSubview(signUpButton)
-        emailLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
-        emailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30).isActive = true
-        emailLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        emailTextField.topAnchor.constraint(equalTo: emailLabel.topAnchor).isActive = true
-        emailTextField.leadingAnchor.constraint(equalTo: emailLabel.trailingAnchor, constant: 20).isActive = true
-        emailTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
-        passwordLabel.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: 30).isActive = true
-        passwordLabel.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor).isActive = true
-        passwordTextField.topAnchor.constraint(equalTo: passwordLabel.topAnchor).isActive = true
-        passwordTextField.leadingAnchor.constraint(equalTo: passwordLabel.trailingAnchor, constant: 20).isActive = true
-        passwordTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
-        nameLabel.topAnchor.constraint(equalTo: passwordLabel.bottomAnchor, constant: 30).isActive = true
-        nameLabel.leadingAnchor.constraint(equalTo: passwordLabel.leadingAnchor).isActive = true
-        nameLabel.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        nameTextField.leadingAnchor.constraint(equalTo: nameLabel.trailingAnchor, constant: 20).isActive = true
-        nameTextField.topAnchor.constraint(equalTo: nameLabel.topAnchor).isActive = true
-        nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30).isActive = true
-        signUpButton.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 30).isActive = true
-        signUpButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        // TODO: relayout -> fit as HI-FI
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
+        let topOffset = (UIScreen.main.bounds.height - 380) / 2
+        emailTextField.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        emailTextField.setTextFieldType(type: .email)
+        passwordTextField.snp.makeConstraints({ make in
+            make.top.equalTo(emailTextField.snp.top).offset(66)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        passwordTextField.setTextFieldType(type: .password)
+        nameTextField.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.top).offset(passwordTextField.frame.height + 28)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        nameTextField.setTextFieldType(type: .name)
+        signUpButton.snp.makeConstraints({ make in
+            make.top.equalTo(nameTextField.snp.top).offset(passwordTextField.frame.height + 32)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
     }
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] receivedValue in
-                guard self != nil else { return }
+            .sink(receiveValue: { [weak self] receivedValue in
                 switch receivedValue {
-                case .signInDidFail(error: let error):
-                    print(error.localizedDescription)
                 case .signUpDidFail(error: let error):
-                    print(error.localizedDescription)
-                case .emailDidMiss:
-                    break
-                case .passwordDidMiss:
-                    break
-                case .ninknameDidMiss:
-                    break
-                    // alert -> give info to user
+                    self?.handleError(error: error)
                 case .signUpDidSuccess:
                     print("Successfully Signed Up")
-                    // success -> switch to current view (navigation dismiss, etc...)
                 }
-            }
+            })
             .store(in: &cancellables)
         signUpButton
             .tapPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self = self else { return }
                 self.input.send(.signUpButtonDidTap)
-            }
+            })
             .store(in: &cancellables)
-        
         emailTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] email in
+            .sink(receiveValue: { [weak self] email in
                 guard let self = self else { return }
                 self.viewModel.email.send(email)
-            }
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.emailTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.emailTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.emailTextField.textField.resignFirstResponder()
+            })
             .store(in: &cancellables)
         passwordTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] password in
+            .sink(receiveValue: { [weak self] password in
                 guard let self = self else { return }
                 self.viewModel.password.send(password)
-            }
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.passwordTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.passwordTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.passwordTextField.textField.resignFirstResponder()
+            })
             .store(in: &cancellables)
         nameTextField
+            .textField
             .textPublisher
             .compactMap({ $0 })
-            .sink { [weak self] name in
+            .sink(receiveValue: { [weak self] name in
                 guard let self = self else { return }
                 self.viewModel.name.send(name)
-            }
+            })
             .store(in: &cancellables)
+        nameTextField
+            .textField
+            .didBeginEditingPublisher
+            .sink(receiveValue: { [weak self] _ in
+                if let yPosition = self?.nameTextField.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            })
+            .store(in: &cancellables)
+        nameTextField
+            .textField
+            .controlPublisher(for: .editingDidEnd)
+            .sink(receiveValue: { [weak self] _ in
+                self?.nameTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        nameTextField
+            .textField
+            .controlPublisher(for: .editingDidEndOnExit)
+            .sink(receiveValue: { [weak self] _ in
+                self?.nameTextField.textField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        emailTextField.passedSubject
+            .combineLatest(passwordTextField.passedSubject, nameTextField.passedSubject)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] passed in
+                let (emailPassed, passwordPassed, namePassed) = passed
+                if emailPassed && passwordPassed && namePassed {
+                    self?.signUpButton.backgroundColor = .systemBlue
+                    self?.signUpButton.isUserInteractionEnabled = true
+                } else {
+                    self?.signUpButton.backgroundColor = .systemGray
+                    self?.signUpButton.isUserInteractionEnabled = false
+                }
+            })
+            .store(in: &cancellables)
+        emailTextField
+            .warningShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .email, isWaringShown: isWaringShown)
+            })
+            .store(in: &cancellables)
+        passwordTextField
+            .warningShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .password, isWaringShown: isWaringShown)
+            })
+            .store(in: &cancellables)
+        nameTextField
+            .warningShownSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] isWaringShown in
+                self?.setTextfieldLayout(textFieldType: .name, isWaringShown: isWaringShown)
+            })
+            .store(in: &cancellables)
+        let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
+        view.addGestureRecognizer(backgroundGesture)
+    }
+}
+
+extension SignUpViewController {
+    private func handleError(error: AuthManagerEnum) {
+        switch error {
+        case .emailAlreadyInUse:
+            emailTextField.setTextFieldState(state: .warning(error: .emailAlreadyInUse))
+        case .wrongPassword:
+            passwordTextField.setTextFieldState(state: .warning(error: .wrongPassword))
+        case .invalidEmail:
+            emailTextField.setTextFieldState(state: .warning(error: .invalidEmail))
+        case .emailDidMiss:
+            emailTextField.setTextFieldState(state: .warning(error: .emailDidMiss))
+        case .passwordDidMiss:
+            passwordTextField.setTextFieldState(state: .warning(error: .passwordDidMiss))
+        case .nameAlreadyInUse:
+            nameTextField.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
+        case .invalidName:
+            nameTextField.setTextFieldState(state: .warning(error: .invalidName))
+        default: break
+        }
+    }
+    
+    private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
+        switch textFieldType {
+        case .email:
+            passwordTextField.snp.updateConstraints({ make in
+                make.top.equalTo(emailTextField.snp.top).offset(isWaringShown ? emailTextField.frame.height + 28 : 66)
+            })
+        case .password:
+            nameTextField.snp.updateConstraints({ make in
+                make.top.equalTo(passwordTextField.snp.top).offset(isWaringShown ? passwordTextField.frame.height + 28 : 66)
+            })
+        case .name:
+            signUpButton.snp.updateConstraints({ make in
+                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 70)
+            })
+        }
+        view.layoutIfNeeded()
+    }
+
+    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
+        emailTextField.textField.resignFirstResponder()
+        passwordTextField.textField.resignFirstResponder()
+        nameTextField.textField.resignFirstResponder()
     }
 }
