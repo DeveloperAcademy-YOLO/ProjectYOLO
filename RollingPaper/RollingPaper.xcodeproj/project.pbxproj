@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1537F13628F9501900130040 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1537F13528F9501900130040 /* GoogleService-Info.plist */; };
+		1537F13828F950FB00130040 /* SettingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1537F13728F950FB00130040 /* SettingScreenViewController.swift */; };
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
@@ -22,7 +24,6 @@
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
-		CF1DEAE028F862D90024EA1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -67,6 +68,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1537F13528F9501900130040 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		1537F13728F950FB00130040 /* SettingScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingScreenViewController.swift; sourceTree = "<group>"; };
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
@@ -85,7 +88,6 @@
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
-		CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "RollingPaper/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -162,7 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				C5AB305528EC119300C2E016 /* .swiftlint.yml */,
-				CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */,
+				1537F13528F9501900130040 /* GoogleService-Info.plist */,
 				D22E4AA028EBDC72001091DA /* RollingPaper */,
 				C5AB30BA28ED655200C2E016 /* RollingPaperTests */,
 				D22E4A9F28EBDC72001091DA /* Products */,
@@ -237,10 +239,10 @@
 				CFDA52C228F48D41006774E2 /* SplitViewController.swift */,
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
-				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
 				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
 				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
+				1537F13728F950FB00130040 /* SettingScreenViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -380,7 +382,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				CF1DEAE028F862D90024EA1F /* GoogleService-Info.plist in Resources */,
+				1537F13628F9501900130040 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
@@ -468,10 +470,11 @@
 				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
+				1537F13828F950FB00130040 /* SettingScreenViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
-				D251BDCF28ED54A40094ECD9 /* LocalDatabaseManager.swift in Sources */,
+				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
@@ -492,7 +495,7 @@
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
-				AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */,
+				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */,
 				CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */,

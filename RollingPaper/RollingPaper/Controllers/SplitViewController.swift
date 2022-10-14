@@ -13,7 +13,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
         let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        let mainViewController = UINavigationController(rootViewController: self.mainViewController)
+        let settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         
         switch category.name {
         case "페이퍼 템플릿":
@@ -25,8 +25,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = paperStorageViewController
             }
         case "설정":
-            if !(self.viewControllers[1] is MainViewController) {
-                self.viewControllers[1] = mainViewController
+            if !(self.viewControllers[1] is SettingScreenViewController) {
+                self.viewControllers[1] = settingScreenViewController
             }
         default:
             self.viewControllers[1] = mainViewController
