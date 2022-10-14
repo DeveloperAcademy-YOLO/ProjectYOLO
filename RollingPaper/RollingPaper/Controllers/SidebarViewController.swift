@@ -7,6 +7,8 @@
 
 import UIKit
 import SnapKit
+import Combine
+import CombineCocoa
 
 protocol SidebarViewControllerDelegate: AnyObject {
     func didSelectCategory(_ category: CategoryModel)
@@ -17,18 +19,17 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     var delegate: SidebarViewControllerDelegate?
     
     private var categories: [CategoryModel] = []
+    private let viewModel = SidebarViewModel()
     
     private let userPhoto: UIImageView = {
         let profilePhoto = UIImageView()
         profilePhoto.translatesAutoresizingMaskIntoConstraints = false
-        profilePhoto.image = UIImage(systemName: "doc.on.doc")
         return profilePhoto
     }()
     
     private let userName: UILabel = {
         let name = UILabel()
         name.translatesAutoresizingMaskIntoConstraints = false
-        name.text = "바트 심슨"
         name.font = .boldSystemFont(ofSize: 20)
         name.sizeToFit()
         return name
@@ -40,12 +41,54 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         view.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
         return view
     }()
+    private var cancellables = Set<AnyCancellable>()
     
-    override func loadView() { // TODO: viewDidLoad, loadView 둘중 무엇을 쓸것인지
+    override func viewDidLoad() {
+        super.viewDidLoad()
         self.view = UIView()
         self.view.backgroundColor = .white
+        bind()
         self.setupSubviews()
         self.tableView.separatorStyle = .none
+        print("Load View")
+    }
+    
+    private func bind() {
+        viewModel
+            .currentUserSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] userModel in
+                // self?.userPhoto.image = userModel.profileUrl
+                if let userModel = userModel {
+                    self?.convertURL(from: userModel.profileUrl)
+                    self?.userName.text = userModel.name
+                } else {
+                    self?.userPhoto.image = UIImage(systemName: "person.circle")
+                    self?.userName.text = "Guest"
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func convertURL(from urlString: String?) {
+        guard let urlString = urlString else { return}
+        FirebaseStorageManager
+            .downloadData(urlString: urlString)
+            .sink { completion in
+                switch completion {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                case .finished: break
+                }
+            } receiveValue: { [weak self] data in
+                if
+                    let data = data,
+                    let image = UIImage(data: data) {
+                    self?.userPhoto.image = image
+                }
+            }
+            .store(in: &cancellables)
+
     }
     
     func show(categories: [CategoryModel]) {
@@ -77,6 +120,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private func setupSubviews() {
         self.setupTableView()
+        self.setupProfileView()
     }
     
     private func setupTableView() {
@@ -86,7 +130,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         
         NSLayoutConstraint.activate([
             self.tableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-            self.tableView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
+            self.tableView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 300),
             self.tableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
             self.tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         ])
@@ -100,12 +144,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             self.userPhoto.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 100),
             self.userPhoto.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
             self.userPhoto.bottomAnchor.constraint(equalTo: self.tableView.topAnchor),
-            self.userPhoto.leadingAnchor.constraint(equalTo: self.view.rightAnchor),
             
-            self.userName.leftAnchor.constraint(equalTo: userPhoto.rightAnchor, constant: 50),
+            self.userName.leftAnchor.constraint(equalTo: userPhoto.rightAnchor, constant: 10),
             self.userName.topAnchor.constraint(equalTo: userPhoto.topAnchor),
             self.userName.bottomAnchor.constraint(equalTo: userPhoto.bottomAnchor),
-            self.userName.rightAnchor.constraint(equalTo: self.view.rightAnchor)
         ])
     }
 }
