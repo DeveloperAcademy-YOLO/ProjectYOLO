@@ -11,7 +11,7 @@ import StickerView
 import SnapKit
 import Combine
 
-class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
+final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
     
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()

@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Combine
 
-class CardRootViewController: UIViewController {
+final class CardRootViewController: UIViewController {
     private let items = ["배경 고르기", "꾸미기"]
     
     var backgroundImg = UIImage(named: "Rectangle")
