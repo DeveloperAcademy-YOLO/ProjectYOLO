@@ -41,6 +41,8 @@ final class SignUpViewModel {
                     self.output.send(.signUpDidFail(error: .invalidEmail))
                 case .signUpSucceed:
                     self.output.send(.signUpDidSuccess)
+                case .nameAlreadyInUse:
+                    self.output.send(.signUpDidFail(error: .nameAlreadyInUse))
                 default:
                     self.output.send(.signUpDidFail(error: .unknownError))
                 }
