@@ -58,7 +58,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             .sink(receiveValue: { [weak self] isValid in
                 guard let self = self else { return }
                 if isValid {
-                    print("THIS IS VALID!")
                     self.auth.createUser(withEmail: email, password: password) { [weak self] _, error in
                         guard let self = self else { return }
                         if let error = self.handleError(with: error) {
@@ -78,7 +77,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                         }
                     }
                 } else {
-                    print("THIS IS INVALID!")
                     self.signedInSubject.send(.nameAlreadyInUse)
                 }
             })
@@ -273,19 +271,16 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     }
     
     private func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
-        if
-            let user = auth.currentUser,
-            var currentUser = userProfileSubject.value {
+        
+        if let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
             if let name = name {
                 changeRequest.displayName = name
-                currentUser.name = name
             }
             if
                 let photoURLString = photoURLString,
                 let photoUrl = URL(string: photoURLString) {
                 changeRequest.photoURL = photoUrl
-                currentUser.profileUrl = photoURLString
             }
             
             changeRequest.commitChanges(completion: { [weak self] error in
