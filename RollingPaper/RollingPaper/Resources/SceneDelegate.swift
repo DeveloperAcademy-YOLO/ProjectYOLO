@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        let splitVC = CardRootViewController()
+        let splitVC = SplitViewController(style: .doubleColumn)
         window.rootViewController = splitVC
         window.makeKeyAndVisible()
         self.window = window

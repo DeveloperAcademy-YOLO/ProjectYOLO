@@ -20,4 +20,6 @@ protocol DatabaseManager {
     func removeCard(paperId: String, card: CardModel)
     func updatePaper(paper: PaperModel)
     func updateCard(paperId: String, card: CardModel)
+    func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never>
+    func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never>
 }

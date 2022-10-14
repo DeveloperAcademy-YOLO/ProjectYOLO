@@ -16,6 +16,7 @@ final class FirestoreManager: DatabaseManager {
         case usersCollectionPath = "rollingpaper_users"
         case papersPath = "rollingpaper_papers"
         case paperPreviewsPath = "rollingpaper_paperPreviews"
+        case usersNamePath = "rollingpaper_userNames"
     }
     
     static let shared: DatabaseManager = FirestoreManager()
@@ -326,4 +327,63 @@ extension FirestoreManager {
         return paperPreview
     }
     
+    /// FirebaseAuthManager에서 이메일 중복 검사를 위해 사용할 퍼블릭 함수
+    func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
+        return Future({ [weak self] promise in
+            self?.database
+                .collection(Constants.usersNamePath.rawValue)
+                .document(Constants.usersNamePath.rawValue)
+                .getDocument(completion: { document, error in
+                    if
+                        error == nil,
+                        let data = document?.data(),
+                        let userNames = data["userNames"] as? [String] {
+                        let userNamesSet = Set(userNames)
+                        if userNamesSet.contains(userName) {
+                            promise(.success(false))
+                        } else {
+                            promise(.success(true))
+                        }
+                    } else {
+                        promise(.success(true))
+                    }
+                })
+        })
+        .eraseToAnyPublisher()
+    }
+    
+    func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
+        var userNamesSet = Set<String>()
+        return Future({ [weak self] promise in
+            self?.database
+                .collection(Constants.usersNamePath.rawValue)
+                .document(Constants.usersNamePath.rawValue)
+                .getDocument(completion: { document, error in
+                    if
+                        error == nil,
+                        let data = document?.data(),
+                        let userNames = data["userNames"] as? [String] {
+                        userNamesSet = Set(userNames)
+                    }
+                    if let oldName = oldName {
+                        userNamesSet.remove(oldName)
+                    }
+                    userNamesSet.insert(newName)
+                    let userNamesList = Array(userNamesSet)
+                    let userNamesDict = ["userNames": userNamesList]
+                    self?.database
+                        .collection(Constants.usersNamePath.rawValue)
+                        .document(Constants.usersNamePath.rawValue)
+                        .setData(userNamesDict, completion: { error in
+                            if let error = error {
+                                print(error.localizedDescription)
+                                promise(.success(false))
+                            } else {
+                                promise(.success(true))
+                            }
+                        })
+                })
+        })
+        .eraseToAnyPublisher()
+    }
 }

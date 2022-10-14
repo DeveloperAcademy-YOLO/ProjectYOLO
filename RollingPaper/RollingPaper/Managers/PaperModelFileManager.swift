@@ -192,4 +192,12 @@ final class PaperModelFileManager: DatabaseManager {
     func resetPaper() {
         paperSubject.send(nil)
     }
+    
+    func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
+        return Just(false).eraseToAnyPublisher()
+    }
+    
+    func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
+        return Just(false).eraseToAnyPublisher()
+    }
 }
