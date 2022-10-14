@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		156A18EB28F661ED006B622F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 156A18EA28F661ED006B622F /* GoogleService-Info.plist */; };
+		156A18ED28F66C74006B622F /* SettingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156A18EC28F66C74006B622F /* SettingScreenViewController.swift */; };
 		1537F13628F9501900130040 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1537F13528F9501900130040 /* GoogleService-Info.plist */; };
 		1537F13828F950FB00130040 /* SettingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1537F13728F950FB00130040 /* SettingScreenViewController.swift */; };
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
@@ -68,6 +70,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		156A18EA28F661ED006B622F /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
+		156A18EC28F66C74006B622F /* SettingScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingScreenViewController.swift; sourceTree = "<group>"; };
 		1537F13528F9501900130040 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1537F13728F950FB00130040 /* SettingScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingScreenViewController.swift; sourceTree = "<group>"; };
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -185,6 +189,7 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
+				156A18EA28F661ED006B622F /* GoogleService-Info.plist */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
@@ -239,6 +244,8 @@
 				CFDA52C228F48D41006774E2 /* SplitViewController.swift */,
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
+				156A18EC28F66C74006B622F /* SettingScreenViewController.swift */,
 				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
 				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
@@ -382,6 +389,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
+				156A18EB28F661ED006B622F /* GoogleService-Info.plist in Resources */,
 				1537F13628F9501900130040 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
@@ -464,6 +472,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
+				156A18ED28F66C74006B622F /* SettingScreenViewController.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
