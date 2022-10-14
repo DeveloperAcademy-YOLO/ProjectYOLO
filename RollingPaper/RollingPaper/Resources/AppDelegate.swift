@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let window = UIWindow(frame: UIScreen.main.bounds)
         let splitVC = SplitViewController(style: .doubleColumn)
         window.makeKeyAndVisible()
-        window.rootViewController = SignInViewController()
+        window.rootViewController = splitVC
         self.window = window
         return true
     }
