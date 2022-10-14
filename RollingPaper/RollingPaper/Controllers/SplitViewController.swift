@@ -17,7 +17,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         case "페이퍼 보관함":
             secondaryVC = MainViewController()
         case "설정":
-            secondaryVC = MainViewController()
+            secondaryVC = SettingScreenViewController()
         default:
             secondaryVC = MainViewController()
         }
