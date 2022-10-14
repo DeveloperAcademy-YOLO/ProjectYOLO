@@ -72,17 +72,23 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private func convertURL(from urlString: String?) {
         guard let urlString = urlString else { return}
-        FirebaseStorageManager.downloadData(urlString: urlString)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
+        FirebaseStorageManager
+            .downloadData(urlString: urlString)
+            .sink { completion in
+                switch completion {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                case .finished: break
+                }
+            } receiveValue: { [weak self] data in
                 if
                     let data = data,
                     let image = UIImage(data: data) {
-                    // imagePublisher.send(image)
                     self?.userPhoto.image = image
                 }
             }
             .store(in: &cancellables)
+
     }
     
     func show(categories: [CategoryModel]) {
