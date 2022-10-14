@@ -51,7 +51,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         self.setupSubviews()
         self.tableView.separatorStyle = .none
         print("Load View")
-        viewModel.authManager.fetchUserProfile() // TODO: 나중에 사라짐
     }
     
     private func bind() {

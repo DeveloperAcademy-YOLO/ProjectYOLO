@@ -10,7 +10,7 @@ import Combine
 
 final class SidebarViewModel {
 
-    let authManager: AuthManager // TODO: 나중에 Private으로
+    private let authManager: AuthManager
     var cancellables = Set<AnyCancellable>()
     let currentUserSubject = PassthroughSubject<UserModel?, Never>()
     
