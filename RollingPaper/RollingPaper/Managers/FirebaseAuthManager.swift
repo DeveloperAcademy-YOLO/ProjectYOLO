@@ -82,7 +82,164 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             })
             .store(in: &cancellables)
     }
+                                  
+    func signIn(email: String, password: String) {
+        auth.signIn(withEmail: email, password: password, completion: { [weak self] _, error in
+            if let error = self?.handleError(with: error) {
+                self?.signedInSubject.send(error)
+            } else {
+                self?.signedInSubject.send(.signInSucceed)
+            }
+        })
+        fetchUserProfile()
+    }
     
+    func signOut() {
+        do {
+            try auth.signOut()
+            signedInSubject.send(.signOutSucceed)
+        } catch {
+            signedInSubject.send(.signOutFailed)
+        }
+        fetchUserProfile()
+    }
+    
+    func deleteUser() {
+        if let user = auth.currentUser {
+            user.delete(completion: { [weak self] error in
+                if error != nil {
+                    self?.signedInSubject.send(.deleteUserFailed)
+                } else {
+                    self?.signedInSubject.send(.deleteUserSucceed)
+                    self?.fetchUserProfile()
+                }
+            })
+        }
+    }
+    
+    /// 현재 유저 프로필 이름 정보 업데이트: (1). 파이어베이스 유저 정보 업데이트 (2). 로컬 데이터 퍼블리셔 내 데이터 업데이트
+    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never> {
+        return Future({ [weak self] promise in
+            if let user = self?.auth.currentUser {
+                let changeRequest = user.createProfileChangeRequest()
+                let nameValidationPublisher = FirestoreManager.shared.isValidUserName(with: newName)
+                    .sink(receiveValue: { [weak self] isValid in
+                        if isValid {
+                            changeRequest.displayName = newName
+                            changeRequest.commitChanges(completion: { [weak self] error in
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                    promise(.success(.profileSetFailed))
+                                } else {
+                                    let nameSetPublisher = FirestoreManager.shared.setUserName(from: oldName, to: newName)
+                                        .sink(receiveValue: { [weak self] isNameSet in
+                                            if isNameSet {
+                                                self?.fetchUserProfile()
+                                                promise(.success(.profileSetSucceed))
+                                            } else {
+                                                promise(.success(.profileSetFailed))
+                                            }
+                                        })
+                                    nameSetPublisher.cancel()
+                                }
+                            })
+                        } else {
+                            promise(.success(.nameAlreadyInUse))
+                        }
+                    })
+                nameValidationPublisher.cancel()
+            } else {
+                promise(.success(.unknownError))
+            }
+        })
+        .eraseToAnyPublisher()
+    }
+    
+    /// 현재 유저 프로필 사진 정보 업데이트: (1). 스토리지 매니저 사진 업로드 (2). 파이어베이스 내 유저 정보 업데이트 (3). 로컬 데이터 퍼블리셔 내 데이터 업데이트
+    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never> {
+        return Future({ [weak self] promise in
+            if let user = self?.auth.currentUser {
+                let changeRequest = user.createProfileChangeRequest()
+                let dataId = user.uid
+                let dataUploadPublisher = FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                            promise(.success(false))
+                        case .finished: break
+                        }
+                    }, receiveValue: { [weak self] photoURL in
+                        if let photoURL = photoURL {
+                            changeRequest.photoURL = photoURL
+                            changeRequest.commitChanges(completion: { [weak self] error in
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                    promise(.success(true))
+                                    self?.fetchUserProfile()
+                                } else {
+                                    promise(.success(false))
+                                }
+                            })
+                        } else {
+                            promise(.success(false))
+                        }
+                    })
+                dataUploadPublisher.cancel()
+            } else {
+                promise(.success(false))
+            }
+        })
+        .eraseToAnyPublisher()
+    }
+    
+    func appleSignIn() {
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        let request = appleIDProvider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = sha256(nonce)
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
+        fetchUserProfile()
+    }
+}
+
+extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        if let window = UIApplication.shared.currentWindow {
+            return window
+        } else {
+            return UIWindow()
+        }
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        guard
+            let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
+            let nonce = currentNonce,
+            let appleIDToken = appleIDCredential.identityToken,
+            let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            return
+        }
+        
+        let firstName = appleIDCredential.fullName?.givenName ?? ""
+        let lastName = appleIDCredential.fullName?.familyName ?? ""
+        let name = lastName + firstName
+
+        let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
+        socialSignIn(credential: credential, name: name)
+    }
+    
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        signedInSubject.send(.unknownError)
+    }
+}
+
+extension FirebaseAuthManager {
     private func handleError(with error: Error?) -> AuthManagerEnum? {
         var result: AuthManagerEnum?
         if let error = error {
@@ -103,19 +260,8 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
         return result
     }
-                                  
-    func signIn(email: String, password: String) {
-        auth.signIn(withEmail: email, password: password, completion: { [weak self] _, error in
-            if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(error)
-            } else {
-                self?.signedInSubject.send(.signInSucceed)
-            }
-        })
-        fetchUserProfile()
-    }
     
-    func signIn(credential: AuthCredential) {
+    private func signIn(credential: AuthCredential) {
         auth.signIn(with: credential) { [weak self] _, error in
             if let error = self?.handleError(with: error) {
                 self?.signedInSubject.send(error)
@@ -154,124 +300,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func signOut() {
-        do {
-            try auth.signOut()
-            signedInSubject.send(.signOutSucceed)
-        } catch {
-            signedInSubject.send(.signOutFailed)
-        }
-        fetchUserProfile()
-    }
-    
-    func deleteUser() {
-        if let user = auth.currentUser {
-            user.delete(completion: { [weak self] error in
-                if error != nil {
-                    self?.signedInSubject.send(.deleteUserFailed)
-                } else {
-                    self?.signedInSubject.send(.deleteUserSucceed)
-                    self?.fetchUserProfile()
-                }
-            })
-        }
-    }
-    
-    /// 현재 유저 프로필 이름 정보 업데이트: (1). 파이어베이스 유저 정보 업데이트 (2). 로컬 데이터 퍼블리셔 내 데이터 업데이트
-    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never> {
-        return Future { [weak self] promise in
-            if
-                let self = self,
-                let user = self.auth.currentUser {
-                let changeRequest = user.createProfileChangeRequest()
-                FirestoreManager
-                    .shared
-                    .isValidUserName(with: newName)
-                    .sink { [weak self] isValid in
-                        if
-                            let self = self,
-                            isValid {
-                            changeRequest.displayName = newName
-                            changeRequest.commitChanges { [weak self] error in
-                                if
-                                    let self = self,
-                                    error == nil {
-                                    FirestoreManager
-                                        .shared
-                                        .setUserName(from: oldName, to: newName)
-                                        .sink { [weak self] userNameSet in
-                                            if
-                                                let self = self,
-                                                userNameSet {
-                                                promise(.success(.profileSetSucceed))
-                                                self.fetchUserProfile()
-                                            } else {
-                                                promise(.success(.profileSetFailed))
-                                            }
-                                        }
-                                        .store(in: &self.cancellables)
-                                } else {
-                                    promise(.success(.unknownError))
-                                }
-                            }
-                        } else {
-                            promise(.success(.nameAlreadyInUse))
-                        }
-                    }
-                    .store(in: &self.cancellables)
-            } else {
-                promise(.success(.userNotFound))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
-    /// 현재 유저 프로필 사진 정보 업데이트: (1). 스토리지 매니저 사진 업로드 (2). 파이어베이스 내 유저 정보 업데이트 (3). 로컬 데이터 퍼블리셔 내 데이터 업데이트
-    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never> {
-        return Future { [weak self] promise in
-            if
-                let self = self,
-                let user = self.auth.currentUser {
-                let changeRequest = user.createProfileChangeRequest()
-                let dataId = user.uid
-                FirebaseStorageManager
-                    .uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
-                    .sink { completion in
-                        switch completion {
-                        case.finished: break
-                        case .failure(let error): promise(.success(false))
-                        }
-                    } receiveValue: { [weak self] photoURL in
-                        if
-                            let self = self,
-                            let photoURL = photoURL {
-                            changeRequest.photoURL = photoURL
-                            changeRequest.commitChanges { [weak self] error in
-                                if
-                                    let self = self,
-                                    error == nil {
-                                    promise(.success(true))
-                                    self.fetchUserProfile()
-                                } else {
-                                    promise(.success(false))
-                                }
-                            }
-                            
-                        } else {
-                            promise(.success(false))
-                        }
-                    }
-                    .store(in: &self.cancellables)
-
-            } else {
-                promise(.success(false))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
     private func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
-        
         if let user = auth.currentUser {
             let changeRequest = user.createProfileChangeRequest()
             if let name = name {
@@ -293,20 +322,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func appleSignIn() {
-        let nonce = randomNonceString()
-        currentNonce = nonce
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let request = appleIDProvider.createRequest()
-        request.requestedScopes = [.fullName, .email]
-        request.nonce = sha256(nonce)
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.presentationContextProvider = self
-        authorizationController.performRequests()
-        fetchUserProfile()
-    }
-    
     private func fetchUserProfile() {
         if let user = auth.currentUser {
             let email = user.email ?? "Default Email"
@@ -319,37 +334,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         } else {
             userProfileSubject.send(nil)
         }
-    }
-}
-
-extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        if let window = UIApplication.shared.currentWindow {
-            return window
-        } else {
-            return UIWindow()
-        }
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        guard
-            let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-            let nonce = currentNonce,
-            let appleIDToken = appleIDCredential.identityToken,
-            let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-            return
-        }
-        
-        let firstName = appleIDCredential.fullName?.givenName ?? ""
-        let lastName = appleIDCredential.fullName?.familyName ?? ""
-        let name = lastName + firstName
-
-        let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
-        socialSignIn(credential: credential, name: name)
-    }
-    
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        signedInSubject.send(.unknownError)
     }
 }
 
