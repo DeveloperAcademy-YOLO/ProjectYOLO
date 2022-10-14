@@ -46,12 +46,9 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         super.viewDidLoad()
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
-        self.preferredPrimaryColumnWidth = 320
         self.loadViewControllers()
         self.sidebarViewController.show(categories: self.sideBarCategories)
-        self.preferredPrimaryColumnWidthFraction = 0.3
-        self.minimumPrimaryColumnWidth = 320
-        self.maximumPrimaryColumnWidth = 640
+        self.preferredPrimaryColumnWidthFraction = 0.25
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
