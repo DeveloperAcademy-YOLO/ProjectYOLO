@@ -105,9 +105,9 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.identifier, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
         
         if indexPath.section == 0 {
-            cell.setCell(paper: viewModel.openedPapers[indexPath.item], now: viewModel.currentTime)
+            cell.setCell(paper: viewModel.openedPapers[indexPath.item], thumbnail: viewModel.openedPaperThumbnails[indexPath.item], now: viewModel.currentTime)
         } else {
-            cell.setCell(paper: viewModel.closedPapers[indexPath.item], now: viewModel.currentTime)
+            cell.setCell(paper: viewModel.closedPapers[indexPath.item], thumbnail: viewModel.closedPaperThumbnails[indexPath.item], now: viewModel.currentTime)
         }
         return cell
     }
@@ -269,7 +269,7 @@ private class CollectionCell: UICollectionViewCell {
         return dateFormatter.string(from: date)
     }
     
-    func setCell(paper: PaperPreviewModel, now: Date) {
+    func setCell(paper: PaperPreviewModel, thumbnail: UIImage?, now: Date) {
         let timeInterval = Int(paper.endTime.timeIntervalSince(now))
         if timeInterval > 0 {
             // 진행중인 페이퍼라면
@@ -284,8 +284,6 @@ private class CollectionCell: UICollectionViewCell {
         }
         
         title.text = paper.title
-        // TODO: 프리뷰 구현해서 이미지에 넣어주기 (FirebaseStorageManager)
-        // preview.image = (paper.thumbnailURLString 으로 썸네일 다운) ?? paper.template.thumbnail
-        preview.image = paper.template.thumbnail
+        preview.image = thumbnail
     }
 }
