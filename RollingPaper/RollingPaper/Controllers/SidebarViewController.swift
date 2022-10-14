@@ -23,13 +23,11 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private let userPhoto: UIImageView = {
         let profilePhoto = UIImageView()
-        profilePhoto.translatesAutoresizingMaskIntoConstraints = false
         return profilePhoto
     }()
     
     private let userName: UILabel = {
         let name = UILabel()
-        name.translatesAutoresizingMaskIntoConstraints = false
         name.font = .boldSystemFont(ofSize: 20)
         name.sizeToFit()
         return name
@@ -125,21 +123,35 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private func setupTableView() {
         self.view.addSubview(tableView)
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
+        tableView.dataSource = self
+        tableView.delegate = self
         
+        tableView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(300)
+        }
+        /*
         NSLayoutConstraint.activate([
             self.tableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
             self.tableView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 300),
             self.tableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
             self.tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         ])
+         */
     }
     
-    private func setupProfileView() { // TODO: 회원 프로필 뷰
+    private func setupProfileView() {
         self.view.addSubview(userName)
         self.view.addSubview(userPhoto)
         
+        userName.snp.makeConstraints { make in
+            make.leading.top.bottom.equalToSuperview()
+        }
+        userPhoto.snp.makeConstraints { make in
+            make.leading.equalTo(userPhoto.snp.trailing).offset(10)
+            make.top.equalTo(userPhoto.snp.top)
+        }
+        /*
         NSLayoutConstraint.activate([
             self.userPhoto.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 100),
             self.userPhoto.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
@@ -147,8 +159,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             
             self.userName.leftAnchor.constraint(equalTo: userPhoto.rightAnchor, constant: 10),
             self.userName.topAnchor.constraint(equalTo: userPhoto.topAnchor),
-            self.userName.bottomAnchor.constraint(equalTo: userPhoto.bottomAnchor),
+            self.userName.bottomAnchor.constraint(equalTo: userPhoto.bottomAnchor)
         ])
+         */
     }
 }
 
