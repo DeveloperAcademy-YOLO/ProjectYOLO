@@ -27,10 +27,10 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         buttonLabel.layer.masksToBounds = true
         buttonLabel.layer.cornerRadius = 30
         buttonLabelConstraints()
-        
+    
         view.addSubview(photoBackgroundButton)
         cameraButtonConstraints()
-        
+    
         view.addSubview(firstColorBackgroundButton)
         firstColorButtonConstraints()
         
@@ -79,11 +79,18 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                     })
                 }
             })
+        
             .store(in: &cancellables)
         secondColorBackgroundButton.tapPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 self?.secondImageViewColor()
-            }
+            })
+        
+            .store(in: &cancellables)
+        thirdColorBackgroundButton.tapPublisher
+            .sink(receiveValue: { [weak self] _ in
+                self?.thirdImageViewColor()
+            })
             .store(in: &cancellables)
     }
     
@@ -139,7 +146,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-//        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -178,10 +184,11 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     }
     
     func thirdImageViewColor() {
-        print("thirdImageViewColor clicked")
+        print("secondImageViewColor clicked")
         selectedColor = backgroundColor[2]
-        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
-        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
+        guard let image = UIImage(named: "Halloween_Candy") else { return }
+        self.someImageView.image = image
+        input.send(.setCardBackgroundImg(background: image))
 
     }
     
@@ -190,75 +197,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         selectedColor = backgroundColor[3]
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
-    }
-    
-    @objc func importImage(_ gesture: UITapGestureRecognizer) {
-        var alertStyle = UIAlertController.Style.actionSheet
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            alertStyle = UIAlertController.Style.alert
-        }
-        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
-        
-        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
-            DispatchQueue.main.async(execute: {
-                self.presentImagePicker(withType: .camera)
-            })
-        }
-        
-        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
-            DispatchQueue.main.async(execute: {
-                self.presentImagePicker(withType: .photoLibrary)
-            })
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        
-        actionSheet.addAction(cameraAction)
-        actionSheet.addAction(libraryAction)
-        actionSheet.addAction(cancelAction)
-        
-        present(actionSheet, animated: true, completion: nil)
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            let image = pickedImage
-            self.someImageView.image = image
-            input.send(.setCardBackgroundImg(background: image))
-        }
-        dismiss(animated: true, completion: nil)
-    }
-    
-    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        pickerController.sourceType = type
-        present(pickerController, animated: true)
-    }
-    
-    private func checkCameraPermission() {
-        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
-            if granted {
-                print("Camera: 권한 허용")
-            } else {
-                print("Camera: 권한 거부")
-            }
-        })
-    }
-    
-    func checkAlbumPermission() {
-        PHPhotoLibrary.requestAuthorization({ status in
-            switch status {
-            case .authorized:
-                print("Album: 권한 허용")
-            case .denied:
-                print("Album: 권한 거부")
-            case .restricted, .notDetermined:
-                print("Album: 선택하지 않음")
-            default:
-                break
-            }
-        })
     }
     
     func someImageViewConstraints() {
@@ -332,5 +270,77 @@ extension UIButton {
         imageView?.contentMode = .scaleAspectFit
         imageEdgeInsets = .zero
         setImage(UIImage(systemName: systemName), for: .normal)
+    }
+}
+
+extension CardBackgroundViewController {
+    
+    @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        var alertStyle = UIAlertController.Style.actionSheet
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            alertStyle = UIAlertController.Style.alert
+        }
+        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        
+        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.presentImagePicker(withType: .camera)
+            })
+        }
+        
+        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.presentImagePicker(withType: .photoLibrary)
+            })
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(cameraAction)
+        actionSheet.addAction(libraryAction)
+        actionSheet.addAction(cancelAction)
+        
+        present(actionSheet, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            let image = pickedImage
+            self.someImageView.image = image
+            input.send(.setCardBackgroundImg(background: image))
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.sourceType = type
+        present(pickerController, animated: true)
+    }
+    
+    private func checkCameraPermission() {
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+            if granted {
+                print("Camera: 권한 허용")
+            } else {
+                print("Camera: 권한 거부")
+            }
+        })
+    }
+    
+    func checkAlbumPermission() {
+        PHPhotoLibrary.requestAuthorization({ status in
+            switch status {
+            case .authorized:
+                print("Album: 권한 허용")
+            case .denied:
+                print("Album: 권한 거부")
+            case .restricted, .notDetermined:
+                print("Album: 선택하지 않음")
+            default:
+                break
+            }
+        })
     }
 }
