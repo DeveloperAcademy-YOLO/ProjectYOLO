@@ -20,7 +20,8 @@ protocol AuthManager {
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser()
-    func updateUserProfile(name: String, photoData: Data?, contentType: DataContentType?) -> AnyPublisher<AuthManagerEnum, Never>
+    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never>
+    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never>
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -177,177 +178,97 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         }
     }
     
-    func updateUserProfile(name: String, photoData: Data?, contentType: DataContentType?) -> AnyPublisher<AuthManagerEnum, Never> {
-        return Future({ [weak self] promise in
-            if let self = self {
-                if
-                    let photoData,
-                    let contentType = contentType {
-                    self.updateUserPhoto(photoData: photoData, contentType: contentType)
-                        .combineLatest(self.updateUserName(name: name))
-                        .sink(receiveValue: { photoUpdate, nameUpdated in
-                            if photoUpdate {
-                                promise(.success(nameUpdated))
-                            } else {
-                                promise(.success(.profileSetFailed))
-                            }
-                            if nameUpdated == .profileSetSucceed {
-                                self.fetchUserProfile()
-                            }
-                        })
-                        .store(in: &self.cancellables)
-                } else {
-                    self.updateUserName(name: name)
-                        .sink(receiveValue: { nameUpdated in
-                            promise(.success(nameUpdated))
-                            if nameUpdated == .profileSetSucceed {
-                                self.fetchUserProfile()
-                            }
-                        })
-                        .store(in: &self.cancellables)
-                }
-            } else {
-                promise(.success(.unknownError))
-            }
-        })
-        .eraseToAnyPublisher()
-    }
-    
-    private func updateUserName(name: String) -> AnyPublisher<AuthManagerEnum, Never> {
-        return Future({ [weak self] promise in
-            if let self = self {
-                if
-                    let user = self.auth.currentUser,
-                    let currentUserName = user.displayName {
-                    let changeRequest = user.createProfileChangeRequest()
-                    if name == currentUserName {
-                        promise(.success(.profileSetSucceed))
-                    } else {
-                        FirestoreManager
-                            .shared
-                            .isValidUserName(with: name)
-                            .sink(receiveValue: { [weak self] isVaild in
-                                if let self = self {
-                                    if isVaild {
-                                        changeRequest.displayName = name
-                                        changeRequest.commitChanges(completion: { [weak self] error in
+    /// 현재 유저 프로필 이름 정보 업데이트: (1). 파이어베이스 유저 정보 업데이트 (2). 로컬 데이터 퍼블리셔 내 데이터 업데이트
+    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never> {
+        return Future { [weak self] promise in
+            if
+                let self = self,
+                let user = self.auth.currentUser {
+                let changeRequest = user.createProfileChangeRequest()
+                FirestoreManager
+                    .shared
+                    .isValidUserName(with: newName)
+                    .sink { [weak self] isValid in
+                        if
+                            let self = self,
+                            isValid {
+                            changeRequest.displayName = newName
+                            changeRequest.commitChanges { [weak self] error in
+                                if
+                                    let self = self,
+                                    error == nil {
+                                    FirestoreManager
+                                        .shared
+                                        .setUserName(from: oldName, to: newName)
+                                        .sink { [weak self] userNameSet in
                                             if
                                                 let self = self,
-                                                error == nil {
-                                                FirestoreManager
-                                                    .shared
-                                                    .setUserName(from: currentUserName, to: name)
-                                                    .sink(receiveValue: { isUserNameSet in
-                                                        if isUserNameSet {
-                                                            promise(.success(.profileSetSucceed))
-                                                        } else {
-                                                            promise(.success(.profileSetFailed))
-                                                        }
-                                                    })
-                                                    .store(in: &self.cancellables)
+                                                userNameSet {
+                                                promise(.success(.profileSetSucceed))
+                                                self.fetchUserProfile()
                                             } else {
                                                 promise(.success(.profileSetFailed))
                                             }
-                                        })
-                                    } else {
-                                        promise(.success(.nameAlreadyInUse))
-                                    }
+                                        }
+                                        .store(in: &self.cancellables)
                                 } else {
                                     promise(.success(.unknownError))
                                 }
-                            })
-                            .store(in: &self.cancellables)
+                            }
+                        } else {
+                            promise(.success(.nameAlreadyInUse))
+                        }
                     }
-                } else {
-                    promise(.success(.userNotFound))
-                }
+                    .store(in: &self.cancellables)
             } else {
-                promise(.success(.unknownError))
+                promise(.success(.userNotFound))
             }
-        })
+        }
         .eraseToAnyPublisher()
     }
     
-    private func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never> {
-        return Future({ [weak self] promise in
-            if let self = self {
-                if
-                    let user = self.auth.currentUser {
-                    let changeRequest = user.createProfileChangeRequest()
-                    let dataId = user.uid
-                    FirebaseStorageManager
-                        .uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            case .failure(let error):
-                                print(error.localizedDescription)
-                                promise(.success(false))
-                            case .finished:
-                                print("Upload Succeed")
+    /// 현재 유저 프로필 사진 정보 업데이트: (1). 스토리지 매니저 사진 업로드 (2). 파이어베이스 내 유저 정보 업데이트 (3). 로컬 데이터 퍼블리셔 내 데이터 업데이트
+    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never> {
+        return Future { [weak self] promise in
+            if
+                let self = self,
+                let user = self.auth.currentUser {
+                let changeRequest = user.createProfileChangeRequest()
+                let dataId = user.uid
+                FirebaseStorageManager
+                    .uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
+                    .sink { completion in
+                        switch completion {
+                        case.finished: break
+                        case .failure(let error): promise(.success(false))
+                        }
+                    } receiveValue: { [weak self] photoURL in
+                        if
+                            let self = self,
+                            let photoURL = photoURL {
+                            changeRequest.photoURL = photoURL
+                            changeRequest.commitChanges { [weak self] error in
+                                if
+                                    let self = self,
+                                    error == nil {
+                                    promise(.success(true))
+                                    self.fetchUserProfile()
+                                } else {
+                                    promise(.success(false))
+                                }
                             }
-                        }, receiveValue: { url in
-                            if let url = url {
-                                changeRequest.photoURL = url
-                                changeRequest.commitChanges(completion: { error in
-                                    if let error = error {
-                                        print(error.localizedDescription)
-                                        promise(.success(false))
-                                    } else {
-                                        promise(.success(true))
-                                    }
-                                })
-                            } else {
-                                promise(.success(false))
-                            }
-                        })
-                        .store(in: &self.cancellables)
-                } else {
-                    promise(.success(false))
-                }
+                            
+                        } else {
+                            promise(.success(false))
+                        }
+                    }
+                    .store(in: &self.cancellables)
+
             } else {
                 promise(.success(false))
             }
-        })
-        .eraseToAnyPublisher()
-    }
-    
-    
-    
-    func updateUserProfile(name: String?, photoData: Data?, contentType: DataContentType?) {
-        if
-            let user = auth.currentUser {
-            let changeRequest = user.createProfileChangeRequest()
-            let dataId = user.uid
-            if let name = name {
-                changeRequest.displayName = name
-            }
-            if
-                let photoData = photoData,
-                let contentType = contentType {
-                FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
-                    .receive(on: DispatchQueue.global(qos: .background))
-                    .sink(receiveCompletion: { completion in
-                        switch completion {
-                        case .finished:
-                            print("Photo Upload Succeed")
-                        case .failure(let error):
-                            print(error.localizedDescription)
-                        }
-                    }, receiveValue: { [weak self] url in
-                        if let url = url {
-                            changeRequest.photoURL = url
-                            changeRequest.commitChanges(completion: { [weak self] error in
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                } else {
-                                    self?.fetchUserProfile()
-                                }
-                            })
-                        }
-                    })
-                    .store(in: &cancellables)
-            }
         }
+        .eraseToAnyPublisher()
     }
     
     private func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
