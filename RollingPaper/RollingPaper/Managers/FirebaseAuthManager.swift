@@ -204,7 +204,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
-        fetchUserProfile()
     }
 }
 
@@ -235,7 +234,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        signedInSubject.send(.unknownError)
+        // Did Error -> No Input to SignedInSubject
     }
 }
 
@@ -273,26 +272,29 @@ extension FirebaseAuthManager {
         fetchUserProfile()
     }
     
+    // TODO: 간편 로그인 이름 -> 최초 입력 시 중복 검사 / 글자 수 검사 여부 확인
     private func socialSignIn(credential: AuthCredential, name: String, photoURLString: String? = nil) {
         auth.signIn(with: credential) { [weak self] _, error in
             if let error = self?.handleError(with: error) {
                 self?.signedInSubject.send(error)
             } else {
                 if let user = self?.auth.currentUser {
-                    self?.signedInSubject.send(.signInSucceed)
                     let changeRequest = user.createProfileChangeRequest()
-                    changeRequest.displayName = name
-                    if let photoURLString = photoURLString {
-                        changeRequest.photoURL = URL(string: photoURLString)
+                    if (user.displayName == nil) || (user.displayName == "") {
+                        changeRequest.displayName = "YOLO"
+                        // 중복 검사 X
+                        changeRequest.commitChanges(completion: { [weak self] error in
+                            if let error = error {
+                                print(error.localizedDescription)
+                                self?.signedInSubject.send(.profileSetFailed)
+                            } else {
+                                self?.fetchUserProfile()
+                            }
+                        })
+                    } else {
+                        self?.fetchUserProfile()
                     }
-                    changeRequest.commitChanges(completion: { [weak self] error in
-                        if let error = error {
-                            print(error.localizedDescription)
-                        } else {
-                            self?.fetchUserProfile()
-                            print("First Signed In and Set User Profile")
-                        }
-                    })
+                    self?.signedInSubject.send(.signInSucceed)
                 } else {
                     self?.signedInSubject.send(.userNotFound)
                 }
