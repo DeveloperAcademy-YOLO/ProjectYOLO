@@ -20,9 +20,12 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
+    private var cancellables = Set<AnyCancellable>()
     
     private let userPhoto: UIImageView = {
-        let profilePhoto = UIImageView()
+        let profilePhoto = UIImageView(frame: CGRect(x: 0, y: 0, width: 48, height: 48))
+        profilePhoto.layer.cornerRadius = profilePhoto.frame.width / 2
+        profilePhoto.contentMode = UIView.ContentMode.scaleAspectFit
         return profilePhoto
     }()
     
@@ -33,18 +36,24 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         return name
     }()
     
+    lazy var userInfoStack: UIStackView = {
+        let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
+        userInfo.axis = .horizontal
+        userInfo.spacing = 13
+        userInfo.addStackViewBackground(color: .white, radiusSize: 5.0)
+        return userInfo
+    }()
+    
     private let tableView: UITableView = {
         let view = UITableView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
         return view
     }()
-    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = UIView()
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .customSidebarBackgroundColor
         bind()
         self.setupSubviews()
         self.tableView.separatorStyle = .none
@@ -88,7 +97,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .store(in: &cancellables)
 
     }
-    
+
     func show(categories: [CategoryModel]) {
         self.categories = categories
         self.tableView.reloadData()
@@ -116,19 +125,24 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         self.delegate?.didSelectCategory(category)
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 56
+    }
+    
     private func setupSubviews() {
-        self.setupTableView()
-        self.setupProfileView()
+        setupProfileView()
+        setupTableView()
     }
     
     private func setupTableView() {
         self.view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
-        
+        tableView.backgroundColor = .clear
         tableView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.top.equalToSuperview().offset(300)
+            make.leading.equalToSuperview().offset(132)
+            make.trailing.bottom.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom).offset(40)
         }
         /*
         NSLayoutConstraint.activate([
@@ -141,27 +155,22 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     private func setupProfileView() {
-        self.view.addSubview(userName)
-        self.view.addSubview(userPhoto)
+        self.view.addSubview(userInfoStack)
+        userInfoStack.backgroundColor = .white
+        userInfoStack.layer.cornerRadius = 12
+        userInfoStack.isLayoutMarginsRelativeArrangement = true
+        userInfoStack.layoutMargins = UIEdgeInsets(top: 13, left: 15, bottom: 13, right: 15)
         
-        userName.snp.makeConstraints { make in
-            make.leading.top.bottom.equalToSuperview()
-        }
         userPhoto.snp.makeConstraints { make in
-            make.leading.equalTo(userPhoto.snp.trailing).offset(10)
-            make.top.equalTo(userPhoto.snp.top)
+            make.width.height.equalTo(50)
         }
-        /*
-        NSLayoutConstraint.activate([
-            self.userPhoto.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 100),
-            self.userPhoto.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
-            self.userPhoto.bottomAnchor.constraint(equalTo: self.tableView.topAnchor),
-            
-            self.userName.leftAnchor.constraint(equalTo: userPhoto.rightAnchor, constant: 10),
-            self.userName.topAnchor.constraint(equalTo: userPhoto.topAnchor),
-            self.userName.bottomAnchor.constraint(equalTo: userPhoto.bottomAnchor)
-        ])
-         */
+        
+        userInfoStack.snp.makeConstraints { make in
+            make.width.equalTo(244)
+            make.height.equalTo(74)
+            make.leading.equalToSuperview().offset(132)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+        }
     }
 }
 
@@ -172,8 +181,16 @@ class CategoryCell: UITableViewCell {
     let categoryIcon = UIImageView()
     let categoryName = UILabel()
     
+    lazy var categoryStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [categoryIcon, categoryName])
+        stack.axis = .horizontal
+        stack.spacing = 16
+        return stack
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.backgroundConfiguration = .clear()
     }
     
     required init?(coder: NSCoder) {
@@ -182,19 +199,16 @@ class CategoryCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-     }
+    }
     
     func layout() {
-        self.addSubview(categoryIcon)
-        self.addSubview(categoryName)
+        self.addSubview(categoryStack)
+        categoryStack.isLayoutMarginsRelativeArrangement = true
+        categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 32, right: 0)
         
-        categoryIcon.translatesAutoresizingMaskIntoConstraints = false
-        categoryName.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            categoryIcon.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
-            categoryIcon.widthAnchor.constraint(equalToConstant: 20),
-            categoryIcon.heightAnchor.constraint(equalToConstant: 20),
-            categoryName.leadingAnchor.constraint(equalTo: categoryIcon.trailingAnchor, constant: 10)
-        ])
+        categoryStack.snp.makeConstraints { make in
+            make.leading.equalTo(self.snp.leading).offset(16)
+            make.width.height.equalTo(24)
+        }
     }
 }
