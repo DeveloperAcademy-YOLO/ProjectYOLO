@@ -12,6 +12,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     func didSelectCategory(_ category: CategoryModel) {
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
+        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         let mainViewController = UINavigationController(rootViewController: self.mainViewController)
         
         switch category.name {
@@ -20,8 +21,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = templateViewController
             }
         case "페이퍼 보관함":
-            if !(self.viewControllers[1] is MainViewController) {
-                self.viewControllers[1] = mainViewController
+            if !(self.viewControllers[1] is PaperStorageViewController) {
+                self.viewControllers[1] = paperStorageViewController
             }
         case "설정":
             if !(self.viewControllers[1] is MainViewController) {
