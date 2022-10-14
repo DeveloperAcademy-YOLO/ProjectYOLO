@@ -10,7 +10,6 @@ import UIKit
 class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
     
     func didSelectCategory(_ category: CategoryModel) {
-        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
         let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         let mainViewController = UINavigationController(rootViewController: self.mainViewController)
@@ -29,7 +28,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = mainViewController
             }
         default:
-            self.viewControllers[1] = mainViewController
+            break
         }
     }
     
