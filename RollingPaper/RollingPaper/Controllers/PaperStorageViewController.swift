@@ -13,7 +13,7 @@ class PaperStorageViewController: UIViewController {
     private let viewModel = PaperStorageViewModel()
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var paperCollectionView: CollectionView?
+    private var paperCollectionView: PaperStorageCollectionView?
     
     
     override func viewDidLoad() {
@@ -64,13 +64,13 @@ class PaperStorageViewController: UIViewController {
         collectionViewLayer.minimumLineSpacing = 28
         collectionViewLayer.headerReferenceSize = .init(width: 116, height: 29)
         
-        paperCollectionView = CollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
+        paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = paperCollectionView else {return}
         
         collectionView.backgroundColor = .white
         collectionView.alwaysBounceVertical = true
-        collectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.identifier)
-        collectionView.register(CollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionHeader.identifier)
+        collectionView.register(PaperStorageCollectionCell.self, forCellWithReuseIdentifier: PaperStorageCollectionCell.identifier)
+        collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -102,7 +102,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.identifier, for: indexPath) as? CollectionCell else {return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageCollectionCell.identifier, for: indexPath) as? PaperStorageCollectionCell else {return UICollectionViewCell()}
         
         if indexPath.section == 0 {
             cell.setCell(paper: viewModel.openedPapers[indexPath.item], thumbnail: viewModel.openedPaperThumbnails[indexPath.item], now: viewModel.currentTime)
@@ -116,9 +116,9 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         if kind == UICollectionView.elementKindSectionHeader {
             guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: CollectionHeader.identifier,
+                withReuseIdentifier: PaperStorageCollectionHeader.identifier,
                 for: indexPath
-            ) as? CollectionHeader else {return UICollectionReusableView()}
+            ) as? PaperStorageCollectionHeader else {return UICollectionReusableView()}
             
             if indexPath.section == 0 {
                 supplementaryView.setHeader(text: "진행중인 페이퍼")
@@ -143,10 +143,10 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
 }
 
 // 진행중인 페이퍼와 종료된 페이퍼들을 모두 보여주는 컬렉션 뷰
-private class CollectionView: UICollectionView {}
+private class PaperStorageCollectionView: UICollectionView {}
 
 // 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
-private class CollectionHeader: UICollectionReusableView {
+private class PaperStorageCollectionHeader: UICollectionReusableView {
     static let identifier = "CollectionHeader"
     private let title = UILabel()
     
@@ -175,7 +175,7 @@ private class CollectionHeader: UICollectionReusableView {
 }
 
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
-private class CollectionCell: UICollectionViewCell {
+private class PaperStorageCollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
     private let cell = UIView()
     private let preview = UIImageView()
