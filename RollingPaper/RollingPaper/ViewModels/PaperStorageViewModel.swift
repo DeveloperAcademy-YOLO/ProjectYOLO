@@ -74,6 +74,7 @@ class PaperStorageViewModel {
             // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
             case .viewDidAppear:
                 self.bindTimer()
+                self.updateCurrentTime()
                 self.downloadThumbnails(outputValue: .initPapers)
             // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
             case .viewDidDisappear:
@@ -101,10 +102,15 @@ class PaperStorageViewModel {
             .autoconnect()
             .sink(receiveValue: { [weak self] date in
                 guard let self = self else {return}
-                self.currentTime = date
+                self.updateCurrentTime(date: date)
                 self.classifyPapers()
                 self.output.send(.papersAreUpdatedByTimer)
             })
+    }
+    
+    // 현재 시간 업데이트하기
+    private func updateCurrentTime(date: Date = Date()) {
+        self.currentTime = date
     }
     
     // 페이퍼가 진행중인지, 종료된건지 분류하기
