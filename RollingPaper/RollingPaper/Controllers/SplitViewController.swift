@@ -12,7 +12,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     func didSelectCategory(_ category: CategoryModel) {
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
         let mainViewController = UINavigationController(rootViewController: self.mainViewController)
         
         switch category.name {
@@ -40,6 +40,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     ]
     private var sidebarViewController: SidebarViewController!
     private var templateViewController: PaperTemplateSelectViewController!
+    private var storageViewController: PaperStorageViewController!
     private var mainViewController: MainViewController!
     
     override func viewDidLoad() {
@@ -65,6 +66,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     private func loadViewControllers() {
         self.sidebarViewController = SidebarViewController()
         self.templateViewController = PaperTemplateSelectViewController()
+        self.storageViewController = PaperStorageViewController()
         self.mainViewController = MainViewController()
         self.sidebarViewController.delegate = self
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
