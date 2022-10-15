@@ -16,19 +16,25 @@ final class CardRootViewController: UIViewController {
     
     private var firstStepView: UIView!
     private var secondStepView: UIView!
-    
     private let viewModel = CardBackgroundViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupViews()
+       // configureNavigationButton()
         instantiateSegmentedViewControllers()
+        self.navigationController?.isNavigationBarHidden = true
     }
     
     private func setupViews() {
         view.backgroundColor = .white
+     
         view.addSubview(segmentedControl)
         segmentedControlConstraints()
+        
+        view.addSubview(completeButton)
+        completeButtonConstraints()
     }
     
     lazy var segmentedControl: UISegmentedControl = {
@@ -41,6 +47,14 @@ final class CardRootViewController: UIViewController {
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
         return control
+    }()
+    
+    lazy var completeButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("완료", for: UIControl.State.normal)
+        button.setTitleColor(UIColor.black, for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
+        return button
     }()
     
     @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
@@ -57,11 +71,43 @@ final class CardRootViewController: UIViewController {
         }
     }
     
+//    func configureNavigationButton() {
+//
+//        self.navigationItem.titleView = segmentedControl
+//
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(openResultView))
+//        navigationItem.rightBarButtonItem?.tintColor = .black
+//
+//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "돌아가기", style: .plain, target: self, action: #selector(cancelBtnPressed))
+//        navigationItem.leftBarButtonItem?.tintColor = .black
+//     }
+
+    @objc func openResultView(_ gesture: UITapGestureRecognizer) {
+        print("selected")
+        let pushVC = CardResultViewController()
+        self.navigationController?.pushViewController(pushVC, animated: true)
+       // pushVC.modalPresentationStyle = .overFullScreen
+       // present(pushVC, animated: true)
+    }
+    
+    @objc func cancelBtnPressed() {
+        print("cancelBtnPressed")
+    }
+    
     private func segmentedControlConstraints() {
         segmentedControl.snp.makeConstraints({ make in
             make.width.equalTo(200)
             make.height.equalTo(35)
             make.centerX.equalTo(self.view)
+            make.top.equalTo(self.view).offset(30)
+        })
+    }
+    
+    private func completeButtonConstraints() {
+        completeButton.snp.makeConstraints({ make in
+            make.width.equalTo(40)
+            make.height.equalTo(40)
+            make.trailing.equalTo(-30)
             make.top.equalTo(self.view).offset(30)
         })
     }

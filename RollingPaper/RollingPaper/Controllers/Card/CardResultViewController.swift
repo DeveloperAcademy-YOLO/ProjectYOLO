@@ -15,7 +15,7 @@ final class CardResultViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .blue
+        view.backgroundColor = .lightGray
         
         view.addSubview(someImageView)
         someImageView.backgroundColor = .white
@@ -24,6 +24,11 @@ final class CardResultViewController: UIViewController {
         someImageView.contentMode = .scaleAspectFill
         someImageView.image = backgroundImg
         someImageViewConstraints()
+        
+        view.addSubview(cancelButton)
+        cancelButtonConstraints()
+       // setNavigationBar()
+        self.navigationController?.isNavigationBarHidden = true
     }
     
     lazy var someImageView: UIImageView = {
@@ -34,6 +39,14 @@ final class CardResultViewController: UIViewController {
         return theImageView
     }()
     
+    lazy var cancelButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("취소", for: UIControl.State.normal)
+        button.setTitleColor(UIColor.black, for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
+        return button
+    }()
+    
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
@@ -41,5 +54,32 @@ final class CardResultViewController: UIViewController {
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
+    }
+//
+//    private func setNavigationBar() {
+//        let createBtn = UIBarButtonItem(title: "게시하기", style: .plain, target: self, action: #selector(createBtnPressed))
+//        navigationItem.rightBarButtonItem = createBtn
+//        navigationItem.rightBarButtonItem?.tintColor = .black
+//
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelBtnPressed))
+//        navigationItem.leftBarButtonItem?.tintColor = .black
+//     //   self.navigationController?.navigationBar.topItem?.title = "취소"
+//    }
+    
+    private func cancelButtonConstraints() {
+        cancelButton.snp.makeConstraints({ make in
+            make.width.equalTo(40)
+            make.height.equalTo(40)
+            make.leading.equalTo(30)
+            make.top.equalTo(self.view).offset(30)
+        })
+    }
+    
+    @objc func createBtnPressed() {
+     print("게시하기 pressed")
+    }
+
+    @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
+        self.navigationController?.popViewController(animated: true)
     }
 }
