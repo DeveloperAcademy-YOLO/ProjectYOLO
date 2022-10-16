@@ -44,20 +44,10 @@ final class SignInViewModel {
             .signedInSubject
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
-                switch receivedValue {
-                case .userNotFound:
-                    self.output.send(.signInDidFail(error: .userNotFound))
-                case .userTokenExpired:
-                    self.output.send(.signInDidFail(error: .userTokenExpired))
-                case .emailAlreadyInUse:
-                    self.output.send(.signInDidFail(error: .emailAlreadyInUse))
-                case .wrongPassword:
-                    self.output.send(.signInDidFail(error: .wrongPassword))
-                case .invalidEmail:
-                    self.output.send(.signInDidFail(error: .invalidEmail))
-                case .signInSucceed:
+                if receivedValue == .signInSucceed {
                     self.output.send(.signInDidSuccess)
-                default: self.output.send(.signInDidFail(error: .unknownError))
+                } else {
+                    self.output.send(.signInDidFail(error: receivedValue))
                 }
             })
             .store(in: &cancellables)
