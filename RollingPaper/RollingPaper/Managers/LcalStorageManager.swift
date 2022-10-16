@@ -37,7 +37,7 @@ final class LocalStorageManager {
         .eraseToAnyPublisher()
     }
     
-    static func downloadData(urlString: String, maxSize: Int64 = Int64(1 * 1024 * 1024)) -> AnyPublisher<Data?, Error> {
+    static func downloadData(urlString: String) -> AnyPublisher<Data?, Error> {
         return Future({ promise in
             if
                 let url = URL(string: urlString),
