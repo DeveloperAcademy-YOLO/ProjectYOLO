@@ -17,13 +17,12 @@ protocol SidebarViewControllerDelegate: AnyObject {
 class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var delegate: SidebarViewControllerDelegate?
-    
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
     
     private let userPhoto: UIImageView = {
-        let profilePhoto = UIImageView(frame: CGRect(x: 0, y: 0, width: 48, height: 48))
+        let profilePhoto = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
         profilePhoto.layer.cornerRadius = profilePhoto.frame.width / 2
         profilePhoto.contentMode = UIView.ContentMode.scaleAspectFit
         return profilePhoto
@@ -39,8 +38,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     lazy var userInfoStack: UIStackView = {
         let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
         userInfo.axis = .horizontal
-        userInfo.spacing = 13
-        userInfo.addStackViewBackground(color: .white, radiusSize: 5.0)
+        userInfo.spacing = 16
         return userInfo
     }()
     
@@ -140,7 +138,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         tableView.delegate = self
         tableView.backgroundColor = .clear
         tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(132)
+            make.leading.equalToSuperview().offset(128)
             make.trailing.bottom.equalToSuperview()
             make.top.equalTo(userInfoStack.snp.bottom).offset(40)
         }
@@ -159,16 +157,16 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         userInfoStack.backgroundColor = .white
         userInfoStack.layer.cornerRadius = 12
         userInfoStack.isLayoutMarginsRelativeArrangement = true
-        userInfoStack.layoutMargins = UIEdgeInsets(top: 13, left: 15, bottom: 13, right: 15)
+        userInfoStack.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
         
         userPhoto.snp.makeConstraints { make in
             make.width.height.equalTo(50)
         }
         
         userInfoStack.snp.makeConstraints { make in
-            make.width.equalTo(244)
+            make.width.equalToSuperview().offset(-156)
             make.height.equalTo(74)
-            make.leading.equalToSuperview().offset(132)
+            make.leading.equalToSuperview().offset(128)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
         }
     }
@@ -204,7 +202,7 @@ class CategoryCell: UITableViewCell {
     func layout() {
         self.addSubview(categoryStack)
         categoryStack.isLayoutMarginsRelativeArrangement = true
-        categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 32, right: 0)
+        categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 32, right: 0)
         
         categoryStack.snp.makeConstraints { make in
             make.leading.equalTo(self.snp.leading).offset(16)
