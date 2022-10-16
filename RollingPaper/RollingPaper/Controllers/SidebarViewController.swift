@@ -50,11 +50,11 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = UIView()
-        self.view.backgroundColor = .customSidebarBackgroundColor
+        view = UIView()
+        view.backgroundColor = .customSidebarBackgroundColor
         bind()
-        self.setupSubviews()
-        self.tableView.separatorStyle = .none
+        setupSubviews()
+        tableView.separatorStyle = .none
         print("Load View")
     }
     
@@ -98,7 +98,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
 
     func show(categories: [CategoryModel]) {
         self.categories = categories
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -133,27 +133,20 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     private func setupTableView() {
-        self.view.addSubview(tableView)
+        view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = .clear
+        
         tableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(128)
             make.trailing.bottom.equalToSuperview()
             make.top.equalTo(userInfoStack.snp.bottom).offset(40)
         }
-        /*
-        NSLayoutConstraint.activate([
-            self.tableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-            self.tableView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 300),
-            self.tableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-            self.tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-        ])
-         */
     }
     
     private func setupProfileView() {
-        self.view.addSubview(userInfoStack)
+        view.addSubview(userInfoStack)
         userInfoStack.backgroundColor = .white
         userInfoStack.layer.cornerRadius = 12
         userInfoStack.isLayoutMarginsRelativeArrangement = true
