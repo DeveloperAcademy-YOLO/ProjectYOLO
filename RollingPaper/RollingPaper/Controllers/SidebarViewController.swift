@@ -195,6 +195,7 @@ class CategoryCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.backgroundConfiguration = .clear()
+        layout()
     }
     
     required init?(coder: NSCoder) {
@@ -205,7 +206,7 @@ class CategoryCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func layout() {
+    private func layout() {
         self.addSubview(categoryStack)
         categoryStack.isLayoutMarginsRelativeArrangement = true
         categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 32, right: 0)
