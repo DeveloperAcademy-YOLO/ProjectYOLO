@@ -22,10 +22,17 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     private var cancellables = Set<AnyCancellable>()
     
     private let userPhoto: UIImageView = {
-        let profilePhoto = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
-        profilePhoto.layer.cornerRadius = profilePhoto.frame.width / 2
-        profilePhoto.contentMode = UIView.ContentMode.scaleAspectFit
-        return profilePhoto
+        let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        photo.layer.cornerRadius = photo.frame.width / 2
+        photo.contentMode = UIView.ContentMode.scaleAspectFit
+        return photo
+    }()
+    
+    private let chevron: UIImageView = {
+        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        chevron.image = UIImage(systemName: "chevron.forward")
+        chevron.contentMode = UIView.ContentMode.scaleAspectFit
+        return chevron
     }()
     
     private let userName: UILabel = {
@@ -36,16 +43,16 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     }()
     
     lazy var userInfoStack: UIStackView = {
-        let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
+        let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName, chevron])
         userInfo.axis = .horizontal
         userInfo.spacing = 16
         return userInfo
     }()
     
     private let tableView: UITableView = {
-        let view = UITableView()
-        view.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
-        return view
+        let tableview = UITableView()
+        tableview.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
+        return tableview
     }()
     
     override func viewDidLoad() {
@@ -54,6 +61,8 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         view.backgroundColor = .customSidebarBackgroundColor
         bind()
         setupSubviews()
+        let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
+        userInfoStack.addGestureRecognizer(tapUserInfo)
         tableView.separatorStyle = .none
         print("Load View")
     }
@@ -125,6 +134,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 56
+    }
+    
+    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
+        print("UserInfoTapped!", sender)
     }
     
     private func setupSubviews() {
