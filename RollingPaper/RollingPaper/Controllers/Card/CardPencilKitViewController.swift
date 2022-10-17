@@ -72,14 +72,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         
         someImageView.addSubview(canvasView)
         
-//        view.addSubview(resultImageView)
-//        resultImageView.backgroundColor = .white
-//        resultImageView.layer.masksToBounds = true
-//        resultImageView.layer.cornerRadius = 50
-//        resultImageView.contentMode = .scaleAspectFill
-//        resultImageView.image = backgroundImg
-//        resultImageViewConstraints()
-        
         pencilKitAppear()
         toolPickerAppear()
         stickerCollectionViewDisappear()
@@ -123,14 +115,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     }
     
     lazy var someImageView: UIImageView = {
-        let theImageView = UIImageView()
-        theImageView.backgroundColor = .white
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.isUserInteractionEnabled = true
-        return theImageView
-    }()
-    
-    lazy var resultImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -184,6 +168,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
         self.isCanvasToggle.toggle()
         if isCanvasToggle == true {
+            selectedStickerView?.showEditingHandlers = false
             toolPickerAppear()
         } else {
             toolPickerDisappear()
@@ -259,17 +244,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             make.centerY.equalTo(self.view)
         })
     }
-    
-    func resultImageViewConstraints() {
-        resultImageView.snp.makeConstraints({ make in
-            make.width.equalTo(300)
-            make.height.equalTo(300)
-            make.trailing.equalTo(-20)
-          //  make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
+
     func collectionViewConstraints() {
         collectionView.snp.makeConstraints({ make in
             make.width.equalTo(730)
@@ -334,6 +309,7 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
        // let image = UIGraphicsGetImageFromCurrentImageContext()
+        
         let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
         let image = renderer.image { _ in
             imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
