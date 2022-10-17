@@ -38,7 +38,7 @@
 		D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */; };
 		D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */; };
 		D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */; };
-		D24AB02728F90DCC007BDC1F /* LcalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LcalStorageManager.swift */; };
+		D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */; };
 		D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBC28ED206F0094ECD9 /* UserModel.swift */; };
 		D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBE28ED219D0094ECD9 /* PaperModel.swift */; };
 		D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC428ED26EE0094ECD9 /* CardModel.swift */; };
@@ -55,6 +55,7 @@
 		D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308D28F16493008365CB /* SignUpTextField.swift */; };
 		D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */; };
 		D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */; };
+		D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,7 +106,7 @@
 		D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RollingPaper.entitlements; sourceTree = "<group>"; };
 		D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
-		D24AB02628F90DCC007BDC1F /* LcalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LcalStorageManager.swift; sourceTree = "<group>"; };
+		D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorageManager.swift; sourceTree = "<group>"; };
 		D251BDBC28ED206F0094ECD9 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		D251BDBE28ED219D0094ECD9 /* PaperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModel.swift; sourceTree = "<group>"; };
 		D251BDC428ED26EE0094ECD9 /* CardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModel.swift; sourceTree = "<group>"; };
@@ -122,6 +123,7 @@
 		D2B6308D28F16493008365CB /* SignUpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpTextField.swift; sourceTree = "<group>"; };
 		D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperPreviewModel.swift; sourceTree = "<group>"; };
 		D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageManager.swift; sourceTree = "<group>"; };
+		D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UNUserNotificationCenter+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +212,7 @@
 				D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */,
 				D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */,
 				BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */,
+				D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -261,7 +264,7 @@
 				D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */,
 				D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */,
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
-				D24AB02628F90DCC007BDC1F /* LcalStorageManager.swift */,
+				D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */,
 				D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */,
 				D251BDD028ED54DD0094ECD9 /* LocalDatabaseFileManager.swift */,
 				D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */,
@@ -492,9 +495,10 @@
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
+				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
-				D24AB02728F90DCC007BDC1F /* LcalStorageManager.swift in Sources */,
+				D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */,

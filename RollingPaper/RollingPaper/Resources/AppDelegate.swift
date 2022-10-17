@@ -22,6 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = splitVC
         self.window = window
         UNUserNotificationCenter.current().delegate = self
+        registerPushNotifications()
         return true
     }
 
@@ -49,20 +50,47 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     /// Background Push Handling
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.notification.request.identifier == "localNotification" {
-            print("Local Notification Called")
-            // Deep Link Modeling
+        if
+            let paperId = response.notification.request.content.userInfo["paperId"] as? String {
+            print("Background Called")
+            print("paperId: \(paperId)")
+            navigatePaperView(paperId: paperId)
+        }
+        if UIApplication.shared.applicationIconBadgeNumber > 0 {
+            UIApplication.shared.applicationIconBadgeNumber = 0
+            UserDefaults.standard.set(0, forKey: "currentBadgeCount")
         }
         completionHandler()
+    }
+    
+    // Navigate to Paper View using PaperId
+    private func navigatePaperView(paperId: String) {
+        guard let rootVC = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController as? SplitViewController else { return }
+        rootVC.didSelectCategory(.init(name: "페이퍼 보관함", icon: ""))
+        guard let navVC = rootVC.viewControllers[1] as? UINavigationController else { return }
+        // 루트 뷰: 페이퍼 보관함 카테고리 선택 -> 네비게이션 컨트롤러 캐스팅 및 페이퍼 뷰로 이동
+        // 현재 푸시 노티피케이션 paperId를 해당 페이퍼 뷰에 전달하면서 이니셜라이즈
+//        navVC.pushViewController(SignInViewController(), animated: true)
     }
     
     /// Register Push Notifctation Permission: (1). AppDelegate (2). After Real Paper activated
     func registerPushNotifications() {
         UNUserNotificationCenter.current()
-            .requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { [weak self] granted, _ in
+            .requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { granted, _ in
                 print("Permission Granted: \(granted)")
                 guard !granted else { return }
+                self.getNotificationSettings()
             })
+    }
+    
+    private func getNotificationSettings() {
+        UNUserNotificationCenter.current()
+            .getNotificationSettings { [weak self] settings in
+                guard settings.authorizationStatus != .authorized else { return }
+                DispatchQueue.main.async {
+                    self?.openSettingView()
+                }
+            }
     }
     
     private func openSettingView() {
