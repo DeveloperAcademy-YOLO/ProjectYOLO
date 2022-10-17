@@ -72,7 +72,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         
         someImageView.addSubview(canvasView)
         
-        pencilKitAppear()
+        canvasViewAppear()
         toolPickerAppear()
         stickerCollectionViewDisappear()
         
@@ -91,8 +91,12 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         saveButtonConstraints()
         
         bind()
-        
-       // view.layer.transform = CATransform3DMakeRotation(45.0, 0, 1.0, 1.0)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        canvasViewAppear()
+        toolPickerAppear()
     }
     
     private func bind() {
@@ -170,8 +174,10 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         self.isCanvasToggle.toggle()
         if isCanvasToggle == true {
             toolPickerAppear()
+            print("true")
         } else {
             toolPickerDisappear()
+            print("false")
         }
     }
     
@@ -218,7 +224,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         collectionViewConstraints()
     }
     
-    func pencilKitAppear() {
+    func canvasViewAppear() {
         canvasView.delegate = self
         canvasView.layer.masksToBounds = true
         canvasView.layer.cornerRadius = 50

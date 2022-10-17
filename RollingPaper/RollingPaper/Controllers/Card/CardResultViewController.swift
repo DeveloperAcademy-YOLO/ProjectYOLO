@@ -55,16 +55,6 @@ final class CardResultViewController: UIViewController {
             make.centerY.equalTo(self.view)
         })
     }
-//
-//    private func setNavigationBar() {
-//        let createBtn = UIBarButtonItem(title: "게시하기", style: .plain, target: self, action: #selector(createBtnPressed))
-//        navigationItem.rightBarButtonItem = createBtn
-//        navigationItem.rightBarButtonItem?.tintColor = .black
-//
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelBtnPressed))
-//        navigationItem.leftBarButtonItem?.tintColor = .black
-//     //   self.navigationController?.navigationBar.topItem?.title = "취소"
-//    }
     
     private func cancelButtonConstraints() {
         cancelButton.snp.makeConstraints({ make in
@@ -81,5 +71,6 @@ final class CardResultViewController: UIViewController {
 
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
         self.navigationController?.popViewController(animated: true)
+        //self.dismiss(animated: true)
     }
 }

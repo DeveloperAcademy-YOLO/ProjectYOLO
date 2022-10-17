@@ -22,7 +22,6 @@ final class CardRootViewController: UIViewController {
         super.viewDidLoad()
         
         setupViews()
-       // configureNavigationButton()
         instantiateSegmentedViewControllers()
         self.navigationController?.isNavigationBarHidden = true
     }
@@ -70,24 +69,13 @@ final class CardRootViewController: UIViewController {
             secondStepView.alpha = 0
         }
     }
-    
-//    func configureNavigationButton() {
-//
-//        self.navigationItem.titleView = segmentedControl
-//
-//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(openResultView))
-//        navigationItem.rightBarButtonItem?.tintColor = .black
-//
-//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "돌아가기", style: .plain, target: self, action: #selector(cancelBtnPressed))
-//        navigationItem.leftBarButtonItem?.tintColor = .black
-//     }
 
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         print("selected")
         let pushVC = CardResultViewController()
         self.navigationController?.pushViewController(pushVC, animated: true)
-       // pushVC.modalPresentationStyle = .overFullScreen
-       // present(pushVC, animated: true)
+//        pushVC.modalPresentationStyle = .overFullScreen
+//        present(pushVC, animated: true)
     }
     
     @objc func cancelBtnPressed() {
