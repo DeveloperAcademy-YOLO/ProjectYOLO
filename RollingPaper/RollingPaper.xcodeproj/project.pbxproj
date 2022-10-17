@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
+		AF4817B228FDBD5100D2C3ED /* CardResultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4817B128FDBD5100D2C3ED /* CardResultViewModel.swift */; };
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
@@ -70,6 +71,7 @@
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
+		AF4817B128FDBD5100D2C3ED /* CardResultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewModel.swift; sourceTree = "<group>"; };
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
 		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */,
 				BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */,
 				AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */,
+				AF4817B128FDBD5100D2C3ED /* CardResultViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -505,6 +508,7 @@
 				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
 				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
+				AF4817B228FDBD5100D2C3ED /* CardResultViewModel.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
