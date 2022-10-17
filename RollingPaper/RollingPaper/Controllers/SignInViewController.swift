@@ -209,7 +209,7 @@ class SignInViewController: UIViewController {
             passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
         case .emailFocused:
             emailTextField.layer.borderWidth = 2.0
-            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            emailTextField.layer.borderColor = UIColor.systemBlue.cgColor
             passwordTextField.layer.borderWidth = 1.0
             passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
         case .emailWaring:
@@ -221,7 +221,7 @@ class SignInViewController: UIViewController {
             emailTextField.layer.borderWidth = 1.0
             emailTextField.layer.borderColor = UIColor.systemGray.cgColor
             passwordTextField.layer.borderWidth = 2.0
-            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderColor = UIColor.systemBlue.cgColor
         case .passwordWaring:
             emailTextField.layer.borderWidth = 1.0
             emailTextField.layer.borderColor = UIColor.systemGray.cgColor
@@ -270,8 +270,9 @@ class SignInViewController: UIViewController {
             })
             .store(in: &cancellables)
         appleSignInButton
-            .controlPublisher(for: .touchUpInside)        
+            .controlEventPublisher(for: .touchDown)
             .sink(receiveValue: { [weak self] _ in
+                print("Apple Login Tapped in View")
                 self?.input.send(.appleSignInButtonTap)
             })
             .store(in: &cancellables)

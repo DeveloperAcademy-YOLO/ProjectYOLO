@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class TemplateSelectViewModel {
+class PaperTemplateSelectViewModel {
     
     enum Input {
         case viewDidAppear
