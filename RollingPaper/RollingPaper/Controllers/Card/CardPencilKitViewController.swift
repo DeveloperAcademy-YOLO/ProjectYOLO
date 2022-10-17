@@ -90,6 +90,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         view.addSubview(saveButton)
         saveButtonConstraints()
         
+        input.send(.viewDidLoad)
         bind()
     }
     
@@ -98,6 +99,13 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         canvasViewAppear()
         toolPickerAppear()
     }
+    
+//    override func viewDidDisappear(_ animated: Bool) {
+//        super.viewDidDisappear(animated)
+//        guard let image = mergeImages(imageView: someImageView) else { return }
+//        input.send(.setCardBackgroundImg(background: image))
+//    }
+    // TODO: 이코드 넣으면 터짐
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())

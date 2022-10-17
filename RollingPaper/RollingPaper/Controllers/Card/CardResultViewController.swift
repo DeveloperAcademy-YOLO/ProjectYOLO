@@ -13,6 +13,19 @@ final class CardResultViewController: UIViewController {
  
     var backgroundImg = UIImage(named: "Rectangle")
     
+    private let viewModel: CardViewModel
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(viewModel: CardViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
@@ -29,6 +42,37 @@ final class CardResultViewController: UIViewController {
         cancelButtonConstraints()
        // setNavigationBar()
         self.navigationController?.isNavigationBarHidden = true
+        input.send(.viewDidLoad)
+        bind()
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = background
+                    })
+                case .getRecentCardBackgroundImgFail:
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "heart.fill")
+                    })
+                case .getRecentCardResultImgSuccess(result: let result):
+                    DispatchQueue.main.async(execute: {
+                        //self.someImageView.image = UIImage(named: "Rectangle")
+                        print("test")
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+                       // self.someImageView.image = UIImage(named: "Rectangle")
+                        print("test")
+                    })
+                }
+            })
+            .store(in: &cancellables)
     }
     
     lazy var someImageView: UIImageView = {
@@ -70,7 +114,7 @@ final class CardResultViewController: UIViewController {
     }
 
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
-        self.navigationController?.popViewController(animated: false)
-      //  self.dismiss(animated: false)
+        //self.navigationController?.popViewController(animated: false)
+        self.dismiss(animated: false)
     }
 }
