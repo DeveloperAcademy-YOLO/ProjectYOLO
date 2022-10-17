@@ -17,39 +17,53 @@ protocol SidebarViewControllerDelegate: AnyObject {
 class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var delegate: SidebarViewControllerDelegate?
-    
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
+    private var cancellables = Set<AnyCancellable>()
     
     private let userPhoto: UIImageView = {
-        let profilePhoto = UIImageView()
-        profilePhoto.translatesAutoresizingMaskIntoConstraints = false
-        return profilePhoto
+        let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        photo.layer.cornerRadius = photo.frame.width / 2
+        photo.contentMode = UIView.ContentMode.scaleAspectFit
+        return photo
+    }()
+    
+    private let chevron: UIImageView = {
+        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        chevron.image = UIImage(systemName: "chevron.forward")
+        chevron.contentMode = UIView.ContentMode.scaleAspectFit
+        return chevron
     }()
     
     private let userName: UILabel = {
         let name = UILabel()
-        name.translatesAutoresizingMaskIntoConstraints = false
         name.font = .boldSystemFont(ofSize: 20)
         name.sizeToFit()
         return name
     }()
     
-    private let tableView: UITableView = {
-        let view = UITableView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
-        return view
+    lazy var userInfoStack: UIStackView = {
+        let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName, chevron])
+        userInfo.axis = .horizontal
+        userInfo.spacing = 16
+        return userInfo
     }()
-    private var cancellables = Set<AnyCancellable>()
+    
+    private let tableView: UITableView = {
+        let tableview = UITableView()
+        tableview.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
+        return tableview
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = UIView()
-        self.view.backgroundColor = .white
+        view = UIView()
+        view.backgroundColor = .customSidebarBackgroundColor
         bind()
-        self.setupSubviews()
-        self.tableView.separatorStyle = .none
+        setupSubviews()
+        let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
+        userInfoStack.addGestureRecognizer(tapUserInfo)
+        tableView.separatorStyle = .none
         print("Load View")
     }
     
@@ -90,10 +104,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .store(in: &cancellables)
 
     }
-    
+
     func show(categories: [CategoryModel]) {
         self.categories = categories
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -118,37 +132,49 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         self.delegate?.didSelectCategory(category)
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 56
+    }
+    
+    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
+        print("UserInfoTapped!", sender)
+    }
+    
     private func setupSubviews() {
-        self.setupTableView()
-        self.setupProfileView()
+        setupProfileView()
+        setupTableView()
     }
     
     private func setupTableView() {
-        self.view.addSubview(tableView)
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
+        view.addSubview(tableView)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.backgroundColor = .clear
         
-        NSLayoutConstraint.activate([
-            self.tableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-            self.tableView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 300),
-            self.tableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-            self.tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-        ])
+        tableView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(128)
+            make.trailing.bottom.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom).offset(40)
+        }
     }
     
-    private func setupProfileView() { // TODO: 회원 프로필 뷰
-        self.view.addSubview(userName)
-        self.view.addSubview(userPhoto)
+    private func setupProfileView() {
+        view.addSubview(userInfoStack)
+        userInfoStack.backgroundColor = .white
+        userInfoStack.layer.cornerRadius = 12
+        userInfoStack.isLayoutMarginsRelativeArrangement = true
+        userInfoStack.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
         
-        NSLayoutConstraint.activate([
-            self.userPhoto.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 100),
-            self.userPhoto.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200),
-            self.userPhoto.bottomAnchor.constraint(equalTo: self.tableView.topAnchor),
-            
-            self.userName.leftAnchor.constraint(equalTo: userPhoto.rightAnchor, constant: 10),
-            self.userName.topAnchor.constraint(equalTo: userPhoto.topAnchor),
-            self.userName.bottomAnchor.constraint(equalTo: userPhoto.bottomAnchor),
-        ])
+        userPhoto.snp.makeConstraints { make in
+            make.width.height.equalTo(50)
+        }
+        
+        userInfoStack.snp.makeConstraints { make in
+            make.width.equalToSuperview().offset(-156)
+            make.height.equalTo(74)
+            make.leading.equalToSuperview().offset(128)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+        }
     }
 }
 
@@ -159,8 +185,17 @@ class CategoryCell: UITableViewCell {
     let categoryIcon = UIImageView()
     let categoryName = UILabel()
     
+    lazy var categoryStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [categoryIcon, categoryName])
+        stack.axis = .horizontal
+        stack.spacing = 16
+        return stack
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.backgroundConfiguration = .clear()
+        layout()
     }
     
     required init?(coder: NSCoder) {
@@ -169,19 +204,16 @@ class CategoryCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-     }
+    }
     
-    func layout() {
-        self.addSubview(categoryIcon)
-        self.addSubview(categoryName)
+    private func layout() {
+        self.addSubview(categoryStack)
+        categoryStack.isLayoutMarginsRelativeArrangement = true
+        categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 32, right: 0)
         
-        categoryIcon.translatesAutoresizingMaskIntoConstraints = false
-        categoryName.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            categoryIcon.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10),
-            categoryIcon.widthAnchor.constraint(equalToConstant: 20),
-            categoryIcon.heightAnchor.constraint(equalToConstant: 20),
-            categoryName.leadingAnchor.constraint(equalTo: categoryIcon.trailingAnchor, constant: 10)
-        ])
+        categoryStack.snp.makeConstraints { make in
+            make.leading.equalTo(self.snp.leading).offset(16)
+            make.width.height.equalTo(24)
+        }
     }
 }
