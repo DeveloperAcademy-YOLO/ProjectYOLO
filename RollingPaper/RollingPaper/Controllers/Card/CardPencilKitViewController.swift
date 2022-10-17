@@ -61,7 +61,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
-
+        
         view.addSubview(someImageView)
         someImageView.backgroundColor = .white
         someImageView.layer.masksToBounds = true
@@ -184,6 +184,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     @objc func stickerToolKit(_ gesture: UITapGestureRecognizer) {
         self.isStickerToggle.toggle()
         if isStickerToggle == true {
+            selectedStickerView?.showEditingHandlers = false
             stickerCollectionViewDisappear()
             print("true")
         } else {
@@ -315,7 +316,6 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
        // let image = UIGraphicsGetImageFromCurrentImageContext()
-        
         let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
         let image = renderer.image { _ in
             imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
