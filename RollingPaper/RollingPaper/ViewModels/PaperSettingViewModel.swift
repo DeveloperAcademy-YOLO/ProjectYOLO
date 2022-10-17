@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class SetPaperViewModel {
+class PaperSettingViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
     private var template: TemplateEnum
