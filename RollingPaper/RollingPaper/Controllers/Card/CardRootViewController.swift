@@ -73,9 +73,9 @@ final class CardRootViewController: UIViewController {
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         print("selected")
         let pushVC = CardResultViewController()
-        self.navigationController?.pushViewController(pushVC, animated: true)
+        self.navigationController?.pushViewController(pushVC, animated: false)
 //        pushVC.modalPresentationStyle = .overFullScreen
-//        present(pushVC, animated: true)
+//        present(pushVC, animated: false)
     }
     
     @objc func cancelBtnPressed() {

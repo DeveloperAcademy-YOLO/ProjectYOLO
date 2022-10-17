@@ -24,7 +24,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    private var isCanvasToggle: Bool = true
+    private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
@@ -171,8 +171,8 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
         selectedStickerView?.showEditingHandlers = false
-        self.isCanvasToggle.toggle()
-        if isCanvasToggle == true {
+        self.isCanvasToolToggle.toggle()
+        if isCanvasToolToggle == true {
             toolPickerAppear()
             print("true")
         } else {
