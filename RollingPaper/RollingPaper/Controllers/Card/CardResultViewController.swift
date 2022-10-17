@@ -54,20 +54,20 @@ final class CardResultViewController: UIViewController {
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
-                        self.someImageView.image = background
+                      //  self.someImageView.image = background
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
-                        self.someImageView.image = UIImage(named: "heart.fill")
+                     // self.someImageView.image = UIImage(named: "heart.fill")
                     })
                 case .getRecentCardResultImgSuccess(result: let result):
                     DispatchQueue.main.async(execute: {
-                        //self.someImageView.image = UIImage(named: "Rectangle")
+                        self.someImageView.image = result
                         print("test")
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
-                       // self.someImageView.image = UIImage(named: "Rectangle")
+                        self.someImageView.image = UIImage(named: "heart.fill")
                         print("test")
                     })
                 }
@@ -115,6 +115,6 @@ final class CardResultViewController: UIViewController {
 
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
         //self.navigationController?.popViewController(animated: false)
-        self.dismiss(animated: false)
+       // self.dismiss(animated: false)
     }
 }

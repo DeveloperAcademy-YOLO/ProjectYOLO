@@ -105,6 +105,12 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
 //        guard let image = mergeImages(imageView: someImageView) else { return }
 //        input.send(.setCardBackgroundImg(background: image))
 //    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+    
+    }
+    
     // TODO: 이코드 넣으면 터짐
     
     private func bind() {
@@ -209,6 +215,9 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             stickerCollectionViewAppear()
             print("false")
         }
+        
+        let image = mergeImages(imageView: someImageView)
+        input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
     }
     
     @objc func savePicture(_ gesture: UITapGestureRecognizer) {

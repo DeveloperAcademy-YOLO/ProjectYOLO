@@ -181,7 +181,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
         selectedColor = backgroundColor[0]
-        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        let image = UIImage(named: "heart.fill")
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
     

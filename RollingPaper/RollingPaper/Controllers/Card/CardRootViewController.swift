@@ -16,6 +16,7 @@ final class CardRootViewController: UIViewController {
     
     private var firstStepView: UIView!
     private var secondStepView: UIView!
+    private var thirdStepView: UIView!
     private let viewModel = CardViewModel()
     
     override func viewDidLoad() {
@@ -52,7 +53,7 @@ final class CardRootViewController: UIViewController {
         let button = UIButton()
         button.setTitle("완료", for: UIControl.State.normal)
         button.setTitleColor(UIColor.black, for: UIControl.State.normal)
-        button.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(resultView(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -61,21 +62,31 @@ final class CardRootViewController: UIViewController {
         case 0:
             firstStepView.alpha = 1
             secondStepView.alpha = 0
+            thirdStepView.alpha = 0
         case 1:
             firstStepView.alpha = 0
             secondStepView.alpha = 1
+            thirdStepView.alpha = 0
         default:
             firstStepView.alpha = 1
             secondStepView.alpha = 0
+            thirdStepView.alpha = 0
         }
     }
 
-    @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        print("selected")
-        let pushVC = CardResultViewController(viewModel: viewModel)
+//    @objc func openResultView(_ gesture: UITapGestureRecognizer) {
+//        print("selected")
+//        let pushVC = CardResultViewController(viewModel: viewModel)
 //        self.navigationController?.pushViewController(pushVC, animated: false)
-        pushVC.modalPresentationStyle = .overFullScreen
-        present(pushVC, animated: false)
+//        pushVC.modalPresentationStyle = .overFullScreen
+//        present(pushVC, animated: false)
+//    }
+    
+    @objc func resultView(_ gesture: UITapGestureRecognizer) {
+        print("selected")
+        firstStepView.alpha = 0
+        secondStepView.alpha = 0
+        thirdStepView.alpha = 1
     }
     
     @objc func cancelBtnPressed() {
@@ -103,17 +114,30 @@ final class CardRootViewController: UIViewController {
     private func instantiateSegmentedViewControllers() {
         let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
         let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
+        let thirdStepViewVC = CardResultViewController(viewModel: viewModel)
           
+        self.addChild(thirdStepViewVC)
         self.addChild(secondStepViewVC)
         self.addChild(firstStepViewVC)
+       
         
+        thirdStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         
+        
+        self.view.addSubview(thirdStepViewVC.view)
         self.view.addSubview(secondStepViewVC.view)
         self.view.addSubview(firstStepViewVC.view)
+       
            
             NSLayoutConstraint.activate([
+                
+                thirdStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
+                thirdStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+                thirdStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+                thirdStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+                
                 firstStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
                 firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
@@ -123,9 +147,12 @@ final class CardRootViewController: UIViewController {
                 secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
                 secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+               
             ])
             
+            self.thirdStepView = thirdStepViewVC.view
             self.firstStepView = firstStepViewVC.view
             self.secondStepView = secondStepViewVC.view
+          
         }
 }
