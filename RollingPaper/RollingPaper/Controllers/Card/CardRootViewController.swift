@@ -16,7 +16,7 @@ final class CardRootViewController: UIViewController {
     
     private var firstStepView: UIView!
     private var secondStepView: UIView!
-    private let viewModel = CardBackgroundViewModel()
+    private let viewModel = CardViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()

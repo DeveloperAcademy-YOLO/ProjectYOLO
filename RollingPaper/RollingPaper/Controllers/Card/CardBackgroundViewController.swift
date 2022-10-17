@@ -50,11 +50,11 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         bind()
     }
     
-    private let viewModel: CardBackgroundViewModel
-    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
+    private let viewModel: CardViewModel
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardBackgroundViewModel) {
+    init(viewModel: CardViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -76,6 +76,16 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
+                    })
+                case .getRecentCardResultImgSuccess(result: let result):
+                    DispatchQueue.main.async(execute: {
+                       // self.someImageView.image = background
+                        print("test")
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+                       // self.someImageView.image = background
+                        print("test")
                     })
                 }
             })
