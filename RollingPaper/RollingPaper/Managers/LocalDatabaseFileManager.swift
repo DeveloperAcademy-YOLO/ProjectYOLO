@@ -9,9 +9,9 @@ import Foundation
 import Combine
 import UIKit
 
-final class PaperModelFileManager: DatabaseManager {
+final class LocalDatabaseFileManager: DatabaseManager {
     
-    static let shared: DatabaseManager = PaperModelFileManager()
+    static let shared: DatabaseManager = LocalDatabaseFileManager()
     
     var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> = .init([])
     var paperSubject: CurrentValueSubject<PaperModel?, Never> = .init(nil)
