@@ -32,17 +32,17 @@ final class LocalDatabaseMockManager: DatabaseManager {
         var card1 = CardModel(date: Date(), contentURLString: "")
         var card2 = CardModel(date: Date(), contentURLString: "")
         var card3 = CardModel(date: Date(), contentURLString: "")
-        var card4 = CardModel(date: Date(), contentURLString: "")
+        let card4 = CardModel(date: Date(), contentURLString: "")
         if
             let mockImage = UIImage(systemName: "person"),
             let mockData = mockImage.jpegData(compressionQuality: 0.8) {
             let uploadPublisher = LocalStorageManager.uploadData(dataId: card1.cardId, data: mockData, contentType: .jpeg, pathRoot: .card)
-                .sink { completion in
+                .sink(receiveCompletion: { completion in
                     switch completion {
                     case .failure(let error): print(error.localizedDescription)
                     case .finished: print("Upload Image Successfully Done")
                     }
-                } receiveValue: { [weak self] photoURL in
+                }, receiveValue: { [weak self] photoURL in
                     if let photoURL = photoURL {
                         let photoURLString = photoURL.absoluteString
                         card1.contentURLString = photoURLString
@@ -52,7 +52,7 @@ final class LocalDatabaseMockManager: DatabaseManager {
                         paper2.cards.append(contentsOf: [card3, card4])
                         self?.papersMockData.append(contentsOf: [paper1, paper2])
                     }
-                }
+                })
             uploadPublisher.cancel()
         }
         var paperPreviews = [PaperPreviewModel]()
