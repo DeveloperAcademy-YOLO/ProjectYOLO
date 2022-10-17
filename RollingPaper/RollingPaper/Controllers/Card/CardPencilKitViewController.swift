@@ -72,6 +72,14 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         
         someImageView.addSubview(canvasView)
         
+//        view.addSubview(resultImageView)
+//        resultImageView.backgroundColor = .white
+//        resultImageView.layer.masksToBounds = true
+//        resultImageView.layer.cornerRadius = 50
+//        resultImageView.contentMode = .scaleAspectFill
+//        resultImageView.image = backgroundImg
+//        resultImageViewConstraints()
+        
         pencilKitAppear()
         toolPickerAppear()
         stickerCollectionViewDisappear()
@@ -86,6 +94,9 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
+        
+        view.addSubview(saveButton)
+        saveButtonConstraints()
         
         bind()
         
@@ -112,6 +123,14 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     }
     
     lazy var someImageView: UIImageView = {
+        let theImageView = UIImageView()
+        theImageView.backgroundColor = .white
+        theImageView.translatesAutoresizingMaskIntoConstraints = false
+        theImageView.isUserInteractionEnabled = true
+        return theImageView
+    }()
+    
+    lazy var resultImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -154,6 +173,14 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         return button
     }()
     
+    lazy var saveButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "square.and.arrow.down")
+        button.tintColor = .lightGray
+        button.addTarget(self, action: #selector(savePicture(_:)), for: .touchUpInside)
+        return button
+    }()
+    
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
         self.isCanvasToggle.toggle()
         if isCanvasToggle == true {
@@ -172,6 +199,12 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             stickerCollectionViewAppear()
             print("false")
         }
+    }
+    
+    @objc func savePicture(_ gesture: UITapGestureRecognizer) {
+        selectedStickerView?.showEditingHandlers = false
+        let image = mergeImages(imageView: someImageView)
+            UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     func toolPickerAppear() {
@@ -227,6 +260,16 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         })
     }
     
+    func resultImageViewConstraints() {
+        resultImageView.snp.makeConstraints({ make in
+            make.width.equalTo(300)
+            make.height.equalTo(300)
+            make.trailing.equalTo(-20)
+          //  make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
     func collectionViewConstraints() {
         collectionView.snp.makeConstraints({ make in
             make.width.equalTo(730)
@@ -269,12 +312,53 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
+           // make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
+        })
+    }
+    
+    func saveButtonConstraints() {
+        saveButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
 }
 
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    func mergeImages(imageView: UIImageView) -> UIImage? {
+        
+        UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
+        imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
+       // let image = UIGraphicsGetImageFromCurrentImageContext()
+        let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
+        let image = renderer.image { _ in
+            imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
+        }
+        UIGraphicsEndImageContext()
+        return image
+    }
+    
+    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            
+            // we got back an error!
+            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        } else {
+            
+            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }
