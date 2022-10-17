@@ -166,9 +166,9 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     }()
     
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
+        selectedStickerView?.showEditingHandlers = false
         self.isCanvasToggle.toggle()
         if isCanvasToggle == true {
-            selectedStickerView?.showEditingHandlers = false
             toolPickerAppear()
         } else {
             toolPickerDisappear()
