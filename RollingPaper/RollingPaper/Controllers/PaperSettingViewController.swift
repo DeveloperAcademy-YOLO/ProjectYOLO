@@ -161,13 +161,5 @@ class PaperSettingViewController: UIViewController {
     // 배경 눌렀을 때 동작
     @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
         paperTitleTextField.resignFirstResponder()
-        receiveMockPaperNotification()
-    }
-    
-    private func receiveMockPaperNotification() {
-        print("ReceiveMockPaperNotification Called!")
-        let soonDate = Calendar.current.date(byAdding: .second, value: 2, to: Date())!
-        let mockPaper = PaperModel(cards: [], date: Date(), endTime: soonDate, title: "Mock Paper!", templateString: "halloween")
-        UNUserNotificationCenter.current().addPaperRequest(paper: mockPaper)
     }
 }
