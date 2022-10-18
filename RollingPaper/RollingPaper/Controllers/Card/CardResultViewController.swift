@@ -52,7 +52,7 @@ final class CardResultViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                case .getRecentCardBackgroundImgSuccess(let background):
+                case .getRecentCardBackgroundImgSuccess(let _):
                     DispatchQueue.main.async(execute: {
                       //  self.someImageView.image = background
                     })
@@ -114,7 +114,7 @@ final class CardResultViewController: UIViewController {
     }
 
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
-        //self.navigationController?.popViewController(animated: false)
+        self.navigationController?.popViewController(animated: false)
        // self.dismiss(animated: false)
     }
 }
