@@ -15,6 +15,8 @@ class SettingScreenViewModel {
         case resignDidTap
         case userImageSet(image: UIImage)
         case userNameSet(name: String)
+        case userProfileSet(name: String, image: UIImage)
+        case userProfileNotSet
     }
     
     enum Output {
@@ -60,6 +62,10 @@ class SettingScreenViewModel {
                             self.authManager.updateUserName(from: currentName, to: name)
                         }
                     }
+                case .userProfileSet(name: let name, image: let image):
+                    break
+                case .userProfileNotSet:
+                    break
                 }
             }
         

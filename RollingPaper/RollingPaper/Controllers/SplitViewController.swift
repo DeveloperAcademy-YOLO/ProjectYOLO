@@ -12,7 +12,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     func didSelectCategory(_ category: CategoryModel) {
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        let paperStorageViewController = UINavigationController(rootViewController: SignInViewController())
         let settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         
         switch category.name {

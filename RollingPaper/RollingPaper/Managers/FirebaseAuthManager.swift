@@ -45,7 +45,7 @@ enum AuthManagerEnum: String, CaseIterable {
     case invalidName
 }
 
-final class FirebaseAuthManager: NSObject, AuthManager {
+class FirebaseAuthManager: NSObject, AuthManager {
     static let shared: AuthManager = FirebaseAuthManager()
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     var userProfileSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
@@ -111,6 +111,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             if let error = self?.handleError(with: error) {
                 self?.signedInSubject.send(error)
             } else {
+                print("Sign In Success")
                 self?.signedInSubject.send(.signInSucceed)
             }
         })
@@ -315,7 +316,9 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     private func fetchUserProfile() {
         if let user = auth.currentUser {
             let email = user.email ?? "Default Email"
-            let name = user.displayName ?? "Default Name"
+            if let name = user.displayName {
+                
+            }
             var userProfile = UserModel(email: email, name: name)
             if let photoUrl = user.photoURL {
                 userProfile.profileUrl = photoUrl.absoluteString
