@@ -329,13 +329,13 @@ extension FirestoreManager {
     
     /// FirebaseAuthManager에서 이메일 중복 검사를 위해 사용할 퍼블릭 함수
     func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
-        return Future { [weak self] promise in
-            if let currentUserEmail = self?.currentUserEmail {
+        return Future({ [weak self] promise in
+            if (self?.currentUserEmail) != nil {
                 self?.database
-                    .collection(Constants.usersCollectionPath.rawValue)
+                    .collection(Constants.usersNamePath.rawValue)
                     .whereField("userName", isEqualTo: userName)
                     .getDocuments(completion: { querySnapshot, _ in
-                        if let querySnapshot = querySnapshot {
+                        if querySnapshot != nil {
                             promise(.success(false))
                         } else {
                             promise(.success(true))
@@ -344,19 +344,20 @@ extension FirestoreManager {
             } else {
                 promise(.success(false))
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
     
     func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
-        return Future { [weak self] promise in
+        return Future({ [weak self] promise in
             if let currentUserEmail = self?.currentUserEmail {
-                if let oldName = oldName {
+                if oldName != nil {
                     self?.database
-                        .collection(Constants.usersCollectionPath.rawValue)
+                        .collection(Constants.usersNamePath.rawValue)
                         .document(currentUserEmail)
-                        .updateData(["userName" : newName], completion: { error in
+                        .updateData(["userName": newName], completion: { error in
                             if let error = error {
+                                print(error.localizedDescription)
                                 promise(.success(false))
                             } else {
                                 promise(.success(true))
@@ -364,10 +365,11 @@ extension FirestoreManager {
                         })
                 } else {
                     self?.database
-                        .collection(Constants.usersCollectionPath.rawValue)
+                        .collection(Constants.usersNamePath.rawValue)
                         .document(currentUserEmail)
-                        .setData(["userName" : newName], completion: { error in
+                        .setData(["userName": newName], completion: { error in
                             if let error = error {
+                                print(error.localizedDescription)
                                 promise(.success(false))
                             } else {
                                 promise(.success(true))
@@ -377,7 +379,7 @@ extension FirestoreManager {
             } else {
                 promise(.success(false))
             }
-        }
+        })
         .eraseToAnyPublisher()
     }
 }
