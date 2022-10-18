@@ -13,7 +13,7 @@ import CombineCocoa
 import AVFoundation
 import Photos
 
-class SettingScreenViewController: UIViewController {
+class SettingScreenViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,19 +47,46 @@ class SettingScreenViewController: UIViewController {
         profileImage.image = UIImage(named: "Halloween_Pumpkin")
         profileImage.contentMode = UIView.ContentMode.scaleAspectFit
         profileImage.backgroundColor = .systemGray6
-        //        profileImage.layer.borderColor = UIColor.red.cgColor
-        //        profileImage.layer.borderWidth = 3.0
-        //        profileImage.clipsToBounds = true
-        //        profileImage.layer.masksToBounds = true
+        profileImage.isUserInteractionEnabled = true
+        profileImage.clipsToBounds = true
         return profileImage
     }()
     
     private let editPhotoButton: UIButton = {
-        let profileImage = UIButton()
-        profileImage.setBackgroundImage(UIImage(systemName: "photo.on.rectangle.angled"), for: .normal)
-        profileImage.isHidden = true
-        return profileImage
+        let button = UIButton()
+        button.setBackgroundImage(UIImage(systemName: "photo.on.rectangle.angled"), for: .normal)
+        button.isHidden = true
+        button.isUserInteractionEnabled = true
+        return button
     }()
+    
+    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.sourceType = type
+        present(pickerController, animated: true)
+    }
+    
+    @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        var alertStyle = UIAlertController.Style.actionSheet
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            alertStyle = UIAlertController.Style.alert
+        }
+        let actionSheet = UIAlertController(title: "프로필 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        
+        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.presentImagePicker(withType: .photoLibrary)
+            })
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(libraryAction)
+        actionSheet.addAction(cancelAction)
+        
+        present(actionSheet, animated: true, completion: nil)
+    }
     
     private let profileText: SignUpTextField = {
         let textField = SignUpTextField()
@@ -132,7 +159,6 @@ class SettingScreenViewController: UIViewController {
         profileText.textField.sendActions(for: .editingChanged)
         profileText.setTextFieldType(type: .name)
         profileText.setWaringView(waringShown: false, text: nil)
-        
     }
     
     @objc func didEditButton() {
@@ -164,10 +190,8 @@ class SettingScreenViewController: UIViewController {
                     profileText.setTextFieldType(type: .name)
                     profileText.setWaringView(waringShown: false, text: nil)
                 }
-                
             }
         }
-        
     }
     
     private let visualEffectView: UIVisualEffectView = {
@@ -198,7 +222,7 @@ class SettingScreenViewController: UIViewController {
         view.addSubview(divideView)
         view.addSubview(logoutButton)
         view.addSubview(resignButton)
-//        view.addSubview(editButton)
+        view.addSubview(editButton)
         view.backgroundColor = .white
         let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(didBackgroundTap))
         view.addGestureRecognizer(backgroundTap)
@@ -255,15 +279,16 @@ class SettingScreenViewController: UIViewController {
     }
     
     private func bind() {
-        resignButton
-            .tapPublisher
+
+        editPhotoButton.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+
+        resignButton.tapPublisher
             .sink { [weak self] _ in
                 print("ResignButton Tapped!")
             }
             .store(in: &cancellables)
         
-        logoutButton
-            .tapPublisher
+        logoutButton.tapPublisher
             .sink { [weak self] _ in
                 print("LogOutButton Tapped!")
                 // ViewModel에게 해당 버튼이 클릭되었다는 인풋을 주기
@@ -272,8 +297,7 @@ class SettingScreenViewController: UIViewController {
             .store(in: &cancellables)
         // ViewModel -> current Image, current Photo를 가지고 있다! == AuthManaher에서 구독받는 UserProfileUsbject의 데이터! -> ViewModel에서 해당 데이터 퍼블리셔를 구독하고, 뷰 컨에서 해당 흘러오는 데이터를 구독하기!
         // ViewModel 완료버튼 누르면 -> ViewModel에서 authManager의 setUserProfile 함수 실행해서 현재 데이터와 다른 포토, 이름 넣기 -> AuthManager에서의 데이터 퍼블리셔 값이 변경될 것이기 때문에, 해당 데이터 퍼블리셔 구독하고 있는 ViewModel -> View Controller의 이미지, 이름 등이 자동으로 바뀐다!
-        profileText
-            .passedSubject
+        profileText.passedSubject
             .sink { isPassed in
                 print("I am Passed? : \(isPassed)")
             }
