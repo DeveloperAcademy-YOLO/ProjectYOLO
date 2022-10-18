@@ -100,13 +100,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         toolPickerAppear()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.selectedStickerView?.showEditingHandlers = false
-        let image = self.mergeImages(imageView: self.someImageView)
-        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
-    }
-    
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
     
     private func bind() {
