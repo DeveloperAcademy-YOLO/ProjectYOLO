@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 import SnapKit
+import Combine
+import CombineCocoa
 
 class SettingScreenViewController: UIViewController {
     
@@ -27,39 +29,39 @@ class SettingScreenViewController: UIViewController {
     }()
     
     private let profileImage: UIImageView = {
-       let profileImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
+        let profileImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
         profileImage.layer.cornerRadius = profileImage.frame.size.width * 0.5
         profileImage.image = UIImage(named: "Halloween_Pumpkin")
         profileImage.contentMode = UIView.ContentMode.scaleAspectFit
-        profileImage.layer.borderColor = UIColor.red.cgColor
-        profileImage.layer.borderWidth = 3.0
-//        profileImage.clipsToBounds = true
-//        profileImage.layer.masksToBounds = true
+        profileImage.backgroundColor = .systemGray6
+        //        profileImage.layer.borderColor = UIColor.red.cgColor
+        
+        //        profileImage.layer.borderWidth = 3.0
+        //        profileImage.clipsToBounds = true
+        //        profileImage.layer.masksToBounds = true
         return profileImage
     }()
     
-    private let blurprofileImage: UIImageView = {
-        let profileImage = UIImageView()
-        profileImage.image = UIImage(systemName: "photo.on.rectangle.angled")
+    private let editPhotoButton: UIButton = {
+        let profileImage = UIButton()
+        profileImage.setBackgroundImage(UIImage(systemName: "photo.on.rectangle.angled"), for: .normal)
+        profileImage.isHidden = true
         return profileImage
     }()
-        
-    private let profileText: UITextField = {
-        let textField = UITextField()
-        textField.layer.masksToBounds = false
-        textField.layer.cornerRadius = 12
-        textField.layer.borderWidth = 1.0
-        
-        let customFont:UIFont = UIFont.init(name: (textField.font?.fontName)!, size: 28.0)!
-        let font = customFont
-        textField.font = customFont
-        
-        textField.layer.borderColor = UIColor.systemBackground.cgColor
-        textField.attributedPlaceholder = NSAttributedString(string: "Yosep", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
-        textField.leftView = paddingView
-        textField.leftViewMode = .always
+    
+    private let profileText: SignUpTextField = {
+        let textField = SignUpTextField()
+        textField.isHidden = true
         return textField
+    }()
+    
+    private let profileLabel: UILabel = {
+        let textLabel = UILabel()
+        textLabel.text = "Yosep"
+        textLabel.font = .preferredFont(forTextStyle: .title1)
+        textLabel.textAlignment = .center
+        
+        return textLabel
     }()
     
     private let divideView: UIView = {
@@ -85,13 +87,11 @@ class SettingScreenViewController: UIViewController {
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .lightGray
-        button.addTarget(self, action: #selector(toggleToolKit(_:)), for: .touchUpInside)
         return button
     }()
     
-    @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
-        
-    }
+    private var cancellables = Set<AnyCancellable>()
+    
     
     private let resignButton: UIButton = {
         let button = UIButton()
@@ -103,40 +103,67 @@ class SettingScreenViewController: UIViewController {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         return button
     }()
+    
+    @objc func didEditButton() {
+        if let currentTitle = navigationItem.rightBarButtonItem?.title {
+            if currentTitle == "편집" {
+                navigationItem.rightBarButtonItem?.title = "완료"
+                divideView.isHidden = true
+                logoutButton.isHidden = true
+                resignButton.isHidden = true
+                profileText.isHidden = false
+                visualEffectView.isHidden = false
+                editPhotoButton.isHidden = false
+                profileLabel.isHidden = true
+            } else if currentTitle == "완료" {
+                navigationItem.rightBarButtonItem?.title = "편집"
+                divideView.isHidden = false
+                logoutButton.isHidden = false
+                resignButton.isHidden = false
+                profileText.isHidden = true
+                visualEffectView.isHidden = true
+                editPhotoButton.isHidden = true
+                profileLabel.isHidden = false
+            }
+        }
         
-    private func createBlur(_ profile: UIImageView) {
-        let blurEffect = UIBlurEffect(style: .regular)
-        let visualEffectView = UIVisualEffectView(effect: blurEffect)
-        visualEffectView.frame = profile.bounds
-        visualEffectView.alpha = 0.5
-        profile.addSubview(visualEffectView)
     }
     
-    private func setupLayout() {
-        
-        view.addSubview(profileImage)
-
+    private let visualEffectView: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .dark)
         let visualEffectView = UIVisualEffectView(effect: blurEffect)
         visualEffectView.frame.self = CGRect(origin: .zero, size: CGSize(width: 180, height: 180))
         visualEffectView.layer.cornerRadius = visualEffectView.frame.size.width / 2
         visualEffectView.clipsToBounds = true
         visualEffectView.alpha = 0.5
+        visualEffectView.isHidden = true
+        return visualEffectView
+    }()
+    
+    private func setupLayout() {
+        
+        view.addSubview(profileImage)
+
         profileImage.addSubview(visualEffectView)
-        profileImage.addSubview(blurprofileImage)
+        profileImage.addSubview(editPhotoButton)
         
         view.addSubview(profileText)
+        view.addSubview(profileLabel)
         view.addSubview(divideView)
         view.addSubview(logoutButton)
         view.addSubview(resignButton)
         view.addSubview(editButton)
         view.backgroundColor = .white
         
-        editButton.snp.makeConstraints{make in
-            make.top.equalTo(37)
-            make.trailing.equalTo(-38)
-            make.height.equalTo(24)
-            make.width.equalTo(37) }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(didEditButton))
+        
+//        editButton.snp.makeConstraints{make in
+//            make.top.equalTo(37)
+//            make.trailing.equalTo(-38)
+//            make.height.equalTo(24)
+//            make.width.equalTo(37)
+//        }
+        
         
         profileImage.snp.makeConstraints ({ make in
             make.top.equalTo(200)
@@ -145,20 +172,28 @@ class SettingScreenViewController: UIViewController {
             make.width.equalTo(180)
         })
         
-        blurprofileImage.snp.makeConstraints { make in
+        editPhotoButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
             make.height.equalTo(39)
             make.width.equalTo(48)
         }
         
-        profileText.snp.makeConstraints { make in
+        profileLabel.snp.makeConstraints { make in
             make.top.equalTo(profileImage.snp.bottom).offset(47)
+            make.width.equalTo(318)
             make.centerX.equalToSuperview()
         }
         
+        profileText.snp.makeConstraints { make in
+            make.top.equalTo(profileImage.snp.bottom).offset(47)
+            make.width.equalTo(318)
+            make.centerX.equalToSuperview()
+        }
+        profileText.setTextFieldType(type: .name)
+        
         divideView.snp.makeConstraints ({ make in
-            make.top.equalTo(profileText.snp.bottom).offset(26)
+            make.top.equalTo(profileLabel.snp.bottom).offset(26)
             make.centerX.equalToSuperview()
             make.height.equalTo(1)
             make.width.equalTo(260)
@@ -174,4 +209,12 @@ class SettingScreenViewController: UIViewController {
             make.centerX.equalTo(view)
         })
     }
+    
+//    private func bind() {
+//        viewModel
+//            .textSubject
+//            .sink()
+//            .store()
+//
+//    }
 }
