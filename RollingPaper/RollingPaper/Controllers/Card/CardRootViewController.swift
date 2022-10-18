@@ -30,7 +30,7 @@ final class CardRootViewController: UIViewController {
                 case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
                         self.backgroundImg = result
-                        print("result Page bind sueccess")
+                        print("CardrootView ResultImg import sueccess")
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
@@ -71,11 +71,11 @@ final class CardRootViewController: UIViewController {
         bind()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        input.send(.resultShown)
-        bind()
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        input.send(.resultShown)
+//        bind()
+//    }
     
     private func setupViews() {
         view.backgroundColor = .white
