@@ -66,12 +66,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     // Navigate to Paper View using PaperId
     private func navigatePaperView(paperId: String) {
         guard let rootVC = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController as? SplitViewController else { return }
-        let navVC = UINavigationController(rootViewController: PaperStorageViewController())
+        let paperView = PaperStorageViewController()
+        let navVC = UINavigationController(rootViewController: paperView)
         rootVC.viewControllers[1] = navVC
-        navVC.pushViewController(SignInViewController(), animated: true)
-        // 루트 뷰: 페이퍼 보관함 카테고리 선택 -> 네비게이션 컨트롤러 캐스팅 및 페이퍼 뷰로 이동
-        // 현재 푸시 노티피케이션 paperId를 해당 페이퍼 뷰에 전달하면서 이니셜라이즈
-//        navVC.pushViewController(SignInViewController(), animated: true)
+        if paperView.isFromServer(paperId: paperId) {
+            FirestoreManager.shared.fetchPaper(paperId: paperId)
+        } else {
+            LocalDatabaseMockManager.shared.fetchPaper(paperId: paperId)
+        }
+        // TODO: 사이먼 뷰로 이동
+        // navVC.pushViewController(SimonView(), animated: true)
     }
     
     /// Register Push Notifctation Permission: (1). AppDelegate (2). After Real Paper activated
