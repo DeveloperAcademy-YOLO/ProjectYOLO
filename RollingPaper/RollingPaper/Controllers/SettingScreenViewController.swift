@@ -93,7 +93,6 @@ class SettingScreenViewController: UIViewController {
         
     }
     
-    
     private let resignButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = UIColor.white
