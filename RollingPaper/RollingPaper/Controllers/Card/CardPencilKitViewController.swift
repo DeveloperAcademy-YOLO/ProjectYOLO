@@ -119,8 +119,8 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
                     })
                 case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
-                        self.someImageView.image = result
-                        print("getRecentCardResultImgSuccess")
+//                        self.someImageView.image = result
+//                        print("getRecentCardResultImgSuccess")
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
