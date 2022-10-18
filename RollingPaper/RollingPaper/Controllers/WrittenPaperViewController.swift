@@ -96,26 +96,25 @@ class WrittenPaperViewController: UIViewController {
         
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        customBackBtn.setTitle("보관함", for: .normal)
+        customBackBtn.setTitle("새로 만들기", for: .normal)
         customBackBtn.setTitleColor(.systemGray, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
-        customBackBtn.addAction(UIAction(handler: {_ in self.move()}), for: .touchUpInside)
+        customBackBtn.addAction(UIAction(handler: {_ in self.moveToPaperTemplateSelectView()}), for: .touchUpInside)
         customBackBtn.addLeftPadding(5)
         
         let paperLinkBtnImage = UIImage(systemName: "square.and.arrow.up")!.resized(to: CGSize(width: 30, height: 30))
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        paperLinkBtn.tintColor = .systemBlue
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
         
         let createCardBtnImage = UIImage(systemName: "plus.rectangle.fill")!.resized(to: CGSize(width: 40, height: 30))
         let createCardBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        createCardBtn.tintColor = .systemGray3
+        
         createCardBtn.setImage(createCardBtnImage, for: .normal)
+        createCardBtn.addAction(UIAction(handler: {_ in self.moveToCardRootView()}), for: .touchUpInside)
         
         let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
         let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        managePaperBtn.tintColor = .systemGray3
         managePaperBtn.setImage(managePaperBtnImage, for: .normal)
         
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
@@ -128,10 +127,14 @@ class WrittenPaperViewController: UIViewController {
         navigationItem.leftBarButtonItem = firstBarButton
     }
 
-    func move() {
+    func moveToPaperTemplateSelectView() {
         if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first {
             self.navigationController?.popToViewController(templateSelectVC, animated: true)
         }
+    }
+    
+    func moveToCardRootView() {
+        self.navigationController?.pushViewController(CardRootViewController(), animated: true)
     }
     
     func setCollectionView() -> UICollectionView {
@@ -183,7 +186,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
 
 extension UIImage {
     func resized(to size: CGSize) -> UIImage {
-        return UIGraphicsImageRenderer(size: size).image{ _ in
+        return UIGraphicsImageRenderer(size: size).image { _ in
             draw(in: CGRect(origin: .zero, size: size))
         }
     }
