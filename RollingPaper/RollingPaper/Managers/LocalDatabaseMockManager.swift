@@ -29,16 +29,31 @@ final class LocalDatabaseMockManager: DatabaseManager {
         let soon = Calendar.current.date(byAdding: .second, value: 3, to: Date())!
         var paper1 = PaperModel(cards: [], date: today, endTime: tomorrow, title: "MockPaper1", templateString: TemplateEnum.halloween.rawValue)
         var paper2 = PaperModel(cards: [], date: today, endTime: soon, title: "MockPaper2", templateString: TemplateEnum.grid.rawValue)
+        var card1 = CardModel(date: Date(), contentURLString: "")
+        var card2 = CardModel(date: Date(), contentURLString: "")
+        var card3 = CardModel(date: Date(), contentURLString: "")
+        let card4 = CardModel(date: Date(), contentURLString: "")
         if
             let mockImage = UIImage(systemName: "person"),
             let mockData = mockImage.jpegData(compressionQuality: 0.8) {
-            let card1 = CardModel(date: Date(), content: mockData)
-            let card2 = CardModel(date: Date(), content: mockData)
-            let card3 = CardModel(date: Date(), content: mockData)
-            let card4 = CardModel(date: Date(), content: mockData)
-            paper1.cards.append(contentsOf: [card1, card2])
-            paper2.cards.append(contentsOf: [card3, card4])
-            papersMockData.append(contentsOf: [paper1, paper2])
+            let uploadPublisher = LocalStorageManager.uploadData(dataId: card1.cardId, data: mockData, contentType: .jpeg, pathRoot: .card)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error): print(error.localizedDescription)
+                    case .finished: print("Upload Image Successfully Done")
+                    }
+                }, receiveValue: { [weak self] photoURL in
+                    if let photoURL = photoURL {
+                        let photoURLString = photoURL.absoluteString
+                        card1.contentURLString = photoURLString
+                        card2.contentURLString = photoURLString
+                        card3.contentURLString = photoURLString
+                        paper1.cards.append(contentsOf: [card1, card2])
+                        paper2.cards.append(contentsOf: [card3, card4])
+                        self?.papersMockData.append(contentsOf: [paper1, paper2])
+                    }
+                })
+            uploadPublisher.cancel()
         }
         var paperPreviews = [PaperPreviewModel]()
         for paper in papersMockData {
