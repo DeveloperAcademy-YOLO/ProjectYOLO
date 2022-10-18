@@ -10,12 +10,15 @@ import UIKit
 import SnapKit
 import Combine
 import CombineCocoa
+import AVFoundation
+import Photos
 
 class SettingScreenViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
+        bind()
     }
     
     private let editButton: UIButton = {
@@ -28,6 +31,16 @@ class SettingScreenViewController: UIViewController {
         return button
     }()
     
+    private let cancelButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = UIColor.clear
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
+        button.setTitle("취소", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
+        return button
+    }()
+    
     private let profileImage: UIImageView = {
         let profileImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
         profileImage.layer.cornerRadius = profileImage.frame.size.width * 0.5
@@ -35,7 +48,6 @@ class SettingScreenViewController: UIViewController {
         profileImage.contentMode = UIView.ContentMode.scaleAspectFit
         profileImage.backgroundColor = .systemGray6
         //        profileImage.layer.borderColor = UIColor.red.cgColor
-        
         //        profileImage.layer.borderWidth = 3.0
         //        profileImage.clipsToBounds = true
         //        profileImage.layer.masksToBounds = true
@@ -65,7 +77,7 @@ class SettingScreenViewController: UIViewController {
     }()
     
     private let divideView: UIView = {
-       let view = UIView()
+        let view = UIView()
         view.backgroundColor = UIColor.gray
         view.layer.masksToBounds = true
         view.layer.borderColor = UIColor.systemPink.cgColor
@@ -104,10 +116,30 @@ class SettingScreenViewController: UIViewController {
         return button
     }()
     
+    @objc func didCancelButton() {
+        profileText.textField.resignFirstResponder()
+        navigationItem.rightBarButtonItem?.title = "편집"
+        navigationItem.leftBarButtonItem?.title = nil
+        
+        divideView.isHidden = false
+        logoutButton.isHidden = false
+        resignButton.isHidden = false
+        profileText.isHidden = true
+        visualEffectView.isHidden = true
+        editPhotoButton.isHidden = true
+        profileLabel.isHidden = false
+        profileText.textField.text = ""
+        profileText.textField.sendActions(for: .editingChanged)
+        profileText.setTextFieldType(type: .name)
+        profileText.setWaringView(waringShown: false, text: nil)
+        
+    }
+    
     @objc func didEditButton() {
         if let currentTitle = navigationItem.rightBarButtonItem?.title {
             if currentTitle == "편집" {
-                navigationItem.rightBarButtonItem?.title = "완료"
+                navigationItem.rightBarButtonItem?.title = "저장"
+                navigationItem.leftBarButtonItem?.title = "취소"
                 divideView.isHidden = true
                 logoutButton.isHidden = true
                 resignButton.isHidden = true
@@ -115,15 +147,24 @@ class SettingScreenViewController: UIViewController {
                 visualEffectView.isHidden = false
                 editPhotoButton.isHidden = false
                 profileLabel.isHidden = true
-            } else if currentTitle == "완료" {
-                navigationItem.rightBarButtonItem?.title = "편집"
-                divideView.isHidden = false
-                logoutButton.isHidden = false
-                resignButton.isHidden = false
-                profileText.isHidden = true
-                visualEffectView.isHidden = true
-                editPhotoButton.isHidden = true
-                profileLabel.isHidden = false
+            } else if currentTitle == "저장" {
+                profileText.textField.resignFirstResponder()
+                if profileText.passedSubject.value {
+                    navigationItem.rightBarButtonItem?.title = "편집"
+                    navigationItem.leftBarButtonItem?.title = nil
+                    divideView.isHidden = false
+                    logoutButton.isHidden = false
+                    resignButton.isHidden = false
+                    profileText.isHidden = true
+                    visualEffectView.isHidden = true
+                    editPhotoButton.isHidden = true
+                    profileLabel.isHidden = false
+                    profileText.textField.text = ""
+                    profileText.textField.sendActions(for: .editingChanged)
+                    profileText.setTextFieldType(type: .name)
+                    profileText.setWaringView(waringShown: false, text: nil)
+                }
+                
             }
         }
         
@@ -140,6 +181,11 @@ class SettingScreenViewController: UIViewController {
         return visualEffectView
     }()
     
+    @objc private func didBackgroundTap() {
+        view.endEditing(true)
+        profileText.textField.resignFirstResponder()
+    }
+    
     private func setupLayout() {
         
         view.addSubview(profileImage)
@@ -152,18 +198,16 @@ class SettingScreenViewController: UIViewController {
         view.addSubview(divideView)
         view.addSubview(logoutButton)
         view.addSubview(resignButton)
-        view.addSubview(editButton)
+//        view.addSubview(editButton)
         view.backgroundColor = .white
+        let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(didBackgroundTap))
+        view.addGestureRecognizer(backgroundTap)
+
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(didEditButton))
         
-//        editButton.snp.makeConstraints{make in
-//            make.top.equalTo(37)
-//            make.trailing.equalTo(-38)
-//            make.height.equalTo(24)
-//            make.width.equalTo(37)
-//        }
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
         
         profileImage.snp.makeConstraints ({ make in
             make.top.equalTo(200)
@@ -191,7 +235,7 @@ class SettingScreenViewController: UIViewController {
             make.centerX.equalToSuperview()
         }
         profileText.setTextFieldType(type: .name)
-        
+        profileText.setWaringView(waringShown: false, text: nil)
         divideView.snp.makeConstraints ({ make in
             make.top.equalTo(profileLabel.snp.bottom).offset(26)
             make.centerX.equalToSuperview()
@@ -210,11 +254,29 @@ class SettingScreenViewController: UIViewController {
         })
     }
     
-//    private func bind() {
-//        viewModel
-//            .textSubject
-//            .sink()
-//            .store()
-//
-//    }
+    private func bind() {
+        resignButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                print("ResignButton Tapped!")
+            }
+            .store(in: &cancellables)
+        
+        logoutButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                print("LogOutButton Tapped!")
+                // ViewModel에게 해당 버튼이 클릭되었다는 인풋을 주기
+                // ViewModel에서는 해당 인풋을 받아서 특정한 행동을 하기
+            }
+            .store(in: &cancellables)
+        // ViewModel -> current Image, current Photo를 가지고 있다! == AuthManaher에서 구독받는 UserProfileUsbject의 데이터! -> ViewModel에서 해당 데이터 퍼블리셔를 구독하고, 뷰 컨에서 해당 흘러오는 데이터를 구독하기!
+        // ViewModel 완료버튼 누르면 -> ViewModel에서 authManager의 setUserProfile 함수 실행해서 현재 데이터와 다른 포토, 이름 넣기 -> AuthManager에서의 데이터 퍼블리셔 값이 변경될 것이기 때문에, 해당 데이터 퍼블리셔 구독하고 있는 ViewModel -> View Controller의 이미지, 이름 등이 자동으로 바뀐다!
+        profileText
+            .passedSubject
+            .sink { isPassed in
+                print("I am Passed? : \(isPassed)")
+            }
+            .store(in: &cancellables)
+    }
 }

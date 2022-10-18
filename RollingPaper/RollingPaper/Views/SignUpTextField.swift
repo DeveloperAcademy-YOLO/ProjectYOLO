@@ -323,7 +323,7 @@ extension SignUpTextField {
 }
 
 extension SignUpTextField {
-    private func setWaringView(waringShown: Bool, text: String?) {
+    func setWaringView(waringShown: Bool, text: String?) {
         waringImage.isHidden = !waringShown
         waringLabel.text = text
         waringLabel.snp.updateConstraints({ make in
