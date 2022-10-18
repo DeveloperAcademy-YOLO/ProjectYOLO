@@ -15,11 +15,12 @@
 		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
 		BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */; };
 		BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */; };
-		C5A7198728F69E110003D593 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */; };
+		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
+		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -72,12 +73,13 @@
 		BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewController.swift; sourceTree = "<group>"; };
 		BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewModel.swift; sourceTree = "<group>"; };
 		BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extensions.swift"; sourceTree = "<group>"; };
-		C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
 		C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
+		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */,
 				D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */,
 				BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */,
+				C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -236,7 +239,7 @@
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* PencilKitViewController.swift */,
-				C5A7198628F69E110003D593 /* WrittenPaperViewController.swift */,
+				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -457,7 +460,6 @@
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
-				C5A7198728F69E110003D593 /* WrittenPaperViewController.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
@@ -469,6 +471,7 @@
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
+				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
 				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
@@ -484,6 +487,7 @@
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* PencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
+				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,

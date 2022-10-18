@@ -10,34 +10,22 @@ import UIKit
 import SnapKit
 
 class WrittenPaperViewController: UIViewController {
-   
-    lazy var titleLabel: BasePaddingLabel = {
+    private var cardsList: UICollectionView?
+    
+    lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
         titleLabel.text = "재현이의 졸업을 축하하며"
+        titleLabel.sizeToFit()
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         return titleLabel
     }()
     
-//    lazy var spacerLabel: UILabel = {
-//        let label = UILabel()
-//        label.
-//    }()
-    
-    private func titleLabelConstraints() {
-        titleLabel.snp.makeConstraints({ make in
-            make.width.equalTo(300)
-            make.height.equalTo(36)
-            make.leading.equalTo(timeLabel.snp.trailing).offset(20)
-        //    make.trailing.equalTo(self.view).offset(-10)
-        })
-    }
-    
-    lazy var timeLabel: BasePaddingLabel = {
+    lazy private var timeLabel: BasePaddingLabel = {
         let timeLabel = BasePaddingLabel()
-     //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
+        //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
         timeLabel.textAlignment = .center
         
         let imageAttachment = NSTextAttachment()
@@ -59,21 +47,10 @@ class WrittenPaperViewController: UIViewController {
         return timeLabel
     }()
     
-    private func timeLabelConstraints() {
-        timeLabel.snp.makeConstraints({ make in
-            make.width.equalTo(120)
-            make.height.equalTo(36)
-         //   make.trailing.equalTo(titleLabel.snp.leading).offset(10)
-          //  make.leading.equalTo(self.view).offset(10)
-        })
-    }
-    
-    lazy var stackView: UIStackView = {
+    lazy private var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = NSLayoutConstraint.Axis.horizontal
         stackView.distribution = UIStackView.Distribution.equalSpacing
-     //   stackView.alignment = UIStackView.Alignment.leading
-      //  stackView.spacing = 10.0
         stackView.addArrangedSubview(self.timeLabel)
         timeLabelConstraints()
         stackView.addArrangedSubview(self.titleLabel)
@@ -81,42 +58,42 @@ class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
-//    private func stackViewConstraints() {
-//        stackView.snp.makeConstraints({ make in
-//            make.width.equalTo(520)
-//            make.height.equalTo(36)
-//            make.centerX.equalTo(self.view)
-//            make.top.equalTo(self.view).offset(30)
-//        })
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = .white
         self.splitViewController?.hide(.primary)
-        self.navigationController?.navigationBar.tintColor = .systemGray
-        
         navigationItem.titleView = stackView
 
-
-//        view.addSubview(timeLabel)
-//        timeLabelConstraints()
-//
-//        view.addSubview(titleLabel)
-//        titleLabelConstraints()
-//
-        setCollectionView()
         setCustomNavBarButtons()
-        
+        self.cardsList = setCollectionView()
+        view.addSubview(self.cardsList ?? UICollectionView())
+        self.navigationController?.navigationBar.tintColor = .systemGray
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
+        cardsList?.reloadData()
+    }
+    
+    
+    private func titleLabelConstraints() {
+        titleLabel.snp.makeConstraints({ make in
+            make.height.equalTo(36)
+            make.leading.equalTo(timeLabel.snp.trailing).offset(10)
+        })
+    }
+    
+    private func timeLabelConstraints() {
+        timeLabel.snp.makeConstraints({ make in
+            make.width.equalTo(120)
+            make.height.equalTo(36)
+        })
     }
     
     func setCustomNavBarButtons() {
+        
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("보관함", for: .normal)
@@ -150,26 +127,14 @@ class WrittenPaperViewController: UIViewController {
         navigationItem.rightBarButtonItems = [thirdBarButton, secondBarButton, fourthBarButton]
         navigationItem.leftBarButtonItem = firstBarButton
     }
-    
-    @objc private func sdd() {
-        
-    }
-    
-    func setPaperTitle() {
-        let asd = UIView()
-        asd.addSubview(timeLabel)
-        asd.addSubview(titleLabel)
-        asd.center.x = self.view.center.x
-        self.navigationItem.titleView = asd
-    }
-    
+
     func move() {
         if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is TemplateSelectViewController }).first {
             self.navigationController?.popToViewController(templateSelectVC, animated: true)
         }
     }
     
-    func setCollectionView() {
+    func setCollectionView() -> UICollectionView {
         var cardsCollection: UICollectionView?
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -188,24 +153,17 @@ class WrittenPaperViewController: UIViewController {
         cardsCollection?.delegate = self
         
         cardsCollection?.reloadData()
+        return cardsCollection ?? UICollectionView()
         
-        view.addSubview(cardsCollection ?? UICollectionView())
     }
     
-}
-
-extension UIButton {
-    func addLeftPadding(_ padding: CGFloat) {
-        titleEdgeInsets = UIEdgeInsets(top: 0.0, left: padding, bottom: 0.0, right: -padding)
-        contentEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: padding)
-    }
 }
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 200 // How many cells to display
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.backgroundColor = UIColor.blue
@@ -219,7 +177,6 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("User tapped on item \(indexPath.row)")
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-//        collectionView.reloadData()
     }
 }
 
