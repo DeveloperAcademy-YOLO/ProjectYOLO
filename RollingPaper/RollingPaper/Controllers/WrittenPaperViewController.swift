@@ -10,9 +10,10 @@ import UIKit
 import SnapKit
 
 class WrittenPaperViewController: UIViewController {
-    private var titleLabel: BasePaddingLabel = {
+   
+    lazy var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
-        titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
+        //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
         titleLabel.text = "재현이의 졸업을 축하하며"
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
@@ -20,9 +21,23 @@ class WrittenPaperViewController: UIViewController {
         return titleLabel
     }()
     
-    private var timeLabel: BasePaddingLabel = {
+//    lazy var spacerLabel: UILabel = {
+//        let label = UILabel()
+//        label.
+//    }()
+    
+    private func titleLabelConstraints() {
+        titleLabel.snp.makeConstraints({ make in
+            make.width.equalTo(300)
+            make.height.equalTo(36)
+            make.leading.equalTo(timeLabel.snp.trailing).offset(20)
+        //    make.trailing.equalTo(self.view).offset(-10)
+        })
+    }
+    
+    lazy var timeLabel: BasePaddingLabel = {
         let timeLabel = BasePaddingLabel()
-        timeLabel.frame = CGRect(x: -100, y: 0, width: 120, height: 36)
+     //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
         timeLabel.textAlignment = .center
         
         let imageAttachment = NSTextAttachment()
@@ -35,65 +50,62 @@ class WrittenPaperViewController: UIViewController {
         completeText.append(textAfterIcon)
         timeLabel.attributedText = completeText
         
-        
         timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
         timeLabel.textColor = .white
         timeLabel.layer.borderColor = UIColor.systemGray3.cgColor
         timeLabel.layer.borderWidth = 1
         timeLabel.layer.cornerRadius = 18
         timeLabel.layer.backgroundColor = UIColor.gray.cgColor
-        
         return timeLabel
     }()
     
+    private func timeLabelConstraints() {
+        timeLabel.snp.makeConstraints({ make in
+            make.width.equalTo(120)
+            make.height.equalTo(36)
+         //   make.trailing.equalTo(titleLabel.snp.leading).offset(10)
+          //  make.leading.equalTo(self.view).offset(10)
+        })
+    }
+    
+    lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = NSLayoutConstraint.Axis.horizontal
+        stackView.distribution = UIStackView.Distribution.equalSpacing
+     //   stackView.alignment = UIStackView.Alignment.leading
+      //  stackView.spacing = 10.0
+        stackView.addArrangedSubview(self.timeLabel)
+        timeLabelConstraints()
+        stackView.addArrangedSubview(self.titleLabel)
+        titleLabelConstraints()
+        return stackView
+    }()
+    
+//    private func stackViewConstraints() {
+//        stackView.snp.makeConstraints({ make in
+//            make.width.equalTo(520)
+//            make.height.equalTo(36)
+//            make.centerX.equalTo(self.view)
+//            make.top.equalTo(self.view).offset(30)
+//        })
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
         view.backgroundColor = .white
         self.splitViewController?.hide(.primary)
         self.navigationController?.navigationBar.tintColor = .systemGray
         
-//        timeLabel.translatesAutoresizingMaskIntoConstraints = false
-//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-//
-//        let asd = UIView()
-//        asd.addSubview(timeLabel)
-//        asd.addSubview(titleLabel)
-//        asd.center.x = self.view.center.x
-//        asd.frame = self.navigationController!.navigationBar.frame
-//        print(self.navigationController!.navigationBar.frame)
-//        print(asd.frame)
-//
-//        timeLabel.translatesAutoresizingMaskIntoConstraints = false
-//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        let stackView   = UIStackView()
-        stackView.axis  = NSLayoutConstraint.Axis.horizontal
-        stackView.distribution  = UIStackView.Distribution.equalSpacing
-        stackView.alignment = UIStackView.Alignment.center
-        stackView.spacing   = 30.0
-////        stackView.frame =
-////        stackView.frame.width = timeLabel.frame.width + titleLabel.frame.width
-////
-        stackView.addArrangedSubview(timeLabel)
-//        stackView.addArrangedSubview(titleLabel)
-//        stackView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        stackView.center.x = self.view.center.x
-//        print(stackView.frame)
-//
-//        print(self.navigationController!.navigationBar.center.x)
-//        print(stackView.center.x)
-////        navigationController?.navigationBar.addSubview(stackView)
-//        navigationItem.titleView = stackView
-//        print(stackView.frame.width)
-////        navigationController?.navigationBar.prefersLargeTitles = false
-//
-//
-//        let sss = UIL
-        
-//        self.navigationItem.titleView = timeLabel
-//        setPaperTitle()
         navigationItem.titleView = stackView
+
+
+//        view.addSubview(timeLabel)
+//        timeLabelConstraints()
+//
+//        view.addSubview(titleLabel)
+//        titleLabelConstraints()
+//
         setCollectionView()
         setCustomNavBarButtons()
         
