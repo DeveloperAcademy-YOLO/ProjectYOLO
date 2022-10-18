@@ -12,6 +12,36 @@ import Combine
 final class CardRootViewController: UIViewController {
     private let items = ["배경 고르기", "꾸미기"]
     
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    DispatchQueue.main.async(execute: {
+//                        self.someImageView.image = background
+//                        print("background sueccess")
+                    })
+                case .getRecentCardBackgroundImgFail:
+                    DispatchQueue.main.async(execute: {
+                     // self.someImageView.image = UIImage(named: "heart.fill")
+                    })
+                case .getRecentCardResultImgSuccess(let result):
+                    DispatchQueue.main.async(execute: {
+                        self.backgroundImg = result
+                        print("result Page bind sueccess")
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+//                        self.someImageView.image = UIImage(named: "heart.fill")
+                        print("result Page bind fail")
+                    })
+                }
+            })
+            .store(in: &cancellables)
+    }
+    
     var backgroundImg = UIImage(named: "Rectangle")
     
     private var firstStepView: UIView!
@@ -34,10 +64,17 @@ final class CardRootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupViews()
         instantiateSegmentedViewControllers()
         self.navigationController?.isNavigationBarHidden = true
+        input.send(.resultShown)
+        bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        input.send(.resultShown)
+        bind()
     }
     
     private func setupViews() {
@@ -49,6 +86,8 @@ final class CardRootViewController: UIViewController {
         view.addSubview(completeButton)
         completeButtonConstraints()
     }
+    
+   
     
     lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: items)
@@ -85,9 +124,15 @@ final class CardRootViewController: UIViewController {
     }
 
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
+        
         print("selected")
-        let pushVC = CardResultViewController(viewModel: viewModel)
+        let pushVC = CardResultViewController(resultImage: backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
         self.navigationController?.pushViewController(pushVC, animated: false)
+//        completion: {
+//            print("send")
+//            self.input.send(.resultShown)
+//        })
+        
 //        pushVC.modalPresentationStyle = .overFullScreen
 //        present(pushVC, animated: false)
     }
