@@ -42,6 +42,7 @@ final class CardResultViewController: UIViewController {
         cancelButtonConstraints()
        // setNavigationBar()
         self.navigationController?.isNavigationBarHidden = true
+       // input.send(.viewDidLoad)
         bind()
     }
     

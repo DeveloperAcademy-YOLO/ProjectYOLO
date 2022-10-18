@@ -110,6 +110,10 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
+                        self.selectedStickerView?.showEditingHandlers = false
+                        let image = self.mergeImages(imageView: self.someImageView)
+                        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
+                        
                         self.someImageView.image = background
                         print("get background ImgSuccess")
                     })
@@ -205,9 +209,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             stickerCollectionViewAppear()
             print("false")
         }
-        
-        let image = mergeImages(imageView: someImageView)
-        input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
     }
     
     @objc func savePicture(_ gesture: UITapGestureRecognizer) {

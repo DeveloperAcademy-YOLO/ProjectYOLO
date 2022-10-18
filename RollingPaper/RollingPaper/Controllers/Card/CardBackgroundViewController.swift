@@ -13,6 +13,22 @@ import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
+    private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]
+    private var selectedColor = String()
+    
+    private let viewModel: CardViewModel
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(viewModel: CardViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
@@ -49,20 +65,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         input.send(.viewDidLoad)
         bind()
     }
-    
-    private let viewModel: CardViewModel
-    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
-    init(viewModel: CardViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -72,10 +75,12 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
+                        print("1")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
+                        print("2")
                     })
                 case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
@@ -101,9 +106,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             })
             .store(in: &cancellables)
     }
-    
-    private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]
-    private var selectedColor = String()
 
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
