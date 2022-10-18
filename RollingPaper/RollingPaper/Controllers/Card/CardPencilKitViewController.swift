@@ -111,20 +111,21 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
+                        print("get background ImgSuccess")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
                     })
-                case .getRecentCardResultImgSuccess(result: let result):
+                case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
-                        //self.someImageView.image = UIImage(named: "Rectangle")
-                        print("test")
+                        self.someImageView.image = result
+                        print("getRecentCardResultImgSuccess")
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
-                       // self.someImageView.image = UIImage(named: "Rectangle")
-                        print("test")
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                        print("getRecentCardResultImgFail")
                     })
                 }
             })
@@ -328,7 +329,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func mergeImages(imageView: UIImageView) -> UIImage? {
-        
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
        // let image = UIGraphicsGetImageFromCurrentImageContext()

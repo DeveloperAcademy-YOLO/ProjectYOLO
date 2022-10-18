@@ -42,8 +42,12 @@ final class CardResultViewController: UIViewController {
         cancelButtonConstraints()
        // setNavigationBar()
         self.navigationController?.isNavigationBarHidden = true
-        input.send(.viewDidLoad)
         bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        input.send(.viewDidLoad)
     }
     
     private func bind() {
@@ -52,23 +56,24 @@ final class CardResultViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                case .getRecentCardBackgroundImgSuccess(let _):
+                case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
-                      //  self.someImageView.image = background
+//                        self.someImageView.image = background
+//                        print("background sueccess")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                      // self.someImageView.image = UIImage(named: "heart.fill")
                     })
-                case .getRecentCardResultImgSuccess(result: let result):
+                case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = result
-                        print("test")
+                        print("result Page bind sueccess")
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "heart.fill")
-                        print("test")
+                        print("result Page bind fail")
                     })
                 }
             })

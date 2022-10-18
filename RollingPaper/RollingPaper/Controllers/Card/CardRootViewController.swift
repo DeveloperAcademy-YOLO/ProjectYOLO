@@ -104,15 +104,15 @@ final class CardRootViewController: UIViewController {
     private func instantiateSegmentedViewControllers() {
         let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
         let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
-          
-        self.addChild(firstStepViewVC)
+        
         self.addChild(secondStepViewVC)
+        self.addChild(firstStepViewVC)
   
         firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view.addSubview(firstStepViewVC.view)
+       
         self.view.addSubview(secondStepViewVC.view)
+        self.view.addSubview(firstStepViewVC.view)
        
             NSLayoutConstraint.activate([
                 firstStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),

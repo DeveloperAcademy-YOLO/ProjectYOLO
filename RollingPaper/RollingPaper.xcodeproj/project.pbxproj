@@ -144,9 +144,9 @@
 		AF30AE6B28F90767002D71C1 /* Card */ = {
 			isa = PBXGroup;
 			children = (
+				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
-				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
 				AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */,
 			);
 			path = Card;
