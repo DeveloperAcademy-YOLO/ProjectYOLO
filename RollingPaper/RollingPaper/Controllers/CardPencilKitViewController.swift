@@ -1,19 +1,41 @@
+//
+//  PencilKitViewController.swift
+//  RollingPaper
+//
+//  Created by Yosep on 2022/10/05.
+//
+
 import UIKit
 import PencilKit
 import StickerView
 import SnapKit
+import Combine
 
-class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
+class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
     
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
     
     var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
-    var arrBGImage: String = "Rectangle"
+    
+    var backgroundImg = UIImage(named: "Rectangle")
+    
+    private let viewModel: CardBackgroundViewModel
+    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToggle: Bool = true
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
+    
+    init(viewModel: CardBackgroundViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     private var _selectedStickerView: StickerView?
     var selectedStickerView: StickerView? {
@@ -34,16 +56,18 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
                 selectedStickerView.superview?.bringSubviewToFront(selectedStickerView)
             }
         }
-    }
+    } 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .lightGray
+
         view.addSubview(someImageView)
-        someImageView.backgroundColor = .gray
+        someImageView.backgroundColor = .white
         someImageView.layer.masksToBounds = true
         someImageView.layer.cornerRadius = 50
         someImageView.contentMode = .scaleAspectFill
+        someImageView.image = backgroundImg
         someImageViewConstraints()
         
         someImageView.addSubview(canvasView)
@@ -62,6 +86,29 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
         
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
+        
+        bind()
+        
+       // view.layer.transform = CATransform3DMakeRotation(45.0, 0, 1.0, 1.0)
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = background
+                    })
+                case .getRecentCardBackgroundImgFail:
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                    })
+                }
+            })
+            .store(in: &cancellables)
     }
     
     lazy var someImageView: UIImageView = {
@@ -166,19 +213,8 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
         canvasViewConstraints()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        someImageView.image = UIImage(named: arrBGImage)
-        
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         
     }
     
@@ -238,7 +274,7 @@ class PencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPic
     }
 }
 
-extension PencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }
@@ -273,7 +309,7 @@ extension PencilKitViewController: UICollectionViewDelegate, UICollectionViewDat
     }
 }
 
-extension PencilKitViewController: StickerViewDelegate {
+extension CardPencilKitViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
         self.selectedStickerView = stickerView
     }

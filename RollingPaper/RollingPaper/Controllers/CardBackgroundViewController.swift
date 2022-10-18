@@ -9,8 +9,10 @@ import UIKit
 import SnapKit
 import AVFoundation
 import Photos
+import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
@@ -43,13 +45,51 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         
         checkCameraPermission()
         checkAlbumPermission()
+    
+        input.send(.viewDidLoad)
+        bind()
     }
     
-    private var firstColorName: String = "customYellow"  // template로 부터 받아온 데이터로 대체
-    private var secondColorName: String = "customRed" // template로 부터 받아온 데이터로 대체
-    private var thirdColorName: String = "customBlack" // template로 부터 받아온 데이터로 대체
-    private var fourthColorName: String = "darkGray" // template로 부터 받아온 데이터로 대체
+    private let viewModel: CardBackgroundViewModel
+    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
+    init(viewModel: CardBackgroundViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(let background):
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = background
+                    })
+                case .getRecentCardBackgroundImgFail:
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                    })
+                }
+            })
+            .store(in: &cancellables)
+        secondColorBackgroundButton.tapPublisher
+            .sink { [weak self] _ in
+                self?.secondImageViewColor()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]
+    private var selectedColor = String()
+
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
@@ -67,7 +107,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: firstColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[0])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -80,33 +120,33 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var secondColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: secondColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[1])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-        button.addTarget(self, action: #selector(secondImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
     lazy var thirdColorBackgroundButton: UIButton = {
         let button = UIButton()
+        selectedColor = backgroundColor[2]
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: thirdColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[2])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
+//        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
     lazy var fourthColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.backgroundColor = UIColor(named: fourthColorName)
+        button.backgroundColor = UIColor(named: backgroundColor[3])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if button.backgroundColor == .white {
             button.layer.borderColor = UIColor.gray.cgColor
@@ -119,29 +159,37 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
-        // theImageView.layer.cornerRadius = 50
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
         return theImageView
     }()
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: firstColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        selectedColor = backgroundColor[0]
+        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
     
-    @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
+    func secondImageViewColor() {
         print("secondImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: secondColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        selectedColor = backgroundColor[1]
+        guard let image = UIImage(named: "Halloween_Candy") else { return }
+        self.someImageView.image = image
+        input.send(.setCardBackgroundImg(background: image))
     }
     
-    @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
+    func thirdImageViewColor() {
         print("thirdImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: thirdColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        selectedColor = backgroundColor[2]
+        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
+
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
-        someImageView.image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: fourthColorName) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        selectedColor = backgroundColor[3]
+        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
@@ -174,7 +222,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            someImageView.image = pickedImage
+            let image = pickedImage
+            self.someImageView.image = image
+            input.send(.setCardBackgroundImg(background: image))
         }
         dismiss(animated: true, completion: nil)
     }

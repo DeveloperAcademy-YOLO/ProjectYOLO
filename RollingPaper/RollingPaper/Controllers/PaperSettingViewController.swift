@@ -9,16 +9,16 @@ import UIKit
 import SnapKit
 import Combine
 
-class SetPaperViewController: UIViewController {
+class PaperSettingViewController: UIViewController {
     private let paperTitleTextField = UITextField()
-    private var viewModel: SetPaperViewModel
-    private let input: PassthroughSubject<SetPaperViewModel.Input, Never> = .init()
+    private var viewModel: PaperSettingViewModel
+    private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
-        viewModel = SetPaperViewModel(template: template)
+        viewModel = PaperSettingViewModel(template: template)
         super.init(nibName: nil, bundle: nil)
         
     }

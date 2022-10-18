@@ -8,13 +8,13 @@
 import UIKit
 import Combine
 
-class SetPaperViewModel {
+class PaperSettingViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
     private var template: TemplateEnum
-    private let databaseManager: LocalDatabaseManager
+    private let databaseManager: DatabaseManager
     
-    init(databaseManager: LocalDatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
+    init(databaseManager: DatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
         self.template = template
     }

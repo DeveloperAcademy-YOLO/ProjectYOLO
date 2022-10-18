@@ -101,4 +101,9 @@ extension UIColor {
     static var customCreateFamilyButtonTitleColor: UIColor {
         return UIColor(rgb: 0x333333)
     }
+    
+    /// SidebarView BackgroundGray
+    static var customSidebarBackgroundColor: UIColor {
+        return UIColor(rgb: 0xF6F6F6)
+    }
 }

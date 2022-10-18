@@ -12,10 +12,5 @@ struct CardModel: Codable {
     var creator: UserModel?
     let date: Date
     var cardId = UUID().uuidString
-    var content: Data
-    // URLString: String
-    var convertedImage: UIImage? {
-        return UIImage(data: content)
-    }
-    // TODO: content -> FirebaseStorage URLString <-> Data
+    var contentURLString: String
 }

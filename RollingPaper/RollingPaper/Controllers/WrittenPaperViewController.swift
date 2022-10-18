@@ -129,7 +129,7 @@ class WrittenPaperViewController: UIViewController {
     }
 
     func move() {
-        if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is TemplateSelectViewController }).first {
+        if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first {
             self.navigationController?.popToViewController(templateSelectVC, animated: true)
         }
     }
