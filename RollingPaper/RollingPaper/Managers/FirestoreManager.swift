@@ -329,30 +329,57 @@ extension FirestoreManager {
     
     /// FirebaseAuthManager에서 이메일 중복 검사를 위해 사용할 퍼블릭 함수
     func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
-        return Future({ [weak self] promise in
-            self?.database
-                .collection(Constants.usersNamePath.rawValue)
-                .document(Constants.usersNamePath.rawValue)
-                .getDocument(completion: { document, error in
-                    if
-                        error == nil,
-                        let data = document?.data(),
-                        let userNames = data["userNames"] as? [String] {
-                        let userNamesSet = Set(userNames)
-                        if userNamesSet.contains(userName) {
+        return Future { [weak self] promise in
+            if let currentUserEmail = self?.currentUserEmail {
+                self?.database
+                    .collection(Constants.usersCollectionPath.rawValue)
+                    .whereField("userName", isEqualTo: userName)
+                    .getDocuments(completion: { querySnapshot, _ in
+                        if let querySnapshot = querySnapshot {
                             promise(.success(false))
                         } else {
                             promise(.success(true))
                         }
-                    } else {
-                        promise(.success(true))
-                    }
-                })
-        })
+                    })
+            } else {
+                promise(.success(false))
+            }
+        }
         .eraseToAnyPublisher()
     }
     
     func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
+        return Future { [weak self] promise in
+            if let currentUserEmail = self?.currentUserEmail {
+                if let oldName = oldName {
+                    self?.database
+                        .collection(Constants.usersCollectionPath.rawValue)
+                        .document(currentUserEmail)
+                        .updateData(["userName" : newName], completion: { error in
+                            if let error = error {
+                                promise(.success(false))
+                            } else {
+                                promise(.success(true))
+                            }
+                        })
+                } else {
+                    self?.database
+                        .collection(Constants.usersCollectionPath.rawValue)
+                        .document(currentUserEmail)
+                        .setData(["userName" : newName], completion: { error in
+                            if let error = error {
+                                promise(.success(false))
+                            } else {
+                                promise(.success(true))
+                            }
+                        })
+                }
+            } else {
+                promise(.success(false))
+            }
+        }
+        .eraseToAnyPublisher()
+        
         var userNamesSet = Set<String>()
         return Future({ [weak self] promise in
             self?.database
