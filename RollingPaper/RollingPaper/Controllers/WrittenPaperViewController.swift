@@ -46,31 +46,6 @@ class WrittenPaperViewController: UIViewController {
         return timeLabel
     }()
     
-    private var timeLabel2: UILabel = {
-        let timeLabel2 = UILabel()
-        timeLabel2.frame = CGRect(x: -100, y: 0, width: 120, height: 36)
-        timeLabel2.textAlignment = .center
-        
-        let imageAttachment = NSTextAttachment()
-        imageAttachment.image = UIImage(systemName: "timer")?.withTintColor(.white)
-        imageAttachment.bounds = CGRect(x: 0, y: -5, width: 20, height: 20)
-        let attachmentString = NSAttributedString(attachment: imageAttachment)
-        let completeText = NSMutableAttributedString(string: "")
-        completeText.append(attachmentString)
-        let textAfterIcon = NSAttributedString(string: "  " + "99:99")
-        completeText.append(textAfterIcon)
-        timeLabel.attributedText = completeText
-        
-        
-        timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
-        timeLabel.textColor = .white
-        timeLabel.layer.borderColor = UIColor.systemGray3.cgColor
-        timeLabel.layer.borderWidth = 1
-        timeLabel.layer.cornerRadius = 18
-        timeLabel.layer.backgroundColor = UIColor.gray.cgColor
-        
-        return
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,7 +74,7 @@ class WrittenPaperViewController: UIViewController {
 ////        stackView.frame =
 ////        stackView.frame.width = timeLabel.frame.width + titleLabel.frame.width
 ////
-        stackView.addArrangedSubview(timeLabel2)
+        stackView.addArrangedSubview(timeLabel)
 //        stackView.addArrangedSubview(titleLabel)
 //        stackView.translatesAutoresizingMaskIntoConstraints = false
 //
