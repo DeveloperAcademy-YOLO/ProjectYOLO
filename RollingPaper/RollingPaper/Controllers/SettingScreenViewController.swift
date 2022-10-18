@@ -15,6 +15,8 @@ import Photos
 
 class SettingScreenViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     
+    let viewModel: SettingScreenViewModel = SettingScreenViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -67,7 +69,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         present(pickerController, animated: true)
     }
     
-    @objc func importImage(_ gesture: UITapGestureRecognizer) {
+    func importImage() {
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
             alertStyle = UIAlertController.Style.alert
@@ -130,6 +132,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     }()
     
     private var cancellables = Set<AnyCancellable>()
+    private let input: PassthroughSubject<SettingScreenViewModel.Input, Never> = .init()
     
     
     private let resignButton: UIButton = {
@@ -159,6 +162,8 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         profileText.textField.sendActions(for: .editingChanged)
         profileText.setTextFieldType(type: .name)
         profileText.setWaringView(waringShown: false, text: nil)
+        profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+
     }
     
     @objc func didEditButton() {
@@ -189,6 +194,8 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                     profileText.textField.sendActions(for: .editingChanged)
                     profileText.setTextFieldType(type: .name)
                     profileText.setWaringView(waringShown: false, text: nil)
+                    profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+
                 }
             }
         }
@@ -209,6 +216,25 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         view.endEditing(true)
         profileText.textField.resignFirstResponder()
     }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            if currentFocusedTextfieldY + 38 > keyboardY {
+                self.view.frame.origin.y =  keyboardY - currentFocusedTextfieldY - 38
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
+    }
+
     
     private func setupLayout() {
         
@@ -232,6 +258,11 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
         
         profileImage.snp.makeConstraints ({ make in
             make.top.equalTo(200)
@@ -278,19 +309,39 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         })
     }
     
+    private var currentFocusedTextfieldY: CGFloat = .zero
+    
     private func bind() {
-
-        editPhotoButton.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+        let output = viewModel.transform(input: input.eraseToAnyPublisher()).eraseToAnyPublisher()
+        output
+            .receive(on: DispatchQueue.main)
+            .sink { output in
+                switch output {
+                case .userProfileChangeDidFail:
+                    print("Fail")
+                }
+            }
+            .store(in: &cancellables)
+        
+//        editPhotoButton.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+        editPhotoButton
+            .tapPublisher
+            .sink { _ in
+                self.importImage()
+            }
+            .store(in: &cancellables)
 
         resignButton.tapPublisher
             .sink { [weak self] _ in
                 print("ResignButton Tapped!")
+                self?.input.send(.resignDidTap)
             }
             .store(in: &cancellables)
         
         logoutButton.tapPublisher
             .sink { [weak self] _ in
                 print("LogOutButton Tapped!")
+                self?.input.send(.signOutDidTap)
                 // ViewModel에게 해당 버튼이 클릭되었다는 인풋을 주기
                 // ViewModel에서는 해당 인풋을 받아서 특정한 행동을 하기
             }
@@ -302,5 +353,40 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 print("I am Passed? : \(isPassed)")
             }
             .store(in: &cancellables)
+        profileText
+            .textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                if let yPosition = self?.profileText.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            }
+            .store(in: &cancellables)
+        viewModel.currentUserSubject
+            .receive(on: DispatchQueue.main)
+            .sink { userModel in
+                self.profileLabel.text = userModel?.name ?? "Default"
+                let placeholder = 
+                self.profileText.textField.attributedPlaceholder = NSAttributedString(string: userModel?.name ?? "Default", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+                
+            }
+            .store(in: &cancellables)
+        
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+
+        self.dismiss(animated: true) {
+            if let image = info[.editedImage] as? UIImage {
+                print("IMAGE HERE!")
+                self.profileImage.image = image
+            } else if let image = info[.originalImage] as? UIImage {
+                print("Original HERE!")
+                self.profileImage.image = image
+
+            }
+            print("Current Propfile Image: \(self.profileImage.image)")
+        }
+
     }
 }
