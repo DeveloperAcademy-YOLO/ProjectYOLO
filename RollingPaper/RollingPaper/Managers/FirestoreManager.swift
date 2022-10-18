@@ -379,38 +379,5 @@ extension FirestoreManager {
             }
         }
         .eraseToAnyPublisher()
-        
-        var userNamesSet = Set<String>()
-        return Future({ [weak self] promise in
-            self?.database
-                .collection(Constants.usersNamePath.rawValue)
-                .document(Constants.usersNamePath.rawValue)
-                .getDocument(completion: { document, error in
-                    if
-                        error == nil,
-                        let data = document?.data(),
-                        let userNames = data["userNames"] as? [String] {
-                        userNamesSet = Set(userNames)
-                    }
-                    if let oldName = oldName {
-                        userNamesSet.remove(oldName)
-                    }
-                    userNamesSet.insert(newName)
-                    let userNamesList = Array(userNamesSet)
-                    let userNamesDict = ["userNames": userNamesList]
-                    self?.database
-                        .collection(Constants.usersNamePath.rawValue)
-                        .document(Constants.usersNamePath.rawValue)
-                        .setData(userNamesDict, completion: { error in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                promise(.success(false))
-                            } else {
-                                promise(.success(true))
-                            }
-                        })
-                })
-        })
-        .eraseToAnyPublisher()
     }
 }
