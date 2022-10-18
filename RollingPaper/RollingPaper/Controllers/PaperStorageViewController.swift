@@ -80,13 +80,9 @@ class PaperStorageViewController: UIViewController {
         })
     }
     
-    // 페이퍼가 서버에서 다운받은것인지 판별
-    func isFromServer(paperId: String) -> Bool {
-        if viewModel.serverPaperIds.contains(paperId) {
-            return true
-        } else {
-            return false
-        }
+    // 특정 페이퍼를 선택하면 알려주기
+    func setSelectedPaper(paperId: String) {
+        input.send(.paperSelected(paperId: paperId))
     }
 }
 
@@ -144,22 +140,15 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             return UICollectionReusableView()
         }
     }
+    
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         if indexPath.section == 0 {
-            if viewModel.serverPaperIds.contains(viewModel.openedPapers[indexPath.item].paperId) {
-                FirestoreManager.shared.fetchPaper(paperId: viewModel.openedPapers[indexPath.item].paperId)
-            } else {
-                LocalDatabaseMockManager.shared.fetchPaper(paperId: viewModel.openedPapers[indexPath.item].paperId)
-            }
+            setSelectedPaper(paperId: viewModel.openedPapers[indexPath.item].paperId)
             // TODO: 사이먼 뷰로 이동
             // navVC.pushViewController(SimonView(), animated: true)
         } else {
-            if viewModel.serverPaperIds.contains(viewModel.closedPapers[indexPath.item].paperId) {
-                FirestoreManager.shared.fetchPaper(paperId: viewModel.closedPapers[indexPath.item].paperId)
-            } else {
-                LocalDatabaseMockManager.shared.fetchPaper(paperId: viewModel.closedPapers[indexPath.item].paperId)
-            }
+            setSelectedPaper(paperId: viewModel.closedPapers[indexPath.item].paperId)
             // TODO: 사이먼 뷰로 이동
             // navVC.pushViewController(SimonView(), animated: true)
         }

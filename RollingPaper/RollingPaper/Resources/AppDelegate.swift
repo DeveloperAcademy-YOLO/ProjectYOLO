@@ -69,11 +69,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let paperView = PaperStorageViewController()
         let navVC = UINavigationController(rootViewController: paperView)
         rootVC.viewControllers[1] = navVC
-        if paperView.isFromServer(paperId: paperId) {
-            FirestoreManager.shared.fetchPaper(paperId: paperId)
-        } else {
-            LocalDatabaseMockManager.shared.fetchPaper(paperId: paperId)
-        }
+        paperView.setSelectedPaper(paperId: paperId)
         // TODO: 사이먼 뷰로 이동
         // navVC.pushViewController(SimonView(), animated: true)
     }

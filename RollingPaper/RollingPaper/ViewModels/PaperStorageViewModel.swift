@@ -12,6 +12,7 @@ class PaperStorageViewModel {
     enum Input {
         case viewDidAppear
         case viewDidDisappear
+        case paperSelected(paperId: String)
     }
     enum Output {
         case initPapers
@@ -97,6 +98,13 @@ class PaperStorageViewModel {
             // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
             case .viewDidDisappear:
                 self.timer?.cancel()
+            // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
+            case .paperSelected(let paperId):
+                if self.serverPaperIds.contains(paperId) {
+                    FirestoreManager.shared.fetchPaper(paperId: paperId)
+                } else {
+                    LocalDatabaseMockManager.shared.fetchPaper(paperId: paperId)
+                }
             }
         })
         .store(in: &cancellables)
