@@ -15,8 +15,12 @@ import Photos
 
 class SettingScreenViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     
-    let viewModel: SettingScreenViewModel = SettingScreenViewModel()
-    
+    private let viewModel: SettingScreenViewModel = SettingScreenViewModel()
+    private var cancellables = Set<AnyCancellable>()
+    private let input: PassthroughSubject<SettingScreenViewModel.Input, Never> = .init()
+    private var currentFocusedTextfieldY: CGFloat = .zero
+    private var countChange: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -47,8 +51,8 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         let profileImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
         profileImage.layer.cornerRadius = profileImage.frame.size.width * 0.5
         profileImage.image = UIImage(named: "Halloween_Pumpkin")
-        profileImage.contentMode = UIView.ContentMode.scaleAspectFit
-        profileImage.backgroundColor = .systemGray6
+        profileImage.contentMode = UIView.ContentMode.scaleAspectFill
+        profileImage.backgroundColor = .clear
         profileImage.isUserInteractionEnabled = true
         profileImage.clipsToBounds = true
         return profileImage
@@ -70,24 +74,22 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     }
     
     func importImage() {
-        var alertStyle = UIAlertController.Style.actionSheet
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            alertStyle = UIAlertController.Style.alert
-        }
-        let actionSheet = UIAlertController(title: "프로필 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        self.presentImagePicker(withType: .photoLibrary)
         
-        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
-            DispatchQueue.main.async(execute: {
-                self.presentImagePicker(withType: .photoLibrary)
-            })
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        
-        actionSheet.addAction(libraryAction)
-        actionSheet.addAction(cancelAction)
-        
-        present(actionSheet, animated: true, completion: nil)
+//        var alertStyle = UIAlertController.Style.actionSheet
+//        if UIDevice.current.userInterfaceIdiom == .pad {
+//            alertStyle = UIAlertController.Style.alert
+//        }
+//        let actionSheet = UIAlertController(title: "프로필 사진 가져오기", message: nil, preferredStyle: alertStyle)
+//        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
+//            DispatchQueue.main.async(execute: {
+//                self.presentImagePicker(withType: .photoLibrary)
+//            })
+//        }
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//        actionSheet.addAction(libraryAction)
+//        actionSheet.addAction(cancelAction)
+//        present(actionSheet, animated: true, completion: nil)
     }
     
     private let profileText: SignUpTextField = {
@@ -115,7 +117,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     
     private let logoutButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor.white
+        button.backgroundColor = UIColor.clear
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
         button.setTitle("로그아웃", for: .normal)
@@ -131,19 +133,26 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         return button
     }()
     
-    private var cancellables = Set<AnyCancellable>()
-    private let input: PassthroughSubject<SettingScreenViewModel.Input, Never> = .init()
-    
-    
     private let resignButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor.white
+        button.backgroundColor = UIColor.clear
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
         button.setTitle("회원탈퇴", for: .normal)
         button.setTitleColor(.red, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         return button
+    }()
+    
+    private let visualEffectView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .dark)
+        let visualEffectView = UIVisualEffectView(effect: blurEffect)
+        visualEffectView.frame.self = CGRect(origin: .zero, size: CGSize(width: 180, height: 180))
+        visualEffectView.layer.cornerRadius = visualEffectView.frame.size.width / 2
+        visualEffectView.clipsToBounds = true
+        visualEffectView.alpha = 0.5
+        visualEffectView.isHidden = true
+        return visualEffectView
     }()
     
     @objc func didCancelButton() {
@@ -163,7 +172,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         profileText.setTextFieldType(type: .name)
         profileText.setWaringView(waringShown: false, text: nil)
         profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
-
     }
     
     @objc func didEditButton() {
@@ -180,7 +188,8 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 profileLabel.isHidden = true
             } else if currentTitle == "저장" {
                 profileText.textField.resignFirstResponder()
-                if profileText.passedSubject.value {
+                if countChange {
+                    countChange = false
                     navigationItem.rightBarButtonItem?.title = "편집"
                     navigationItem.leftBarButtonItem?.title = nil
                     divideView.isHidden = false
@@ -195,22 +204,10 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                     profileText.setTextFieldType(type: .name)
                     profileText.setWaringView(waringShown: false, text: nil)
                     profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
-
                 }
             }
         }
     }
-    
-    private let visualEffectView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .dark)
-        let visualEffectView = UIVisualEffectView(effect: blurEffect)
-        visualEffectView.frame.self = CGRect(origin: .zero, size: CGSize(width: 180, height: 180))
-        visualEffectView.layer.cornerRadius = visualEffectView.frame.size.width / 2
-        visualEffectView.clipsToBounds = true
-        visualEffectView.alpha = 0.5
-        visualEffectView.isHidden = true
-        return visualEffectView
-    }()
     
     @objc private func didBackgroundTap() {
         view.endEditing(true)
@@ -234,10 +231,8 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             view.frame.origin.y = 0
         }
     }
-
     
     private func setupLayout() {
-        
         view.addSubview(profileImage)
 
         profileImage.addSubview(visualEffectView)
@@ -249,20 +244,17 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         view.addSubview(logoutButton)
         view.addSubview(resignButton)
         view.addSubview(editButton)
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(didBackgroundTap))
         view.addGestureRecognizer(backgroundTap)
-
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(didEditButton))
-        
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         
         profileImage.snp.makeConstraints ({ make in
             make.top.equalTo(200)
@@ -289,8 +281,10 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             make.width.equalTo(318)
             make.centerX.equalToSuperview()
         }
+        
         profileText.setTextFieldType(type: .name)
         profileText.setWaringView(waringShown: false, text: nil)
+        
         divideView.snp.makeConstraints ({ make in
             make.top.equalTo(profileLabel.snp.bottom).offset(26)
             make.centerX.equalToSuperview()
@@ -309,8 +303,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         })
     }
     
-    private var currentFocusedTextfieldY: CGFloat = .zero
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher()).eraseToAnyPublisher()
         output
@@ -323,7 +315,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             }
             .store(in: &cancellables)
         
-//        editPhotoButton.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
         editPhotoButton
             .tapPublisher
             .sink { _ in
@@ -351,6 +342,9 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         profileText.passedSubject
             .sink { isPassed in
                 print("I am Passed? : \(isPassed)")
+                if isPassed {
+                    self.countChange = true
+                }
             }
             .store(in: &cancellables)
         profileText
@@ -368,25 +362,21 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 self.profileLabel.text = userModel?.name ?? "Default"
                 let placeholder = 
                 self.profileText.textField.attributedPlaceholder = NSAttributedString(string: userModel?.name ?? "Default", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
-                
             }
             .store(in: &cancellables)
-        
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-
         self.dismiss(animated: true) {
             if let image = info[.editedImage] as? UIImage {
-                print("IMAGE HERE!")
+                print("hello")
                 self.profileImage.image = image
             } else if let image = info[.originalImage] as? UIImage {
-                print("Original HERE!")
+                self.countChange = true
+                print("original")
                 self.profileImage.image = image
-
             }
             print("Current Propfile Image: \(self.profileImage.image)")
         }
-
     }
 }

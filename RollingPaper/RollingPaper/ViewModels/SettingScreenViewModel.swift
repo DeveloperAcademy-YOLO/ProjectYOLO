@@ -68,6 +68,7 @@ class SettingScreenViewModel {
                     break
                 }
             }
+            .store(in: &cancellables)
         
         return output.eraseToAnyPublisher()
     }
