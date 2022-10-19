@@ -101,9 +101,9 @@ class PaperStorageViewModel {
             // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
             case .paperSelected(let paperId):
                 if self.serverPaperIds.contains(paperId) {
-                    FirestoreManager.shared.fetchPaper(paperId: paperId)
+                    self.serverDatabaseManager.fetchPaper(paperId: paperId)
                 } else {
-                    LocalDatabaseMockManager.shared.fetchPaper(paperId: paperId)
+                    self.localDatabaseManager.fetchPaper(paperId: paperId)
                 }
             }
         })
