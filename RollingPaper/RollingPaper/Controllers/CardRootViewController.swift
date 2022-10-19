@@ -60,30 +60,53 @@ class CardRootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         
         instantiateSegmentedViewControllers()
+        setCustomNavBarButtons()
         
-        navigationItem.titleView = segmentedControl
-        self.navigationItem.leftBarButtonItem = self.leftButton
-        self.navigationItem.rightBarButtonItem = self.rightButton
         input.send(.resultShown)
         bind()
     }
     
     lazy var leftButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(title: "leftBtn", style: .plain, target: self, action: #selector(cancelBtnPressed(_:)))
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
+        let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
+        customBackBtn.setTitle("돌아가기", for: .normal)
+        customBackBtn.setTitleColor(.black, for: .normal)
+        customBackBtn.setImage(customBackBtnImage, for: .normal)
+        customBackBtn.addLeftPadding(5)
+        customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
+        
+        let button = UIBarButtonItem(customView: customBackBtn)
            button.tag = 1
-           
            return button
        }()
-    
+
     lazy var rightButton: UIBarButtonItem = {
-            let button = UIBarButtonItem(title: "RightBtn", style: .plain, target: self, action: #selector(openResultView(_:)))
-            button.tag = 2
-            
-            return button
+        let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
+        customCompleteBtn.setTitle("완료", for: .normal)
+        customCompleteBtn.setTitleColor(.black, for: .normal)
+        customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
+    
+        let button = UIBarButtonItem(customView: customCompleteBtn)
+        button.tag = 2
+           return button
         }()
     
+    func setCustomNavBarButtons() {
+        self.navigationItem.titleView = segmentedControl
+        
+        navigationItem.leftBarButtonItem = leftButton
+        navigationItem.rightBarButtonItem = rightButton
+       
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithOpaqueBackground()
+        navBarAppearance.backgroundColor = .systemBackground
+        
+        self.navigationItem.standardAppearance = navBarAppearance
+        self.navigationItem.scrollEdgeAppearance = navBarAppearance
+    }
     
     lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: items)
@@ -153,12 +176,12 @@ class CardRootViewController: UIViewController {
         self.view.addSubview(firstStepViewVC.view)
        
             NSLayoutConstraint.activate([
-                firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+                firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
                 firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
                 firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
                 
-                secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+                secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
                 secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
                 secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)

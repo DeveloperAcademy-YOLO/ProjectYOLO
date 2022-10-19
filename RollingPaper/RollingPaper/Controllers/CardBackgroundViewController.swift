@@ -34,16 +34,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         view.backgroundColor = .lightGray
         
         view.addSubview(someImageView)
-        someImageView.layer.masksToBounds = true
-        someImageView.layer.cornerRadius = 50
-        someImageView.contentMode = .scaleAspectFill
         someImageViewConstraints()
         
         view.addSubview(buttonLabel)
-        buttonLabel.layer.masksToBounds = true
-        buttonLabel.layer.cornerRadius = 30
-        buttonLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
-           
         buttonLabelConstraints()
     
         view.addSubview(photoBackgroundButton)
@@ -109,6 +102,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = 30
+        label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         return label
     }()
     
@@ -174,6 +170,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
+        theImageView.layer.masksToBounds = true
+        theImageView.layer.cornerRadius = 50
+        theImageView.contentMode = .scaleAspectFill
         return theImageView
     }()
     

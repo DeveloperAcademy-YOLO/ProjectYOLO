@@ -62,11 +62,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         super.viewDidLoad()
         view.backgroundColor = .lightGray
         view.addSubview(someImageView)
-        someImageView.backgroundColor = .white
-        someImageView.layer.masksToBounds = true
-        someImageView.layer.cornerRadius = 50
-        someImageView.contentMode = .scaleAspectFill
-        someImageView.image = backgroundImg
         someImageViewConstraints()
         
         someImageView.addSubview(canvasView)
@@ -76,9 +71,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerCollectionViewDisappear()
         
         view.addSubview(buttonLabel)
-        buttonLabel.layer.masksToBounds = true
-        buttonLabel.layer.cornerRadius = 30
-        buttonLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         buttonLabelConstraints()
         
         view.addSubview(pencilToggleButton)
@@ -136,6 +128,11 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
+        theImageView.backgroundColor = .white
+        theImageView.layer.masksToBounds = true
+        theImageView.layer.cornerRadius = 50
+        theImageView.contentMode = .scaleAspectFill
+        theImageView.image = backgroundImg
         return theImageView
     }()
     
@@ -155,6 +152,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = 30
+        label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         return label
     }()
     
