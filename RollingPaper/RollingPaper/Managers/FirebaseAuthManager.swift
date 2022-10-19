@@ -58,15 +58,16 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     
     func isValidUserName(name: String) -> AnyPublisher<Bool, Never> {
         return Future { [weak self] promise in
+            print("\(name) is valid name?")
             self?.database
                 .collection(FireStoreConstants.usersNamePath.rawValue)
                 .whereField("name", isEqualTo: name)
                 .getDocuments(completion: { querySnapshot, _ in
-                    if
-                        let documents = querySnapshot?.documents,
-                        documents.isEmpty {
-                        promise(.success(true))
+                    if let documents = querySnapshot?.documents {
+                        print("document searched")
+                        promise(.success(documents.isEmpty ? true : false))
                     } else {
+                        print("no document searched")
                         promise(.success(false))
                     }
                 })
@@ -116,9 +117,10 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     }
     
     func signUp(email: String, password: String, name: String) {
-        let namePublisher = isValidUserName(name: name)
+        isValidUserName(name: name)
             .sink { [weak self] isVaild in
                 if isVaild {
+                    print("Name is Valid")
                     self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
                         if let error = self?.handleError(with: error) {
                             self?.signedInSubject.send(error)
@@ -128,9 +130,11 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                             self?.signedInSubject.send(.signUpSucceed)
                         }
                     })
+                } else {
+                    print("Name is Invalid")
                 }
             }
-        namePublisher.cancel()
+            .store(in: &cancellables)
     }
                                   
     func signIn(email: String, password: String) {
