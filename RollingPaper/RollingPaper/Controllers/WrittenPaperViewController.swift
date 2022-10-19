@@ -151,11 +151,14 @@ class WrittenPaperViewController: UIViewController {
         allertController.addAction(UIAlertAction(title: "수정", style: .default,
                                                  handler: {_ in
             print("수정")
-            let alert = UIAlertController(title: "페이퍼 제목 수정", message: "textField", preferredStyle: .alert)
+            let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
             let edit = UIAlertAction(title: "수정", style: .default) { (edit) in  }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(cancel)
             alert.addAction(edit)
+            alert.addTextField{ (editTitleTextField) in
+                editTitleTextField.text = "dummy text"
+            }
             self.present(alert, animated: true, completion: nil)
         }))
         allertController.addAction(UIAlertAction(title: "마감", style: .default,
@@ -176,6 +179,9 @@ class WrittenPaperViewController: UIViewController {
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
             alert.addAction(cancel)
+            alert.addTextField{ (editTitleTextField) in
+                editTitleTextField.placeholder = "재현이의 생일을 축하하며"
+            }
             self.present(alert, animated: true, completion: nil)
         }))
         
