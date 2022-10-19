@@ -60,15 +60,14 @@ class WrittenPaperViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         self.splitViewController?.hide(.primary)
-        navigationItem.titleView = stackView
+        self.navigationController?.navigationBar.tintColor = .systemGray
         
+        navigationItem.titleView = stackView
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
-        self.navigationController?.navigationBar.tintColor = .systemGray
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -76,7 +75,6 @@ class WrittenPaperViewController: UIViewController {
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
     }
-    
     
     private func titleLabelConstraints() {
         titleLabel.snp.makeConstraints({ make in
@@ -93,7 +91,6 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func setCustomNavBarButtons() {
-        
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("보관함", for: .normal)
@@ -106,6 +103,7 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
+        paperLinkBtn.addAction(UIAction(handler: {_ in self.presentSignUpModal(paperLinkBtn)}), for: .touchUpInside)
         
         let createCardBtnImage = UIImage(systemName: "plus.rectangle.fill")!.resized(to: CGSize(width: 40, height: 30))
         let createCardBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -118,11 +116,11 @@ class WrittenPaperViewController: UIViewController {
         managePaperBtn.addAction(UIAction(handler: {_ in self.setPopOverView(managePaperBtn)}), for: .touchUpInside)
         
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
-        let secondBarButton = UIBarButtonItem(customView: paperLinkBtn)
-        let thirdBarButton = UIBarButtonItem(customView: createCardBtn)
-        let fourthBarButton = UIBarButtonItem(customView: managePaperBtn)
+        let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
+        let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
+        let fourthBarButton = UIBarButtonItem(customView: createCardBtn)
         
-        navigationItem.rightBarButtonItems = [thirdBarButton, secondBarButton, fourthBarButton]
+        navigationItem.rightBarButtonItems = [fourthBarButton, thirdBarButton, secondBarButton]
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
@@ -138,30 +136,31 @@ class WrittenPaperViewController: UIViewController {
         self.navigationController?.pushViewController(CardRootViewController(), animated: true)
     }
     
+    func presentSignUpModal(_ sender: UIButton) {
+        let signUpVC = SignUpViewController()
+        signUpVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
+        self.present(signUpVC, animated: true)
+    }
+    
     func setPopOverView(_ sender: UIButton) {
-        
         let attributedTitleString = NSAttributedString(string: "페이지 관리", attributes: [
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
-            NSAttributedString.Key.strokeWidth: -5
-        ])
-        
+            NSAttributedString.Key.strokeWidth: -5 ])
         let attributedMessageString = NSAttributedString(string: "정보를 수정하거나 삭제할 수 있습니다.", attributes: [
-            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)
-        ])
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15) ])
         
-        let ac = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
-        ac.addAction(UIAlertAction(title: "수정", style: .default, handler: {_ in print("pressed")}))
-        ac.addAction(UIAlertAction(title: "마감", style: .default, handler: {_ in print("pressed")}))
-        ac.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: {_ in print("pressed")}))
+        let allertController = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
+        allertController.addAction(UIAlertAction(title: "수정", style: .default, handler: {_ in print("수정")}))
+        allertController.addAction(UIAlertAction(title: "마감", style: .default, handler: {_ in print("마감")}))
+        allertController.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: {_ in print("삭제")}))
         
-        ac.setValue(attributedTitleString, forKey: "attributedTitle")
-        ac.setValue(attributedMessageString, forKey: "attributedMessage")
+        allertController.setValue(attributedTitleString, forKey: "attributedTitle")
+        allertController.setValue(attributedMessageString, forKey: "attributedMessage")
         
-        let popover = ac.popoverPresentationController
+        let popover = allertController.popoverPresentationController
         popover?.sourceView = sender
-        popover?.delegate = self
         popover?.backgroundColor = UIColor.white
-        present(ac, animated: true)
+        present(allertController, animated: true)
     }
     
     func setCollectionView() -> UICollectionView {
@@ -191,7 +190,7 @@ class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 200 // How many cells to display
+        return 100 // How many cells to display
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -203,24 +202,8 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
 }
 extension WrittenPaperViewController: UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("User tapped on item \(indexPath.row)")
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-    }
-}
-
-
-extension UIImage {
-    func resized(to size: CGSize) -> UIImage {
-        return UIGraphicsImageRenderer(size: size).image{ _ in
-            draw(in: CGRect(origin: .zero, size: size))
-        }
-    }
-}
-
-extension UIViewController: UIPopoverPresentationControllerDelegate {
-    public func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
-        return .popover
     }
 }
