@@ -10,6 +10,7 @@ import FirebaseAuth
 import Combine
 import AuthenticationServices
 import CryptoKit
+import FirebaseFirestore
 
 protocol AuthManager {
     static var shared: AuthManager { get }
@@ -20,8 +21,9 @@ protocol AuthManager {
     func signUp(email: String, password: String, name: String)
     func signOut()
     func deleteUser()
-    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never>
-    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never>
+    func setUserProfile(userModel: UserModel)
+    func isValidUserName(name: String) -> AnyPublisher<Bool, Never>
+    func fetchUserProfile()
 }
 
 enum AuthManagerEnum: String, CaseIterable {
@@ -50,37 +52,85 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     var userProfileSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     private let auth = FirebaseAuth.Auth.auth()
+    private let database = Firestore.firestore()
     private var currentNonce: String?
     private var cancellables = Set<AnyCancellable>()
     
-    func signUp(email: String, password: String, name: String) {
-        FirestoreManager.shared.isValidUserName(with: name)
-            .sink(receiveValue: { [weak self] isValid in
-                guard let self = self else { return }
-                if isValid {
-                    self.auth.createUser(withEmail: email, password: password) { [weak self] _, error in
-                        guard let self = self else { return }
-                        if let error = self.handleError(with: error) {
-                            self.signedInSubject.send(error)
-                        } else {
-                            FirestoreManager.shared.setUserName(from: nil, to: name)
-                                .sink(receiveValue: { [weak self] isNameSet in
-                                    guard let self = self else { return }
-                                    if isNameSet {
-                                        self.signedInSubject.send(.signUpSucceed)
-                                        self.updateUserProfile(name: name)
-                                    } else {
-                                        self.signedInSubject.send(.unknownError)
-                                    }
-                                })
-                                .store(in: &self.cancellables)
-                        }
+    func isValidUserName(name: String) -> AnyPublisher<Bool, Never> {
+        return Future { [weak self] promise in
+            self?.database
+                .collection(FireStoreConstants.usersNamePath.rawValue)
+                .whereField("name", isEqualTo: name)
+                .getDocuments(completion: { querySnapshot, _ in
+                    if
+                        let documents = querySnapshot?.documents,
+                        documents.isEmpty {
+                        promise(.success(true))
+                    } else {
+                        promise(.success(false))
                     }
+                })
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetchUserProfile() {
+        guard let email = UserDefaults.standard.value(forKey: "currentUserEmail") as? String else {
+            userProfileSubject.send(nil)
+            return
+        }
+        database
+            .collection(FireStoreConstants.usersNamePath.rawValue)
+            .document(email)
+            .getDocument { [weak self] document, _ in
+                if
+                    let document = document,
+                    let data = document.data() {
+                    var userModel = UserModel(email: email, name: "Default Name")
+                    if let userName = data["name"] as? String {
+                        userModel.name = userName
+                    }
+                    if let photoURLString = data["profileUrl"] as? String {
+                        userModel.profileUrl = photoURLString
+                    }
+                    self?.userProfileSubject.send(userModel)
+                }
+            }
+    }
+    
+    func setUserProfile(userModel: UserModel) {
+        var userDict = ["name": userModel.name]
+        if let profileUrl = userModel.profileUrl {
+            userDict["profileUrl"] = profileUrl
+        }
+        database
+            .collection(FireStoreConstants.usersNamePath.rawValue)
+            .document(userModel.email)
+            .setData(userDict, merge: true, completion: { [weak self] error in
+                if let error = error {
+                    print(error.localizedDescription)
                 } else {
-                    self.signedInSubject.send(.nameAlreadyInUse)
+                    self?.fetchUserProfile()
                 }
             })
-            .store(in: &cancellables)
+    }
+    
+    func signUp(email: String, password: String, name: String) {
+        let namePublisher = isValidUserName(name: name)
+            .sink { [weak self] isVaild in
+                if isVaild {
+                    self?.auth.createUser(withEmail: email, password: password, completion: { _, error in
+                        if let error = self?.handleError(with: error) {
+                            self?.signedInSubject.send(error)
+                        } else {
+                            let userModel = UserModel(email: email, name: name)
+                            self?.setUserProfile(userModel: userModel)
+                            self?.signedInSubject.send(.signUpSucceed)
+                        }
+                    })
+                }
+            }
+        namePublisher.cancel()
     }
                                   
     func signIn(email: String, password: String) {
@@ -88,20 +138,22 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             if let error = self?.handleError(with: error) {
                 self?.signedInSubject.send(error)
             } else {
+                UserDefaults.standard.setValue(email, forKey: "currentUserEmail")
                 self?.signedInSubject.send(.signInSucceed)
+                self?.fetchUserProfile()
             }
         })
-        fetchUserProfile()
     }
     
     func signOut() {
         do {
             try auth.signOut()
             signedInSubject.send(.signOutSucceed)
+            UserDefaults.standard.setValue(nil, forKey: "currentUserEmail")
+            fetchUserProfile()
         } catch {
             signedInSubject.send(.signOutFailed)
         }
-        fetchUserProfile()
     }
     
     func deleteUser() {
@@ -111,86 +163,11 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     self?.signedInSubject.send(.deleteUserFailed)
                 } else {
                     self?.signedInSubject.send(.deleteUserSucceed)
+                    UserDefaults.standard.setValue(nil, forKey: "currentUserEmail")
                     self?.fetchUserProfile()
                 }
             })
         }
-    }
-    
-    /// 현재 유저 프로필 이름 정보 업데이트: (1). 파이어베이스 유저 정보 업데이트 (2). 로컬 데이터 퍼블리셔 내 데이터 업데이트
-    func updateUserName(from oldName: String, to newName: String) -> AnyPublisher<AuthManagerEnum, Never> {
-        return Future({ [weak self] promise in
-            if let user = self?.auth.currentUser {
-                let changeRequest = user.createProfileChangeRequest()
-                let nameValidationPublisher = FirestoreManager.shared.isValidUserName(with: newName)
-                    .sink(receiveValue: { [weak self] isValid in
-                        if isValid {
-                            changeRequest.displayName = newName
-                            changeRequest.commitChanges(completion: { [weak self] error in
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    promise(.success(.profileSetFailed))
-                                } else {
-                                    let nameSetPublisher = FirestoreManager.shared.setUserName(from: oldName, to: newName)
-                                        .sink(receiveValue: { [weak self] isNameSet in
-                                            if isNameSet {
-                                                self?.fetchUserProfile()
-                                                promise(.success(.profileSetSucceed))
-                                            } else {
-                                                promise(.success(.profileSetFailed))
-                                            }
-                                        })
-                                    nameSetPublisher.cancel()
-                                }
-                            })
-                        } else {
-                            promise(.success(.nameAlreadyInUse))
-                        }
-                    })
-                nameValidationPublisher.cancel()
-            } else {
-                promise(.success(.unknownError))
-            }
-        })
-        .eraseToAnyPublisher()
-    }
-    
-    /// 현재 유저 프로필 사진 정보 업데이트: (1). 스토리지 매니저 사진 업로드 (2). 파이어베이스 내 유저 정보 업데이트 (3). 로컬 데이터 퍼블리셔 내 데이터 업데이트
-    func updateUserPhoto(photoData: Data, contentType: DataContentType) -> AnyPublisher<Bool, Never> {
-        return Future({ [weak self] promise in
-            if let user = self?.auth.currentUser {
-                let changeRequest = user.createProfileChangeRequest()
-                let dataId = user.uid
-                let dataUploadPublisher = FirebaseStorageManager.uploadData(dataId: dataId, data: photoData, contentType: contentType, pathRoot: .profile)
-                    .sink(receiveCompletion: { completion in
-                        switch completion {
-                        case .failure(let error):
-                            print(error.localizedDescription)
-                            promise(.success(false))
-                        case .finished: break
-                        }
-                    }, receiveValue: { [weak self] photoURL in
-                        if let photoURL = photoURL {
-                            changeRequest.photoURL = photoURL
-                            changeRequest.commitChanges(completion: { [weak self] error in
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    promise(.success(true))
-                                    self?.fetchUserProfile()
-                                } else {
-                                    promise(.success(false))
-                                }
-                            })
-                        } else {
-                            promise(.success(false))
-                        }
-                    })
-                dataUploadPublisher.cancel()
-            } else {
-                promise(.success(false))
-            }
-        })
-        .eraseToAnyPublisher()
     }
     
     func appleSignIn() {
@@ -227,10 +204,36 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
         
         let firstName = appleIDCredential.fullName?.givenName ?? ""
         let lastName = appleIDCredential.fullName?.familyName ?? ""
-        let name = lastName + firstName
-
+        var name = firstName + lastName
+        if name.isEmpty {
+            name = "Default Name"
+        }
+        
         let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
-        socialSignIn(credential: credential, name: name)
+        auth.signIn(with: credential) { [weak self] _, error in
+            guard
+                error == nil,
+                let currentUser = self?.auth.currentUser else {
+                if let error = self?.handleError(with: error) {
+                    self?.signedInSubject.send(error)
+                }
+                return
+            }
+            if let currentUser = self?.auth.currentUser {
+                if
+                    (appleIDCredential.email == nil || appleIDCredential.email == ""),
+                    let email = currentUser.email {
+                    UserDefaults.standard.set(email, forKey: "currentUserEmail")
+                    self?.fetchUserProfile()
+                } else if
+                    let email = appleIDCredential.email,
+                    !email.isEmpty {
+                    UserDefaults.standard.set(email, forKey: "currentUserEmail")
+                    self?.setUserProfile(userModel: UserModel(email: email, name: name))
+                }
+                self?.signedInSubject.send(.signInSucceed)
+            }
+        }
     }
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
@@ -258,84 +261,6 @@ extension FirebaseAuthManager {
             }
         }
         return result
-    }
-    
-    private func signIn(credential: AuthCredential) {
-        auth.signIn(with: credential) { [weak self] _, error in
-            if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(error)
-            } else {
-                self?.signedInSubject.send(.signInSucceed)
-                self?.fetchUserProfile()
-            }
-        }
-        fetchUserProfile()
-    }
-    
-    // TODO: 간편 로그인 이름 -> 최초 입력 시 중복 검사 / 글자 수 검사 여부 확인
-    private func socialSignIn(credential: AuthCredential, name: String, photoURLString: String? = nil) {
-        auth.signIn(with: credential) { [weak self] _, error in
-            if let error = self?.handleError(with: error) {
-                self?.signedInSubject.send(error)
-            } else {
-                if let user = self?.auth.currentUser {
-                    let changeRequest = user.createProfileChangeRequest()
-                    if (user.displayName == nil) || (user.displayName == "") {
-                        changeRequest.displayName = "YOLO"
-                        // 중복 검사 X
-                        changeRequest.commitChanges(completion: { [weak self] error in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                self?.signedInSubject.send(.profileSetFailed)
-                            } else {
-                                self?.fetchUserProfile()
-                            }
-                        })
-                    } else {
-                        self?.fetchUserProfile()
-                    }
-                    self?.signedInSubject.send(.signInSucceed)
-                } else {
-                    self?.signedInSubject.send(.userNotFound)
-                }
-            }
-        }
-    }
-    
-    private func updateUserProfile(name: String? = nil, photoURLString: String? = nil) {
-        if let user = auth.currentUser {
-            let changeRequest = user.createProfileChangeRequest()
-            if let name = name {
-                changeRequest.displayName = name
-            }
-            if
-                let photoURLString = photoURLString,
-                let photoUrl = URL(string: photoURLString) {
-                changeRequest.photoURL = photoUrl
-            }
-            
-            changeRequest.commitChanges(completion: { [weak self] error in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else {
-                    self?.fetchUserProfile()
-                }
-            })
-        }
-    }
-    
-    private func fetchUserProfile() {
-        if let user = auth.currentUser {
-            let email = user.email ?? "Default Email"
-            let name = user.displayName ?? "Default Name"
-            var userProfile = UserModel(email: email, name: name)
-            if let photoUrl = user.photoURL {
-                userProfile.profileUrl = photoUrl.absoluteString
-            }
-            userProfileSubject.send(userProfile)
-        } else {
-            userProfileSubject.send(nil)
-        }
     }
 }
 

@@ -10,43 +10,38 @@ import FirebaseFirestore
 import Combine
 import CombineCocoa
 
+enum FireStoreConstants: String {
+    case usersCollectionPath = "rollingpaper_users"
+    case papersPath = "rollingpaper_papers"
+    case paperPreviewsPath = "rollingpaper_paperPreviews"
+    case usersNamePath = "rollingpaper_userNames"
+}
+
 final class FirestoreManager: DatabaseManager {
-    
-    enum Constants: String {
-        case usersCollectionPath = "rollingpaper_users"
-        case papersPath = "rollingpaper_papers"
-        case paperPreviewsPath = "rollingpaper_paperPreviews"
-        case usersNamePath = "rollingpaper_userNames"
-    }
     
     static let shared: DatabaseManager = FirestoreManager()
     var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> = .init([])
     var paperSubject: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     private let database = Firestore.firestore()
-    private let authManager: AuthManager
     private var cancellables = Set<AnyCancellable>()
     private var currentUserEmail: String?
     
-    private init(authManager: AuthManager = FirebaseAuthManager.shared) {
-        self.authManager = authManager
+    private init() {
         bind()
     }
     
     /// 현재 로그인된 유저 프로필 데이터 퍼블리셔 구독: (1). 유저 프로필이 변경될 때 감지 가능 (2). 로드 시 자동으로 현재 로그인된 유저가 작성한 페이퍼 프리뷰 배열을 로드
     private func bind() {
-        authManager
-            .userProfileSubject
-            .sink(receiveValue: { [weak self] userProfile in
-                self?.currentUserEmail = userProfile?.email
-                self?.loadPaperPreviews()
-            })
-            .store(in: &cancellables)
+        if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+            self.currentUserEmail = currentUserEmail
+            self.loadPaperPreviews()
+        }
     }
     
     /// (1). 페이퍼 아이디를 통해 파이어베이스 내 저장된 페이퍼 탐색 및 페이퍼 퍼블리셔에 로드 (2). 페이퍼 아이디에 대한 페이퍼 데이터가 존재하지 않을 때 유저의 페이퍼 프리뷰 배열 업데이트
     func fetchPaper(paperId: String) {
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)
             .getDocument(completion: { [weak self] document, error in
                 guard
@@ -73,7 +68,7 @@ final class FirestoreManager: DatabaseManager {
             currentUserEmail != nil,
             let paperDict = getPaperDict(with: paper) else { return }
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paper.paperId)
             .setData(paperDict) { [weak self] error in
                 if let error = error {
@@ -93,7 +88,7 @@ final class FirestoreManager: DatabaseManager {
         currentPaper.cards.append(card)
         guard let paperDict = getPaperDict(with: currentPaper) else { return }
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)
             .setData(paperDict) { [weak self] error in
                 if let error = error {
@@ -108,7 +103,7 @@ final class FirestoreManager: DatabaseManager {
     /// (1). 파이어베이스 내 페이퍼 데이터 삭제 (2). 현재 유저가 작성한 페이퍼 아이디 목록 중 해당 페이퍼 아이디 삭제 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 삭제 (4). 현재 유저의 로컬 페이퍼 프리뷰 데이터 중 해당 페이퍼 삭제
     func removePaper(paperId: String) {
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)
             .delete(completion: { [weak self] error in
                 if let error = error {
@@ -124,7 +119,7 @@ final class FirestoreManager: DatabaseManager {
     /// 현재 작성 중 페이퍼가 있을 때(페이퍼 데이터 퍼블리셔 값이 유효할 때): (1). 파이어베이스 내 데이터 변경 (2). 로컬 페이퍼 데이터 퍼블리셔 데이터 변경
     func removeCard(paperId: String, card: CardModel) {
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)
             .getDocument(completion: { [weak self] document, error in
                 guard
@@ -145,7 +140,7 @@ final class FirestoreManager: DatabaseManager {
         guard let paperDict = getPaperDict(with: paper) else { return }
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
         database
-            .collection(Constants.papersPath.rawValue)
+            .collection(FireStoreConstants.papersPath.rawValue)
             .document(paper.paperId)
             .setData(paperDict) { [weak self] error in
                 if let error = error {
@@ -171,7 +166,7 @@ extension FirestoreManager {
     /// 파이어베이스 내 페이퍼 프리뷰 로드, 페이퍼 프리뷰가 존재하지 않을 경우 현재 유저의 페이퍼 목록 중 페이퍼 아이디를 삭제
     private func fetchPaperPreview(paperId: String) {
         database
-            .collection(Constants.paperPreviewsPath.rawValue)
+            .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperId)
             .getDocument(completion: { [weak self] document, error in
                 guard
@@ -188,7 +183,7 @@ extension FirestoreManager {
     /// (1). 파이어베이스 내 페이퍼 프리뷰 삭제 (2). 유저 로컬 페이퍼 프리뷰 데이터 중 해당 페이퍼 프리뷰 데이터 삭제
     private func removePaperPreview(paperId: String) {
         database
-            .collection(Constants.paperPreviewsPath.rawValue)
+            .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperId)
             .delete(completion: { [weak self] error in
                 if let error = error {
@@ -207,7 +202,7 @@ extension FirestoreManager {
     private func setPaperPreview(paperPreview: PaperPreviewModel) {
         guard let paperPreviewDict = getPaperPreviewDict(with: paperPreview) else { return }
         database
-            .collection(Constants.paperPreviewsPath.rawValue)
+            .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperPreview.paperId)
             .setData(paperPreviewDict) { error in
                 if let error = error {
@@ -222,7 +217,7 @@ extension FirestoreManager {
     private func addUsersPaperId(paperId: String) {
         guard let currentUserEmail = currentUserEmail else { return }
         database
-            .collection(Constants.usersCollectionPath.rawValue)
+            .collection(FireStoreConstants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
             .getDocument(completion: { [weak self] snapshot, error in
                 guard
@@ -232,7 +227,7 @@ extension FirestoreManager {
                 paperIds.append(paperId)
                 dictionary["paperIds"] = paperIds
                 self?.database
-                    .collection(Constants.usersCollectionPath.rawValue)
+                    .collection(FireStoreConstants.usersCollectionPath.rawValue)
                     .document(currentUserEmail)
                     .setData(dictionary, completion: { error in
                         if let error = error {
@@ -248,7 +243,7 @@ extension FirestoreManager {
     private func removeUsersPaperId(paperId: String) {
         guard let currentUserEmail = currentUserEmail else { return }
         database
-            .collection(Constants.usersCollectionPath.rawValue)
+            .collection(FireStoreConstants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
             .getDocument(completion: { [weak self] snapshot, error in
                 guard
@@ -258,7 +253,7 @@ extension FirestoreManager {
                 paperIds.removeAll(where: {$0 == paperId })
                 dictionary["paperIds"] = paperIds
                 self?.database
-                    .collection(Constants.usersCollectionPath.rawValue)
+                    .collection(FireStoreConstants.usersCollectionPath.rawValue)
                     .document(currentUserEmail)
                     .setData(dictionary, completion: { error in
                         if let error = error {
@@ -274,7 +269,7 @@ extension FirestoreManager {
     private func loadPaperPreviews() {
         guard let currentUserEmail = currentUserEmail else { return }
         database
-            .collection(Constants.usersCollectionPath.rawValue)
+            .collection(FireStoreConstants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
             .getDocument(completion: { [weak self] snapshot, error in
                 guard
@@ -325,61 +320,5 @@ extension FirestoreManager {
             return nil
         }
         return paperPreview
-    }
-    
-    /// FirebaseAuthManager에서 이메일 중복 검사를 위해 사용할 퍼블릭 함수
-    func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
-        return Future({ [weak self] promise in
-            if (self?.currentUserEmail) != nil {
-                self?.database
-                    .collection(Constants.usersNamePath.rawValue)
-                    .whereField("userName", isEqualTo: userName)
-                    .getDocuments(completion: { querySnapshot, _ in
-                        if querySnapshot != nil {
-                            promise(.success(false))
-                        } else {
-                            promise(.success(true))
-                        }
-                    })
-            } else {
-                promise(.success(false))
-            }
-        })
-        .eraseToAnyPublisher()
-    }
-    
-    func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
-        return Future({ [weak self] promise in
-            if let currentUserEmail = self?.currentUserEmail {
-                if oldName != nil {
-                    self?.database
-                        .collection(Constants.usersNamePath.rawValue)
-                        .document(currentUserEmail)
-                        .updateData(["userName": newName], completion: { error in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                promise(.success(false))
-                            } else {
-                                promise(.success(true))
-                            }
-                        })
-                } else {
-                    self?.database
-                        .collection(Constants.usersNamePath.rawValue)
-                        .document(currentUserEmail)
-                        .setData(["userName": newName], completion: { error in
-                            if let error = error {
-                                print(error.localizedDescription)
-                                promise(.success(false))
-                            } else {
-                                promise(.success(true))
-                            }
-                        })
-                }
-            } else {
-                promise(.success(false))
-            }
-        })
-        .eraseToAnyPublisher()
     }
 }
