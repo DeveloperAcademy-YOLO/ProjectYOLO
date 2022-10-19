@@ -116,7 +116,9 @@ class CardRootViewController: UIViewController {
         control.layer.cornerRadius = 9
         control.layer.masksToBounds = true
         control.clipsToBounds = true
-        control.selectedSegmentTintColor = .darkGray
+       // control.layer.borderWidth = 1
+       // control.layer.borderColor = CGColor(red: 100, green: 100, blue: 80, alpha: 1)
+        control.selectedSegmentTintColor = UIColor(red: 1, green: 1, blue: 1)
         control.translatesAutoresizingMaskIntoConstraints = false
         control.setImage(
             UIImage.textEmbededImage(
