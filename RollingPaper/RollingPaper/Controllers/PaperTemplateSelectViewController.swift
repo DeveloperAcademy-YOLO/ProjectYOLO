@@ -19,6 +19,11 @@ class PaperTemplateSelectViewController: UIViewController {
         return recentTemplate == nil ? false : true
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.splitViewController?.show(.primary)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setMainView()

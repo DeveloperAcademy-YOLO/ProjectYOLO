@@ -44,8 +44,7 @@ class PaperSettingViewController: UIViewController {
                 case .createPaperSuccess(let paper):
                     self.paper = paper
                     print("페이퍼 생성 성공")
-                    // TODO: 사이먼 뷰로 이동
-                    // navVC.pushViewController(SimonView(), animated: true)
+                    self.navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
                     print(paper)
                 case .createPaperFail:
                     self.paper = nil

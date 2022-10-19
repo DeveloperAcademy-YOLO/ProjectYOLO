@@ -22,6 +22,11 @@ class PaperStorageViewController: UIViewController {
         setCollectionView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.splitViewController?.show(.primary)
+    }
+    
     // view가 나타나면 알려주기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
