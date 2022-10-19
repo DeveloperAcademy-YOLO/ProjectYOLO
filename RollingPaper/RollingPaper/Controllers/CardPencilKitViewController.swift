@@ -76,6 +76,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerCollectionViewDisappear()
         
         view.addSubview(buttonLabel)
+        buttonLabel.layer.masksToBounds = true
         buttonLabel.layer.cornerRadius = 30
         buttonLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         buttonLabelConstraints()
