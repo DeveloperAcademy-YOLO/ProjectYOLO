@@ -51,7 +51,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private let tableView: UITableView = {
         let tableview = UITableView()
-        tableview.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.cellIdentifier)
+        tableview.register(UITableViewCell.self, forCellReuseIdentifier: "DefaultCell")
         return tableview
     }()
     
@@ -111,14 +111,30 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell()
         let category = self.categories[indexPath.row]
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.cellIdentifier, for: indexPath) as? CategoryCell else { fatalError("Table Cell Error") }
-        var content = cell.defaultContentConfiguration()
+        // TODO: 다음 스프린트 때 TableView를 Collection View로 Refactoring
+        /*
+        let backgroundCell: UIView = {
+            var backgroundCell = UIView(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
+            backgroundCell.backgroundColor = .gray
+            return backgroundCell
+        }()
+        */
+        var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
+        backgroundConfig.backgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
+        // cell.selectedBackgroundView = backgroundCell
+        cell.backgroundConfiguration = backgroundConfig
+        cell.selectionStyle = .none
         
-        content.text = category.name
+        var content = cell.defaultContentConfiguration()
         content.image = UIImage(systemName: category.icon)
+        content.text = category.name
+        content.imageToTextPadding = 16
+        content.imageProperties.tintColor = .systemGray3
+        content.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 0)
         cell.contentConfiguration = content
-        cell.selectionStyle = .gray
+        
         return cell
     }
     
@@ -153,8 +169,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         
         tableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(128)
-            make.trailing.bottom.equalToSuperview()
-            make.top.equalTo(userInfoStack.snp.bottom).offset(40)
+            make.trailing.equalToSuperview().offset(-28)
+            make.bottom.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom).offset(24)
         }
     }
     
@@ -174,46 +191,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             make.height.equalTo(74)
             make.leading.equalToSuperview().offset(128)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
-        }
-    }
-}
-
-class CategoryCell: UITableViewCell {
-    
-    static let cellIdentifier = "CategoryCell"
-    
-    let categoryIcon = UIImageView()
-    let categoryName = UILabel()
-    
-    lazy var categoryStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [categoryIcon, categoryName])
-        stack.axis = .horizontal
-        stack.spacing = 16
-        return stack
-    }()
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.backgroundConfiguration = .clear()
-        layout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
-    
-    private func layout() {
-        self.addSubview(categoryStack)
-        categoryStack.isLayoutMarginsRelativeArrangement = true
-        categoryStack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 32, right: 0)
-        
-        categoryStack.snp.makeConstraints { make in
-            make.leading.equalTo(self.snp.leading).offset(16)
-            make.width.height.equalTo(24)
         }
     }
 }
