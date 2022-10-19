@@ -134,7 +134,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        self.navigationController?.pushViewController(CardRootViewController(), animated: true)
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel()), animated: true)
     }
     
     func setCollectionView() -> UICollectionView {
