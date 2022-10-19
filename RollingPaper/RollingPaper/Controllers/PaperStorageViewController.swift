@@ -128,11 +128,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
-            return viewModel.openedPapers.count
-        } else {
-            return viewModel.closedPapers.count
-        }
+        return section == 0 ? viewModel.openedPapers.count : viewModel.closedPapers.count
     }
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -141,17 +137,8 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageCollectionCell.identifier, for: indexPath) as? PaperStorageCollectionCell else {return UICollectionViewCell()}
-        
-        var paper: PaperPreviewModel
-        var thumbnail: UIImage?
-        if indexPath.section == 0 {
-            paper = viewModel.openedPapers[indexPath.item]
-            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-            
-        } else {
-            paper = viewModel.closedPapers[indexPath.item]
-            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-        }
+        let paper = indexPath.section == 0 ? viewModel.openedPapers[indexPath.item] : viewModel.closedPapers[indexPath.item]
+        let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
         cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime)
         return cell
     }
@@ -163,12 +150,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 withReuseIdentifier: PaperStorageCollectionHeader.identifier,
                 for: indexPath
             ) as? PaperStorageCollectionHeader else {return UICollectionReusableView()}
-            
-            if indexPath.section == 0 {
-                supplementaryView.setHeader(text: "진행중인 페이퍼")
-            } else {
-                supplementaryView.setHeader(text: "종료된 페이퍼")
-            }
+            supplementaryView.setHeader(text: indexPath.section == 0 ? "진행중인 페이퍼" : "종료된 페이퍼")
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -177,16 +159,10 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 0 {
-            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-                guard let self = self else {return}
-                self.setSelectedPaper(paperId: self.viewModel.openedPapers[indexPath.item].paperId)
-            }
-        } else {
-            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-                guard let self = self else {return}
-                self.setSelectedPaper(paperId: self.viewModel.closedPapers[indexPath.item].paperId)
-            }
+        navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
+            guard let self = self else {return}
+            let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
+            self.setSelectedPaper(paperId: papers[indexPath.item].paperId )
         }
         return true
     }
