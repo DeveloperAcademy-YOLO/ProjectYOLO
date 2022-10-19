@@ -40,10 +40,8 @@ class WrittenPaperViewController: UIViewController {
         
         timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
         timeLabel.textColor = .white
-        timeLabel.layer.borderColor = UIColor.systemGray3.cgColor
-        timeLabel.layer.borderWidth = 1
         timeLabel.layer.cornerRadius = 18
-        timeLabel.layer.backgroundColor = UIColor.gray.cgColor
+        timeLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
         return timeLabel
     }()
     
@@ -150,9 +148,36 @@ class WrittenPaperViewController: UIViewController {
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15) ])
         
         let allertController = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
-        allertController.addAction(UIAlertAction(title: "수정", style: .default, handler: {_ in print("수정")}))
-        allertController.addAction(UIAlertAction(title: "마감", style: .default, handler: {_ in print("마감")}))
-        allertController.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: {_ in print("삭제")}))
+        allertController.addAction(UIAlertAction(title: "수정", style: .default,
+                                                 handler: {_ in
+            print("수정")
+            let alert = UIAlertController(title: "페이퍼 제목 수정", message: "textField", preferredStyle: .alert)
+            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(cancel)
+            alert.addAction(edit)
+            self.present(alert, animated: true, completion: nil)
+        }))
+        allertController.addAction(UIAlertAction(title: "마감", style: .default,
+                                                 handler: {_ in
+            print("마감")
+            let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
+            let stop = UIAlertAction(title: "마감", style: .default) { (stop) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(cancel)
+            alert.addAction(stop)
+            self.present(alert, animated: true, completion: nil)
+        }))
+        allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
+                                                 handler: {_ in
+            print("삭제")
+            let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { (delete) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(delete)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+        }))
         
         allertController.setValue(attributedTitleString, forKey: "attributedTitle")
         allertController.setValue(attributedMessageString, forKey: "attributedMessage")
