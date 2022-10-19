@@ -141,17 +141,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AF30AE6B28F90767002D71C1 /* Card */ = {
-			isa = PBXGroup;
-			children = (
-				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
-				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
-				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
-				AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */,
-			);
-			path = Card;
-			sourceTree = "<group>";
-		};
 		C5AB30BA28ED655200C2E016 /* RollingPaperTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -240,7 +229,10 @@
 		D22E4AB728EBDC8B001091DA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				AF30AE6B28F90767002D71C1 /* Card */,
+				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
+				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
+				AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */,
 				D22E4AA528EBDC72001091DA /* MainViewController.swift */,
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
