@@ -116,7 +116,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
                     })
-                case .getRecentCardResultImgSuccess(let result):
+                case .getRecentCardResultImgSuccess(_):
                     DispatchQueue.main.async(execute: {
 //                        self.someImageView.image = result
 //                        print("getRecentCardResultImgSuccess")

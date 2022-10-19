@@ -26,14 +26,11 @@ class CardRootViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                case .getRecentCardBackgroundImgSuccess(let background):
+                case .getRecentCardBackgroundImgSuccess(_):
                     DispatchQueue.main.async(execute: {
-//                        self.someImageView.image = background
-//                        print("background sueccess")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
-                     // self.someImageView.image = UIImage(named: "heart.fill")
                     })
                 case .getRecentCardResultImgSuccess(let result):
                     DispatchQueue.main.async(execute: {
@@ -42,7 +39,6 @@ class CardRootViewController: UIViewController {
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
-//                        self.someImageView.image = UIImage(named: "heart.fill")
                         print("result Page bind fail")
                     })
                 }
@@ -79,12 +75,6 @@ class CardRootViewController: UIViewController {
         bind()
     }
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        input.send(.resultShown)
-//        bind()
-//    }
-    
     private func setupViews() {
         view.backgroundColor = .white
      
@@ -94,8 +84,6 @@ class CardRootViewController: UIViewController {
         view.addSubview(completeButton)
         completeButtonConstraints()
     }
-    
-   
     
     lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: items)
@@ -131,31 +119,20 @@ class CardRootViewController: UIViewController {
         }
     }
     
-//    func testfunc() {
-//        print(self.children)
-//        if let vc = self.children[0] as? CardPencilKitViewController {
-//            vc.testfunc()
-//            print("CardPencilKit here!")
-//        } else {
-//            print("Fail!")
-//        }
-////        test.selectedStickerView?.showEditingHandlers = false
-////        let image = test.mergeImages(imageView: test.someImageView)
-////        test.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
-//    }
 
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        if let vc = self.children[0] as? CardPencilKitViewController {
-            vc.testfunc()
+        if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
+            secondStepViewVC.testfunc()
             print("CardPencilKit here!")
             
         } else {
             print("Fail!")
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0, execute: {
+        DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
             let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
+         
             self.navigationController?.pushViewController(pushVC, animated: false)
-        }) // TODO: 리팩토링 필요 1순위
+        }) // TODO: 리팩토링 필요
     }
     
     @objc func cancelBtnPressed() {
