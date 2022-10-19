@@ -11,8 +11,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
-        let mainViewController = UINavigationController(rootViewController: self.mainViewController)
+        let paperStorageViewController = UINavigationController(rootViewController: SignUpViewController())
+        let mainViewController = UINavigationController(rootViewController: SignInViewController())
         
         switch category.name {
         case "페이퍼 템플릿":
