@@ -15,7 +15,6 @@ class PaperStorageViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var paperCollectionView: PaperStorageCollectionView?
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
@@ -85,13 +84,18 @@ class PaperStorageViewController: UIViewController {
             make.top.equalTo(view.safeAreaLayoutGuide).offset(0)
         })
     }
+    
+    // 특정 페이퍼를 선택하면 알려주기
+    func setSelectedPaper(paperId: String) {
+        input.send(.paperSelected(paperId: paperId))
+    }
 }
 
 // 컬렉션 뷰에 대한 여러 설정들을 해줌
 extension PaperStorageViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 200, height: 200)
+        return CGSize(width: 196, height: 169)
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -109,11 +113,17 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageCollectionCell.identifier, for: indexPath) as? PaperStorageCollectionCell else {return UICollectionViewCell()}
         
+        var paper: PaperPreviewModel
+        var thumbnail: UIImage?
         if indexPath.section == 0 {
-            cell.setCell(paper: viewModel.openedPapers[indexPath.item], thumbnail: viewModel.openedPaperThumbnails[indexPath.item], now: viewModel.currentTime)
+            paper = viewModel.openedPapers[indexPath.item]
+            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
+            
         } else {
-            cell.setCell(paper: viewModel.closedPapers[indexPath.item], thumbnail: viewModel.closedPaperThumbnails[indexPath.item], now: viewModel.currentTime)
+            paper = viewModel.closedPapers[indexPath.item]
+            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
         }
+        cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime)
         return cell
     }
     // 특정 위치의 헤더
@@ -135,13 +145,17 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             return UICollectionReusableView()
         }
     }
+    
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        // TODO: 터치한 페이퍼 뷰로 이동
         if indexPath.section == 0 {
-            print("진행중인 페이퍼 \(indexPath.item+1) 터치됨")
+            setSelectedPaper(paperId: viewModel.openedPapers[indexPath.item].paperId)
+            // TODO: 사이먼 뷰로 이동
+            // navVC.pushViewController(SimonView(), animated: true)
         } else {
-            print("종료된 페이퍼 \(indexPath.item+1) 터치됨")
+            setSelectedPaper(paperId: viewModel.closedPapers[indexPath.item].paperId)
+            // TODO: 사이먼 뷰로 이동
+            // navVC.pushViewController(SimonView(), animated: true)
         }
         return true
     }

@@ -91,7 +91,7 @@ class PaperTemplateSelectViewController: UIViewController {
 extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀 크기
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 200, height: 169)
+        return CGSize(width: 196, height: 169)
     }
     
     // 섹션별 셀 개수
