@@ -10,14 +10,13 @@ import UIKit
 class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
     
     func didSelectCategory(_ category: CategoryModel) {
-        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
         let mainViewController = UINavigationController(rootViewController: self.mainViewController)
         
         switch category.name {
         case "페이퍼 템플릿":
-            if !(self.viewControllers[1] is TemplateSelectViewController) {
+            if !(self.viewControllers[1] is PaperTemplateSelectViewController) {
                 self.viewControllers[1] = templateViewController
             }
         case "페이퍼 보관함":
@@ -29,7 +28,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = mainViewController
             }
         default:
-            self.viewControllers[1] = mainViewController
+            break
         }
     }
     
@@ -39,19 +38,17 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         CategoryModel(name: "설정", icon: "gearshape")
     ]
     private var sidebarViewController: SidebarViewController!
-    private var templateViewController: TemplateSelectViewController!
+    private var templateViewController: PaperTemplateSelectViewController!
+    private var storageViewController: PaperStorageViewController!
     private var mainViewController: MainViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
-        self.preferredPrimaryColumnWidth = 320
         self.loadViewControllers()
         self.sidebarViewController.show(categories: self.sideBarCategories)
-        self.preferredPrimaryColumnWidthFraction = 0.3
-        self.minimumPrimaryColumnWidth = 320
-        self.maximumPrimaryColumnWidth = 640
+        self.preferredPrimaryColumnWidthFraction = 0.25
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
@@ -64,7 +61,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     private func loadViewControllers() {
         self.sidebarViewController = SidebarViewController()
-        self.templateViewController = TemplateSelectViewController()
+        self.templateViewController = PaperTemplateSelectViewController()
+        self.storageViewController = PaperStorageViewController()
         self.mainViewController = MainViewController()
         self.sidebarViewController.delegate = self
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)

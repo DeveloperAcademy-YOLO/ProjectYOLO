@@ -330,51 +330,32 @@ extension FirestoreManager {
     /// FirebaseAuthManager에서 이메일 중복 검사를 위해 사용할 퍼블릭 함수
     func isValidUserName(with userName: String) -> AnyPublisher<Bool, Never> {
         return Future({ [weak self] promise in
-            self?.database
-                .collection(Constants.usersNamePath.rawValue)
-                .document(Constants.usersNamePath.rawValue)
-                .getDocument(completion: { document, error in
-                    if
-                        error == nil,
-                        let data = document?.data(),
-                        let userNames = data["userNames"] as? [String] {
-                        let userNamesSet = Set(userNames)
-                        if userNamesSet.contains(userName) {
+            if (self?.currentUserEmail) != nil {
+                self?.database
+                    .collection(Constants.usersNamePath.rawValue)
+                    .whereField("userName", isEqualTo: userName)
+                    .getDocuments(completion: { querySnapshot, _ in
+                        if querySnapshot != nil {
                             promise(.success(false))
                         } else {
                             promise(.success(true))
                         }
-                    } else {
-                        promise(.success(true))
-                    }
-                })
+                    })
+            } else {
+                promise(.success(false))
+            }
         })
         .eraseToAnyPublisher()
     }
     
     func setUserName(from oldName: String?, to newName: String) -> AnyPublisher<Bool, Never> {
-        var userNamesSet = Set<String>()
         return Future({ [weak self] promise in
-            self?.database
-                .collection(Constants.usersNamePath.rawValue)
-                .document(Constants.usersNamePath.rawValue)
-                .getDocument(completion: { document, error in
-                    if
-                        error == nil,
-                        let data = document?.data(),
-                        let userNames = data["userNames"] as? [String] {
-                        userNamesSet = Set(userNames)
-                    }
-                    if let oldName = oldName {
-                        userNamesSet.remove(oldName)
-                    }
-                    userNamesSet.insert(newName)
-                    let userNamesList = Array(userNamesSet)
-                    let userNamesDict = ["userNames": userNamesList]
+            if let currentUserEmail = self?.currentUserEmail {
+                if oldName != nil {
                     self?.database
                         .collection(Constants.usersNamePath.rawValue)
-                        .document(Constants.usersNamePath.rawValue)
-                        .setData(userNamesDict, completion: { error in
+                        .document(currentUserEmail)
+                        .updateData(["userName": newName], completion: { error in
                             if let error = error {
                                 print(error.localizedDescription)
                                 promise(.success(false))
@@ -382,7 +363,22 @@ extension FirestoreManager {
                                 promise(.success(true))
                             }
                         })
-                })
+                } else {
+                    self?.database
+                        .collection(Constants.usersNamePath.rawValue)
+                        .document(currentUserEmail)
+                        .setData(["userName": newName], completion: { error in
+                            if let error = error {
+                                print(error.localizedDescription)
+                                promise(.success(false))
+                            } else {
+                                promise(.success(true))
+                            }
+                        })
+                }
+            } else {
+                promise(.success(false))
+            }
         })
         .eraseToAnyPublisher()
     }

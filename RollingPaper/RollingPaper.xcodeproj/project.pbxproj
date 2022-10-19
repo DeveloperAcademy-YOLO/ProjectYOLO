@@ -17,12 +17,23 @@
 		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
 		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
 		BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */; };
+		BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */; };
+		BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */; };
+		BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */; };
+		BCF2481928EFC4CF008CD0F9 /* PaperSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* PaperSettingViewModel.swift */; };
 		BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */; };
+		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
+		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
+		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
+		C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */; };
+		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
+		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */; };
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
-		C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */; };
+		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
+		CF1DEAE028F862D90024EA1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -38,6 +49,7 @@
 		D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */; };
 		D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */; };
 		D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */; };
+		D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */; };
 		D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBC28ED206F0094ECD9 /* UserModel.swift */; };
 		D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBE28ED219D0094ECD9 /* PaperModel.swift */; };
 		D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC428ED26EE0094ECD9 /* CardModel.swift */; };
@@ -45,7 +57,7 @@
 		D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */; };
 		D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */; };
 		D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */; };
-		D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */; };
+		D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDD028ED54DD0094ECD9 /* LocalDatabaseFileManager.swift */; };
 		D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */; };
 		D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308128EE871C008365CB /* Combine+Extensions.swift */; };
 		D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */; };
@@ -54,6 +66,8 @@
 		D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6308D28F16493008365CB /* SignUpTextField.swift */; };
 		D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */; };
 		D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */; };
+		D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */; };
+		D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,17 +89,25 @@
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
-		BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewController.swift; sourceTree = "<group>"; };
-		BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSelectViewModel.swift; sourceTree = "<group>"; };
-		BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewController.swift; sourceTree = "<group>"; };
-		BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPaperViewModel.swift; sourceTree = "<group>"; };
+		BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewController.swift; sourceTree = "<group>"; };
+		BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewModel.swift; sourceTree = "<group>"; };
+		BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSettingViewController.swift; sourceTree = "<group>"; };
+		BCF2481828EFC4CF008CD0F9 /* PaperSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSettingViewModel.swift; sourceTree = "<group>"; };
 		BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extensions.swift"; sourceTree = "<group>"; };
+		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
+		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
+		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
+		C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
+		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
-		C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
+		CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -104,6 +126,7 @@
 		D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RollingPaper.entitlements; sourceTree = "<group>"; };
 		D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
+		D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorageManager.swift; sourceTree = "<group>"; };
 		D251BDBC28ED206F0094ECD9 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		D251BDBE28ED219D0094ECD9 /* PaperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModel.swift; sourceTree = "<group>"; };
 		D251BDC428ED26EE0094ECD9 /* CardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModel.swift; sourceTree = "<group>"; };
@@ -111,7 +134,7 @@
 		D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateEnum.swift; sourceTree = "<group>"; };
 		D251BDCA28ED32890094ECD9 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
-		D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModelFileManager.swift; sourceTree = "<group>"; };
+		D251BDD028ED54DD0094ECD9 /* LocalDatabaseFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDatabaseFileManager.swift; sourceTree = "<group>"; };
 		D2B6307F28EE870D008365CB /* UIControl+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308128EE871C008365CB /* Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Combine+Extensions.swift"; sourceTree = "<group>"; };
 		D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
@@ -120,6 +143,8 @@
 		D2B6308D28F16493008365CB /* SignUpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpTextField.swift; sourceTree = "<group>"; };
 		D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperPreviewModel.swift; sourceTree = "<group>"; };
 		D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageManager.swift; sourceTree = "<group>"; };
+		D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCacheManager.swift; sourceTree = "<group>"; };
+		D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UNUserNotificationCenter+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +166,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C5A7198828F8837D0003D593 /* CustomUIComponents */ = {
+			isa = PBXGroup;
+			children = (
+				C5A7198A28F883D40003D593 /* UILabel+Padding.swift */,
+			);
+			path = CustomUIComponents;
+			sourceTree = "<group>";
+		};
 		C5AB30BA28ED655200C2E016 /* RollingPaperTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -182,11 +215,12 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
-				C5AB30C228ED6A4000C2E016 /* GoogleService-Info.plist */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
+				CF1DEADF28F862D90024EA1F /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
+				C5A7198828F8837D0003D593 /* CustomUIComponents */,
 				D22E4AB728EBDC8B001091DA /* Controllers */,
 				D22E4AB628EBDC86001091DA /* Models */,
 				D22E4AAA28EBDC73001091DA /* Assets.xcassets */,
@@ -208,6 +242,8 @@
 				D2B6308328EEE2A1008365CB /* UIView+Extensions.swift */,
 				D2B6308528EF0BCB008365CB /* UIFont+Extensions.swift */,
 				BCF2481A28F50CEC008CD0F9 /* UINavigationController+Extensions.swift */,
+				C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */,
+				D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -236,11 +272,13 @@
 				D22E4AA528EBDC72001091DA /* MainViewController.swift */,
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
-				BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */,
-				BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */,
+				BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */,
+				BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */,
+				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
 				CFDA52C228F48D41006774E2 /* SplitViewController.swift */,
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
+				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -260,9 +298,11 @@
 				D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */,
 				D2B6309728F6F3E4008365CB /* FirebaseStorageManager.swift */,
 				D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */,
+				D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */,
 				D251BDCE28ED54A40094ECD9 /* DatabaseManager.swift */,
-				D251BDD028ED54DD0094ECD9 /* PaperModelFileManager.swift */,
+				D251BDD028ED54DD0094ECD9 /* LocalDatabaseFileManager.swift */,
 				D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */,
+				D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -272,10 +312,11 @@
 			children = (
 				D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */,
 				D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */,
-				BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */,
-				BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */,
+				BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */,
+				BCF2481828EFC4CF008CD0F9 /* PaperSettingViewModel.swift */,
 				BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */,
 				AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */,
+				CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -379,7 +420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				C5AB30C328ED6A4000C2E016 /* GoogleService-Info.plist in Resources */,
+				CF1DEAE028F862D90024EA1F /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
@@ -460,15 +501,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				D22E4AA628EBDC72001091DA /* MainViewController.swift in Sources */,
-				BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */,
+				BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */,
 				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
-				BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */,
+				BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */,
@@ -477,6 +519,7 @@
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
+				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
 				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
@@ -489,19 +532,26 @@
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
+				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* PaperModelFileManager.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
-				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */,
+				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
+				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
+				D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */,
+				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
+				D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */,
+				CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */,
+				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
-				BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */,
+				BCF2481928EFC4CF008CD0F9 /* PaperSettingViewModel.swift in Sources */,
 				D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
