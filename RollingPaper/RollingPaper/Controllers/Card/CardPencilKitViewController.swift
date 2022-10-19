@@ -258,11 +258,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
         canvasViewConstraints()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-    }
-    
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
