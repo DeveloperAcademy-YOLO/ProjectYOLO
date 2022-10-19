@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = splitVC
         self.window = window
         UNUserNotificationCenter.current().delegate = self
-        registerPushNotifications()
+//        registerPushNotifications()
         return true
     }
 
