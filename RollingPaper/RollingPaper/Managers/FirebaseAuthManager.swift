@@ -56,6 +56,11 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     private var currentNonce: String?
     private var cancellables = Set<AnyCancellable>()
     
+    private override init() {
+        super.init()
+        fetchUserProfile()
+    }
+    
     func isValidUserName(name: String) -> AnyPublisher<Bool, Never> {
         return Future { [weak self] promise in
             print("\(name) is valid name?")
