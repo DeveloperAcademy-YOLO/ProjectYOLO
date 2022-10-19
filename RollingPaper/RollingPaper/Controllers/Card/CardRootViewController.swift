@@ -9,7 +9,15 @@ import UIKit
 import SnapKit
 import Combine
 
-final class CardRootViewController: UIViewController {
+//protocol CardRootViewControllerDelegate: AnyObject {
+//    func testfunc()
+//}
+
+class CardRootViewController: UIViewController {
+    
+//    weak var delegate: CardRootViewControllerDelegate?
+//    
+//    
     private let items = ["배경 고르기", "꾸미기"]
     
     private func bind() {
@@ -122,19 +130,32 @@ final class CardRootViewController: UIViewController {
             secondStepView.alpha = 0
         }
     }
+    
+//    func testfunc() {
+//        print(self.children)
+//        if let vc = self.children[0] as? CardPencilKitViewController {
+//            vc.testfunc()
+//            print("CardPencilKit here!")
+//        } else {
+//            print("Fail!")
+//        }
+////        test.selectedStickerView?.showEditingHandlers = false
+////        let image = test.mergeImages(imageView: test.someImageView)
+////        test.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
+//    }
 
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        
-        print("selected")
-        let pushVC = CardResultViewController(resultImage: backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
-        self.navigationController?.pushViewController(pushVC, animated: false)
-//        completion: {
-//            print("send")
-//            self.input.send(.resultShown)
-//        })
-        
-//        pushVC.modalPresentationStyle = .overFullScreen
-//        present(pushVC, animated: false)
+        if let vc = self.children[0] as? CardPencilKitViewController {
+            vc.testfunc()
+            print("CardPencilKit here!")
+            
+        } else {
+            print("Fail!")
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0, execute: {
+            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
+            self.navigationController?.pushViewController(pushVC, animated: false)
+        }) // TODO: 리팩토링 필요 1순위
     }
     
     @objc func cancelBtnPressed() {

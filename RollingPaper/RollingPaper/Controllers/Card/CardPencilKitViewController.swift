@@ -11,7 +11,7 @@ import StickerView
 import SnapKit
 import Combine
 
-final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
+class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
     
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
@@ -21,7 +21,7 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     var backgroundImg = UIImage(named: "Rectangle")
     
     private let viewModel: CardViewModel
-    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToolToggle: Bool = true
@@ -61,7 +61,6 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
-        
         view.addSubview(someImageView)
         someImageView.backgroundColor = .white
         someImageView.layer.masksToBounds = true
@@ -205,12 +204,13 @@ final class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate,
             stickerCollectionViewAppear()
             print("false")
         }
-        
+    }
+    
+    func testfunc() {
+        print("Test good !!!!")
         self.selectedStickerView?.showEditingHandlers = false
         let image = self.mergeImages(imageView: self.someImageView)
         self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
-        
-        
     }
     
     @objc func savePicture(_ gesture: UITapGestureRecognizer) {
