@@ -20,9 +20,9 @@ class CardViewModel {
     }
     
     enum Output {
-        case getRecentCardBackgroundImgSuccess(background: UIImage)
+        case getRecentCardBackgroundImgSuccess(background: UIImage?)
         case getRecentCardBackgroundImgFail
-        case getRecentCardResultImgSuccess(result: UIImage)
+        case getRecentCardResultImgSuccess(result: UIImage?)
         case getRecentCardResultImgFail
     }
     
@@ -59,7 +59,7 @@ class CardViewModel {
     private func getRecentCardBackgroundImg() {
         if let recentBackgroundImg = UserDefaults.standard.data(forKey: "cardBackgroundImg") {
             let backImg = UIImage(data: recentBackgroundImg)
-            output.send(.getRecentCardBackgroundImgSuccess(background: backImg!))
+            output.send(.getRecentCardBackgroundImgSuccess(background: backImg))
         } else {
             output.send(.getRecentCardBackgroundImgFail)
         }
@@ -74,7 +74,7 @@ class CardViewModel {
     private func getRecentCardResultImg() {
         if let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg") {
             let resultImg = UIImage(data: recentResultImg)
-            output.send(.getRecentCardResultImgSuccess(result: resultImg!))
+            output.send(.getRecentCardResultImgSuccess(result: resultImg))
         } else {
             output.send(.getRecentCardResultImgFail)
         }
