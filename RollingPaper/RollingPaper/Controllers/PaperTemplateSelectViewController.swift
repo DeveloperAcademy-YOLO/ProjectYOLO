@@ -115,20 +115,12 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
     
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if isRecentExist && section == 0 {
-            return 1
-        } else {
-            return viewModel.getTemplates().count
-        }
+        return isRecentExist && section == 0 ? 1 : viewModel.getTemplates().count
     }
     
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if isRecentExist {
-            return 2
-        } else {
-            return 1
-        }
+        return isRecentExist ? 2 : 1
     }
     
     // 특정 위치의 셀
@@ -152,12 +144,7 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
                 withReuseIdentifier: PaperTemplateCollectionHeader.identifier,
                 for: indexPath
             ) as? PaperTemplateCollectionHeader else {return UICollectionReusableView()}
-            
-            if isRecentExist && indexPath.section == 0 {
-                supplementaryView.setHeader(text: "최근 사용한")
-            } else {
-                supplementaryView.setHeader(text: "모두")
-            }
+            supplementaryView.setHeader(text: isRecentExist && indexPath.section == 0 ? "최근 사용한" : "모두")
             return supplementaryView
         } else {
             return UICollectionReusableView()
