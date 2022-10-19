@@ -35,9 +35,8 @@ final class CardResultViewController: UIViewController {
         someImageView.image = image
         someImageViewConstraints()
         
-        view.addSubview(cancelButton)
-        cancelButtonConstraints()
-        self.navigationController?.isNavigationBarHidden = true
+        self.navigationItem.leftBarButtonItem = self.leftButton
+        self.navigationItem.rightBarButtonItem = self.rightButton
 
     }
     
@@ -53,13 +52,19 @@ final class CardResultViewController: UIViewController {
         return theImageView
     }()
     
-    lazy var cancelButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("취소", for: UIControl.State.normal)
-        button.setTitleColor(UIColor.black, for: UIControl.State.normal)
-        button.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
-        return button
-    }()
+    lazy var leftButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "leftBtn", style: .plain, target: self, action: #selector(cancelBtnPressed(_:)))
+           button.tag = 1
+           
+           return button
+       }()
+    
+    lazy var rightButton: UIBarButtonItem = {
+            let button = UIBarButtonItem(title: "RightBtn", style: .plain, target: self, action: #selector(createBtnPressed(_:)))
+            button.tag = 2
+            
+            return button
+        }()
     
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
@@ -69,21 +74,13 @@ final class CardResultViewController: UIViewController {
             make.centerY.equalTo(self.view)
         })
     }
-    
-    private func cancelButtonConstraints() {
-        cancelButton.snp.makeConstraints({ make in
-            make.width.equalTo(40)
-            make.height.equalTo(40)
-            make.leading.equalTo(30)
-            make.top.equalTo(self.view).offset(30)
-        })
-    }
-    
-    @objc func createBtnPressed() {
+
+    @objc func createBtnPressed(_ sender: UISegmentedControl) {
      print("게시하기 pressed")
     }
 
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
         self.navigationController?.popViewController(animated: false)
     }
+    
 }

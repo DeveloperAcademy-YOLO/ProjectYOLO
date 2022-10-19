@@ -76,8 +76,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerCollectionViewDisappear()
         
         view.addSubview(buttonLabel)
-        buttonLabel.layer.masksToBounds = true
         buttonLabel.layer.cornerRadius = 30
+        buttonLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         buttonLabelConstraints()
         
         view.addSubview(pencilToggleButton)
@@ -286,9 +286,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     func buttonLabelConstraints() {
         buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(250)
+            make.width.equalTo(100)
             make.height.equalTo(450)
-            make.leading.equalTo(-160)
+            make.leading.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
     }
@@ -308,7 +308,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
-           // make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
     
@@ -328,7 +327,6 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
     func mergeImages(imageView: UIImageView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
-       // let image = UIGraphicsGetImageFromCurrentImageContext()
         let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
         let image = renderer.image { _ in
             imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)

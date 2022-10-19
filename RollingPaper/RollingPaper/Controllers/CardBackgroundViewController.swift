@@ -42,6 +42,8 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         view.addSubview(buttonLabel)
         buttonLabel.layer.masksToBounds = true
         buttonLabel.layer.cornerRadius = 30
+        buttonLabel.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+           
         buttonLabelConstraints()
     
         view.addSubview(photoBackgroundButton)
@@ -217,9 +219,9 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     func buttonLabelConstraints() {
         buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(250)
+            make.width.equalTo(100)
             make.height.equalTo(450)
-            make.leading.equalTo(-160)
+            make.leading.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
     }

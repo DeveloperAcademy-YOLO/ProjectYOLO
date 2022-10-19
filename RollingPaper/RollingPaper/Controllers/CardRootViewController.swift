@@ -60,22 +60,30 @@ class CardRootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
+        
         instantiateSegmentedViewControllers()
-        self.navigationController?.isNavigationBarHidden = true
+        
+        navigationItem.titleView = segmentedControl
+        self.navigationItem.leftBarButtonItem = self.leftButton
+        self.navigationItem.rightBarButtonItem = self.rightButton
         input.send(.resultShown)
         bind()
     }
     
-    private func setupViews() {
-        view.backgroundColor = .white
-     
-        view.addSubview(segmentedControl)
-        segmentedControlConstraints()
-        
-        view.addSubview(completeButton)
-        completeButtonConstraints()
-    }
+    lazy var leftButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "leftBtn", style: .plain, target: self, action: #selector(cancelBtnPressed(_:)))
+           button.tag = 1
+           
+           return button
+       }()
+    
+    lazy var rightButton: UIBarButtonItem = {
+            let button = UIBarButtonItem(title: "RightBtn", style: .plain, target: self, action: #selector(openResultView(_:)))
+            button.tag = 2
+            
+            return button
+        }()
+    
     
     lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl(items: items)
@@ -111,7 +119,6 @@ class CardRootViewController: UIViewController {
         }
     }
     
-
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
             secondStepViewVC.resultImageSend()
@@ -127,26 +134,9 @@ class CardRootViewController: UIViewController {
         }) // TODO: 리팩토링 필요
     }
     
-    @objc func cancelBtnPressed() {
+    @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
         print("cancelBtnPressed")
-    }
-    
-    private func segmentedControlConstraints() {
-        segmentedControl.snp.makeConstraints({ make in
-            make.width.equalTo(200)
-            make.height.equalTo(35)
-            make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view).offset(30)
-        })
-    }
-    
-    private func completeButtonConstraints() {
-        completeButton.snp.makeConstraints({ make in
-            make.width.equalTo(40)
-            make.height.equalTo(40)
-            make.trailing.equalTo(-30)
-            make.top.equalTo(self.view).offset(30)
-        })
+        self.navigationController?.popViewController(animated: true)
     }
     
     private func instantiateSegmentedViewControllers() {
@@ -163,12 +153,12 @@ class CardRootViewController: UIViewController {
         self.view.addSubview(firstStepViewVC.view)
        
             NSLayoutConstraint.activate([
-                firstStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
+                firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
                 firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
                 firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
                 
-                secondStepViewVC.view.topAnchor.constraint(equalTo: self.segmentedControl.bottomAnchor, constant: 10),
+                secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
                 secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
                 secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
                 secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
