@@ -91,9 +91,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         canvasViewAppear()
         toolPickerAppear()
     }
-    
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -329,9 +327,9 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
         let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
-        let image = renderer.image { _ in
+        let image = renderer.image(actions: { _ in
             imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
-        }
+        })
         UIGraphicsEndImageContext()
         return image
     }
@@ -339,7 +337,6 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
     @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
         if let error = error {
             
-            // we got back an error!
             let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)

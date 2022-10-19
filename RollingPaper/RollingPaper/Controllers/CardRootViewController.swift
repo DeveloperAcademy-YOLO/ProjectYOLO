@@ -10,7 +10,6 @@ import SnapKit
 import Combine
 
 class CardRootViewController: UIViewController {
-    private let items = ["배경 고르기", "꾸미기"]
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
@@ -111,23 +110,34 @@ class CardRootViewController: UIViewController {
     }
     
     lazy var segmentedControl: UISegmentedControl = {
+        let items = ["Step1", "Step2"]
         let control = UISegmentedControl(items: items)
         control.selectedSegmentIndex = 0
         control.layer.cornerRadius = 9
         control.layer.masksToBounds = true
+        control.clipsToBounds = true
         control.selectedSegmentTintColor = .darkGray
+        control.translatesAutoresizingMaskIntoConstraints = false
+        control.setImage(
+            UIImage.textEmbededImage(
+                image: UIImage(named: "first_step_icon")!,
+                string: "배경 고르기",
+                color: .white
+            ),
+            forSegmentAt: 0
+        )
+        control.setImage(
+            UIImage.textEmbededImage(
+                image: UIImage(named: "second_step_icon")!,
+                string: "꾸미기",
+                color: .white
+            ),
+            forSegmentAt: 1
+        )
         control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
         control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
         control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
         return control
-    }()
-    
-    lazy var completeButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("완료", for: UIControl.State.normal)
-        button.setTitleColor(UIColor.black, for: UIControl.State.normal)
-        button.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
-        return button
     }()
     
     @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
@@ -189,9 +199,32 @@ class CardRootViewController: UIViewController {
                 secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
                
             ])
-            
             self.firstStepView = firstStepViewVC.view
             self.secondStepView = secondStepViewVC.view
-          
         }
+}
+
+extension UIImage {
+    class func textEmbededImage(image: UIImage, string: String, color: UIColor, imageAlignment: Int = 0, segFont: UIFont? = nil) -> UIImage {
+        let font = segFont ?? UIFont.boldSystemFont(ofSize: 16.0)
+        let expectedTextSize: CGSize = (string as NSString).size(withAttributes: [NSAttributedString.Key.font: font])
+        let width: CGFloat = expectedTextSize.width + image.size.width + 5.0
+        let height: CGFloat = max(expectedTextSize.height, image.size.width)
+        let size: CGSize = CGSize(width: width, height: height)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        let context: CGContext = UIGraphicsGetCurrentContext()!
+        context.setFillColor(color.cgColor)
+        let fontTopPosition: CGFloat = (height - expectedTextSize.height) / 2.0
+        let textOrigin: CGFloat = (imageAlignment == 0) ? image.size.width + 5 : 0
+        let textPoint: CGPoint = CGPoint.init(x: textOrigin, y: fontTopPosition)
+        string.draw(at: textPoint, withAttributes: [NSAttributedString.Key.font: font])
+        let flipVertical: CGAffineTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height)
+        context.concatenate(flipVertical)
+        let alignment: CGFloat =  (imageAlignment == 0) ? 0.0 : expectedTextSize.width + 5.0
+        context.draw(image.cgImage!, in: CGRect.init(x: alignment, y: ((height - image.size.height) / 2.0), width: image.size.width, height: image.size.height))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage ?? UIImage(systemName: "heart.fill")!
+    }
 }
