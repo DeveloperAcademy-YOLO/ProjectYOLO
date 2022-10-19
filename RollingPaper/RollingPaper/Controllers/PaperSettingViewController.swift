@@ -44,8 +44,8 @@ class PaperSettingViewController: UIViewController {
                 case .createPaperSuccess(let paper):
                     self.paper = paper
                     print("페이퍼 생성 성공")
-                    // TODO: 페이퍼 객체 넘겨주면서 네비게이션 연결
-                    // navigationController?.pushViewController(, animated: true)
+                    // TODO: 사이먼 뷰로 이동
+                    // navVC.pushViewController(SimonView(), animated: true)
                     print(paper)
                 case .createPaperFail:
                     self.paper = nil
