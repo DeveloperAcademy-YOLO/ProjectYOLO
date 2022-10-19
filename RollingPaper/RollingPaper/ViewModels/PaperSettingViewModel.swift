@@ -24,16 +24,10 @@ class PaperSettingViewModel {
         case endSettingPaper
     }
     
-    enum Output {
-        case createPaperSuccess(paper: PaperModel)
-        case createPaperFail
-    }
-    
-    private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     // 어떤 행동이 Input으로 들어오면 그것에 맞는 행동을 Output에 저장한 뒤 반환해주기
-    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
+    func transform(input: AnyPublisher<Input, Never>) {
         input.sink(receiveValue: { [weak self] event in
             guard let self = self else {return}
             switch event {
@@ -44,7 +38,6 @@ class PaperSettingViewModel {
             }
         })
         .store(in: &cancellables)
-        return output.eraseToAnyPublisher()
     }
     
     // 페이퍼 제목 설정하기
@@ -56,11 +49,10 @@ class PaperSettingViewModel {
     private func createPaper() {
         let currentTime = Date()
         guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
-            output.send(.createPaperFail)
             return
         }
         let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template.template.templateString)
         databaseManager.addPaper(paper: paper)
-        output.send(.createPaperSuccess(paper: paper))
+        databaseManager.fetchPaper(paperId: paper.paperId)
     }
 }

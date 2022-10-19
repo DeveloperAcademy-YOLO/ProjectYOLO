@@ -14,7 +14,6 @@ class PaperSettingViewController: UIViewController {
     private var viewModel: PaperSettingViewModel
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var paper: PaperModel?
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
@@ -36,22 +35,7 @@ class PaperSettingViewController: UIViewController {
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
     private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher())
-        output
-            .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .createPaperSuccess(let paper):
-                    self.paper = paper
-                    print("페이퍼 생성 성공")
-                    self.navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
-                    print(paper)
-                case .createPaperFail:
-                    self.paper = nil
-                    print("페이퍼 생성 실패")
-                }
-            })
-            .store(in: &cancellables)
+        viewModel.transform(input: input.eraseToAnyPublisher())
     }
     
     // 네비게이션 바 초기화
@@ -154,7 +138,9 @@ class PaperSettingViewController: UIViewController {
     
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
-        input.send(.endSettingPaper)
+        navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
+            self?.input.send(.endSettingPaper)
+        }
     }
     
     // 배경 눌렀을 때 동작
