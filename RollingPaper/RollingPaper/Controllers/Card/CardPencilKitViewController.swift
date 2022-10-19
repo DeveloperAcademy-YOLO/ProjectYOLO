@@ -118,8 +118,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                     })
                 case .getRecentCardResultImgSuccess(_):
                     DispatchQueue.main.async(execute: {
-//                        self.someImageView.image = result
-//                        print("getRecentCardResultImgSuccess")
+
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
@@ -205,18 +204,18 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             print("false")
         }
     }
-    
-    func testfunc() {
-        print("Test good !!!!")
-        self.selectedStickerView?.showEditingHandlers = false
-        let image = self.mergeImages(imageView: self.someImageView)
-        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
-    }
-    
+
     @objc func savePicture(_ gesture: UITapGestureRecognizer) {
         selectedStickerView?.showEditingHandlers = false
         let image = mergeImages(imageView: someImageView)
             UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    func resultImageSend() {
+        print("Test good !!!!")
+        self.selectedStickerView?.showEditingHandlers = false
+        let image = self.mergeImages(imageView: self.someImageView)
+        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
     }
     
     func toolPickerAppear() {

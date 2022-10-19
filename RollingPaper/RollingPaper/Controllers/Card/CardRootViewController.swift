@@ -9,15 +9,7 @@ import UIKit
 import SnapKit
 import Combine
 
-//protocol CardRootViewControllerDelegate: AnyObject {
-//    func testfunc()
-//}
-
 class CardRootViewController: UIViewController {
-    
-//    weak var delegate: CardRootViewControllerDelegate?
-//    
-//    
     private let items = ["배경 고르기", "꾸미기"]
     
     private func bind() {
@@ -122,7 +114,7 @@ class CardRootViewController: UIViewController {
 
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
-            secondStepViewVC.testfunc()
+            secondStepViewVC.resultImageSend()
             print("CardPencilKit here!")
             
         } else {
