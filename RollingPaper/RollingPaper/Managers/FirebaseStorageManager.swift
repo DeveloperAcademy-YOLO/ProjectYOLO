@@ -47,7 +47,7 @@ final class FirebaseStorageManager {
     static func uploadData(dataId: String, data: Data, contentType: DataContentType, pathRoot: DataPathRoot) -> AnyPublisher<URL?, Error> {
         let metadata = StorageMetadata()
         metadata.contentType = contentType.rawValue
-        let reference = Storage.storage().reference().child("\(pathRoot.rawValue)/\(dataId)")
+        let reference = Storage.storage().reference().child("\(pathRoot.rawValue)/\(dataId + UUID().uuidString)")
         return Future({ promise in
             reference.putData(data, metadata: metadata, completion: { _, error in
                 if let error = error {
