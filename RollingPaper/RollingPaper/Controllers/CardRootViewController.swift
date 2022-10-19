@@ -38,7 +38,7 @@ class CardRootViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg = UIImage(named: "Rectangle")
     
     private var firstStepView: UIView!
     private var secondStepView: UIView!
@@ -73,6 +73,7 @@ class CardRootViewController: UIViewController {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("돌아가기", for: .normal)
+        customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         customBackBtn.setTitleColor(.black, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
@@ -86,6 +87,7 @@ class CardRootViewController: UIViewController {
     lazy var rightButton: UIBarButtonItem = {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customCompleteBtn.setTitle("완료", for: .normal)
+        customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         customCompleteBtn.setTitleColor(.black, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
     
@@ -94,7 +96,7 @@ class CardRootViewController: UIViewController {
            return button
         }()
     
-    func setCustomNavBarButtons() {
+    private func setCustomNavBarButtons() {
         self.navigationItem.titleView = segmentedControl
         
         navigationItem.leftBarButtonItem = leftButton

@@ -16,9 +16,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
     
-    var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
+    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
     
-    var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg = UIImage(named: "Rectangle")
     
     private let viewModel: CardViewModel
     let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
