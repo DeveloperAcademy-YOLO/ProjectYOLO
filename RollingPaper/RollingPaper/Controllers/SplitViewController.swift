@@ -11,8 +11,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
-        let mainViewController = UINavigationController(rootViewController: self.mainViewController)
+        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        let settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         
         switch category.name {
         case "페이퍼 템플릿":
@@ -25,7 +25,12 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
             }
         case "설정":
             if !(self.viewControllers[1] is MainViewController) {
-                self.viewControllers[1] = mainViewController
+                if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+                    print(currentUserEmail)
+                    self.viewControllers[1] = settingScreenViewController
+                } else {
+                    self.viewControllers[1] = UINavigationController(rootViewController: SignInViewController())
+                }
             }
         default:
             break

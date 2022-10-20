@@ -55,7 +55,9 @@ final class SignUpViewModel {
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
-                case .signUpButtonDidTap: self.handleSignUp()
+                case .signUpButtonDidTap:
+                    print("Sign Up Button Did Tap")
+                    self.handleSignUp()
                 }
             })
             .store(in: &cancellables)

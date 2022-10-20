@@ -73,6 +73,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userModel in
                 // self?.userPhoto.image = userModel.profileUrl
+                print("SideBar Called!")
                 if let userModel = userModel {
                     self?.convertURL(from: userModel.profileUrl)
                     self?.userName.text = userModel.name
