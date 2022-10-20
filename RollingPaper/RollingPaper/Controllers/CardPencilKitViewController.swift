@@ -73,8 +73,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        view.addSubview(pencilToggleButton)
-        pencilToggleButtonConstraints()
+        view.addSubview(pencilOnButton)
+        pencilOnButtonConstraints()
         
         view.addSubview(stickerOffButton)
         stickerOffButtonConstraints()
@@ -152,7 +152,15 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         return label
     }()
     
-    lazy var pencilToggleButton: UIButton = {
+    lazy var pencilOnButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "pencil.and.outline")
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(toggleToolKit(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var pencilOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .lightGray
@@ -163,6 +171,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var stickerOnButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "stickerToogleOn"), for: .normal)
+        button.setImage(UIImage(named: "stickerToogleOn"), for: .highlighted)
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
     }()
@@ -170,6 +179,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var stickerOffButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
+        button.setImage(UIImage(named: "stickerToogleOff"), for: .highlighted)
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
     }()
@@ -178,11 +188,11 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         selectedStickerView?.showEditingHandlers = false
         self.isCanvasToolToggle.toggle()
         if isCanvasToolToggle == true {
+            pencilOnButtonAppear()
             toolPickerAppear()
-            print("true")
         } else {
+            pencilOffButtonAppear()
             toolPickerDisappear()
-            print("false")
         }
     }
     
@@ -192,16 +202,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             selectedStickerView?.showEditingHandlers = false
             stickerOffButtonAppear()
             stickerCollectionViewDisappear()
-            print("true")
         } else {
             stickerOnButtonAppear()
             stickerCollectionViewAppear()
-            print("false")
         }
     }
     
     func resultImageSend() {
-        print("Test good !!!!")
         self.selectedStickerView?.showEditingHandlers = false
         let image = self.mergeImages(imageView: self.someImageView)
         self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
@@ -215,6 +222,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     func toolPickerDisappear() {
         toolPicker.addObserver(canvasView)
         toolPicker.setVisible(false, forFirstResponder: canvasView)
+    }
+    
+    func pencilOnButtonAppear() {
+        view.addSubview(pencilOnButton)
+        pencilOnButtonConstraints()
+    }
+    
+    func pencilOffButtonAppear() {
+        view.addSubview(pencilOffButton)
+        pencilOffButtonConstraints()
     }
     
     func stickerOnButtonAppear() {
@@ -292,8 +309,18 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         })
     }
     
-    func pencilToggleButtonConstraints() {
-        pencilToggleButton.snp.makeConstraints({ make in
+    func pencilOnButtonConstraints() {
+        pencilOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    func pencilOffButtonConstraints() {
+        pencilOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
@@ -307,7 +334,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(pencilToggleButton.snp.bottom).offset(18)
+            make.top.equalTo(buttonLabel.snp.top).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
@@ -317,7 +344,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(pencilToggleButton.snp.bottom).offset(18)
+            make.top.equalTo(buttonLabel.snp.top).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
