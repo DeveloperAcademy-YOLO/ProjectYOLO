@@ -62,13 +62,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         super.viewDidLoad()
         view.backgroundColor = .lightGray
        
-        view.addSubview(someImageView)
+        view.addSubview(rootUIImageView)
+        rootUIImageViewConstraints()
+
+        rootUIImageView.addSubview(someImageView)
         someImageViewConstraints()
-      
-        someImageView.addSubview(canvasView)
+        
+        rootUIImageView.addSubview(canvasView)
         canvasViewConstraints()
         
-        canvasViewAppear()
+        canvasViewInteractionEnabled()
         toolPickerAppear()
         stickerCollectionViewDisappear()
         
@@ -84,7 +87,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        canvasViewAppear()
+        canvasViewInteractionEnabled()
         toolPickerAppear()
     }
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
@@ -117,10 +120,20 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             .store(in: &cancellables)
     }
     
+    lazy var rootUIImageView: UIImageView = {
+        let theImageView = UIImageView()
+        theImageView.translatesAutoresizingMaskIntoConstraints = false
+        theImageView.backgroundColor = .systemBackground
+        theImageView.layer.masksToBounds = true
+        theImageView.layer.cornerRadius = 50
+        theImageView.contentMode = .scaleAspectFill
+        theImageView.isUserInteractionEnabled = true
+        return theImageView
+    }()
+    
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.isUserInteractionEnabled = true
         theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
@@ -187,23 +200,73 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         self.isCanvasToolToggle.toggle()
         self.isStickerToggle.toggle()
         if isCanvasToolToggle == true && isStickerToggle == false {
+            print("sticker button off")
+            stickerButtonOff()
             selectedStickerView?.showEditingHandlers = false
+            stickerCollectionViewDisappear()
+            imageViewInteractionDisabled()
+            
             pencilButtonOn()
             toolPickerAppear()
-            stickerButtonOff()
-            stickerCollectionViewDisappear()
+            canvasViewInteractionEnabled()
         } else {
+            print("sticker button On")
             stickerButtonOn()
             stickerCollectionViewAppear()
+            imageViewInteractionEnabled()
+            
             pencilButtonOff()
             toolPickerDisappear()
+            canvasViewInteractionDisabled()
         }
     }
     
     func resultImageSend() {
         self.selectedStickerView?.showEditingHandlers = false
-        let image = self.mergeImages(imageView: self.someImageView)
+        let image = self.mergeImages(imageView: self.rootUIImageView)
         self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
+    }
+    
+    func canvasViewInteractionDisabled() {
+        rootUIImageView.addSubview(canvasView)
+        canvasView.delegate = self
+        canvasView.layer.masksToBounds = true
+        canvasView.layer.cornerRadius = 50
+        canvasView.contentMode = .scaleAspectFill
+        canvasView.isOpaque = false
+        canvasView.alwaysBounceVertical = true
+        canvasView.drawingPolicy = .anyInput
+        canvasView.translatesAutoresizingMaskIntoConstraints = true
+        canvasView.becomeFirstResponder()
+        canvasView.isUserInteractionEnabled = false
+        canvasViewConstraints()
+    }
+    
+    func canvasViewInteractionEnabled() {
+        rootUIImageView.addSubview(canvasView)
+        canvasView.delegate = self
+        canvasView.layer.masksToBounds = true
+        canvasView.layer.cornerRadius = 50
+        canvasView.contentMode = .scaleAspectFill
+        canvasView.isOpaque = false
+        canvasView.alwaysBounceVertical = true
+        canvasView.drawingPolicy = .anyInput
+        canvasView.translatesAutoresizingMaskIntoConstraints = true
+        canvasView.becomeFirstResponder()
+        canvasView.isUserInteractionEnabled = true
+        canvasViewConstraints()
+    }
+    
+    func imageViewInteractionDisabled() {
+        rootUIImageView.addSubview(someImageView)
+        someImageView.isUserInteractionEnabled = false
+        someImageViewConstraints()
+    }
+    
+    func imageViewInteractionEnabled() {
+        rootUIImageView.addSubview(someImageView)
+        someImageView.isUserInteractionEnabled = true
+        someImageViewConstraints()
     }
     
     func toolPickerAppear() {
@@ -250,19 +313,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         collectionView.layer.cornerRadius = 100
         collectionView.isHidden = true
         collectionViewConstraints()
-    }
-    
-    func canvasViewAppear() {
-        canvasView.delegate = self
-        canvasView.layer.masksToBounds = true
-        canvasView.layer.cornerRadius = 50
-        canvasView.contentMode = .scaleAspectFill
-        canvasView.isOpaque = false
-        canvasView.alwaysBounceVertical = true
-        canvasView.drawingPolicy = .anyInput
-        canvasView.translatesAutoresizingMaskIntoConstraints = true
-        canvasView.becomeFirstResponder()
-        canvasViewConstraints()
     }
 }
 
@@ -405,6 +455,15 @@ extension UIButton {
 }
 
 extension CardPencilKitViewController {
+    func rootUIImageViewConstraints() {
+        rootUIImageView.snp.makeConstraints({ make in
+            make.width.equalTo(813)
+            make.height.equalTo(515)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
