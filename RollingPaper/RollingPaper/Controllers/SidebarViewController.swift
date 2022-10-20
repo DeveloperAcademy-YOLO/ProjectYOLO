@@ -23,13 +23,14 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        photo.image = UIImage(systemName: "person.circle")
         photo.layer.cornerRadius = photo.frame.width / 2
         photo.contentMode = UIView.ContentMode.scaleAspectFit
         return photo
     }()
     
     private let chevron: UIImageView = {
-        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 15, height: 15))
         chevron.image = UIImage(systemName: "chevron.forward")
         chevron.contentMode = UIView.ContentMode.scaleAspectFit
         return chevron
@@ -37,6 +38,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private let userName: UILabel = {
         let name = UILabel()
+        name.text = "Guest"
         name.font = .boldSystemFont(ofSize: 20)
         name.sizeToFit()
         return name
