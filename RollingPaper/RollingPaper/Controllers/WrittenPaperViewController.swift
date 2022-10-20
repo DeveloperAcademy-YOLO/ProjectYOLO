@@ -40,10 +40,8 @@ class WrittenPaperViewController: UIViewController {
         
         timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
         timeLabel.textColor = .white
-        timeLabel.layer.borderColor = UIColor.systemGray3.cgColor
-        timeLabel.layer.borderWidth = 1
         timeLabel.layer.cornerRadius = 18
-        timeLabel.layer.backgroundColor = UIColor.gray.cgColor
+        timeLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
         return timeLabel
     }()
     
@@ -60,15 +58,14 @@ class WrittenPaperViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         self.splitViewController?.hide(.primary)
+        self.navigationController?.navigationBar.tintColor = .systemGray
+        
         navigationItem.titleView = stackView
-
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
-        self.navigationController?.navigationBar.tintColor = .systemGray
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -76,7 +73,6 @@ class WrittenPaperViewController: UIViewController {
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
     }
-    
     
     private func titleLabelConstraints() {
         titleLabel.snp.makeConstraints({ make in
@@ -93,48 +89,109 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func setCustomNavBarButtons() {
-        
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        customBackBtn.setTitle("새로 만들기", for: .normal)
+        customBackBtn.setTitle("보관함", for: .normal)
         customBackBtn.setTitleColor(.systemGray, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
-        customBackBtn.addAction(UIAction(handler: {_ in self.moveToPaperTemplateSelectView()}), for: .touchUpInside)
+        customBackBtn.addAction(UIAction(handler: {_ in self.moveToPaperStorageView()}), for: .touchUpInside)
         customBackBtn.addLeftPadding(5)
         
         let paperLinkBtnImage = UIImage(systemName: "square.and.arrow.up")!.resized(to: CGSize(width: 30, height: 30))
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
+        paperLinkBtn.addAction(UIAction(handler: {_ in self.presentSignUpModal(paperLinkBtn)}), for: .touchUpInside)
         
         let createCardBtnImage = UIImage(systemName: "plus.rectangle.fill")!.resized(to: CGSize(width: 40, height: 30))
         let createCardBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        
         createCardBtn.setImage(createCardBtnImage, for: .normal)
         createCardBtn.addAction(UIAction(handler: {_ in self.moveToCardRootView()}), for: .touchUpInside)
         
         let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
         let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         managePaperBtn.setImage(managePaperBtnImage, for: .normal)
+        managePaperBtn.addAction(UIAction(handler: {_ in self.setPopOverView(managePaperBtn)}), for: .touchUpInside)
         
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
-        let secondBarButton = UIBarButtonItem(customView: paperLinkBtn)
-        let thirdBarButton = UIBarButtonItem(customView: createCardBtn)
-        let fourthBarButton = UIBarButtonItem(customView: managePaperBtn)
+        let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
+        let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
+        let fourthBarButton = UIBarButtonItem(customView: createCardBtn)
         
-        
-        navigationItem.rightBarButtonItems = [thirdBarButton, secondBarButton, fourthBarButton]
+        navigationItem.rightBarButtonItems = [fourthBarButton, thirdBarButton, secondBarButton]
         navigationItem.leftBarButtonItem = firstBarButton
     }
-
-    func moveToPaperTemplateSelectView() {
-        if let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first {
-            self.navigationController?.popToViewController(templateSelectVC, animated: true)
+    
+    func moveToPaperStorageView() {
+        if
+            let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
+            let splitVC = templateSelectVC.parent?.parent as? SplitViewController {
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
         }
     }
     
     func moveToCardRootView() {
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel()), animated: true)
+    }
+    
+    func presentSignUpModal(_ sender: UIButton) {
+        let signUpVC = SignUpViewController()
+        signUpVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
+        self.present(signUpVC, animated: true)
+    }
+    
+    func setPopOverView(_ sender: UIButton) {
+        let attributedTitleString = NSAttributedString(string: "페이지 관리", attributes: [
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
+            NSAttributedString.Key.strokeWidth: -5 ])
+        let attributedMessageString = NSAttributedString(string: "정보를 수정하거나 삭제할 수 있습니다.", attributes: [
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15) ])
+        
+        let allertController = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
+        allertController.addAction(UIAlertAction(title: "수정", style: .default,
+                                                 handler: {_ in
+            print("수정")
+            let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
+            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(cancel)
+            alert.addAction(edit)
+            alert.addTextField{ (editTitleTextField) in
+                editTitleTextField.text = "dummy text"
+            }
+            self.present(alert, animated: true, completion: nil)
+        }))
+        allertController.addAction(UIAlertAction(title: "마감", style: .default,
+                                                 handler: {_ in
+            print("마감")
+            let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
+            let stop = UIAlertAction(title: "마감", style: .default) { (stop) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(cancel)
+            alert.addAction(stop)
+            self.present(alert, animated: true, completion: nil)
+        }))
+        allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
+                                                 handler: {_ in
+            print("삭제")
+            let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { (delete) in  }
+            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            alert.addAction(delete)
+            alert.addAction(cancel)
+            alert.addTextField{ (editTitleTextField) in
+                editTitleTextField.placeholder = "재현이의 생일을 축하하며"
+            }
+            self.present(alert, animated: true, completion: nil)
+        }))
+        
+        allertController.setValue(attributedTitleString, forKey: "attributedTitle")
+        allertController.setValue(attributedMessageString, forKey: "attributedMessage")
+        
+        let popover = allertController.popoverPresentationController
+        popover?.sourceView = sender
+        popover?.backgroundColor = UIColor.white
+        present(allertController, animated: true)
     }
     
     func setCollectionView() -> UICollectionView {
@@ -164,9 +221,9 @@ class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 200 // How many cells to display
+        return 100 // How many cells to display
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.backgroundColor = UIColor.blue
@@ -176,18 +233,8 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
 }
 extension WrittenPaperViewController: UICollectionViewDelegate {
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("User tapped on item \(indexPath.row)")
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-    }
-}
-
-
-extension UIImage {
-    func resized(to size: CGSize) -> UIImage {
-        return UIGraphicsImageRenderer(size: size).image { _ in
-            draw(in: CGRect(origin: .zero, size: size))
-        }
     }
 }
