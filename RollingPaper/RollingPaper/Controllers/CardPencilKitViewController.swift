@@ -73,11 +73,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        view.addSubview(pencilOnButton)
-        pencilOnButtonConstraints()
-        
-        view.addSubview(stickerOffButton)
-        stickerOffButtonConstraints()
+        pencilOnButtonAppear()
+        stickerOffButtonAppear()
         
         input.send(.viewDidLoad)
         bind()
