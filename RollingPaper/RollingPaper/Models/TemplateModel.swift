@@ -10,6 +10,8 @@ import UIKit
 
 struct TemplateModel: Codable {
     let templateString: String
+    let templateTitle: String
+    let templateDescription: String
     let colorHexes: [Int]
     let stickerNames: [String]
     var colors: [UIColor] {
