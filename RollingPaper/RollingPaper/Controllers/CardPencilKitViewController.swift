@@ -79,8 +79,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
         
-        view.addSubview(saveButton)
-        saveButtonConstraints()
+//        view.addSubview(saveButton)
+//        saveButtonConstraints()
         
         input.send(.viewDidLoad)
         bind()
@@ -166,19 +166,19 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var stickerToggleButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogle"), for: .normal)
+        button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
         button.tintColor = .lightGray
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
     }()
     
-    lazy var saveButton: UIButton = {
-        let button = UIButton()
-        button.setUIImage(systemName: "square.and.arrow.down")
-        button.tintColor = .lightGray
-        button.addTarget(self, action: #selector(savePicture(_:)), for: .touchUpInside)
-        return button
-    }()
+//    lazy var saveButton: UIButton = {
+//        let button = UIButton()
+//        button.setUIImage(systemName: "square.and.arrow.down")
+//       // button.tintColor = .lightGray
+//        button.addTarget(self, action: #selector(savePicture(_:)), for: .touchUpInside)
+//        return button
+//    }()
     
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
         selectedStickerView?.showEditingHandlers = false
@@ -204,11 +204,11 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         }
     }
 
-    @objc func savePicture(_ gesture: UITapGestureRecognizer) {
-        selectedStickerView?.showEditingHandlers = false
-        let image = mergeImages(imageView: someImageView)
-            UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
-    }
+//    @objc func savePicture(_ gesture: UITapGestureRecognizer) {
+//        selectedStickerView?.showEditingHandlers = false
+//        let image = mergeImages(imageView: someImageView)
+//            UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
+//    }
     
     func resultImageSend() {
         print("Test good !!!!")
@@ -307,19 +307,20 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
-        })
-    }
-    
-    func saveButtonConstraints() {
-        saveButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
+            make.top.equalTo(pencilToggleButton.snp.bottom).offset(18)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
+    
+//    func saveButtonConstraints() {
+//        saveButton.snp.makeConstraints({ make in
+//            make.width.equalTo(50)
+//            make.height.equalTo(50)
+//            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+//            make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
+//            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
+//        })
+//    }
 }
 
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -334,22 +335,22 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
         UIGraphicsEndImageContext()
         return image
     }
-    
-    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
-            
-            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-            
-        } else {
-            
-            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-            
-        }
-    }
+//
+//    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+//        if let error = error {
+//
+//            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "OK", style: .default))
+//            present(alert, animated: true)
+//
+//        } else {
+//
+//            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "OK", style: .default))
+//            present(alert, animated: true)
+//
+//        }
+//    }
     
     func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
          guard let image = image else { return nil }

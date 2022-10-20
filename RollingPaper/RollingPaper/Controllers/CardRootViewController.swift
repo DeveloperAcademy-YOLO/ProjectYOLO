@@ -130,14 +130,22 @@ class CardRootViewController: UIViewController {
         )
         control.setImage(
             UIImage.textEmbededImage(
-                image: UIImage(named: "second_step_icon")!,
+                image: UIImage(systemName: "paintbrush")!,
+                string: "꾸미기",
+                color: .white
+            ),
+            forSegmentAt: 1
+        )
+        control.setImage(
+            UIImage.textEmbededImage(
+                image: UIImage(systemName: "paintbrush.fill")!,
                 string: "꾸미기",
                 color: .white
             ),
             forSegmentAt: 1
         )
         control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        control.setTitleTextAttributes([.foregroundColor: UIColor.systemBackground], for: .selected)
         control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
         return control
     }()
