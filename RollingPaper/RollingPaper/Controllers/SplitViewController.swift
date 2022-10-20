@@ -11,8 +11,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        let settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
+        let settingScreenViewController = UINavigationController(rootViewController: self.settingViewController)
         
         switch category.name {
         case "페이퍼 템플릿":
@@ -24,7 +24,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = paperStorageViewController
             }
         case "설정":
-            if !(self.viewControllers[1] is MainViewController) {
+            if !(self.viewControllers[1] is SettingScreenViewController) {
                 if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                     print(currentUserEmail)
                     self.viewControllers[1] = settingScreenViewController
@@ -46,6 +46,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     private var templateViewController: PaperTemplateSelectViewController!
     private var storageViewController: PaperStorageViewController!
     private var mainViewController: MainViewController!
+    private var settingViewController: SettingScreenViewController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,6 +70,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         self.templateViewController = PaperTemplateSelectViewController()
         self.storageViewController = PaperStorageViewController()
         self.mainViewController = MainViewController()
+        self.settingViewController = SettingScreenViewController()
         self.sidebarViewController.delegate = self
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)

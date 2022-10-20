@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let window = UIWindow(frame: UIScreen.main.bounds)
         let splitVC = SplitViewController(style: .doubleColumn)
         window.makeKeyAndVisible()
-        window.rootViewController = splitVC
+//        window.rootViewController = splitVC
         self.window = window
         UNUserNotificationCenter.current().delegate = self
 //        registerPushNotifications()

@@ -67,33 +67,75 @@ class SettingScreenViewModel {
                 }
             })
             .sink { userModel in
+                var photoStorage = Set<AnyCancellable>()
                 if let photoURLString = userModel?.profileUrl {
                     if let image = NSCacheManager.shared.getImage(name: photoURLString) {
                         print("CacheManager Called!")
                         self.currentPhotoSubject.send(image)
                     } else {
-                        print("FireStorageManager Called!")
-                        FirebaseStorageManager.downloadData(urlString: photoURLString)
-                            .removeDuplicates(by: { $0 == $1 })
+                        print("LocalDatabaseManager Called!")
+                        LocalStorageManager.downloadData(urlString: photoURLString)
+                            .receive(on: DispatchQueue.global(qos: .background))
                             .sink { completion in
                                 switch completion {
-                                case .failure(let error): print(error.localizedDescription)
+                                case .failure(let error):
+                                    print(error.localizedDescription)
+                                    FirebaseStorageManager.downloadData(urlString: photoURLString)
+                                        .receive(on: DispatchQueue.global(qos: .background))
+                                        .sink { completion in
+                                            switch completion {
+                                            case .finished: break
+                                            case .failure(let error):
+                                                print(error.localizedDescription)
+                                                self.currentPhotoSubject.send(nil)
+                                            }
+                                        } receiveValue: { [weak self] data  in
+                                            if
+                                                let data = data,
+                                                let image = UIImage(data: data) {
+                                                NSCacheManager.shared.setImage(image: image, name: photoURLString)
+                                                self?.currentPhotoSubject.send(image)
+                                            } else {
+                                                self?.currentPhotoSubject.send(nil)
+                                            }
+                                        }
+                                        .store(in: &photoStorage)
+
                                 case .finished: break
                                 }
-                            } receiveValue: { [weak self] photoData in
-                                guard
-                                    let photoData = photoData,
-                                    let image = UIImage(data: photoData) else {
-                                    self?.currentPhotoSubject.send(UIImage(systemName: "person"))
-                                    return
+                            } receiveValue: { [weak self] data in
+                                if
+                                    let data = data,
+                                    let image = UIImage(data: data) {
+                                    self?.currentPhotoSubject.send(image)
+                                    NSCacheManager.shared.setImage(image: image, name: photoURLString)
+                                } else {
+                                    FirebaseStorageManager.downloadData(urlString: photoURLString)
+                                        .receive(on: DispatchQueue.global(qos: .background))
+                                        .sink { [weak self] completion in
+                                            switch completion {
+                                            case .finished: break
+                                            case .failure(let error):
+                                                print(error.localizedDescription)
+                                                self?.currentPhotoSubject.send(nil)
+                                            }
+                                        } receiveValue: { [weak self] data  in
+                                            if
+                                                let data = data,
+                                                let image = UIImage(data: data) {
+                                                NSCacheManager.shared.setImage(image: image, name: photoURLString)
+                                                self?.currentPhotoSubject.send(image)
+                                            } else {
+                                                self?.currentPhotoSubject.send(nil)
+                                            }
+                                        }
+                                        .store(in: &photoStorage)
                                 }
-                                print("NSCacheManager Stored!")
-                                NSCacheManager.shared.setImage(image: image, name: photoURLString)
-                                self?.currentPhotoSubject.send(image)
                             }
-                            .store(in: &self.cancellables)
+                            .store(in: &photoStorage)
+
                     }
-                    }
+                }
             }
             .store(in: &cancellables)
     }
@@ -115,7 +157,9 @@ class SettingScreenViewModel {
                             .sink { completion in
                                 switch completion {
                                 case .finished: break
-                                case .failure(let error): print(error.localizedDescription)
+                                case .failure(let error):
+                                    self.output.send(.userProfileChangeDidFail)
+                                    print(error.localizedDescription)
                                 }
                             } receiveValue: { [weak self] photoURL in
                                 if let photoURLString = photoURL?.absoluteString {
@@ -159,10 +203,13 @@ class SettingScreenViewModel {
                                             var currentUserModel = self.currentUserSubject.value,
                                             let data = image.jpegData(compressionQuality: 0.2) {
                                             FirebaseStorageManager.uploadData(dataId: self.currentUserSubject.value?.email ?? "", data: data, contentType: .jpeg, pathRoot: .profile)
+                                                .receive(on: DispatchQueue.global(qos: .background))
                                                 .sink { completion in
                                                     switch completion {
                                                     case .finished: break
-                                                    case .failure(let error): print(error.localizedDescription)
+                                                    case .failure(let error):
+                                                        self.output.send(.userProfileChangeDidFail)
+                                                        print(error.localizedDescription)
                                                     }
                                                 } receiveValue: { [weak self] photoURL in
                                                     if let photoURLString = photoURL?.absoluteString {

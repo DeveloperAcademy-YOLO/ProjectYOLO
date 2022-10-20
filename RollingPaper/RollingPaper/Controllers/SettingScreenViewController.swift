@@ -56,7 +56,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         profileImage.layer.cornerRadius = profileImage.frame.size.width * 0.5
         profileImage.image = UIImage(named: "Halloween_Pumpkin")
         profileImage.contentMode = UIView.ContentMode.scaleAspectFill
-        profileImage.backgroundColor = .clear
+        profileImage.backgroundColor = .systemBackground
         profileImage.isUserInteractionEnabled = true
         profileImage.clipsToBounds = true
         return profileImage
@@ -77,25 +77,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         present(pickerController, animated: true)
     }
 
-    func importImage() {
-        self.presentImagePicker(withType: .photoLibrary)
-
-//        var alertStyle = UIAlertController.Style.actionSheet
-//        if UIDevice.current.userInterfaceIdiom == .pad {
-//            alertStyle = UIAlertController.Style.alert
-//        }
-//        let actionSheet = UIAlertController(title: "프로필 사진 가져오기", message: nil, preferredStyle: alertStyle)
-//        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
-//            DispatchQueue.main.async(execute: {
-//                self.presentImagePicker(withType: .photoLibrary)
-//            })
-//        }
-//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-//        actionSheet.addAction(libraryAction)
-//        actionSheet.addAction(cancelAction)
-//        present(actionSheet, animated: true, completion: nil)
-    }
-
     private let profileText: SignUpTextField = {
         let textField = SignUpTextField()
         textField.isHidden = true
@@ -107,7 +88,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         textLabel.text = "Guest"
         textLabel.font = .preferredFont(forTextStyle: .title1)
         textLabel.textAlignment = .center
-
         return textLabel
     }()
 
@@ -121,30 +101,21 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
 
     private let logoutButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor.clear
+        button.backgroundColor = UIColor.systemBackground
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
-        button.setTitle("로그아웃", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        return button
-    }()
-
-    lazy var pencilToggleButton: UIButton = {
-        let button = UIButton()
-        button.setUIImage(systemName: "pencil.and.outline")
-        button.tintColor = .lightGray
+        let title = NSAttributedString(string: "로그아웃", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body), NSAttributedString.Key.foregroundColor: UIColor(rgb: 0x808080)])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
 
     private let resignButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor.clear
+        button.backgroundColor = UIColor.systemBackground
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
-        button.setTitle("회원탈퇴", for: .normal)
-        button.setTitleColor(.red, for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        let title = NSAttributedString(string: "회원탈퇴", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body), NSAttributedString.Key.foregroundColor: UIColor(rgb: 0xCB0F0F)])
+        button.setAttributedTitle(title, for: .normal)
         return button
     }()
 
@@ -309,18 +280,18 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         divideView.snp.makeConstraints ({ make in
             make.top.equalTo(profileLabel.snp.bottom).offset(26)
             make.centerX.equalToSuperview()
-            make.height.equalTo(1)
-            make.width.equalTo(260)
+            make.height.equalTo(2)
+            make.width.equalTo(264)
         })
 
         logoutButton.snp.makeConstraints({ make in
-            make.top.equalTo(divideView.snp.bottom).offset(27)
+            make.top.equalTo(divideView.snp.bottom).offset(25)
             make.centerX.equalToSuperview()
         })
 
         resignButton.snp.makeConstraints({ make in
-            make.top.equalTo(logoutButton.snp.bottom).offset(24)
-            make.centerX.equalTo(view)
+            make.top.equalTo(logoutButton.snp.bottom).offset(16.5)
+            make.centerX.equalToSuperview()
         })
     }
 
@@ -353,6 +324,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                     self.profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
                 case .userProfileChangeDidFail:
                     print("Fail")
+                    // TODO: Fail 시 alert
                 case .nameAlreadyInUse:
                     self.profileText.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
                 }
@@ -362,7 +334,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         editPhotoButton
             .tapPublisher
             .sink { _ in
-                self.importImage()
+                self.presentImagePicker(withType: .photoLibrary)
             }
             .store(in: &cancellables)
 
