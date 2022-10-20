@@ -9,6 +9,25 @@ import UIKit
 import SnapKit
 import Combine
 
+private class Length {
+    static let templateThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(24*5))/4
+    static let templateThumbnailHeight: CGFloat = templateThumbnailWidth*0.75
+    static let templateThumbnailCornerRadius: CGFloat = 12
+    static let templateTitleHeight: CGFloat = 19
+    static let templateTitleTopMargin: CGFloat = 16
+    static let cellWidth: CGFloat = templateThumbnailWidth
+    static let cellHeight: CGFloat = templateThumbnailHeight + templateTitleTopMargin + templateTitleHeight
+    static let cellHorizontalSpace: CGFloat = 20
+    static let cellVerticalSpace: CGFloat = 28
+    static let sectionTopMargin: CGFloat = 28
+    static let sectionBottomMargin: CGFloat = 48
+    static let sectionRightMargin: CGFloat = 28
+    static let sectionLeftMargin: CGFloat = 28
+    static let headerWidth: CGFloat = 116
+    static let headerHeight: CGFloat = 29
+    static let headerLeftMargin: CGFloat = 34
+}
+
 class PaperTemplateSelectViewController: UIViewController {
     private let viewModel = PaperTemplateSelectViewModel()
     private let input: PassthroughSubject<PaperTemplateSelectViewModel.Input, Never> = .init()
@@ -63,14 +82,14 @@ class PaperTemplateSelectViewController: UIViewController {
     // 컬렉션 뷰 초기화
     private func setCollectionView() {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: 28, left: 28, bottom: 48, right: 28)
-        collectionViewLayer.minimumInteritemSpacing = 20
-        collectionViewLayer.minimumLineSpacing = 28
-        collectionViewLayer.headerReferenceSize = .init(width: 116, height: 29)
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
+        collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
+        collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
+        collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
         
         templateCollectionView = PaperTemplateCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = templateCollectionView else {return}
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .systemBackground
         collectionView.alwaysBounceVertical = true
         collectionView.register(PaperTemplateCollectionCell.self, forCellWithReuseIdentifier: PaperTemplateCollectionCell.identifier)
         collectionView.register(PaperTemplateCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperTemplateCollectionHeader.identifier)
@@ -91,25 +110,17 @@ class PaperTemplateSelectViewController: UIViewController {
 extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀 크기
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 196, height: 169)
+        return CGSize(width: Length.cellWidth, height: Length.cellHeight)
     }
     
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if isRecentExist && section == 0 {
-            return 1
-        } else {
-            return viewModel.getTemplates().count
-        }
+        return isRecentExist && section == 0 ? 1 : viewModel.getTemplates().count
     }
     
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if isRecentExist {
-            return 2
-        } else {
-            return 1
-        }
+        return isRecentExist ? 2 : 1
     }
     
     // 특정 위치의 셀
@@ -133,12 +144,7 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
                 withReuseIdentifier: PaperTemplateCollectionHeader.identifier,
                 for: indexPath
             ) as? PaperTemplateCollectionHeader else {return UICollectionReusableView()}
-            
-            if isRecentExist && indexPath.section == 0 {
-                supplementaryView.setHeader(text: "최근 사용한")
-            } else {
-                supplementaryView.setHeader(text: "모두")
-            }
+            supplementaryView.setHeader(text: isRecentExist && indexPath.section == 0 ? "최근 사용한" : "모두")
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -186,7 +192,7 @@ private class PaperTemplateCollectionHeader: UICollectionReusableView {
         title.font = .preferredFont(forTextStyle: .title2)
         title.snp.makeConstraints({ make in
             make.top.equalToSuperview()
-            make.leading.equalToSuperview().offset(34)
+            make.leading.equalToSuperview().offset(Length.headerLeftMargin)
         })
     }
     
@@ -216,19 +222,19 @@ private class PaperTemplateCollectionCell: UICollectionViewCell {
         cell.addArrangedSubview(imageView)
         cell.addArrangedSubview(title)
         
-        cell.spacing = 16
+        cell.spacing = Length.templateTitleTopMargin
         cell.axis = .vertical
         cell.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
         })
         
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 12
+        imageView.layer.cornerRadius = Length.templateThumbnailCornerRadius
         imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
-            make.width.equalTo(196)
-            make.height.equalTo(134)
+            make.width.equalTo(Length.templateThumbnailWidth)
+            make.height.equalTo(Length.templateThumbnailHeight)
         })
         
         title.font = .preferredFont(forTextStyle: .body)
