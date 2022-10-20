@@ -6,8 +6,13 @@
 //
 
 import UIKit
+import Combine
+import CombineCocoa
 
 class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
+    
+    private let splitViewManager = SplitViewManager.shared
+    private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
     
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
@@ -46,6 +51,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     private var templateViewController: PaperTemplateSelectViewController!
     private var storageViewController: PaperStorageViewController!
     private var mainViewController: MainViewController!
+    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +60,17 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         self.loadViewControllers()
         self.sidebarViewController.show(categories: self.sideBarCategories)
         self.preferredPrimaryColumnWidthFraction = 0.25
+        
+        delegate = self
+        splitViewManager.transform(input: input.eraseToAnyPublisher())
+    }
+    
+    func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewController.DisplayMode) {
+        if displayMode.rawValue == 1 {
+            input.send(.viewIsClosed)
+        } else {
+            input.send(.viewIsOpened)
+        }
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
