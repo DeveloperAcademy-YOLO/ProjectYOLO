@@ -248,17 +248,18 @@ extension CardBackgroundViewController {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            let image = pickedImage
-            self.someImageView.image = image
-            input.send(.setCardBackgroundImg(background: image))
+            someImageView.image = pickedImage
         }
         dismiss(animated: true, completion: nil)
+        input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
     }
     
     private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = type
+        pickerController.cameraFlashMode = .off
+        pickerController.cameraDevice = .front
         present(pickerController, animated: true)
     }
     
