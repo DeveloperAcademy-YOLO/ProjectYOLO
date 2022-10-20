@@ -13,24 +13,35 @@ import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
+    private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]
+    private var selectedColor = String()
+    
+    private let viewModel: CardViewModel
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(viewModel: CardViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
         
         view.addSubview(someImageView)
-        someImageView.layer.masksToBounds = true
-        someImageView.layer.cornerRadius = 50
-        someImageView.contentMode = .scaleAspectFill
         someImageViewConstraints()
         
         view.addSubview(buttonLabel)
-        buttonLabel.layer.masksToBounds = true
-        buttonLabel.layer.cornerRadius = 30
         buttonLabelConstraints()
-        
+    
         view.addSubview(photoBackgroundButton)
         cameraButtonConstraints()
-        
+    
         view.addSubview(firstColorBackgroundButton)
         firstColorButtonConstraints()
         
@@ -49,20 +60,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         input.send(.viewDidLoad)
         bind()
     }
-    
-    private let viewModel: CardBackgroundViewModel
-    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
-    init(viewModel: CardBackgroundViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -72,27 +70,41 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
+                        print("CardBackgroundViewController import background image from view Model")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
                     })
+                case .getRecentCardResultImgSuccess(_):
+                    DispatchQueue.main.async(execute: {
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+                    })
                 }
             })
+        
             .store(in: &cancellables)
         secondColorBackgroundButton.tapPublisher
-            .sink { [weak self] _ in
+            .sink(receiveValue: { [weak self] _ in
                 self?.secondImageViewColor()
-            }
+            })
+        
+            .store(in: &cancellables)
+        thirdColorBackgroundButton.tapPublisher
+            .sink(receiveValue: { [weak self] _ in
+                self?.thirdImageViewColor()
+            })
             .store(in: &cancellables)
     }
-    
-    private var backgroundColor: [String] = ["customYellow", "customRed", "customBlack", "darkGray"]
-    private var selectedColor = String()
 
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = 30
+        label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         return label
     }()
     
@@ -139,7 +151,6 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
-//        button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -159,13 +170,16 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.backgroundColor = .white
+        theImageView.layer.masksToBounds = true
+        theImageView.layer.cornerRadius = 50
+        theImageView.contentMode = .scaleAspectFill
         return theImageView
     }()
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
         selectedColor = backgroundColor[0]
-        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
+        let image = UIImage(named: "heart.fill")
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
     
@@ -178,10 +192,11 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     }
     
     func thirdImageViewColor() {
-        print("thirdImageViewColor clicked")
+        print("secondImageViewColor clicked")
         selectedColor = backgroundColor[2]
-        let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
-        input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
+        guard let image = UIImage(named: "Halloween_Candy") else { return }
+        self.someImageView.image = image
+        input.send(.setCardBackgroundImg(background: image))
 
     }
     
@@ -191,6 +206,82 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         let image = UIImage(named: "Rectangle")?.withTintColor(UIColor(named: selectedColor) ?? UIColor(red: 100, green: 200, blue: 200), renderingMode: .alwaysOriginal)
         input.send(.setCardBackgroundImg(background: image ?? UIImage(systemName: "heart.fill")!))
     }
+    
+    func someImageViewConstraints() {
+        someImageView.snp.makeConstraints({ make in
+            make.width.equalTo(813)
+            make.height.equalTo(515)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func buttonLabelConstraints() {
+        buttonLabel.snp.makeConstraints({ make in
+            make.width.equalTo(100)
+            make.height.equalTo(450)
+            make.leading.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func cameraButtonConstraints() {
+        photoBackgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(buttonLabel.snp.top).offset(50)
+        })
+    }
+    
+    func firstColorButtonConstraints() {
+        firstColorBackgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(photoBackgroundButton.snp.bottom).offset(20)
+        })
+    }
+    
+    func secondColorButtonConstraints() {
+        secondColorBackgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
+        })
+    }
+    
+    func thirdColorButtonConstraints() {
+        thirdColorBackgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
+        })
+    }
+    
+    func fourthColorButtonConstraints() {
+        fourthColorBackgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
+        })
+    }
+}
+
+extension UIButton {
+    func setImage(systemName: String) {
+        contentHorizontalAlignment = .fill
+        contentVerticalAlignment = .fill
+        imageView?.contentMode = .scaleAspectFit
+        imageEdgeInsets = .zero
+        setImage(UIImage(systemName: systemName), for: .normal)
+    }
+}
+
+extension CardBackgroundViewController {
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
         var alertStyle = UIAlertController.Style.actionSheet
@@ -259,78 +350,5 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
                 break
             }
         })
-    }
-    
-    func someImageViewConstraints() {
-        someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    func buttonLabelConstraints() {
-        buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(250)
-            make.height.equalTo(450)
-            make.leading.equalTo(-160)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    func cameraButtonConstraints() {
-        photoBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.top.equalTo(buttonLabel.snp.top).offset(50)
-        })
-    }
-    
-    func firstColorButtonConstraints() {
-        firstColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.top.equalTo(photoBackgroundButton.snp.bottom).offset(20)
-        })
-    }
-    
-    func secondColorButtonConstraints() {
-        secondColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
-        })
-    }
-    
-    func thirdColorButtonConstraints() {
-        thirdColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
-        })
-    }
-    
-    func fourthColorButtonConstraints() {
-        fourthColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
-        })
-    }
-}
-
-extension UIButton {
-    func setImage(systemName: String) {
-        contentHorizontalAlignment = .fill
-        contentVerticalAlignment = .fill
-        imageView?.contentMode = .scaleAspectFit
-        imageEdgeInsets = .zero
-        setImage(UIImage(systemName: systemName), for: .normal)
     }
 }

@@ -16,19 +16,19 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     let canvasView = PKCanvasView(frame: .zero)
     let toolPicker = PKToolPicker()
     
-    var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
+    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
     
-    var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg = UIImage(named: "Rectangle")
     
-    private let viewModel: CardBackgroundViewModel
-    private let input: PassthroughSubject<CardBackgroundViewModel.Input, Never> = .init()
+    private let viewModel: CardViewModel
+    let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    private var isCanvasToggle: Bool = true
+    private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
-    init(viewModel: CardBackgroundViewModel) {
+    init(viewModel: CardViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -61,24 +61,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
-
         view.addSubview(someImageView)
-        someImageView.backgroundColor = .white
-        someImageView.layer.masksToBounds = true
-        someImageView.layer.cornerRadius = 50
-        someImageView.contentMode = .scaleAspectFill
-        someImageView.image = backgroundImg
         someImageViewConstraints()
         
         someImageView.addSubview(canvasView)
         
-        pencilKitAppear()
+        canvasViewAppear()
         toolPickerAppear()
         stickerCollectionViewDisappear()
         
         view.addSubview(buttonLabel)
-        buttonLabel.layer.masksToBounds = true
-        buttonLabel.layer.cornerRadius = 30
         buttonLabelConstraints()
         
         view.addSubview(pencilToggleButton)
@@ -87,11 +79,19 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(stickerToggleButton)
         stickerToggleButtonConstraints()
         
-        bind()
+        view.addSubview(saveButton)
+        saveButtonConstraints()
         
-       // view.layer.transform = CATransform3DMakeRotation(45.0, 0, 1.0, 1.0)
+        input.send(.viewDidLoad)
+        bind()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        canvasViewAppear()
+        toolPickerAppear()
+    }
+    // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -101,10 +101,20 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = background
+                        print("get background ImgSuccess")
                     })
                 case .getRecentCardBackgroundImgFail:
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "Rectangle")
+                    })
+                case .getRecentCardResultImgSuccess(_):
+                    DispatchQueue.main.async(execute: {
+
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+                        self.someImageView.image = UIImage(named: "Rectangle")
+                        print("getRecentCardResultImgFail")
                     })
                 }
             })
@@ -116,6 +126,11 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
+        theImageView.backgroundColor = .white
+        theImageView.layer.masksToBounds = true
+        theImageView.layer.cornerRadius = 50
+        theImageView.contentMode = .scaleAspectFill
+        theImageView.image = backgroundImg
         return theImageView
     }()
     
@@ -135,6 +150,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.backgroundColor = .white
+        label.layer.masksToBounds = true
+        label.layer.cornerRadius = 30
+        label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         return label
     }()
     
@@ -154,24 +172,49 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         return button
     }()
     
+    lazy var saveButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "square.and.arrow.down")
+        button.tintColor = .lightGray
+        button.addTarget(self, action: #selector(savePicture(_:)), for: .touchUpInside)
+        return button
+    }()
+    
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
-        self.isCanvasToggle.toggle()
-        if isCanvasToggle == true {
+        selectedStickerView?.showEditingHandlers = false
+        self.isCanvasToolToggle.toggle()
+        if isCanvasToolToggle == true {
             toolPickerAppear()
+            print("true")
         } else {
             toolPickerDisappear()
+            print("false")
         }
     }
     
     @objc func stickerToolKit(_ gesture: UITapGestureRecognizer) {
         self.isStickerToggle.toggle()
         if isStickerToggle == true {
+            selectedStickerView?.showEditingHandlers = false
             stickerCollectionViewDisappear()
             print("true")
         } else {
             stickerCollectionViewAppear()
             print("false")
         }
+    }
+
+    @objc func savePicture(_ gesture: UITapGestureRecognizer) {
+        selectedStickerView?.showEditingHandlers = false
+        let image = mergeImages(imageView: someImageView)
+            UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    func resultImageSend() {
+        print("Test good !!!!")
+        self.selectedStickerView?.showEditingHandlers = false
+        let image = self.mergeImages(imageView: self.someImageView)
+        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
     }
     
     func toolPickerAppear() {
@@ -200,7 +243,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         collectionViewConstraints()
     }
     
-    func pencilKitAppear() {
+    func canvasViewAppear() {
         canvasView.delegate = self
         canvasView.layer.masksToBounds = true
         canvasView.layer.cornerRadius = 50
@@ -213,11 +256,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         canvasViewConstraints()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-    }
-    
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(813)
@@ -226,7 +264,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.centerY.equalTo(self.view)
         })
     }
-    
+
     func collectionViewConstraints() {
         collectionView.snp.makeConstraints({ make in
             make.width.equalTo(730)
@@ -247,9 +285,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     func buttonLabelConstraints() {
         buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(250)
+            make.width.equalTo(100)
             make.height.equalTo(450)
-            make.leading.equalTo(-160)
+            make.leading.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
     }
@@ -269,12 +307,49 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.height.equalTo(50)
             make.leading.equalTo(20)
             make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
+        })
+    }
+    
+    func saveButtonConstraints() {
+        saveButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
 }
 
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    func mergeImages(imageView: UIImageView) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
+        imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let renderer = UIGraphicsImageRenderer(size: imageView.frame.size)
+        let image = renderer.image(actions: { _ in
+            imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
+        })
+        UIGraphicsEndImageContext()
+        return image
+    }
+    
+    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            
+            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        } else {
+            
+            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }

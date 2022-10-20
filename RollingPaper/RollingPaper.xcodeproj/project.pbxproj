@@ -8,10 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
+		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
-		AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */; };
+		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
+		BCF2481128ED512A008CD0F9 /* TemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* TemplateSelectViewController.swift */; };
+		BCF2481328ED5335008CD0F9 /* TemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* TemplateSelectViewModel.swift */; };
+		BCF2481728EFC499008CD0F9 /* SetPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* SetPaperViewController.swift */; };
+		BCF2481928EFC4CF008CD0F9 /* SetPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481828EFC4CF008CD0F9 /* SetPaperViewModel.swift */; };
 		BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */; };
 		BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */; };
 		BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */; };
@@ -76,10 +81,11 @@
 /* Begin PBXFileReference section */
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
+		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
 		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
-		AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewModel.swift; sourceTree = "<group>"; };
+		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewController.swift; sourceTree = "<group>"; };
 		BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewModel.swift; sourceTree = "<group>"; };
@@ -255,6 +261,10 @@
 		D22E4AB728EBDC8B001091DA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
+				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
+				AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */,
 				D22E4AA528EBDC72001091DA /* MainViewController.swift */,
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
@@ -265,8 +275,6 @@
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
-				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
-				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -303,7 +311,7 @@
 				BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */,
 				BCF2481828EFC4CF008CD0F9 /* PaperSettingViewModel.swift */,
 				BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */,
-				AFE8D6ED28F6E270005B1F45 /* CardBackgroundViewModel.swift */,
+				AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */,
 				CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */,
 			);
 			path = ViewModels;
@@ -522,6 +530,7 @@
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
+				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
@@ -529,15 +538,13 @@
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */,
-				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
-				AFE8D6EE28F6E270005B1F45 /* CardBackgroundViewModel.swift in Sources */,
 				D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */,
 				CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */,
-				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
+				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
 				BCF2481928EFC4CF008CD0F9 /* PaperSettingViewModel.swift in Sources */,
