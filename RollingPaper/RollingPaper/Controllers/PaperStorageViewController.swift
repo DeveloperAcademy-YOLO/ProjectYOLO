@@ -9,6 +9,35 @@ import UIKit
 import SnapKit
 import Combine
 
+private class Length {
+    static let paperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(24*5))/4
+    static let paperThumbnailHeight: CGFloat = paperThumbnailWidth*0.75
+    static let paperThumbnailCornerRadius: CGFloat = 12
+    static let paperTitleHeight: CGFloat = 19
+    static let paperTitleTopMargin: CGFloat = 16
+    static let timerHeight: CGFloat = 28
+    static let timerTopMargin: CGFloat = 12
+    static let cellWidth: CGFloat = paperThumbnailWidth
+    static let cellHeight: CGFloat = paperThumbnailHeight + paperTitleTopMargin + paperTitleHeight + timerTopMargin + timerHeight
+    static let cellHorizontalSpace: CGFloat = 20
+    static let cellVerticalSpace: CGFloat = 28
+    static let sectionTopMargin: CGFloat = 28
+    static let sectionBottomMargin: CGFloat = 48
+    static let sectionRightMargin: CGFloat = 28
+    static let sectionLeftMargin: CGFloat = 28
+    static let headerWidth: CGFloat = 116
+    static let headerHeight: CGFloat = 29
+    static let headerLeftMargin: CGFloat = 34
+    static let timerTopPadding: CGFloat = 7
+    static let timerBottomPadding: CGFloat = 7
+    static let timerRightPadding: CGFloat = 10
+    static let timerLeftPadding: CGFloat = 10
+    static let timerSpace: CGFloat = 5
+    static let timerCornerRadius: CGFloat = 15
+    static let clockImageWidth: CGFloat = 14
+    static let clockImageHeight: CGFloat = 14
+}
+
 class PaperStorageViewController: UIViewController {
     private let viewModel = PaperStorageViewModel()
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
@@ -57,16 +86,16 @@ class PaperStorageViewController: UIViewController {
     
     // 메인 뷰 초기화
     private func setMainView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
     }
     
     // 컬렉션 뷰 초기화
     private func setCollectionView() {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: 28, left: 28, bottom: 48, right: 28)
-        collectionViewLayer.minimumInteritemSpacing = 20
-        collectionViewLayer.minimumLineSpacing = 28
-        collectionViewLayer.headerReferenceSize = .init(width: 116, height: 29)
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
+        collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
+        collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
+        collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
         
         paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = paperCollectionView else {return}
@@ -81,7 +110,7 @@ class PaperStorageViewController: UIViewController {
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
             make.leading.trailing.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(0)
+            make.top.equalTo(view.safeAreaLayoutGuide)
         })
     }
     
@@ -95,15 +124,11 @@ class PaperStorageViewController: UIViewController {
 extension PaperStorageViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 196, height: 169)
+        return CGSize(width: Length.cellWidth, height: Length.cellHeight)
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
-            return viewModel.openedPapers.count
-        } else {
-            return viewModel.closedPapers.count
-        }
+        return section == 0 ? viewModel.openedPapers.count : viewModel.closedPapers.count
     }
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -112,17 +137,8 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageCollectionCell.identifier, for: indexPath) as? PaperStorageCollectionCell else {return UICollectionViewCell()}
-        
-        var paper: PaperPreviewModel
-        var thumbnail: UIImage?
-        if indexPath.section == 0 {
-            paper = viewModel.openedPapers[indexPath.item]
-            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-            
-        } else {
-            paper = viewModel.closedPapers[indexPath.item]
-            thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-        }
+        let paper = indexPath.section == 0 ? viewModel.openedPapers[indexPath.item] : viewModel.closedPapers[indexPath.item]
+        let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
         cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime)
         return cell
     }
@@ -134,12 +150,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 withReuseIdentifier: PaperStorageCollectionHeader.identifier,
                 for: indexPath
             ) as? PaperStorageCollectionHeader else {return UICollectionReusableView()}
-            
-            if indexPath.section == 0 {
-                supplementaryView.setHeader(text: "진행중인 페이퍼")
-            } else {
-                supplementaryView.setHeader(text: "종료된 페이퍼")
-            }
+            supplementaryView.setHeader(text: indexPath.section == 0 ? "진행중인 페이퍼" : "종료된 페이퍼")
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -148,16 +159,10 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 0 {
-            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-                guard let self = self else {return}
-                self.setSelectedPaper(paperId: self.viewModel.openedPapers[indexPath.item].paperId)
-            }
-        } else {
-            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-                guard let self = self else {return}
-                self.setSelectedPaper(paperId: self.viewModel.closedPapers[indexPath.item].paperId)
-            }
+        navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
+            guard let self = self else {return}
+            let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
+            self.setSelectedPaper(paperId: papers[indexPath.item].paperId )
         }
         return true
     }
@@ -227,30 +232,31 @@ private class PaperStorageCollectionCell: UICollectionViewCell {
         })
         
         preview.layer.masksToBounds = true
-        preview.layer.cornerRadius = 12
+        preview.layer.cornerRadius = Length.paperThumbnailCornerRadius
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
-            make.width.equalTo(196)
-            make.height.equalTo(134)
+            make.width.equalTo(Length.paperThumbnailWidth)
+            make.height.equalTo(Length.paperThumbnailHeight)
         })
         
         title.font = .preferredFont(forTextStyle: .body)
         title.textColor = UIColor(rgb: 0x808080)
         title.textAlignment = .center
         title.snp.makeConstraints({ make in
-            make.top.equalTo(preview.snp.bottom).offset(10)
+            make.top.equalTo(preview.snp.bottom).offset(Length.paperTitleTopMargin)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
         })
         
+        timer.layer.cornerRadius = Length.timerCornerRadius
         timer.distribution = .equalSpacing
-        timer.layoutMargins = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        timer.layoutMargins = UIEdgeInsets(top: Length.timerTopPadding, left: Length.timerLeftPadding, bottom: Length.timerBottomPadding, right: Length.timerRightPadding)
         timer.isLayoutMarginsRelativeArrangement = true
-        timer.layer.cornerRadius = 12
-        timer.spacing = 5
+        timer.layer.cornerRadius = Length.timerCornerRadius
+        timer.spacing = Length.timerSpace
         timer.snp.makeConstraints({ make in
-            make.top.equalTo(title.snp.bottom).offset(10)
+            make.top.equalTo(title.snp.bottom).offset(Length.timerTopMargin)
             make.centerX.equalToSuperview()
         })
         
@@ -258,8 +264,8 @@ private class PaperStorageCollectionCell: UICollectionViewCell {
         clock.tintColor = .white
         clock.contentMode = .scaleAspectFit
         clock.snp.makeConstraints({ make in
-            make.width.equalTo(15)
-            make.height.equalTo(15)
+            make.width.equalTo(Length.clockImageWidth)
+            make.height.equalTo(Length.clockImageHeight)
         })
         
         time.font = .preferredFont(forTextStyle: .body)

@@ -46,7 +46,7 @@ class PaperSettingViewController: UIViewController {
     
     // 메인 뷰 초기화
     private func setMainView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         let title1 = getTitle(text: "롤링페이퍼 제목")
         let subtitle1 = getSubTitle(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요")
