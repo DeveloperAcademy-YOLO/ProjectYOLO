@@ -229,7 +229,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         photoBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(buttonLabel.snp.top).offset(50)
         })
     }
@@ -238,7 +238,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         firstColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(photoBackgroundButton.snp.bottom).offset(20)
         })
     }
@@ -247,7 +247,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         secondColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
         })
     }
@@ -256,7 +256,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         thirdColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
         })
     }
@@ -265,7 +265,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         fourthColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
         })
     }

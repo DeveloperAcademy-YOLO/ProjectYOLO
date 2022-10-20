@@ -166,7 +166,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var stickerToggleButton: UIButton = {
         let button = UIButton()
-        button.setUIImage(systemName: "sparkles")
+        button.setImage(UIImage(named: "stickerToogle"), for: .normal)
         button.tintColor = .lightGray
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
@@ -297,15 +297,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(buttonLabel.snp.top).offset(20)
         })
     }
     
     func stickerToggleButtonConstraints() {
         stickerToggleButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.width.equalTo(80.7)
+            make.height.equalTo(63.76)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
             make.top.equalTo(pencilToggleButton.snp.bottom).offset(50)
         })
     }
@@ -314,7 +315,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         saveButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
@@ -349,6 +350,16 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
             
         }
     }
+    
+    func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
+         guard let image = image else { return nil }
+         let newSize = CGSize(width: width, height: height)
+         UIGraphicsBeginImageContextWithOptions(newSize, false, UIScreen.main.scale)
+         image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
+         let newImage = UIGraphicsGetImageFromCurrentImageContext()
+         UIGraphicsEndImageContext()
+         return newImage
+     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
