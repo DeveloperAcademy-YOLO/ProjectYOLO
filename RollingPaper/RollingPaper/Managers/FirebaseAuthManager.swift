@@ -137,6 +137,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     })
                 } else {
                     print("Name is Invalid")
+                    self?.signedInSubject.send(.nameAlreadyInUse)
                 }
             }
             .store(in: &cancellables)

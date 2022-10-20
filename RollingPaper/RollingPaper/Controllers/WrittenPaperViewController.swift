@@ -225,7 +225,7 @@ class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 100 // How many cells to display
+        return 30 // How many cells to display
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
