@@ -98,10 +98,8 @@ class PaperTemplateSelectViewController: UIViewController {
         
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
-            make.left.right.bottom.equalToSuperview()
-            
-            // 물어볼 것
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(0)
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
         })
     }
 }
