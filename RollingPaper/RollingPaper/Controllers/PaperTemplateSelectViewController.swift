@@ -10,6 +10,7 @@ import SnapKit
 import Combine
 
 private class Length {
+    static let extraLeftMargin: CGFloat = 54
     static let templateThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(24*5))/4
     static let templateThumbnailHeight: CGFloat = templateThumbnailWidth*0.75
     static let templateThumbnailCornerRadius: CGFloat = 12
@@ -29,6 +30,7 @@ private class Length {
 }
 
 class PaperTemplateSelectViewController: UIViewController {
+    private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperTemplateSelectViewModel()
     private let input: PassthroughSubject<PaperTemplateSelectViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
@@ -48,6 +50,7 @@ class PaperTemplateSelectViewController: UIViewController {
         setMainView()
         setCollectionView()
         bind()
+        splitViewBind()
     }
     
     // view가 나타날때마다 최근 템플릿 확인하기 위해 input에 값 설정하기
@@ -74,20 +77,53 @@ class PaperTemplateSelectViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
+    private func splitViewBind() {
+        let output = splitViewManager.getOutput()
+        output
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { event in
+                var extraLeftMargin: Int
+                var extraRightMargin: Int
+                switch event {
+                case .viewIsOpened:
+                    extraLeftMargin = 0
+                    extraRightMargin = 0
+                case .viewIsClosed:
+                    extraLeftMargin = 54
+                    extraRightMargin = 24
+                }
+                self.templateCollectionView?.snp.updateConstraints({ make in
+                    make.leading.equalToSuperview().offset(extraLeftMargin)
+                    make.trailing.equalToSuperview().offset(extraRightMargin)
+                })
+                UIView.animate(withDuration: 0.5, delay: 0, animations: {
+                    self.view.layoutIfNeeded()
+                })
+            })
+            .store(in: &cancellables)
+    }
+    
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .white
     }
     
-    // 컬렉션 뷰 초기화
-    private func setCollectionView() {
+    // 컬렉션 뷰 레이아웃 초기화
+    private func setCollectionViewLayout() {
         let collectionViewLayer = UICollectionViewFlowLayout()
         collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
         collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
         collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
         collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
+        self.templateCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: true)
+    }
+    
+    // 컬렉션 뷰 초기화
+    private func setCollectionView() {
+        templateCollectionView = PaperTemplateCollectionView(frame: .zero, collectionViewLayout: .init())
+        setCollectionViewLayout()
         
-        templateCollectionView = PaperTemplateCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = templateCollectionView else {return}
         collectionView.backgroundColor = .systemBackground
         collectionView.alwaysBounceVertical = true

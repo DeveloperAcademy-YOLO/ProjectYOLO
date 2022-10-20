@@ -93,16 +93,19 @@ class PaperStorageViewController: UIViewController {
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { event in
-                var toAdd: Int
+                var extraLeftMargin: Int
+                var extraRightMargin: Int
                 switch event {
                 case .viewIsOpened:
-                    toAdd = 0
+                    extraLeftMargin = 0
+                    extraRightMargin = 0
                 case .viewIsClosed:
-                    toAdd = 54
+                    extraLeftMargin = 54
+                    extraRightMargin = 24
                 }
-                
                 self.paperCollectionView?.snp.updateConstraints({ make in
-                    make.leading.equalToSuperview().offset(toAdd)
+                    make.leading.equalToSuperview().offset(extraLeftMargin)
+                    make.trailing.equalToSuperview().offset(extraRightMargin)
                 })
                 UIView.animate(withDuration: 0.5, delay: 0, animations: {
                     self.view.layoutIfNeeded()
