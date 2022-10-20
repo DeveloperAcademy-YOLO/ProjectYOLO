@@ -12,8 +12,7 @@ import SnapKit
 import Combine
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
-    
-    let canvasView = PKCanvasView(frame: .zero)
+
     let toolPicker = PKToolPicker()
     
     private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
@@ -131,6 +130,20 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         return theImageView
     }()
     
+    lazy var canvasView: PKCanvasView = {
+        let canvas = PKCanvasView(frame: .zero)
+        canvas.delegate = self
+        canvas.layer.masksToBounds = true
+        canvas.layer.cornerRadius = 50
+        canvas.contentMode = .scaleAspectFill
+        canvas.isOpaque = false
+        canvas.alwaysBounceVertical = true
+        canvas.drawingPolicy = .anyInput
+        canvas.translatesAutoresizingMaskIntoConstraints = true
+        canvas.becomeFirstResponder()
+        return canvas
+    }()
+
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -204,20 +217,21 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
             stickerButtonOff()
             selectedStickerView?.showEditingHandlers = false
             stickerCollectionViewDisappear()
-            imageViewInteractionDisabled()
             
             pencilButtonOn()
             toolPickerAppear()
-            canvasViewInteractionEnabled()
+            
+            imageViewInteractionDisabled()
+            canvasViewInteractionEnabled() // 여기 순서가 중요함
         } else {
             print("sticker button On")
             stickerButtonOn()
             stickerCollectionViewAppear()
-            imageViewInteractionEnabled()
-            
             pencilButtonOff()
             toolPickerDisappear()
-            canvasViewInteractionDisabled()
+            
+            imageViewInteractionEnabled()
+            canvasViewInteractionDisabled() // 여기 순서가 중요함
         }
     }
     
@@ -229,30 +243,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     func canvasViewInteractionDisabled() {
         rootUIImageView.addSubview(canvasView)
-        canvasView.delegate = self
-        canvasView.layer.masksToBounds = true
-        canvasView.layer.cornerRadius = 50
-        canvasView.contentMode = .scaleAspectFill
-        canvasView.isOpaque = false
-        canvasView.alwaysBounceVertical = true
-        canvasView.drawingPolicy = .anyInput
-        canvasView.translatesAutoresizingMaskIntoConstraints = true
-        canvasView.becomeFirstResponder()
         canvasView.isUserInteractionEnabled = false
         canvasViewConstraints()
     }
     
     func canvasViewInteractionEnabled() {
         rootUIImageView.addSubview(canvasView)
-        canvasView.delegate = self
-        canvasView.layer.masksToBounds = true
-        canvasView.layer.cornerRadius = 50
-        canvasView.contentMode = .scaleAspectFill
-        canvasView.isOpaque = false
-        canvasView.alwaysBounceVertical = true
-        canvasView.drawingPolicy = .anyInput
-        canvasView.translatesAutoresizingMaskIntoConstraints = true
-        canvasView.becomeFirstResponder()
         canvasView.isUserInteractionEnabled = true
         canvasViewConstraints()
     }
