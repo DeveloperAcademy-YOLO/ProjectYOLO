@@ -19,11 +19,11 @@ private class Length {
     static let thumbnailRightPadding: CGFloat = 24
     static let thumbnailBottomPadding: CGFloat = 28
     static let thumbnailLabelSpacing: CGFloat = 8
-    static let inputViewLeftMargin: CGFloat = 36
-    static let inputViewRightMargin: CGFloat = 88
-    static let inputViewTitleBottomMargin: CGFloat = 14
-    static let inputViewSubTitleBottomMargin: CGFloat = 32
-    static let inputViewSectionSpacing: CGFloat = 48
+    static let sectionLeftMargin: CGFloat = 36
+    static let sectionRightMargin: CGFloat = 88
+    static let sectionTitleBottomMargin: CGFloat = 14
+    static let sectionSubTitleBottomMargin: CGFloat = 32
+    static let sectionSpacing: CGFloat = 48
     static let textfieldHeight: CGFloat = 15
     static let textfieldWithBorderSpacing: CGFloat = 9
     static let textfieldBorderWidth: CGFloat = 2
@@ -87,7 +87,6 @@ class PaperSettingViewController: UIViewController {
         view.backgroundColor = .systemBackground
         
         let thumbnail = UIImageView()
-        let inputView = UIView()
         let thumbnailTitle = UILabel()
         let thumbnailDescription = UILabel()
         let title1 = getTitle(text: "롤링페이퍼 제목")
@@ -97,14 +96,13 @@ class PaperSettingViewController: UIViewController {
         let subtitle2 = getSubTitle(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다")
         
         view.addSubview(thumbnail)
-        view.addSubview(inputView)
+        view.addSubview(title1)
+        view.addSubview(subtitle1)
+        view.addSubview(textField)
+        view.addSubview(title2)
+        view.addSubview(subtitle2)
         thumbnail.addSubview(thumbnailTitle)
         thumbnail.addSubview(thumbnailDescription)
-        inputView.addSubview(title1)
-        inputView.addSubview(subtitle1)
-        inputView.addSubview(textField)
-        inputView.addSubview(title2)
-        inputView.addSubview(subtitle2)
         
         thumbnail.layer.masksToBounds = true
         thumbnail.layer.cornerRadius = Length.thumbnailRadius
@@ -136,38 +134,31 @@ class PaperSettingViewController: UIViewController {
             make.trailing.equalToSuperview().offset(-Length.thumbnailRightPadding)
         })
         
-        
-        inputView.snp.makeConstraints({ make in
-            make.leading.equalTo(thumbnail.snp.trailing).offset(Length.inputViewLeftMargin)
-            make.trailing.equalToSuperview().offset(-Length.inputViewRightMargin)
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(Length.topMargin)
-        })
-        
         title1.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(Length.topMargin)
+            make.leading.equalTo(thumbnail.snp.trailing).offset(Length.sectionLeftMargin)
+            make.trailing.equalToSuperview().offset(-Length.sectionRightMargin)
         })
         subtitle1.snp.makeConstraints({ make in
-            make.top.equalTo(title1.snp.bottom).offset(Length.inputViewTitleBottomMargin)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.top.equalTo(title1.snp.bottom).offset(Length.sectionTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
         })
         textField.snp.makeConstraints({ make in
-            make.top.equalTo(subtitle1.snp.bottom).offset(Length.inputViewSubTitleBottomMargin)
-            make.leading.equalTo(subtitle1)
-            make.trailing.equalToSuperview()
+            make.top.equalTo(subtitle1.snp.bottom).offset(Length.sectionSubTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
             make.height.equalTo(Length.textfieldWithBorderHeight)
         })
         title2.snp.makeConstraints({ make in
-            make.top.equalTo(textField.snp.bottom).offset(Length.inputViewSectionSpacing)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.top.equalTo(textField.snp.bottom).offset(Length.sectionSpacing)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
         })
         subtitle2.snp.makeConstraints({ make in
-            make.top.equalTo(title2.snp.bottom).offset(Length.inputViewTitleBottomMargin)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.top.equalTo(title2.snp.bottom).offset(Length.sectionTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
         })
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
@@ -197,7 +188,6 @@ class PaperSettingViewController: UIViewController {
     // 텍스트필드 뷰 가져오기
     private func getTextField(placeHolder: String) -> UITextField {
         let border = UIView()
-        
         paperTitleTextField.addSubview(border)
         paperTitleTextField.placeholder = placeHolder
         paperTitleTextField.textColor = .placeholderText
