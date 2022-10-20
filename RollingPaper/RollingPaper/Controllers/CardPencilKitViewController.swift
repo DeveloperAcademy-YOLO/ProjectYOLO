@@ -78,7 +78,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         
         view.addSubview(stickerOffButton)
         stickerOffButtonConstraints()
-    
+        
         input.send(.viewDidLoad)
         bind()
     }
@@ -106,7 +106,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                     })
                 case .getRecentCardResultImgSuccess(_):
                     DispatchQueue.main.async(execute: {
-
+                        
                     })
                 case .getRecentCardResultImgFail:
                     DispatchQueue.main.async(execute: {
@@ -272,82 +272,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         canvasView.becomeFirstResponder()
         canvasViewConstraints()
     }
-    
-    func someImageViewConstraints() {
-        someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-
-    func collectionViewConstraints() {
-        collectionView.snp.makeConstraints({ make in
-            make.width.equalTo(730)
-            make.height.equalTo(100)
-            make.centerX.equalTo(self.view)
-            make.top.equalTo(someImageView.snp.bottom).offset(10)
-        })
-    }
-    
-    func canvasViewConstraints() {
-        canvasView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    func buttonLabelConstraints() {
-        buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(100)
-            make.height.equalTo(450)
-            make.leading.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    func pencilOnButtonConstraints() {
-        pencilOnButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(buttonLabel.snp.top).offset(20)
-        })
-    }
-    
-    func pencilOffButtonConstraints() {
-        pencilOffButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
-            make.leading.equalTo(20)
-            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(buttonLabel.snp.top).offset(20)
-        })
-    }
-    
-    func stickerOnButtonConstraints() {
-        stickerOnButton.snp.makeConstraints({ make in
-            make.width.equalTo(80.7)
-            make.height.equalTo(63.76)
-            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(buttonLabel.snp.top).offset(90)
-            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-        })
-    }
-    
-    func stickerOffButtonConstraints() {
-        stickerOffButton.snp.makeConstraints({ make in
-            make.width.equalTo(80.7)
-            make.height.equalTo(63.76)
-            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(buttonLabel.snp.top).offset(90)
-            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-        })
-    }
 }
 
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -364,14 +288,14 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
     }
     
     func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
-         guard let image = image else { return nil }
-         let newSize = CGSize(width: width, height: height)
-         UIGraphicsBeginImageContextWithOptions(newSize, false, UIScreen.main.scale)
-         image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
-         let newImage = UIGraphicsGetImageFromCurrentImageContext()
-         UIGraphicsEndImageContext()
-         return newImage
-     }
+        guard let image = image else { return nil }
+        let newSize = CGSize(width: width, height: height)
+        UIGraphicsBeginImageContextWithOptions(newSize, false, UIScreen.main.scale)
+        image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
@@ -485,5 +409,83 @@ extension UIButton {
         imageView?.contentMode = .scaleAspectFit
         imageEdgeInsets = .zero
         setImage(UIImage(systemName: systemName), for: .normal)
+    }
+}
+
+extension CardPencilKitViewController {
+    func someImageViewConstraints() {
+        someImageView.snp.makeConstraints({ make in
+            make.width.equalTo(813)
+            make.height.equalTo(515)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func collectionViewConstraints() {
+        collectionView.snp.makeConstraints({ make in
+            make.width.equalTo(730)
+            make.height.equalTo(100)
+            make.centerX.equalTo(self.view)
+            make.top.equalTo(someImageView.snp.bottom).offset(10)
+        })
+    }
+    
+    func canvasViewConstraints() {
+        canvasView.snp.makeConstraints({ make in
+            make.width.equalTo(813)
+            make.height.equalTo(515)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func buttonLabelConstraints() {
+        buttonLabel.snp.makeConstraints({ make in
+            make.width.equalTo(100)
+            make.height.equalTo(450)
+            make.leading.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func pencilOnButtonConstraints() {
+        pencilOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    func pencilOffButtonConstraints() {
+        pencilOffButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(20)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    func stickerOnButtonConstraints() {
+        stickerOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(80.7)
+            make.height.equalTo(63.76)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
+            make.top.equalTo(buttonLabel.snp.top).offset(90)
+            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
+        })
+    }
+    
+    func stickerOffButtonConstraints() {
+        stickerOffButton.snp.makeConstraints({ make in
+            make.width.equalTo(80.7)
+            make.height.equalTo(63.76)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
+            make.top.equalTo(buttonLabel.snp.top).offset(90)
+            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
+        })
     }
 }

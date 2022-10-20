@@ -79,28 +79,28 @@ class CardRootViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-           button.tag = 1
-           return button
-       }()
-
+        button.tag = 1
+        return button
+    }()
+    
     lazy var rightButton: UIBarButtonItem = {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customCompleteBtn.setTitle("완료", for: .normal)
         customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         customCompleteBtn.setTitleColor(.black, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
-    
+        
         let button = UIBarButtonItem(customView: customCompleteBtn)
         button.tag = 2
-           return button
-        }()
+        return button
+    }()
     
     private func setCustomNavBarButtons() {
         self.navigationItem.titleView = segmentedControl
         
         navigationItem.leftBarButtonItem = leftButton
         navigationItem.rightBarButtonItem = rightButton
-       
+        
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
         navBarAppearance.backgroundColor = .systemBackground
@@ -150,7 +150,7 @@ class CardRootViewController: UIViewController {
         }
         DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
             let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
-         
+            
             self.navigationController?.pushViewController(pushVC, animated: false)
         }) // TODO: 리팩토링 필요
     }
@@ -166,28 +166,28 @@ class CardRootViewController: UIViewController {
         
         self.addChild(secondStepViewVC)
         self.addChild(firstStepViewVC)
-  
+        
         firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-       
+        
         self.view.addSubview(secondStepViewVC.view)
         self.view.addSubview(firstStepViewVC.view)
-       
-            NSLayoutConstraint.activate([
-                firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-                firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-                firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-                firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
-                
-                secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-                secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-                secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-                secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
-               
-            ])
-            self.firstStepView = firstStepViewVC.view
-            self.secondStepView = secondStepViewVC.view
-        }
+        
+        NSLayoutConstraint.activate([
+            firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+            
+            secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
+            secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+            
+        ])
+        self.firstStepView = firstStepViewVC.view
+        self.secondStepView = secondStepViewVC.view
+    }
 }
 
 extension UIImage {
