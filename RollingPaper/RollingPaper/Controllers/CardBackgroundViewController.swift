@@ -181,28 +181,28 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         print("firstImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[0])") else { return }
         self.someImageView.image = image
-        input.send(.setCardBackgroundImg(background: image ))
+        backgroundImageSend()
     }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[1])") else { return }
         self.someImageView.image = image
-        input.send(.setCardBackgroundImg(background: image))
+        backgroundImageSend()
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[2])") else { return }
         self.someImageView.image = image
-        input.send(.setCardBackgroundImg(background: image))
+        backgroundImageSend()
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[3])") else { return }
         self.someImageView.image = image
-        input.send(.setCardBackgroundImg(background: image ))
+        backgroundImageSend()
     }
 }
 
@@ -251,7 +251,11 @@ extension CardBackgroundViewController {
             someImageView.image = pickedImage
         }
         dismiss(animated: true, completion: nil)
-        input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
+        backgroundImageSend()
+    }
+    
+    func backgroundImageSend() {
+        self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
     }
     
     private func cameraImagePicker(withType type: UIImagePickerController.SourceType) {
