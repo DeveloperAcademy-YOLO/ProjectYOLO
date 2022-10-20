@@ -10,7 +10,6 @@ import SnapKit
 import Combine
 
 private class Length {
-    static let extraLeftMargin: CGFloat = 54
     static let templateThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(24*5))/4
     static let templateThumbnailHeight: CGFloat = templateThumbnailWidth*0.75
     static let templateThumbnailCornerRadius: CGFloat = 12
