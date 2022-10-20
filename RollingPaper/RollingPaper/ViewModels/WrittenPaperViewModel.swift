@@ -13,11 +13,15 @@ class WrittenPaperViewModel {
     
     private let localDatabaseManager: DatabaseManager
     private let serverDatabaseManager: DatabaseManager
-//    private var currentPaper: PaperModel
-//
     private var cancellables = Set<AnyCancellable>()
-//
+    
+    enum DataSource {
+        case fromLocal
+        case fromServer
+    }
+
     var currentPaper: PaperModel?
+    private var paperFrom: DataSource?
     private var paperID: String = ""
     private var paperTemplate: TemplateModel?
     private var paperTitle: String?
@@ -45,6 +49,7 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Local Paper")
                     self?.currentPaper = paper
+                    self?.paperFrom = DataSource.fromLocal
                 }
                 else {
                     print("로컬 비었음")
@@ -56,15 +61,28 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Server Paper")
                     self?.currentPaper = paper
+                    self?.paperFrom = DataSource.fromServer
                 } else {
                     print("서버 비었음")
                 }
             })
     }
     
-    func changePaperTitle() {}
+    func changePaperTitle(input: String) {
+        currentPaper?.title = input
+//        switch self.paperFrom {
+//        case .fromLocal:
+//            localDatabaseManager.updatePaper(paper: currentPaper)
+//        case .fromServer:
+//            serverDatabaseManager.updatePaper(paper: currentPaper)
+//        }
+    }
     
-    func setRemainingTime() {}
+    func getRemainingTime(_ paperID: String) {}
+    
+    func callEveryCards() {
+        
+    }
     
     func addCard() {} // 이건 요셉 뷰에서 추가해야하는 내용
     
@@ -72,8 +90,24 @@ class WrittenPaperViewModel {
     
     func showCardDetail() {}
     
-    func stopPaper() {}
+    func stopPaper(_ paperID: String, from paperFrom: DataSource) {
+//        switch paperFrom {
+//        case .fromLocal: break
+//
+//        case .fromServer:
+//            <#code#>
+//        }
+    }
     
-    func deletePaper() {}
+    func deletePaper(_ paperID: String, from paperFrom: DataSource) {
+        switch paperFrom {
+        case .fromLocal:
+            localDatabaseManager.removePaper(paperId: paperID)
+        case .fromServer:
+            serverDatabaseManager.removePaper(paperId: paperID)
+        }
+    }
+    
+    func makePaperLinkForShare() {}
 
 }

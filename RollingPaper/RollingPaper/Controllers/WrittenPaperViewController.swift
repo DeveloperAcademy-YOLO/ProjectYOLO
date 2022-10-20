@@ -13,6 +13,8 @@ import Combine
 class WrittenPaperViewController: UIViewController {
     lazy private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
+    lazy private var titleEmbedingTextField: UITextField = UITextField()
+    lazy private var changedPaperTitle: String = ""
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
@@ -157,12 +159,19 @@ class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             print("수정")
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
-            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in  }
-            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in
+                if let changedPaperTitle = self.titleEmbedingTextField.text {
+                    self.viewModel.changePaperTitle(input: changedPaperTitle)
+                    print(changedPaperTitle)
+                    //이거 아직 subscribe에 전달 안 해줘서 실시간으로 바뀌진 않음
+                }
+            }
+            let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
             alert.addAction(edit)
-            alert.addTextField{ (editTitleTextField) in
-                editTitleTextField.text = "dummy text"
+            alert.addTextField { (editTitleTextField) in
+                self.titleEmbedingTextField = editTitleTextField
+                editTitleTextField.text = self.viewModel.currentPaper?.title
             }
             self.present(alert, animated: true, completion: nil)
         }))
