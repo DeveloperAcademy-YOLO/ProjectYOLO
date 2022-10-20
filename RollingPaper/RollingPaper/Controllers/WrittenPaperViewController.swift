@@ -8,15 +8,17 @@
 import Foundation
 import UIKit
 import SnapKit
+import Combine
 
 class WrittenPaperViewController: UIViewController {
+    lazy private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-        titleLabel.text = "재현이의 졸업을 축하하며"
+        titleLabel.text = viewModel.currentPaper?.title
         titleLabel.sizeToFit()
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
@@ -126,9 +128,8 @@ class WrittenPaperViewController: UIViewController {
         if
             let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
             let splitVC = currentVC.parent?.parent as? SplitViewController {
-            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))}
-        
-        else if
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
+        } else if
             let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperStorageViewController }).first,
             let splitVC = currentVC.parent?.parent as? SplitViewController {
             splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))}

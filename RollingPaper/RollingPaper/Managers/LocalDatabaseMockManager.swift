@@ -71,6 +71,7 @@ final class LocalDatabaseMockManager: DatabaseManager {
     
     /// 로컬 페이퍼 데이터 추가 및 프리뷰 데이터 추가
     func addPaper(paper: PaperModel) {
+        paperSubject.send(paper)
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString)
         papersSubject.send(papersSubject.value + [paperPreview])
         papersMockData.append(paper)

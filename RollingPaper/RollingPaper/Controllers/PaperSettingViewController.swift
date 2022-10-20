@@ -15,6 +15,8 @@ class PaperSettingViewController: UIViewController {
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
+    private var currentPaperTitle: String = ""
+    
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
         viewModel = PaperSettingViewModel(template: template)
@@ -136,8 +138,15 @@ class PaperSettingViewController: UIViewController {
         return paperTitleTextField
     }
     
+    func setCurrentPaperTitle() {
+        currentPaperTitle = paperTitleTextField.text ?? "제목을 입력하지 않으셨습니다."
+    }
+    
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+        self.setCurrentPaperTitle()
+        self.input.send(.setPaperTitle(title: self.currentPaperTitle))
+        self.input.send(.endSettingPaper)
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
             self?.input.send(.endSettingPaper)
         }
