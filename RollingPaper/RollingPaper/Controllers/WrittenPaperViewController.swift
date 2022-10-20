@@ -124,10 +124,14 @@ class WrittenPaperViewController: UIViewController {
     
     func moveToPaperStorageView() {
         if
-            let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
-            let splitVC = templateSelectVC.parent?.parent as? SplitViewController {
-            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
-        }
+            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
+            let splitVC = currentVC.parent?.parent as? SplitViewController {
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))}
+        
+        else if
+            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperStorageViewController }).first,
+            let splitVC = currentVC.parent?.parent as? SplitViewController {
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))}
     }
     
     func moveToCardRootView() {
