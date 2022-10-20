@@ -189,12 +189,17 @@ class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             print("삭제")
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
-            let delete = UIAlertAction(title: "삭제", style: .destructive) { (delete) in  }
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { (deletion) in
+//                if self.titleEmbedingTextField.text == self.viewModel.currentPaper?.title {
+//                    self.viewModel.deletePaper(self.viewModel.currentPaper?.paperId!, from: self.viewModel.paperFrom!)
+//                }
+            }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
             alert.addAction(cancel)
-            alert.addTextField{ (editTitleTextField) in
-                editTitleTextField.placeholder = "재현이의 생일을 축하하며"
+            alert.addTextField { (editTitleTextField) in
+                self.titleEmbedingTextField = editTitleTextField
+                editTitleTextField.placeholder = self.viewModel.currentPaper?.title
             }
             self.present(alert, animated: true, completion: nil)
         }))

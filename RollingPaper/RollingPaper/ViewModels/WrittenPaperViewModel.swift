@@ -21,7 +21,7 @@ class WrittenPaperViewModel {
     }
 
     var currentPaper: PaperModel?
-    private var paperFrom: DataSource?
+    var paperFrom: DataSource?
     private var paperID: String = ""
     private var paperTemplate: TemplateModel?
     private var paperTitle: String?
