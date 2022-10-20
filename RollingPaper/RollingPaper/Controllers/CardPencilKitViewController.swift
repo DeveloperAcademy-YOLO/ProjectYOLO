@@ -25,7 +25,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     private var cancellables = Set<AnyCancellable>()
     
     private var isCanvasToolToggle: Bool = true
-    private var isStickerToggle: Bool = true
+    private var isStickerToggle: Bool = false
     private var imageSticker: UIImage!
     
     init(viewModel: CardViewModel) {
@@ -74,7 +74,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         buttonLabelConstraints()
         
         pencilOnButtonAppear()
-        stickerOffButtonAppear()
+        stickerButtonOff()
         
         input.send(.viewDidLoad)
         bind()
@@ -153,7 +153,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .black
-        button.addTarget(self, action: #selector(toggleToolKit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -161,7 +161,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .lightGray
-        button.addTarget(self, action: #selector(toggleToolKit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -169,7 +169,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         let button = UIButton()
         button.setImage(UIImage(named: "stickerToogleOn"), for: .normal)
         button.setImage(UIImage(named: "stickerToogleOn"), for: .highlighted)
-        button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -177,31 +177,24 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         let button = UIButton()
         button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
         button.setImage(UIImage(named: "stickerToogleOff"), for: .highlighted)
-        button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
-    @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
-        selectedStickerView?.showEditingHandlers = false
+    @objc func togglebutton(_ gesture: UITapGestureRecognizer) {
         self.isCanvasToolToggle.toggle()
-        if isCanvasToolToggle == true {
+        self.isStickerToggle.toggle()
+        if isCanvasToolToggle == true && isStickerToggle == false {
+            selectedStickerView?.showEditingHandlers = false
             pencilOnButtonAppear()
             toolPickerAppear()
-        } else {
-            pencilOffButtonAppear()
-            toolPickerDisappear()
-        }
-    }
-    
-    @objc func stickerToolKit(_ gesture: UITapGestureRecognizer) {
-        self.isStickerToggle.toggle()
-        if isStickerToggle == true {
-            selectedStickerView?.showEditingHandlers = false
-            stickerOffButtonAppear()
+            stickerButtonOff()
             stickerCollectionViewDisappear()
         } else {
-            stickerOnButtonAppear()
+            stickerButtonOn()
             stickerCollectionViewAppear()
+            pencilOffButtonAppear()
+            toolPickerDisappear()
         }
     }
     
@@ -231,12 +224,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         pencilOffButtonConstraints()
     }
     
-    func stickerOnButtonAppear() {
+    func stickerButtonOn() {
         view.addSubview(stickerOnButton)
         stickerOnButtonConstraints()
     }
     
-    func stickerOffButtonAppear() {
+    func stickerButtonOff() {
         view.addSubview(stickerOffButton)
         stickerOffButtonConstraints()
     }
