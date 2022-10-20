@@ -61,10 +61,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .lightGray
+       
         view.addSubview(someImageView)
         someImageViewConstraints()
-        
+      
         someImageView.addSubview(canvasView)
+        canvasViewConstraints()
         
         canvasViewAppear()
         toolPickerAppear()
@@ -73,7 +75,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        pencilOnButtonAppear()
+        pencilButtonOn()
         stickerButtonOff()
         
         input.send(.viewDidLoad)
@@ -186,14 +188,14 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         self.isStickerToggle.toggle()
         if isCanvasToolToggle == true && isStickerToggle == false {
             selectedStickerView?.showEditingHandlers = false
-            pencilOnButtonAppear()
+            pencilButtonOn()
             toolPickerAppear()
             stickerButtonOff()
             stickerCollectionViewDisappear()
         } else {
             stickerButtonOn()
             stickerCollectionViewAppear()
-            pencilOffButtonAppear()
+            pencilButtonOff()
             toolPickerDisappear()
         }
     }
@@ -214,12 +216,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         toolPicker.setVisible(false, forFirstResponder: canvasView)
     }
     
-    func pencilOnButtonAppear() {
+    func pencilButtonOn() {
         view.addSubview(pencilOnButton)
         pencilOnButtonConstraints()
     }
     
-    func pencilOffButtonAppear() {
+    func pencilButtonOff() {
         view.addSubview(pencilOffButton)
         pencilOffButtonConstraints()
     }
@@ -304,16 +306,16 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
                 let testImage = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100))
                 testImage.image = imageSticker
                 testImage.contentMode = .scaleAspectFit
-                let stickerView3 = StickerView.init(contentView: testImage)
-                stickerView3.center = CGPoint.init(x: 150, y: 150)
-                stickerView3.delegate = self
-                stickerView3.setImage(UIImage.init(named: "Close")!, forHandler: StickerViewHandler.close)
-                stickerView3.setImage(UIImage.init(named: "Rotate")!, forHandler: StickerViewHandler.rotate)
-                stickerView3.setImage(UIImage.init(named: "Flip")!, forHandler: StickerViewHandler.flip)
-                stickerView3.showEditingHandlers = false
-                stickerView3.tag = 999
-                self.someImageView.addSubview(stickerView3)
-                self.selectedStickerView = stickerView3
+                let stickerView = StickerView.init(contentView: testImage)
+                stickerView.center = CGPoint.init(x: 150, y: 150)
+                stickerView.delegate = self
+                stickerView.setImage(UIImage.init(named: "Close")!, forHandler: StickerViewHandler.close)
+                stickerView.setImage(UIImage.init(named: "Rotate")!, forHandler: StickerViewHandler.rotate)
+                stickerView.setImage(UIImage.init(named: "Flip")!, forHandler: StickerViewHandler.flip)
+                stickerView.showEditingHandlers = false
+                stickerView.tag = 999
+                self.someImageView.addSubview(stickerView)
+                self.selectedStickerView = stickerView
             } else {
                 print("Sticker not loaded")
             }
