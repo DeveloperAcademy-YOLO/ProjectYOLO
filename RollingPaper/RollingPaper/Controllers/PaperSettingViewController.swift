@@ -62,8 +62,24 @@ class PaperSettingViewController: UIViewController {
     
     // 네비게이션 바 초기화
     private func setNavigationBar() {
-        let createBtn = UIBarButtonItem(title: "생성하기", style: .plain, target: self, action: #selector(createBtnPressed))
-        navigationItem.rightBarButtonItem = createBtn
+        // 요셉이 만들어주신 거 그대로 쓰긴 했는데, 나중에 크기와 색깔을 전부 통일해야할듯함 (티모가 따로 디자인해주신 버튼이 아니라면)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
+        let leftCustomBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
+        leftCustomBackBtn.setTitle("템플릿", for: .normal)
+        leftCustomBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        leftCustomBackBtn.setTitleColor(.black, for: .normal)
+        leftCustomBackBtn.setImage(customBackBtnImage, for: .normal)
+        leftCustomBackBtn.addLeftPadding(5)
+        leftCustomBackBtn.addTarget(self, action: #selector(backBtnPressed), for: .touchUpInside)
+        
+        let righCustomCreateBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
+        righCustomCreateBtn.setTitle("생성하기", for: .normal)
+        righCustomCreateBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
+        righCustomCreateBtn.setTitleColor(.black, for: .normal)
+        righCustomCreateBtn.addTarget(self, action: #selector(createBtnPressed), for: .touchUpInside)
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: leftCustomBackBtn)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: righCustomCreateBtn)
     }
     
     // 메인 뷰 초기화
@@ -212,8 +228,13 @@ class PaperSettingViewController: UIViewController {
         return paperTitleTextField
     }
     
+    // 뒤로가기 버튼 눌렀을 때 동작
+    @objc private func backBtnPressed() {
+        navigationController?.popViewController(animated: true)
+    }
+    
     // 생성하기 버튼 눌렀을 때 동작
-    @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+    @objc private func createBtnPressed() {
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
             self?.input.send(.endSettingPaper)
         }
