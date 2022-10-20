@@ -32,6 +32,7 @@ final class SignUpViewModel {
     private func bind() {
         authManager
             .signedInSubject
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
@@ -52,6 +53,7 @@ final class SignUpViewModel {
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
