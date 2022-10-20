@@ -25,6 +25,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
         photo.image = UIImage(systemName: "person.circle")
         photo.layer.cornerRadius = photo.frame.width / 2
+        photo.layer.masksToBounds = true
         photo.contentMode = UIView.ContentMode.scaleAspectFit
         return photo
     }()
@@ -33,6 +34,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 15, height: 15))
         chevron.image = UIImage(systemName: "chevron.forward")
         chevron.contentMode = UIView.ContentMode.scaleAspectFit
+        chevron.snp.makeConstraints { make in
+            make.height.width.equalTo(15)
+        }
         return chevron
     }()
     
@@ -116,17 +120,8 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         let category = self.categories[indexPath.row]
-        // TODO: 다음 스프린트 때 TableView를 Collection View로 Refactoring
-        /*
-        let backgroundCell: UIView = {
-            var backgroundCell = UIView(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
-            backgroundCell.backgroundColor = .gray
-            return backgroundCell
-        }()
-        */
         var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
         backgroundConfig.backgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
-        // cell.selectedBackgroundView = backgroundCell
         cell.backgroundConfiguration = backgroundConfig
         cell.selectionStyle = .none
         
