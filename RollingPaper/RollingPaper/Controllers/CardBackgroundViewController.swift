@@ -39,9 +39,12 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
     
-        view.addSubview(photoBackgroundButton)
+        view.addSubview(cameraBackgroundButton)
         cameraButtonConstraints()
     
+        view.addSubview(divider)
+        dividerConstraints()
+        
         view.addSubview(firstColorBackgroundButton)
         firstColorButtonConstraints()
         
@@ -101,14 +104,14 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
 
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .systemBackground
         label.layer.masksToBounds = true
         label.layer.cornerRadius = 30
         label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         return label
     }()
     
-    lazy var photoBackgroundButton: UIButton = {
+    lazy var cameraBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(systemName: "camera")
         button.tintColor = .darkGray
@@ -116,12 +119,18 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         return button
     }()
     
+    lazy var divider: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .lightGray
+        return label
+    }()
+    
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.backgroundColor = UIColor(named: backgroundColor[0])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if button.backgroundColor == .white {
+        if button.backgroundColor == .systemBackground {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
@@ -134,7 +143,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.backgroundColor = UIColor(named: backgroundColor[1])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if button.backgroundColor == .white {
+        if button.backgroundColor == .systemBackground {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
@@ -147,7 +156,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.backgroundColor = UIColor(named: backgroundColor[2])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if button.backgroundColor == .white {
+        if button.backgroundColor == .systemBackground {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
@@ -159,7 +168,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.backgroundColor = UIColor(named: backgroundColor[3])
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if button.backgroundColor == .white {
+        if button.backgroundColor == .systemBackground {
             button.layer.borderColor = UIColor.gray.cgColor
             button.layer.borderWidth = 2
         }
@@ -169,7 +178,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.backgroundColor = .white
+        theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
@@ -226,11 +235,20 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     }
     
     func cameraButtonConstraints() {
-        photoBackgroundButton.snp.makeConstraints({ make in
+        cameraBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
             make.top.equalTo(buttonLabel.snp.top).offset(50)
+        })
+    }
+    
+    func dividerConstraints() {
+        divider.snp.makeConstraints({ make in
+            make.width.equalTo(65)
+            make.height.equalTo(2)
+            make.centerX.equalTo(cameraBackgroundButton.snp.centerX)
+            make.top.equalTo(cameraBackgroundButton.snp.bottom).offset(20)
         })
     }
     
@@ -239,7 +257,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(photoBackgroundButton.snp.bottom).offset(20)
+            make.top.equalTo(divider.snp.bottom).offset(20)
         })
     }
     

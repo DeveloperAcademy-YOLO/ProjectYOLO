@@ -116,34 +116,10 @@ class CardRootViewController: UIViewController {
         control.layer.cornerRadius = 9
         control.layer.masksToBounds = true
         control.clipsToBounds = true
-       // control.layer.borderWidth = 1
-       // control.layer.borderColor = CGColor(red: 100, green: 100, blue: 80, alpha: 1)
         control.selectedSegmentTintColor = UIColor(red: 1, green: 1, blue: 1)
         control.translatesAutoresizingMaskIntoConstraints = false
-        control.setImage(
-            UIImage.textEmbededImage(
-                image: UIImage(named: "first_step_icon")!,
-                string: "배경 고르기",
-                color: .white
-            ),
-            forSegmentAt: 0
-        )
-        control.setImage(
-            UIImage.textEmbededImage(
-                image: UIImage(systemName: "paintbrush")!,
-                string: "꾸미기",
-                color: .white
-            ),
-            forSegmentAt: 1
-        )
-        control.setImage(
-            UIImage.textEmbededImage(
-                image: UIImage(systemName: "paintbrush.fill")!,
-                string: "꾸미기",
-                color: .white
-            ),
-            forSegmentAt: 1
-        )
+        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "rectangle.dashed.and.paperclip")!, string: "배경 고르기", color: .white), forSegmentAt: 0)
+        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "paintbrush")!, string: "꾸미기", color: .white), forSegmentAt: 1)
         control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
         control.setTitleTextAttributes([.foregroundColor: UIColor.systemBackground], for: .selected)
         control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)

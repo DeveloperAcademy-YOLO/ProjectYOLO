@@ -76,12 +76,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         view.addSubview(pencilToggleButton)
         pencilToggleButtonConstraints()
         
-        view.addSubview(stickerToggleButton)
-        stickerToggleButtonConstraints()
-        
-//        view.addSubview(saveButton)
-//        saveButtonConstraints()
-        
+        view.addSubview(stickerOffButton)
+        stickerOffButtonConstraints()
+    
         input.send(.viewDidLoad)
         bind()
     }
@@ -123,10 +120,9 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
-        theImageView.backgroundColor = .white
+        theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
@@ -143,13 +139,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         setCollectionView.dataSource = self
         setCollectionView.delegate = self
         setCollectionView.register(StickerCollectionViewCell.self, forCellWithReuseIdentifier: "StickerCollectionViewCell")
-        setCollectionView.backgroundColor = .white
+        setCollectionView.backgroundColor = .systemBackground
         return setCollectionView
     }()
     
     lazy var buttonLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .white
+        label.backgroundColor = .systemBackground
         label.layer.masksToBounds = true
         label.layer.cornerRadius = 30
         label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
@@ -164,21 +160,19 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         return button
     }()
     
-    lazy var stickerToggleButton: UIButton = {
+    lazy var stickerOnButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
-        button.tintColor = .lightGray
+        button.setImage(UIImage(named: "stickerToogleOn"), for: .normal)
         button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
         return button
     }()
     
-//    lazy var saveButton: UIButton = {
-//        let button = UIButton()
-//        button.setUIImage(systemName: "square.and.arrow.down")
-//       // button.tintColor = .lightGray
-//        button.addTarget(self, action: #selector(savePicture(_:)), for: .touchUpInside)
-//        return button
-//    }()
+    lazy var stickerOffButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
+        button.addTarget(self, action: #selector(stickerToolKit(_:)), for: .touchUpInside)
+        return button
+    }()
     
     @objc func toggleToolKit(_ gesture: UITapGestureRecognizer) {
         selectedStickerView?.showEditingHandlers = false
@@ -196,19 +190,15 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         self.isStickerToggle.toggle()
         if isStickerToggle == true {
             selectedStickerView?.showEditingHandlers = false
+            stickerOffButtonAppear()
             stickerCollectionViewDisappear()
             print("true")
         } else {
+            stickerOnButtonAppear()
             stickerCollectionViewAppear()
             print("false")
         }
     }
-
-//    @objc func savePicture(_ gesture: UITapGestureRecognizer) {
-//        selectedStickerView?.showEditingHandlers = false
-//        let image = mergeImages(imageView: someImageView)
-//            UIImageWriteToSavedPhotosAlbum(image!, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
-//    }
     
     func resultImageSend() {
         print("Test good !!!!")
@@ -225,6 +215,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     func toolPickerDisappear() {
         toolPicker.addObserver(canvasView)
         toolPicker.setVisible(false, forFirstResponder: canvasView)
+    }
+    
+    func stickerOnButtonAppear() {
+        view.addSubview(stickerOnButton)
+        stickerOnButtonConstraints()
+    }
+    
+    func stickerOffButtonAppear() {
+        view.addSubview(stickerOffButton)
+        stickerOffButtonConstraints()
     }
     
     func stickerCollectionViewAppear() {
@@ -302,8 +302,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         })
     }
     
-    func stickerToggleButtonConstraints() {
-        stickerToggleButton.snp.makeConstraints({ make in
+    func stickerOnButtonConstraints() {
+        stickerOnButton.snp.makeConstraints({ make in
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
@@ -312,15 +312,15 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         })
     }
     
-//    func saveButtonConstraints() {
-//        saveButton.snp.makeConstraints({ make in
-//            make.width.equalTo(50)
-//            make.height.equalTo(50)
-//            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-//            make.top.equalTo(stickerToggleButton.snp.bottom).offset(50)
-//            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-//        })
-//    }
+    func stickerOffButtonConstraints() {
+        stickerOffButton.snp.makeConstraints({ make in
+            make.width.equalTo(80.7)
+            make.height.equalTo(63.76)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(10)
+            make.top.equalTo(pencilToggleButton.snp.bottom).offset(18)
+            make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
+        })
+    }
 }
 
 extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -335,22 +335,6 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
         UIGraphicsEndImageContext()
         return image
     }
-//
-//    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-//        if let error = error {
-//
-//            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "OK", style: .default))
-//            present(alert, animated: true)
-//
-//        } else {
-//
-//            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "OK", style: .default))
-//            present(alert, animated: true)
-//
-//        }
-//    }
     
     func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
          guard let image = image else { return nil }

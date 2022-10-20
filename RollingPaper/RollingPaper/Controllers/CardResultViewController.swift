@@ -40,10 +40,9 @@ final class CardResultViewController: UIViewController {
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.backgroundColor = .white
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
-        theImageView.backgroundColor = .white
+        theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
@@ -60,12 +59,10 @@ final class CardResultViewController: UIViewController {
     }()
     
     lazy var leftButton: UIBarButtonItem = {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("취소", for: .normal)
         customBackBtn.setTitleColor(.black, for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
