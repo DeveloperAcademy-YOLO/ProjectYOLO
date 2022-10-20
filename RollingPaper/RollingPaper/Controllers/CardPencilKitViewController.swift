@@ -353,7 +353,7 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
                 testImage.image = imageSticker
                 testImage.contentMode = .scaleAspectFit
                 let stickerView = StickerView.init(contentView: testImage)
-                stickerView.center = CGPoint.init(x: 150, y: 150)
+                stickerView.center = CGPoint.init(x: 400, y: 250)
                 stickerView.delegate = self
                 stickerView.setImage(UIImage.init(named: "Close")!, forHandler: StickerViewHandler.close)
                 stickerView.setImage(UIImage.init(named: "Rotate")!, forHandler: StickerViewHandler.rotate)
