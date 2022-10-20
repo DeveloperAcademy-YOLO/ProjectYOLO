@@ -205,6 +205,7 @@ class PaperSettingViewController: UIViewController {
         // 제목 입력할때마다 입력한 글자 저장
         paperTitleTextField
             .controlPublisher(for: .editingChanged)
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { _ in
                 self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
             })
@@ -213,6 +214,7 @@ class PaperSettingViewController: UIViewController {
         // 엔터 누르면 포커스 해제하고 키보드 내리기
         paperTitleTextField
             .controlPublisher(for: .editingDidEndOnExit)
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { _ in
                 self.paperTitleTextField.resignFirstResponder()
             })
