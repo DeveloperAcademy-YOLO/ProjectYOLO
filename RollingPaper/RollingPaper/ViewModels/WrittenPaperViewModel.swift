@@ -45,13 +45,11 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Local Paper")
                     self?.currentPaper = paper
-                    
                 }
                 else {
                     print("로컬 비었음")
                 }
             })
-            .store(in: &cancellables) // 이 줄 있으면 여러번 호출됨, 계속 저장만 해서 그런가 봄
         
         self.serverDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
@@ -62,7 +60,6 @@ class WrittenPaperViewModel {
                     print("서버 비었음")
                 }
             })
-            .store(in: &cancellables)
     }
     
     func changePaperTitle() {}
