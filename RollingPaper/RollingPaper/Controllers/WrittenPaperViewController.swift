@@ -202,30 +202,26 @@ class WrittenPaperViewController: UIViewController {
         var cardsCollection: UICollectionView?
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 5, left: 20, bottom: 20, right: 20 )
+        layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
         layout.itemSize = CGSize(width: (self.view.frame.width-80)/3, height: ((self.view.frame.width-120)/3)*0.75)
         layout.minimumInteritemSpacing = 20
         layout.minimumLineSpacing = 20
         
-        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 30, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
+        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
         cardsCollection?.center.x = view.center.x
         cardsCollection?.showsVerticalScrollIndicator = false
-        cardsCollection?.layer.cornerRadius = 12
-        cardsCollection?.layer.masksToBounds = true
         cardsCollection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsCollection?.dataSource = self
         cardsCollection?.delegate = self
-        
         cardsCollection?.reloadData()
         return cardsCollection ?? UICollectionView()
-        
     }
     
 }
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 30 // How many cells to display
+        return 9 // How many cells to display
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
