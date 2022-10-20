@@ -18,8 +18,14 @@ struct TemplateModel: Codable {
     var thumbnailString: String {
         return "thumbnail_\(templateString).jpg"
     }
+    var thumbnailDetailString: String {
+        return "thumbnail_\(templateString)_detail.jpg"
+    }
     var thumbnail: UIImage? {
         return UIImage(named: thumbnailString)
+    }
+    var thumbnailDetail: UIImage? {
+        return UIImage(named: thumbnailDetailString)
     }
     var template: UIImage? {
         return UIImage(named: templateString)
