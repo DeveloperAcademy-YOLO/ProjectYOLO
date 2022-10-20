@@ -149,13 +149,15 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         if indexPath.section == 0 {
-            setSelectedPaper(paperId: viewModel.openedPapers[indexPath.item].paperId)
-            // TODO: 사이먼 뷰로 이동
-            // navVC.pushViewController(SimonView(), animated: true)
+            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
+                guard let self = self else {return}
+                self.setSelectedPaper(paperId: self.viewModel.openedPapers[indexPath.item].paperId)
+            }
         } else {
-            setSelectedPaper(paperId: viewModel.closedPapers[indexPath.item].paperId)
-            // TODO: 사이먼 뷰로 이동
-            // navVC.pushViewController(SimonView(), animated: true)
+            navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
+                guard let self = self else {return}
+                self.setSelectedPaper(paperId: self.viewModel.closedPapers[indexPath.item].paperId)
+            }
         }
         return true
     }

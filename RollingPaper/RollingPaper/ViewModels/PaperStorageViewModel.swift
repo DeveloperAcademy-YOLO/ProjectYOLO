@@ -19,10 +19,6 @@ class PaperStorageViewModel {
         case papersAreUpdatedInDatabase
         case papersAreUpdatedByTimer
     }
-    enum Location {
-        case local
-        case server
-    }
     var currentTime: Date = Date()
     var serverPaperIds = Set<String>()
     var localPaperIds = Set<String>()
