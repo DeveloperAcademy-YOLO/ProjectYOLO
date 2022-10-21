@@ -193,16 +193,18 @@ class WrittenPaperViewController: UIViewController {
                 self.titleEmbedingTextField = editTitleTextField
                 editTitleTextField.text = self.viewModel.currentPaper?.title
             }
+            alert.preferredAction = edit
             self.present(alert, animated: true, completion: nil)
         }))
         allertController.addAction(UIAlertAction(title: "마감", style: .default,
                                                  handler: {_ in
             print("마감")
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
-            let stop = UIAlertAction(title: "마감", style: .default) { (stop) in  }
+            let stop = UIAlertAction(title: "확인", style: .default) { (stop) in  }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(cancel)
             alert.addAction(stop)
+            alert.preferredAction = stop
             self.present(alert, animated: true, completion: nil)
         }))
         allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
@@ -217,6 +219,7 @@ class WrittenPaperViewController: UIViewController {
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
             alert.addAction(cancel)
+            alert.preferredAction = delete
             alert.addTextField { (editTitleTextField) in
                 self.titleEmbedingTextField = editTitleTextField
                 editTitleTextField.placeholder = self.viewModel.currentPaper?.title
