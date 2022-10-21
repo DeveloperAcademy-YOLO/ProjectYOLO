@@ -165,7 +165,7 @@ class SignInViewController: UIViewController {
             make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
         })
         signUpLabel.snp.makeConstraints({ make in
-            make.top.equalTo(waringLabel.snp.bottom).offset(32)
+            make.top.equalTo(passwordTextField.snp.bottom).offset(36)
             make.centerX.equalToSuperview()
         })
         signInButton.snp.makeConstraints({ make in
@@ -220,8 +220,8 @@ class SignInViewController: UIViewController {
         if let message = message {
             waringLabel.text = message
         }
-        signInButton.snp.updateConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 80 : 28)
+        signUpLabel.snp.updateConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 69 : 36)
         })
         view.layoutIfNeeded()
     }
