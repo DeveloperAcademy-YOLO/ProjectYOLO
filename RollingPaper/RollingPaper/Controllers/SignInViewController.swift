@@ -271,6 +271,15 @@ class SignInViewController: UIViewController {
         }
     }
     
+    private func navigateToCurrentFlow() {
+        if
+            let splitVC = presentingViewController as? SplitViewController,
+            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController,
+            let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+            dismiss(animated: true)
+        }
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -288,6 +297,7 @@ class SignInViewController: UIViewController {
                 case .signInDidSuccess:
                     self.setWarningMessage(isShown: false, message: nil)
                     // navigate to current view flow (dismiss, etc...)
+                    self.navigateToCurrentFlow()
                 case .emailFocused:
                     self.setWarningMessage(isShown: false, message: nil)
                     self.setTextFieldUI(textFieldFocused: .emailFocused)
@@ -381,6 +391,12 @@ class SignInViewController: UIViewController {
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.normalBoundTap)
                 self?.passwordTextField.resignFirstResponder()
+            })
+            .store(in: &cancellables)
+        signUpButton
+            .tapPublisher
+            .sink(receiveValue: { [weak self] _ in
+                self?.navigationController?.pushViewController(SignUpViewController(), animated: true)
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
