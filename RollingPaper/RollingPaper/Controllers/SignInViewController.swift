@@ -50,13 +50,17 @@ class SignInViewController: UIViewController {
         textField.leftViewMode = .always
         return textField
     }()
-    private let signUpLabel: UILabel = {
-        let label = UILabel()
-        label.text = "계정 만들기"
-        label.textColor = .systemGray
-        label.font = .preferredFont(forTextStyle: .body)
-        label.textAlignment = .center
-        return label
+    private let signUpButton: UIButton = {
+        let button = UIButton()
+        let title = NSAttributedString(string: "계정 만들기", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body), NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        button.setAttributedTitle(title, for: .normal)
+        return button
+    }()
+    private let signUpDivider: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray
+        view.layer.masksToBounds = true
+        return view
     }()
     private let signInButton: UIButton = {
         let button = UIButton()
@@ -71,7 +75,7 @@ class SignInViewController: UIViewController {
     }()
     private let divider: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.gray
+        view.backgroundColor = UIColor.systemGray
         view.layer.masksToBounds = true
         return view
     }()
@@ -140,7 +144,7 @@ class SignInViewController: UIViewController {
         
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpLabel, signInButton, divider, appleSignInButton])
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
         let topOffset = (UIScreen.main.bounds.height - 246) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -164,12 +168,18 @@ class SignInViewController: UIViewController {
             make.top.equalTo(waringImage.snp.top)
             make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
         })
-        signUpLabel.snp.makeConstraints({ make in
+        signUpButton.snp.makeConstraints({ make in
             make.top.equalTo(passwordTextField.snp.bottom).offset(36)
             make.centerX.equalToSuperview()
         })
+        signUpDivider.snp.makeConstraints({ make in
+            make.top.equalTo(signUpButton.snp.bottom).offset(-5.75)
+            make.width.equalTo(signUpButton.snp.width)
+            make.height.equalTo(1)
+            make.leading.equalTo(signUpButton.snp.leading)
+        })
         signInButton.snp.makeConstraints({ make in
-            make.top.equalTo(signUpLabel.snp.bottom).offset(36)
+            make.top.equalTo(signUpButton.snp.bottom).offset(36)
             make.width.equalTo(375)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
@@ -220,7 +230,7 @@ class SignInViewController: UIViewController {
         if let message = message {
             waringLabel.text = message
         }
-        signUpLabel.snp.updateConstraints({ make in
+        signUpButton.snp.updateConstraints({ make in
             make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 69 : 36)
         })
         view.layoutIfNeeded()
