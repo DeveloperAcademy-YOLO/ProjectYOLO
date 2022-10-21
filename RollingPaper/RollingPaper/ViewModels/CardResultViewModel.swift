@@ -8,7 +8,7 @@ import UIKit
 import Combine
 
 class CardResultViewModel {
-    private var setCardResult: UIImage = UIImage(named: "Rectangle") ?? UIImage(systemName: "heart.fill")!
+    private var setCardResult: UIImage = UIImage()
     private let databaseManager: DatabaseManager
     
     init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared) {
