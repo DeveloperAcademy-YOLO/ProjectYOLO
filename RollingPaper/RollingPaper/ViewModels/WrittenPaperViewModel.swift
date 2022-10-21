@@ -11,8 +11,8 @@ import Combine
 
 class WrittenPaperViewModel {
     
-    private let localDatabaseManager: DatabaseManager
-    private let serverDatabaseManager: DatabaseManager
+    let localDatabaseManager: DatabaseManager
+    let serverDatabaseManager: DatabaseManager
     private var cancellables = Set<AnyCancellable>()
     
     enum DataSource {
@@ -21,6 +21,7 @@ class WrittenPaperViewModel {
     }
 
     var currentPaper: PaperModel?
+    let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
     private var paperID: String = ""
     private var paperTemplate: TemplateModel?
@@ -40,6 +41,8 @@ class WrittenPaperViewModel {
     init(localDatabaseManager: DatabaseManager = LocalDatabaseMockManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
+        print("WrittenViewModel Init")
+        print(localDatabaseManager.paperSubject.value)
         setCurrentPaper()
     }
     
@@ -47,14 +50,16 @@ class WrittenPaperViewModel {
         self.localDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Local Paper")
+                    print("Local Paper: \(paper)")
                     self?.currentPaper = paper
+                    self?.currentPaperPublisher.send(paper)
                     self?.paperFrom = DataSource.fromLocal
                 }
                 else {
                     print("로컬 비었음")
                 }
             })
+            .store(in: &cancellables)
         
         self.serverDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
@@ -66,6 +71,7 @@ class WrittenPaperViewModel {
                     print("서버 비었음")
                 }
             })
+            .store(in: &cancellables)
     }
     
     func changePaperTitle(input: String) {

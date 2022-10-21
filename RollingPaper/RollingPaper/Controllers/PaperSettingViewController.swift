@@ -144,13 +144,8 @@ class PaperSettingViewController: UIViewController {
     
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
-        self.setCurrentPaperTitle()
-        self.input.send(.setPaperTitle(title: self.currentPaperTitle))
         self.input.send(.endSettingPaper)
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
-//        navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-//            self?.input.send(.endSettingPaper)
-//        }
     }
     
     // 배경 눌렀을 때 동작

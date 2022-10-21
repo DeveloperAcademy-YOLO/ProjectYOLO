@@ -60,6 +60,8 @@ class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
+    private var cancellables = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -70,6 +72,16 @@ class WrittenPaperViewController: UIViewController {
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
+        
+        viewModel.currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] paperModel in
+                if let paperModel = paperModel {
+                    self?.titleLabel.text = paperModel.title
+                }
+            }
+            .store(in: &cancellables)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,10 +143,18 @@ class WrittenPaperViewController: UIViewController {
             let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
             let splitVC = currentVC.parent?.parent as? SplitViewController {
             splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
+            if viewModel.paperFrom == .fromLocal {
+                viewModel.localDatabaseManager.resetPaper()
+            }
         } else if
             let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperStorageViewController }).first,
             let splitVC = currentVC.parent?.parent as? SplitViewController {
-            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))}
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
+            if viewModel.paperFrom == .fromLocal {
+                viewModel.localDatabaseManager.resetPaper()
+            }
+            
+        }
     }
     
     func moveToCardRootView() {
