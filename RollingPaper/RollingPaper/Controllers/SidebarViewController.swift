@@ -95,6 +95,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         guard let urlString = urlString else { return}
         FirebaseStorageManager
             .downloadData(urlString: urlString)
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink { completion in
                 switch completion {
                 case .failure(let error):
@@ -105,7 +106,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
                 if
                     let data = data,
                     let image = UIImage(data: data) {
-                    self?.userPhoto.image = image
+                    DispatchQueue.main.async {
+                        self?.userPhoto.image = image
+                    }
                 }
             }
             .store(in: &cancellables)

@@ -81,6 +81,7 @@ final class FirebaseStorageManager {
     }
     
     static func downloadData(urlString: String, maxSize: Int64 = Int64(1 * 1024 * 1024)) -> AnyPublisher<Data?, Error> {
+        print("FirebaseStorageManager DownloadData Called!")
         let reference = Storage.storage().reference(forURL: urlString)
         return Future({ promise in
             reference.getData(maxSize: maxSize, completion: { data, error in

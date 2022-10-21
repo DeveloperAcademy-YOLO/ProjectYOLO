@@ -38,13 +38,16 @@ final class LocalStorageManager {
     }
     
     static func downloadData(urlString: String) -> AnyPublisher<Data?, Error> {
+        print("LocalStorageManager: downloadData Called")
         return Future({ promise in
-            if
-                let url = URL(string: urlString),
-                let data = try? Data(contentsOf: url) {
-                promise(.success(data))
-            } else {
-                promise(.failure(URLError(.badURL)))
+            DispatchQueue.global(qos: .background).async {
+                if
+                    let url = URL(string: urlString),
+                    let data = try? Data(contentsOf: url) {
+                    promise(.success(data))
+                } else {
+                    promise(.failure(URLError(.badURL)))
+                }
             }
         })
         .eraseToAnyPublisher()
