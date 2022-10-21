@@ -39,6 +39,7 @@ private class Length {
 }
 
 class PaperStorageViewController: UIViewController {
+    private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperStorageViewModel()
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
@@ -47,6 +48,7 @@ class PaperStorageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        splitViewBind()
         setMainView()
         setCollectionView()
     }
@@ -84,29 +86,61 @@ class PaperStorageViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
+    private func splitViewBind() {
+        let output = splitViewManager.getOutput()
+        output
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { event in
+                var extraLeftMargin: Int
+                var extraRightMargin: Int
+                switch event {
+                case .viewIsOpened:
+                    extraLeftMargin = 0
+                    extraRightMargin = 0
+                case .viewIsClosed:
+                    extraLeftMargin = 54
+                    extraRightMargin = 24
+                }
+                self.paperCollectionView?.snp.updateConstraints({ make in
+                    make.leading.equalToSuperview().offset(extraLeftMargin)
+                    make.trailing.equalToSuperview().offset(extraRightMargin)
+                })
+                UIView.animate(withDuration: 0.5, delay: 0, animations: {
+                    self.view.layoutIfNeeded()
+                })
+            })
+            .store(in: &cancellables)
+    }
+    
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .systemBackground
     }
     
-    // 컬렉션 뷰 초기화
-    private func setCollectionView() {
+    // 컬렉션 뷰 레이아웃 초기화
+    private func setCollectionViewLayout() {
         let collectionViewLayer = UICollectionViewFlowLayout()
         collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
         collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
         collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
         collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
+        self.paperCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: true)
+    }
+    
+    // 컬렉션 뷰 초기화
+    private func setCollectionView() {
+        paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: .init())
+        setCollectionViewLayout()
         
-        paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: collectionViewLayer)
         guard let collectionView = paperCollectionView else {return}
-        
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .systemBackground
         collectionView.alwaysBounceVertical = true
         collectionView.register(PaperStorageCollectionCell.self, forCellWithReuseIdentifier: PaperStorageCollectionCell.identifier)
         collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
-        
+
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
             make.leading.trailing.bottom.equalToSuperview()
@@ -191,7 +225,7 @@ private class PaperStorageCollectionHeader: UICollectionReusableView {
         title.font = .preferredFont(forTextStyle: .title2)
         title.snp.makeConstraints({ make in
             make.top.equalToSuperview()
-            make.leading.equalToSuperview().offset(34)
+            make.leading.equalToSuperview().offset(Length.headerLeftMargin)
         })
     }
     
