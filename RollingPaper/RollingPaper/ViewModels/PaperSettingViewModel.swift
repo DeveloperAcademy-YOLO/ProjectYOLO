@@ -14,7 +14,7 @@ class PaperSettingViewModel {
     private var template: TemplateEnum
     private let databaseManager: DatabaseManager
     
-    init(databaseManager: DatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
+    init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
         self.template = template
     }
@@ -28,16 +28,18 @@ class PaperSettingViewModel {
     
     // 어떤 행동이 Input으로 들어오면 그것에 맞는 행동을 Output에 저장한 뒤 반환해주기
     func transform(input: AnyPublisher<Input, Never>) {
-        input.sink(receiveValue: { [weak self] event in
-            guard let self = self else {return}
-            switch event {
-            case .setPaperTitle(let title):
-                self.setPaperTitle(title: title)
-            case .endSettingPaper:
-                self.createPaper()
-            }
-        })
-        .store(in: &cancellables)
+        input
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .setPaperTitle(let title):
+                    self.setPaperTitle(title: title)
+                case .endSettingPaper:
+                    self.createPaper()
+                }
+            })
+            .store(in: &cancellables)
     }
     
     // 페이퍼 제목 설정하기

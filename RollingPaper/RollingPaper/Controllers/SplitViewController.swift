@@ -6,8 +6,13 @@
 //
 
 import UIKit
+import Combine
+import CombineCocoa
 
 class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
+    
+    private let splitViewManager = SplitViewManager.shared
+    private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
     
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
@@ -24,7 +29,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
                 self.viewControllers[1] = paperStorageViewController
             }
         case "설정":
-            if !(self.viewControllers[1] is MainViewController) {
+            if !(self.viewControllers[1] is SettingScreenViewController) {
                 if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                     print(currentUserEmail)
                     self.viewControllers[1] = settingScreenViewController
@@ -55,6 +60,17 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         self.loadViewControllers()
         self.sidebarViewController.show(categories: self.sideBarCategories)
         self.preferredPrimaryColumnWidthFraction = 0.25
+        
+        delegate = self
+        splitViewManager.transform(input: input.eraseToAnyPublisher())
+    }
+    
+    func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewController.DisplayMode) {
+        if displayMode.rawValue == 1 {
+            input.send(.viewIsClosed)
+        } else {
+            input.send(.viewIsOpened)
+        }
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {

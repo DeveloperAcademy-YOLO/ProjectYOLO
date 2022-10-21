@@ -19,4 +19,3 @@ struct PaperPreviewModel: Codable {
     }
     var thumbnailURLString: String?
 }
-

@@ -74,7 +74,7 @@ class PaperStorageViewModel {
         return closed
     }
     
-    init(localDatabaseManager: DatabaseManager = LocalDatabaseMockManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
+    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
         bindDatabaseManager()
@@ -82,34 +82,37 @@ class PaperStorageViewModel {
     
     // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
-        input.sink(receiveValue: { [weak self] event in
-            guard let self = self else {return}
-            switch event {
-            // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
-            case .viewDidAppear:
-                self.bindTimer()
-                self.updateCurrentTime()
-                self.downloadLocalThumbnails(outputValue: .initPapers)
-                self.downloadServerThumbnails(outputValue: .initPapers)
-            // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
-            case .viewDidDisappear:
-                self.timer?.cancel()
-            // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
-            case .paperSelected(let paperId):
-                if self.serverPaperIds.contains(paperId) {
-                    self.serverDatabaseManager.fetchPaper(paperId: paperId)
-                } else {
-                    self.localDatabaseManager.fetchPaper(paperId: paperId)
+        input
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
+                case .viewDidAppear:
+                    self.bindTimer()
+                    self.updateCurrentTime()
+                    self.downloadLocalThumbnails(outputValue: .initPapers)
+                    self.downloadServerThumbnails(outputValue: .initPapers)
+                // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
+                case .viewDidDisappear:
+                    self.timer?.cancel()
+                // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
+                case .paperSelected(let paperId):
+                    if self.serverPaperIds.contains(paperId) {
+                        self.serverDatabaseManager.fetchPaper(paperId: paperId)
+                    } else {
+                        self.localDatabaseManager.fetchPaper(paperId: paperId)
+                    }
                 }
-            }
-        })
-        .store(in: &cancellables)
+            })
+            .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
     // 데이터베이스 메니저 연동
     private func bindDatabaseManager() {
         localDatabaseManager.papersSubject
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
                 self.papersFromLocal = paperPreviews
@@ -122,6 +125,7 @@ class PaperStorageViewModel {
             .store(in: &cancellables)
         
         serverDatabaseManager.papersSubject
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
                 self.papersFromServer = paperPreviews
@@ -138,6 +142,7 @@ class PaperStorageViewModel {
     private func bindTimer() {
         timer = Timer.publish(every: timerInterval, on: .main, in: .common)
             .autoconnect()
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] date in
                 guard let self = self else {return}
                 self.updateCurrentTime(date: date)
@@ -183,6 +188,7 @@ class PaperStorageViewModel {
                     }
                 } else {
                     LocalStorageManager.downloadData(urlString: thumbnailURLString)
+                        .receive(on: DispatchQueue.global(qos: .background))
                         .sink(receiveCompletion: { completion in
                             switch completion {
                             case .failure(let error):
@@ -236,6 +242,7 @@ class PaperStorageViewModel {
                     }
                 } else {
                     FirebaseStorageManager.downloadData(urlString: thumbnailURLString)
+                        .receive(on: DispatchQueue.global(qos: .background))
                         .sink(receiveCompletion: { completion in
                             switch completion {
                             case .failure(let error):

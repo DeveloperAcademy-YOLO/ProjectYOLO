@@ -23,20 +23,26 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        photo.image = UIImage(systemName: "person.circle")
         photo.layer.cornerRadius = photo.frame.width / 2
+        photo.layer.masksToBounds = true
         photo.contentMode = UIView.ContentMode.scaleAspectFit
         return photo
     }()
     
     private let chevron: UIImageView = {
-        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 15, height: 15))
         chevron.image = UIImage(systemName: "chevron.forward")
         chevron.contentMode = UIView.ContentMode.scaleAspectFit
+        chevron.snp.makeConstraints { make in
+            make.height.width.equalTo(15)
+        }
         return chevron
     }()
     
     private let userName: UILabel = {
         let name = UILabel()
+        name.text = "Guest"
         name.font = .boldSystemFont(ofSize: 20)
         name.sizeToFit()
         return name
@@ -89,6 +95,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         guard let urlString = urlString else { return}
         FirebaseStorageManager
             .downloadData(urlString: urlString)
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink { completion in
                 switch completion {
                 case .failure(let error):
@@ -99,7 +106,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
                 if
                     let data = data,
                     let image = UIImage(data: data) {
-                    self?.userPhoto.image = image
+                    DispatchQueue.main.async {
+                        self?.userPhoto.image = image
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -114,17 +123,8 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         let category = self.categories[indexPath.row]
-        // TODO: 다음 스프린트 때 TableView를 Collection View로 Refactoring
-        /*
-        let backgroundCell: UIView = {
-            var backgroundCell = UIView(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
-            backgroundCell.backgroundColor = .gray
-            return backgroundCell
-        }()
-        */
         var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
         backgroundConfig.backgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
-        // cell.selectedBackgroundView = backgroundCell
         cell.backgroundConfiguration = backgroundConfig
         cell.selectionStyle = .none
         
