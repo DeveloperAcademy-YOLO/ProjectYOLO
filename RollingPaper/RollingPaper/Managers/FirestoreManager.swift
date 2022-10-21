@@ -63,6 +63,7 @@ final class FirestoreManager: DatabaseManager {
     
     /// (1). 파이어베이스 내 페이퍼 데이터 추가 (2). 현재 유저가 작성한 페이퍼 아이디 목록에 추가 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 추가
     func addPaper(paper: PaperModel) {
+        paperSubject.send(paper)
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
         guard
             currentUserEmail != nil,

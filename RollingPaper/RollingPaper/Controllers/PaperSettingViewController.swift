@@ -37,6 +37,8 @@ class PaperSettingViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var viewModel: PaperSettingViewModel
     
+    private var currentPaperTitle: String = ""
+    
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
         self.template = template
@@ -220,17 +222,23 @@ class PaperSettingViewController: UIViewController {
         return paperTitleTextField
     }
     
+    func setCurrentPaperTitle() {
+        currentPaperTitle = paperTitleTextField.text ?? "제목을 입력하지 않으셨습니다."
+    }
+    
+    // 생성하기 버튼 눌렀을 때 동작
+    @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+        self.input.send(.endSettingPaper)
+        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
+    }
+    
     // 뒤로가기 버튼 눌렀을 때 동작
     @objc private func backBtnPressed() {
         navigationController?.popViewController(animated: true)
     }
     
-    // 생성하기 버튼 눌렀을 때 동작
-    @objc private func createBtnPressed() {
-        navigationController?.pushViewController(WrittenPaperViewController(), animated: true) { [weak self] in
-            self?.input.send(.endSettingPaper)
-        }
-    }
+
+    
     
     // 배경 눌렀을 때 동작
     @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {

@@ -8,15 +8,19 @@
 import Foundation
 import UIKit
 import SnapKit
+import Combine
 
 class WrittenPaperViewController: UIViewController {
+    lazy private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
+    lazy private var titleEmbedingTextField: UITextField = UITextField()
+    lazy private var changedPaperTitle: String = ""
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-        titleLabel.text = "재현이의 졸업을 축하하며"
+        titleLabel.text = viewModel.currentPaper?.title
         titleLabel.sizeToFit()
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
@@ -56,6 +60,8 @@ class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
+    private var cancellables = Set<AnyCancellable>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -66,6 +72,16 @@ class WrittenPaperViewController: UIViewController {
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
+        
+        viewModel.currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] paperModel in
+                if let paperModel = paperModel {
+                    self?.titleLabel.text = paperModel.title
+                }
+            }
+            .store(in: &cancellables)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -124,9 +140,20 @@ class WrittenPaperViewController: UIViewController {
     
     func moveToPaperStorageView() {
         if
-            let templateSelectVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
-            let splitVC = templateSelectVC.parent?.parent as? SplitViewController {
+            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
+            let splitVC = currentVC.parent?.parent as? SplitViewController {
             splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
+            if viewModel.paperFrom == .fromLocal {
+                viewModel.localDatabaseManager.resetPaper()
+            }
+        } else if
+            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperStorageViewController }).first,
+            let splitVC = currentVC.parent?.parent as? SplitViewController {
+            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
+            if viewModel.paperFrom == .fromLocal {
+                viewModel.localDatabaseManager.resetPaper()
+            }
+            
         }
     }
     
@@ -152,12 +179,19 @@ class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             print("수정")
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
-            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in  }
-            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in
+                if let changedPaperTitle = self.titleEmbedingTextField.text {
+                    self.viewModel.changePaperTitle(input: changedPaperTitle)
+                    print(changedPaperTitle)
+                    //이거 아직 subscribe에 전달 안 해줘서 실시간으로 바뀌진 않음
+                }
+            }
+            let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
             alert.addAction(edit)
-            alert.addTextField{ (editTitleTextField) in
-                editTitleTextField.text = "dummy text"
+            alert.addTextField { (editTitleTextField) in
+                self.titleEmbedingTextField = editTitleTextField
+                editTitleTextField.text = self.viewModel.currentPaper?.title
             }
             self.present(alert, animated: true, completion: nil)
         }))
@@ -175,12 +209,17 @@ class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             print("삭제")
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
-            let delete = UIAlertAction(title: "삭제", style: .destructive) { (delete) in  }
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { (deletion) in
+//                if self.titleEmbedingTextField.text == self.viewModel.currentPaper?.title {
+//                    self.viewModel.deletePaper(self.viewModel.currentPaper?.paperId!, from: self.viewModel.paperFrom!)
+//                }
+            }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
             alert.addAction(cancel)
-            alert.addTextField{ (editTitleTextField) in
-                editTitleTextField.placeholder = "재현이의 생일을 축하하며"
+            alert.addTextField { (editTitleTextField) in
+                self.titleEmbedingTextField = editTitleTextField
+                editTitleTextField.placeholder = self.viewModel.currentPaper?.title
             }
             self.present(alert, animated: true, completion: nil)
         }))
@@ -198,30 +237,26 @@ class WrittenPaperViewController: UIViewController {
         var cardsCollection: UICollectionView?
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 5, left: 20, bottom: 20, right: 20 )
+        layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
         layout.itemSize = CGSize(width: (self.view.frame.width-80)/3, height: ((self.view.frame.width-120)/3)*0.75)
         layout.minimumInteritemSpacing = 20
         layout.minimumLineSpacing = 20
         
-        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 30, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
+        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
         cardsCollection?.center.x = view.center.x
         cardsCollection?.showsVerticalScrollIndicator = false
-        cardsCollection?.layer.cornerRadius = 12
-        cardsCollection?.layer.masksToBounds = true
         cardsCollection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsCollection?.dataSource = self
         cardsCollection?.delegate = self
-        
         cardsCollection?.reloadData()
         return cardsCollection ?? UICollectionView()
-        
     }
     
 }
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 100 // How many cells to display
+        return 9 // How many cells to display
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

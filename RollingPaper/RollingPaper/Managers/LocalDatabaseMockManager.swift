@@ -65,8 +65,7 @@ final class LocalDatabaseMockManager: DatabaseManager {
     
     /// 페이퍼 프리뷰 가데이터를 해당 데이터 퍼블리셔 내에 등록
     private func loadPapers() {
-        let paperPreviews = downloadMockdata()
-        papersSubject.send(paperPreviews)
+//        papersSubject.send(paperPreviews)
     }
     
     /// 로컬 페이퍼 데이터 추가 및 프리뷰 데이터 추가

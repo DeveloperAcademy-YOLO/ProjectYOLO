@@ -44,7 +44,7 @@ class PaperSettingViewModel {
     
     // 페이퍼 제목 설정하기
     private func setPaperTitle(title: String) {
-        paperTitle = title
+        self.paperTitle = title
     }
     
     // 페이퍼 만들기
@@ -53,7 +53,7 @@ class PaperSettingViewModel {
         guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
             return
         }
-        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: paperTitle, templateString: template.template.templateString)
+        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
         databaseManager.addPaper(paper: paper)
         databaseManager.fetchPaper(paperId: paper.paperId)
     }

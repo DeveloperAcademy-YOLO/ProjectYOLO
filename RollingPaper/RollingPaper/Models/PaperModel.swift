@@ -14,9 +14,9 @@ struct PaperModel: Codable {
     var cards: [CardModel]
     let date: Date
     let endTime: Date
-    let title: String
+    var title: String
     var linkUrl: String?
-    let templateString: String
+    var templateString: String
     var template: TemplateModel {
         return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template
     }
