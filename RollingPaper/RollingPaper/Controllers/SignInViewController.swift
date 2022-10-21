@@ -348,7 +348,6 @@ class SignInViewController: UIViewController {
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
-//        backgroundGesture.delegate = self
         view.addGestureRecognizer(backgroundGesture)
     }
     
