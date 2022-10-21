@@ -55,10 +55,43 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     private let database = Firestore.firestore()
     private var currentNonce: String?
     private var cancellables = Set<AnyCancellable>()
+    private var snapshotListener: ListenerRegistration?
     
     private override init() {
         super.init()
         fetchUserProfile()
+        addSnapshotListener()
+    }
+    
+    private func removeSnapshotListener() {
+        snapshotListener = nil
+    }
+    
+    private func addSnapshotListener() {
+        guard let email = UserDefaults.standard.value(forKey: "currentUserEmail") as? String else {
+            
+            return
+        }
+        snapshotListener = database
+            .collection(FireStoreConstants.usersNamePath.rawValue)
+            .document(email)
+            .addSnapshotListener { [weak self] document, error in
+                if
+                    let data = document?.data(),
+                    let currentUserProfile = self?.userProfileSubject.value {
+                    var changedUserProfile = currentUserProfile
+                    if let changedName = data["name"] as? String {
+                        changedUserProfile.name = changedName
+                    }
+                    if let changedProfileUrl = data["profileUrl"] as? String {
+                        changedUserProfile.profileUrl = changedProfileUrl
+                    }
+                    
+                    if changedUserProfile.name != currentUserProfile.name || changedUserProfile.profileUrl != currentUserProfile.profileUrl {
+                        self?.fetchUserProfile()
+                    }
+                }
+            }
     }
     
     func isValidUserName(name: String) -> AnyPublisher<Bool, Never> {
@@ -137,6 +170,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     })
                 } else {
                     print("Name is Invalid")
+                    self?.signedInSubject.send(.nameAlreadyInUse)
                 }
             }
             .store(in: &cancellables)
@@ -150,6 +184,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                 UserDefaults.standard.setValue(email, forKey: "currentUserEmail")
                 self?.signedInSubject.send(.signInSucceed)
                 self?.fetchUserProfile()
+                self?.addSnapshotListener()
             }
         })
     }
@@ -159,6 +194,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
             try auth.signOut()
             signedInSubject.send(.signOutSucceed)
             UserDefaults.standard.setValue(nil, forKey: "currentUserEmail")
+            removeSnapshotListener()
             fetchUserProfile()
         } catch {
             signedInSubject.send(.signOutFailed)
@@ -172,6 +208,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     self?.signedInSubject.send(.deleteUserFailed)
                 } else {
                     self?.signedInSubject.send(.deleteUserSucceed)
+                    self?.removeSnapshotListener()
                     UserDefaults.standard.setValue(nil, forKey: "currentUserEmail")
                     self?.fetchUserProfile()
                 }
@@ -241,6 +278,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
                     self?.setUserProfile(userModel: UserModel(email: email, name: name))
                 }
                 self?.signedInSubject.send(.signInSucceed)
+                self?.addSnapshotListener()
             }
         }
     }
