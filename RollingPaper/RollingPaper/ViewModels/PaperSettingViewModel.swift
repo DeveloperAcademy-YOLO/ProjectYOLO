@@ -14,7 +14,7 @@ class PaperSettingViewModel {
     private var template: TemplateEnum
     private let databaseManager: DatabaseManager
     
-    init(databaseManager: DatabaseManager = LocalDatabaseMockManager.shared, template: TemplateEnum) {
+    init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
         self.template = template
     }

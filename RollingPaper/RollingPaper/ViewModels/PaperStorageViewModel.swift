@@ -74,7 +74,7 @@ class PaperStorageViewModel {
         return closed
     }
     
-    init(localDatabaseManager: DatabaseManager = LocalDatabaseMockManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
+    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
         bindDatabaseManager()
