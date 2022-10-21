@@ -51,9 +51,9 @@ class CardViewModel {
     }
     
     private func setCardBackgroundImg(background: UIImage) {
-        guard let png = background.pngData()
-        else { return }// png로 바꿔서 넣어 버린다.
-        UserDefaults.standard.set(png, forKey: "cardBackgroundImg")
+        guard let jpeg = background.jpegData(compressionQuality: 1)
+        else { return }
+        UserDefaults.standard.set(jpeg, forKey: "cardBackgroundImg")
     }
     
     private func getRecentCardBackgroundImg() {
