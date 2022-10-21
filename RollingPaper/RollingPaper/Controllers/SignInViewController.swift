@@ -50,14 +50,30 @@ class SignInViewController: UIViewController {
         textField.leftViewMode = .always
         return textField
     }()
+    private let signUpLabel: UILabel = {
+        let label = UILabel()
+        label.text = "계정 만들기"
+        label.textColor = .systemGray
+        label.font = .preferredFont(forTextStyle: .body)
+        label.textAlignment = .center
+        return label
+    }()
     private let signInButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(rgb: 0x007AFF)
+        button.backgroundColor = .white
         button.layer.cornerRadius = 12
+        button.layer.borderColor = UIColor.black.cgColor
+        button.layer.borderWidth = 1.0
         button.layer.masksToBounds = true
-        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.white])
+        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.label])
         button.setAttributedTitle(title, for: .normal)
         return button
+    }()
+    private let divider: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.gray
+        view.layer.masksToBounds = true
+        return view
     }()
     private let appleSignInButton: ASAuthorizationAppleIDButton = {
         let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
@@ -124,7 +140,7 @@ class SignInViewController: UIViewController {
         
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signInButton, appleSignInButton])
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpLabel, signInButton, divider, appleSignInButton])
         let topOffset = (UIScreen.main.bounds.height - 246) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -148,14 +164,24 @@ class SignInViewController: UIViewController {
             make.top.equalTo(waringImage.snp.top)
             make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
         })
+        signUpLabel.snp.makeConstraints({ make in
+            make.top.equalTo(waringLabel.snp.bottom).offset(32)
+            make.centerX.equalToSuperview()
+        })
         signInButton.snp.makeConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(28)
+            make.top.equalTo(signUpLabel.snp.bottom).offset(36)
             make.width.equalTo(375)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
         })
+        divider.snp.makeConstraints({ make in
+            make.width.equalTo(340)
+            make.height.equalTo(2)
+            make.top.equalTo(signInButton.snp.bottom).offset(24)
+            make.centerX.equalToSuperview()
+        })
         appleSignInButton.snp.makeConstraints({ make in
-            make.top.equalTo(signInButton.snp.bottom).offset(28)
+            make.top.equalTo(divider.snp.bottom).offset(24)
             make.width.equalTo(375)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
