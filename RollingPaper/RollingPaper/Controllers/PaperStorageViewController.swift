@@ -134,7 +134,7 @@ class PaperStorageViewController: UIViewController {
         setCollectionViewLayout()
         
         guard let collectionView = paperCollectionView else {return}
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .systemBackground
         collectionView.alwaysBounceVertical = true
         collectionView.register(PaperStorageCollectionCell.self, forCellWithReuseIdentifier: PaperStorageCollectionCell.identifier)
         collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)

@@ -105,7 +105,7 @@ class PaperTemplateSelectViewController: UIViewController {
     
     // 메인 뷰 초기화
     private func setMainView() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
     }
     
     // 컬렉션 뷰 레이아웃 초기화
