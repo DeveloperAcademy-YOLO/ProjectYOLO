@@ -302,8 +302,12 @@ extension CardBackgroundViewController {
 extension CardBackgroundViewController {
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
+            make.width.equalTo(920)
+            make.height.equalTo(650)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(90)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -311,7 +315,7 @@ extension CardBackgroundViewController {
     
     func buttonLabelConstraints() {
         buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(100)
+            make.width.equalTo(90)
             make.height.equalTo(450)
             make.leading.equalTo(self.view)
             make.centerY.equalTo(self.view)

@@ -99,10 +99,14 @@ final class CardResultViewController: UIViewController {
     
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
+            make.width.equalTo(920)
+            make.height.equalTo(650)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(120)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view).offset(15)
+            make.centerY.equalTo(self.view)
         })
     }
     

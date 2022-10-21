@@ -15,7 +15,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
 
     let toolPicker = PKToolPicker()
     
-    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Ghost", "Halloween_Candy", "Halloween_StickCandy", "Halloween_StickCandy", "Halloween_Bat", "Halloween_Pumpkin", "Halloween_StickCandy", "Halloween_Candy"]
+    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin2", "Halloween_Hat", "Halloween_Blood", "Halloween_Ghost2", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Pumpkin2", "Halloween_StickCandy", "Halloween_Blood"]
     
     private var backgroundImg = UIImage(named: "Rectangle")
     
@@ -23,8 +23,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    private var isCanvasToolToggle: Bool = true
-    private var isStickerToggle: Bool = false
+    private var isCanvasToolToggle: Bool = false
+    private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
     init(viewModel: CardViewModel) {
@@ -70,25 +70,26 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         rootUIImageView.addSubview(canvasView)
         canvasViewConstraints()
         
-        canvasViewInteractionEnabled()
-        toolPickerAppear()
-        stickerCollectionViewDisappear()
-        
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        pencilButtonOn()
-        stickerButtonOff()
+        pencilButtonOff()
+        canvasViewInteractionDisabled()
+        toolPickerDisappear()
         
+        stickerButtonOn()
+        imageViewInteractionEnabled()
+        stickerCollectionViewAppear()
+
         input.send(.viewDidLoad)
         bind()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        canvasViewInteractionEnabled()
-        toolPickerAppear()
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        //canvasViewInteractionEnabled()
+//        //toolPickerAppear()
+//    }
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
@@ -306,7 +307,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     func stickerCollectionViewDisappear() {
         view.addSubview(collectionView)
         collectionView.layer.masksToBounds = true
-        collectionView.layer.cornerRadius = 100
+        collectionView.layer.cornerRadius = 50
         collectionView.isHidden = true
         collectionViewConstraints()
     }
@@ -341,7 +342,7 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let aCell = collectionView.dequeueReusableCell(withReuseIdentifier: "StickerCollectionViewCell", for: indexPath) as? StickerCollectionViewCell else {return UICollectionViewCell()}
-        aCell.myImage.image = UIImage(named: self.arrStickers[indexPath.item])
+        aCell.myImage.image = resizedImage(image: UIImage(named: self.arrStickers[indexPath.item]), width: 80, height: 80)
         return aCell
     }
     
@@ -453,8 +454,12 @@ extension UIButton {
 extension CardPencilKitViewController {
     func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
+            make.width.equalTo(920)
+            make.height.equalTo(650)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(90)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -462,8 +467,25 @@ extension CardPencilKitViewController {
     
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
+            make.width.equalTo(920)
+            make.height.equalTo(650)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(90)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    func canvasViewConstraints() {
+        canvasView.snp.makeConstraints({ make in
+            make.width.equalTo(920)
+            make.height.equalTo(650)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(90)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -474,22 +496,13 @@ extension CardPencilKitViewController {
             make.width.equalTo(730)
             make.height.equalTo(100)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(someImageView.snp.bottom).offset(10)
-        })
-    }
-    
-    func canvasViewConstraints() {
-        canvasView.snp.makeConstraints({ make in
-            make.width.equalTo(813)
-            make.height.equalTo(515)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.top.equalTo(self.view.snp.bottom).offset(-120)
         })
     }
     
     func buttonLabelConstraints() {
         buttonLabel.snp.makeConstraints({ make in
-            make.width.equalTo(100)
+            make.width.equalTo(90)
             make.height.equalTo(450)
             make.leading.equalTo(self.view)
             make.centerY.equalTo(self.view)
