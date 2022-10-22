@@ -57,12 +57,9 @@ class SignUpViewController: UIViewController {
         setKeyboardObserver()
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        let topOffset = (UIScreen.main.bounds.height - 380) / 2
-        emailTextField.snp.updateConstraints({ make in
-            make.top.equalToSuperview().offset(topOffset)
-        })
-        view.layoutIfNeeded()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        layoutIfModalView()
     }
     
     private func setKeyboardObserver() {
@@ -91,10 +88,20 @@ class SignUpViewController: UIViewController {
         }
     }
     
+    private func layoutIfModalView() {
+        if presentingViewController != nil {
+            let topOffset = (view.frame.height - 380) / 2
+            emailTextField.snp.updateConstraints({ make in
+                make.top.equalToSuperview().offset(topOffset)
+            })
+            view.layoutIfNeeded()
+        }
+    }
+    
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, passwordTextField, nameTextField, signInButton, signInDivider, signUpButton])
-        let topOffset = (UIScreen.main.bounds.height - 380) / 2
+        let topOffset = (view.frame.height - 380) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
@@ -141,7 +148,8 @@ class SignUpViewController: UIViewController {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
                 case .signUpDidSuccess:
-                    print("Successfully Signed Up")
+                    //TODO: mark sign up success
+                    self?.navigateToSignIn()
                 }
             })
             .store(in: &cancellables)
@@ -287,22 +295,26 @@ class SignUpViewController: UIViewController {
             .tapPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
-                if
-                    let splitVC = self?.presentingViewController as? SplitViewController,
-                    let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
-                    currentNavVC.dismiss(animated: true) {
-                        let signInVC = SignInViewController()
-                        let navVC = UINavigationController(rootViewController: signInVC)
-                        navVC.modalPresentationStyle = .pageSheet
-                        splitVC.present(navVC, animated: true)
-                    }
-                } else {
-                    self?.navigationController?.popViewController(animated: true)
-                }
+                self?.navigateToSignIn()
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
+    }
+    
+    private func navigateToSignIn() {
+        if
+            let splitVC = presentingViewController as? SplitViewController,
+            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
+            currentNavVC.dismiss(animated: true) {
+                let signInVC = SignInViewController()
+                let navVC = UINavigationController(rootViewController: signInVC)
+                navVC.modalPresentationStyle = .pageSheet
+                splitVC.present(navVC, animated: true)
+            }
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     private func setCloseButton() {

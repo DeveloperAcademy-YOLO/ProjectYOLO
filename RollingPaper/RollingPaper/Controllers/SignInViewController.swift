@@ -111,40 +111,21 @@ class SignInViewController: UIViewController {
         setKeyboardObserver()
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        let topOffset = (UIScreen.main.bounds.height - 246) / 2
-        emailTextField.snp.updateConstraints({ make in
-            make.top.equalToSuperview().offset(topOffset)
-        })
-        view.layoutIfNeeded()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        layoutIfModalView()
     }
     
-    private func setKeyboardObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        if
-            let userInfo = notification.userInfo,
-            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
-            let keyboardRect = keyboardInfo.cgRectValue
-            let keyboardY = keyboardRect.origin.y
-            let originalHeight = UIScreen.main.bounds.height
-            let currentViewHeight = view.frame.height
-            let offsetHeight = (originalHeight - currentViewHeight) / 2
-            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
-                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
-            }
+    private func layoutIfModalView() {
+        if presentingViewController != nil {
+            let topOffset = (view.frame.height - 332) / 2
+            emailTextField.snp.updateConstraints({ make in
+                make.top.equalToSuperview().offset(topOffset)
+            })
+            view.layoutIfNeeded()
         }
     }
     
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if view.frame.origin.y != 0 {
-            view.frame.origin.y = 0
-        }
-    }
-        
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
@@ -200,54 +181,6 @@ class SignInViewController: UIViewController {
             make.centerX.equalToSuperview()
         })
         setCloseButton()
-    }
-    
-    private func setCloseButton() {
-        if presentingViewController != nil {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
-        }
-    }
-    
-    @objc private func close() {
-        dismiss(animated: true)
-    }
-    
-    private func handleError(error: AuthManagerEnum) {
-        switch error {
-        case .userNotFound:
-            setWarningMessage(isShown: true, message: "이메일이 존재하지 않습니다")
-            setTextFieldUI(textFieldFocused: .emailWaring)
-        case .userTokenExpired:
-            setWarningMessage(isShown: true, message: "이메일 토큰이 만료되었습니다")
-            setTextFieldUI(textFieldFocused: .emailWaring)
-        case .emailAlreadyInUse:
-            setWarningMessage(isShown: true, message: "이미 사용 중인 이메일입니다")
-            setTextFieldUI(textFieldFocused: .emailWaring)
-        case .wrongPassword:
-            setWarningMessage(isShown: true, message: "비밀번호가 틀렸습니다")
-            setTextFieldUI(textFieldFocused: .passwordWaring)
-        case .invalidEmail:
-            setWarningMessage(isShown: true, message: "입력된 이메일 주소를 확인해주세요")
-            setTextFieldUI(textFieldFocused: .emailWaring)
-        case .unknownError:
-            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
-            setTextFieldUI(textFieldFocused: .bothWaring)
-        default:
-            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
-            setTextFieldUI(textFieldFocused: .bothWaring)
-        }
-    }
-    
-    private func setWarningMessage(isShown: Bool, message: String?) {
-        waringLabel.isHidden = !isShown
-        waringImage.isHidden = !isShown
-        if let message = message {
-            waringLabel.text = message
-        }
-        signUpButton.snp.updateConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 69 : 36)
-        })
-        view.layoutIfNeeded()
     }
     
     private func setTextFieldUI(textFieldFocused: TextFieldFocused) {
@@ -422,6 +355,9 @@ class SignInViewController: UIViewController {
                         splitVC.present(navVC, animated: true)
                     }
                 } else {
+                    let backButtonItem = UIBarButtonItem(title: "로그인", style: .plain, target: self, action: nil)
+                    backButtonItem.tintColor = .systemGray
+                    self?.navigationItem.backBarButtonItem = backButtonItem
                     self?.navigationController?.pushViewController(SignUpViewController(), animated: true)
                 }
             })
@@ -434,5 +370,82 @@ class SignInViewController: UIViewController {
         view.endEditing(true)
         emailTextField.resignFirstResponder()
         passwordTextField.resignFirstResponder()
+    }
+}
+
+extension SignInViewController {
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            let originalHeight = UIScreen.main.bounds.height
+            let currentViewHeight = view.frame.height
+            let offsetHeight = (originalHeight - currentViewHeight) / 2
+            print(originalHeight, currentViewHeight, offsetHeight, currentFocusedTextfieldY, keyboardY)
+            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
+    }
+    
+    private func setCloseButton() {
+        if presentingViewController != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
+        }
+    }
+    
+    @objc private func close() {
+        dismiss(animated: true)
+    }
+    
+    private func handleError(error: AuthManagerEnum) {
+        switch error {
+        case .userNotFound:
+            setWarningMessage(isShown: true, message: "이메일이 존재하지 않습니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
+        case .userTokenExpired:
+            setWarningMessage(isShown: true, message: "이메일 토큰이 만료되었습니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
+        case .emailAlreadyInUse:
+            setWarningMessage(isShown: true, message: "이미 사용 중인 이메일입니다")
+            setTextFieldUI(textFieldFocused: .emailWaring)
+        case .wrongPassword:
+            setWarningMessage(isShown: true, message: "비밀번호가 틀렸습니다")
+            setTextFieldUI(textFieldFocused: .passwordWaring)
+        case .invalidEmail:
+            setWarningMessage(isShown: true, message: "입력된 이메일 주소를 확인해주세요")
+            setTextFieldUI(textFieldFocused: .emailWaring)
+        case .unknownError:
+            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+            setTextFieldUI(textFieldFocused: .bothWaring)
+        default:
+            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
+            setTextFieldUI(textFieldFocused: .bothWaring)
+        }
+    }
+    
+    private func setWarningMessage(isShown: Bool, message: String?) {
+        waringLabel.isHidden = !isShown
+        waringImage.isHidden = !isShown
+        if let message = message {
+            waringLabel.text = message
+        }
+        signUpButton.snp.updateConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 69 : 36)
+        })
+        view.layoutIfNeeded()
     }
 }
