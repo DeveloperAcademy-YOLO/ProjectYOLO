@@ -104,6 +104,7 @@ class PaperStorageViewController: UIViewController {
                 case .viewIsClosed:
                     self?.splitViewIsOpened = false
                 }
+                self?.updateLayout()
             })
             .store(in: &cancellables)
     }
@@ -283,6 +284,7 @@ private class PaperStorageOpenedCollectionCell: UICollectionViewCell {
         
         preview.layer.masksToBounds = true
         preview.layer.cornerRadius = Length.paperThumbnailCornerRadius
+        preview.contentMode = .scaleAspectFill
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
@@ -396,6 +398,7 @@ private class PaperStorageClosedCollectionCell: UICollectionViewCell {
         
         preview.layer.masksToBounds = true
         preview.layer.cornerRadius = Length.paperThumbnailCornerRadius
+        preview.contentMode = .scaleAspectFill
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()

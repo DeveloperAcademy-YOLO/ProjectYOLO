@@ -263,6 +263,7 @@ private class PaperTemplateCollectionCell: UICollectionViewCell {
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = Length.templateThumbnailCornerRadius
+        imageView.contentMode = .scaleAspectFill
         imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
