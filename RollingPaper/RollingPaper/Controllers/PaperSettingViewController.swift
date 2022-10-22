@@ -191,8 +191,7 @@ class PaperSettingViewController: UIViewController {
     private func getTextField(placeHolder: String) -> UITextField {
         let border = UIView()
         paperTitleTextField.addSubview(border)
-        paperTitleTextField.placeholder = placeHolder
-        paperTitleTextField.textColor = .placeholderText
+        paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
         
         // 제목 입력할때마다 입력한 글자 저장
         paperTitleTextField
