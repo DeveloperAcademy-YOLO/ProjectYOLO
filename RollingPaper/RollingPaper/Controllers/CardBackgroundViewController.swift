@@ -243,7 +243,7 @@ extension CardBackgroundViewController {
         actionSheet.addAction(libraryAction)
         actionSheet.addAction(cancelAction)
         
-        present(actionSheet, animated: true, completion: nil)
+        present(actionSheet, animated: false, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
@@ -264,7 +264,7 @@ extension CardBackgroundViewController {
         pickerController.sourceType = type
         pickerController.cameraFlashMode = .off
         pickerController.cameraDevice = .front
-        present(pickerController, animated: true)
+        present(pickerController, animated: false)
     }
     
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {

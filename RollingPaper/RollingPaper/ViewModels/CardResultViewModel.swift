@@ -30,7 +30,7 @@ class CardResultViewModel {
                 case .setCardResultImg(let result):
                     self.setCardResult(result: result)
                 case .resultSend:
-                 print("ee")
+                    self.createCard()
                 }
             })
             .store(in: &cancellables)
@@ -38,5 +38,11 @@ class CardResultViewModel {
     private func setCardResult(result: UIImage) {
         self.setCardResult = result
     }
+    private func createCard() {
+        let currentTime = Date()
+        let result = CardModel(date: currentTime, contentURLString: "test")
+        databaseManager.addCard(paperId: "test", card: result)
+    }
+        
 }
     
