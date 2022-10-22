@@ -287,19 +287,22 @@ class SignUpViewController: UIViewController {
             .tapPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
-                self?.navigateToSignInView()
+                if
+                    let splitVC = self?.presentingViewController as? SplitViewController,
+                    let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
+                    currentNavVC.dismiss(animated: true) {
+                        let signInVC = SignInViewController()
+                        let navVC = UINavigationController(rootViewController: signInVC)
+                        navVC.modalPresentationStyle = .pageSheet
+                        splitVC.present(navVC, animated: true)
+                    }
+                } else {
+                    self?.navigationController?.popViewController(animated: true)
+                }
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
-    }
-    
-    private func navigateToSignInView() {
-        if presentingViewController != nil {
-            
-        } else {
-            navigationController?.popViewController(animated: true)
-        }
     }
     
     private func setCloseButton() {

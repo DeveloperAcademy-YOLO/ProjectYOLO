@@ -290,7 +290,10 @@ class SignInViewController: UIViewController {
             let splitVC = presentingViewController as? SplitViewController,
             let currentNavVC = splitVC.viewControllers[1] as? UINavigationController,
             let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+            // dismiss and connect to server paper flow
             dismiss(animated: true)
+        } else {
+            // Call SplitVC and refresh this settingView
         }
     }
     
@@ -310,7 +313,6 @@ class SignInViewController: UIViewController {
                     self.setTextFieldUI(textFieldFocused: .passwordWaring)
                 case .signInDidSuccess:
                     self.setWarningMessage(isShown: false, message: nil)
-                    // navigate to current view flow (dismiss, etc...)
                     self.navigateToCurrentFlow()
                 case .emailFocused:
                     self.setWarningMessage(isShown: false, message: nil)
