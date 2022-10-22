@@ -23,6 +23,18 @@ class SignUpViewController: UIViewController {
         let textField = SignUpTextField()
         return textField
     }()
+    private let signInButton: UIButton = {
+        let button = UIButton()
+        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body), NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        button.setAttributedTitle(title, for: .normal)
+        return button
+    }()
+    private let signInDivider: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray
+        view.layer.masksToBounds = true
+        return view
+    }()
     private let signUpButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .systemGray
@@ -78,7 +90,7 @@ class SignUpViewController: UIViewController {
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signInButton, signInDivider, signUpButton])
         let topOffset = (UIScreen.main.bounds.height - 380) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -98,12 +110,23 @@ class SignUpViewController: UIViewController {
             make.width.equalTo(380)
         })
         nameTextField.setTextFieldType(type: .name)
+        signInButton.snp.makeConstraints({ make in
+            make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
+            make.centerX.equalToSuperview()
+        })
+        signInDivider.snp.makeConstraints({ make in
+            make.top.equalTo(signInButton.snp.bottom).offset(-5.75)
+            make.width.equalTo(signInButton.snp.width)
+            make.height.equalTo(1)
+            make.leading.equalTo(signInButton.snp.leading)
+        })
         signUpButton.snp.makeConstraints({ make in
-            make.top.equalTo(nameTextField.snp.top).offset(passwordTextField.frame.height + 32)
+            make.top.equalTo(signInButton.snp.bottom).offset(36)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
             make.height.equalTo(38)
         })
+        setCloseButton()
     }
     
     private func bind() {
@@ -260,6 +283,16 @@ class SignUpViewController: UIViewController {
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
     }
+    
+    private func setCloseButton() {
+        if presentingViewController != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
+        }
+    }
+    
+    @objc private func close() {
+        dismiss(animated: true)
+    }
 }
 
 extension SignUpViewController {
@@ -294,8 +327,8 @@ extension SignUpViewController {
                 make.top.equalTo(passwordTextField.snp.top).offset(isWaringShown ? passwordTextField.frame.height + 28 : 66)
             })
         case .name:
-            signUpButton.snp.updateConstraints({ make in
-                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 70)
+            signInButton.snp.updateConstraints({ make in
+                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 74)
             })
         }
         view.layoutIfNeeded()

@@ -196,6 +196,17 @@ class SignInViewController: UIViewController {
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
         })
+        setCloseButton()
+    }
+    
+    private func setCloseButton() {
+        if presentingViewController != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
+        }
+    }
+    
+    @objc private func close() {
+        dismiss(animated: true)
     }
     
     private func handleError(error: AuthManagerEnum) {
@@ -270,7 +281,7 @@ class SignInViewController: UIViewController {
             passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
         }
     }
-    
+        
     private func navigateToCurrentFlow() {
         if
             let splitVC = presentingViewController as? SplitViewController,
