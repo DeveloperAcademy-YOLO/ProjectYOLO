@@ -76,8 +76,11 @@ class SignUpViewController: UIViewController {
             let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRect = keyboardInfo.cgRectValue
             let keyboardY = keyboardRect.origin.y
-            if currentFocusedTextfieldY + 38 > keyboardY {
-                self.view.frame.origin.y =  keyboardY - currentFocusedTextfieldY - 38
+            let originalHeight = UIScreen.main.bounds.height
+            let currentViewHeight = view.frame.height
+            let offsetHeight = (originalHeight - currentViewHeight) / 2
+            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
             }
         }
     }
@@ -280,8 +283,23 @@ class SignUpViewController: UIViewController {
                 self?.setTextfieldLayout(textFieldType: .name, isWaringShown: isWaringShown)
             })
             .store(in: &cancellables)
+        signInButton
+            .tapPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                self?.navigateToSignInView()
+            })
+            .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
+    }
+    
+    private func navigateToSignInView() {
+        if presentingViewController != nil {
+            
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     private func setCloseButton() {

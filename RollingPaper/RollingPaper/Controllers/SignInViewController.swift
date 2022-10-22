@@ -130,8 +130,11 @@ class SignInViewController: UIViewController {
             let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRect = keyboardInfo.cgRectValue
             let keyboardY = keyboardRect.origin.y
-            if currentFocusedTextfieldY + 38 > keyboardY {
-                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38
+            let originalHeight = UIScreen.main.bounds.height
+            let currentViewHeight = view.frame.height
+            let offsetHeight = (originalHeight - currentViewHeight) / 2
+            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
             }
         }
     }
@@ -145,7 +148,7 @@ class SignInViewController: UIViewController {
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
-        let topOffset = (UIScreen.main.bounds.height - 246) / 2
+        let topOffset = (view.frame.height - 332) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
@@ -407,7 +410,18 @@ class SignInViewController: UIViewController {
         signUpButton
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
-                self?.navigationController?.pushViewController(SignUpViewController(), animated: true)
+                if
+                    let splitVC = self?.presentingViewController as? SplitViewController,
+                    let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
+                    currentNavVC.dismiss(animated: true) {
+                        let signUpVC = SignUpViewController()
+                        let navVC = UINavigationController(rootViewController: signUpVC)
+                        navVC.modalPresentationStyle = .pageSheet
+                        splitVC.present(navVC, animated: true)
+                    }
+                } else {
+                    self?.navigationController?.pushViewController(SignUpViewController(), animated: true)
+                }
             })
             .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
