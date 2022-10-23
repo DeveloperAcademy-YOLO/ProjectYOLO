@@ -13,9 +13,15 @@ final class CardResultViewController: UIViewController {
     
     private var backgroundImg = UIImage(named: "Rectangle")
     let image: UIImage
+    private let paperID: String
+    private let viewModel: CardViewModel
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
-    init(resultImage: UIImage) {
+    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel) {
         self.image = resultImage
+        self.paperID = paperID
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -116,6 +122,8 @@ final class CardResultViewController: UIViewController {
     
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
+        print(paperID)
+        self.input.send(.resultSend(paperID: paperID))
     }
     
 }

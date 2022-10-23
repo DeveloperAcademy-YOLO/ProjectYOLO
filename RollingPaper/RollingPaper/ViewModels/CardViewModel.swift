@@ -9,14 +9,24 @@ import UIKit
 import Combine
 
 class CardViewModel {
-    var cardBackgroundImg = UIImage(named: "Rectangle")
-    var cardResultImg = UIImage(named: "heart.fill")
+    
+    let currentCard: CurrentValueSubject<CardModel?, Never> = .init(nil)
+
+    private var card = [CardModel]()
+    
+    
+    private let databaseManager: DatabaseManager
+    
+    init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared) {
+        self.databaseManager = databaseManager
+    }
     
     enum Input {
         case viewDidLoad
         case resultShown
         case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImgGet
         case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImageSet
+        case resultSend(paperID: String)
     }
     
     enum Output {
@@ -44,6 +54,8 @@ class CardViewModel {
                 self.getRecentCardResultImg()
             case.resultShown:
                 self.getRecentCardResultImg()
+            case.resultSend(let paperID):
+                self.createCard(paperID: paperID)
             }
         })
         .store(in: &cancellables)
@@ -66,12 +78,19 @@ class CardViewModel {
     }
     
     private func setCardResultImg(result: UIImage) {
-        guard let png = result.pngData()
-        else { return }// png로 바꿔서 넣어 버린다.
-        UserDefaults.standard.set(png, forKey: "cardResultImg")
-//        guard let result = result.jpegData(compressionQuality: 0.2)
-//        else { return }
-//        FirebaseStorageManager.uploadData(dataId: "string", data: result, contentType: .jpeg, pathRoot: .card)
+        guard let result = result.jpegData(compressionQuality: 0.2)
+        else { return }
+        UserDefaults.standard.set(result, forKey: "cardResultImg")
+    }
+    
+    private func createCard(paperID: String) {
+        guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
+        else { return }
+        FirebaseStorageManager.uploadData(dataId: self.currentCard.value?.cardId ?? "", data: recentResultImg, contentType: .jpeg, pathRoot: .card) // TODO:
+      
+        let currentTime = Date()
+        let resultCard = CardModel(date: currentTime, contentURLString: "") // TODO:
+        databaseManager.addCard(paperId: paperID, card: resultCard) // TODO:
     }
     
     private func getRecentCardResultImg() {

@@ -158,7 +158,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel()), animated: true)
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaper?.paperId ?? "paperID send fail"), animated: true) // TODO:
     }
     
     func presentSignUpModal(_ sender: UIButton) {

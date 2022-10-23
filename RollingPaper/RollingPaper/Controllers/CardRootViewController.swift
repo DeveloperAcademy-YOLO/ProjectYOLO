@@ -44,12 +44,14 @@ class CardRootViewController: UIViewController {
     private var thirdStepView: UIView!
     
     private let viewModel: CardViewModel
+    private let paperID: String
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, paperID: String) {
         self.viewModel = viewModel
+        self.paperID = paperID
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -141,6 +143,9 @@ class CardRootViewController: UIViewController {
     }
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
+        
+        //self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
+        
         if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
             secondStepViewVC.resultImageSend()
             print("CardPencilKit here!")
@@ -149,7 +154,7 @@ class CardRootViewController: UIViewController {
             print("Fail!")
         }
         DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
+            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel)
             
             self.navigationController?.pushViewController(pushVC, animated: false)
         }) // TODO: 리팩토링 필요
