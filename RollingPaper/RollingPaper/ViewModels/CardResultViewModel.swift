@@ -8,7 +8,7 @@ import UIKit
 import Combine
 
 class CardResultViewModel {
-    private var setCardResult: UIImage = UIImage()
+    // private var setCardResult: UIImage = UIImage()
     private let databaseManager: DatabaseManager
     
     init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared) {
@@ -36,8 +36,11 @@ class CardResultViewModel {
             .store(in: &cancellables)
     }
     private func setCardResult(result: UIImage) {
-        self.setCardResult = result
+        guard let result = result.jpegData(compressionQuality: 0.2)
+        else { return }
+        FirebaseStorageManager.uploadData(dataId: "string", data: result, contentType: .jpeg, pathRoot: .card)
     }
+    
     private func createCard() {
         let currentTime = Date()
         let result = CardModel(date: currentTime, contentURLString: "test")

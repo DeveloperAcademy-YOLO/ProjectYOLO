@@ -69,6 +69,9 @@ class CardViewModel {
         guard let png = result.pngData()
         else { return }// png로 바꿔서 넣어 버린다.
         UserDefaults.standard.set(png, forKey: "cardResultImg")
+//        guard let result = result.jpegData(compressionQuality: 0.2)
+//        else { return }
+//        FirebaseStorageManager.uploadData(dataId: "string", data: result, contentType: .jpeg, pathRoot: .card)
     }
     
     private func getRecentCardResultImg() {
