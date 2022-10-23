@@ -147,8 +147,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
         backgroundConfig.backgroundInsets = Layout.tableCellBackgroundInsets
         cell.backgroundConfiguration = backgroundConfig
-        cell.selectionStyle = .none
-        
+        cell.selectionStyle = .gray
         var content = cell.defaultContentConfiguration()
         content.image = UIImage(systemName: category.icon)
         content.text = category.name
@@ -171,6 +170,8 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         let category = self.categories[indexPath.row]
         self.delegate?.didSelectCategory(category)
     }
+    
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return Layout.tableCellHeight
