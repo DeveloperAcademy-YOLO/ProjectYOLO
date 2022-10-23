@@ -13,7 +13,44 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
+    private var sidebarViewController: SidebarViewController!
+    // private var templateViewController: PaperTemplateSelectViewController!
+    // private var storageViewController: PaperStorageViewController!
+    // private var mainViewController: MainViewController!
+    // private var settingViewController: SettingScreenViewController!
+    private var current = "페이퍼 템플릿"
+    private var paperTemplateSelectViewController: UINavigationController!
+    private var paperStorageViewController: UINavigationController!
+    private var settingScreenViewController: UINavigationController!
     
+    var sideBarCategories: [CategoryModel] = [
+        CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
+        CategoryModel(name: "페이퍼 보관함", icon: "folder"),
+        CategoryModel(name: "설정", icon: "gearshape")
+    ]
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(changeSecondaryView(noitificaiton:)), name: Notification.Name.viewChange, object: nil)
+        self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
+        self.presentsWithGesture = true
+        self.loadViewControllers()
+        self.sidebarViewController.show(categories: self.sideBarCategories)
+        self.preferredPrimaryColumnWidthFraction = 0.25
+        delegate = self
+        splitViewManager.transform(input: input.eraseToAnyPublisher())
+    }
+    
+    private func loadViewControllers() {
+        self.sidebarViewController.delegate = self
+        self.sidebarViewController = SidebarViewController()
+        self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
+        self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
+        self.viewControllers = [sidebar, paperTemplateSelectViewController]
+    }
+    /*
     func didSelectCategory(_ category: CategoryModel) {
         let templateViewController = UINavigationController(rootViewController: self.templateViewController)
         let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
@@ -41,28 +78,23 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
             break
         }
     }
-    
-    var sideBarCategories: [CategoryModel] = [
-        CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
-        CategoryModel(name: "페이퍼 보관함", icon: "folder"),
-        CategoryModel(name: "설정", icon: "gearshape")
-    ]
-    private var sidebarViewController: SidebarViewController!
-    private var templateViewController: PaperTemplateSelectViewController!
-    private var storageViewController: PaperStorageViewController!
-    private var mainViewController: MainViewController!
-    private var settingViewController: SettingScreenViewController!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
-        self.presentsWithGesture = true
-        self.loadViewControllers()
-        self.sidebarViewController.show(categories: self.sideBarCategories)
-        self.preferredPrimaryColumnWidthFraction = 0.25
-        
-        delegate = self
-        splitViewManager.transform(input: input.eraseToAnyPublisher())
+    */
+    @objc func changeSecondaryView(noitificaiton: Notification) {
+        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+        if self.current == object {
+            return
+        }
+        switch object {
+        case "페이퍼 템플릿":
+            self.viewControllers[1] = paperTemplateSelectViewController
+        case "페이퍼 보관함":
+            self.viewControllers[1] = paperStorageViewController
+        case "설정":
+            self.viewControllers[1] = settingScreenViewController
+        default :
+            break
+        }
+        self.current = object
     }
     
     func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewController.DisplayMode) {
@@ -79,17 +111,5 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     func primaryViewController(forExpanding splitViewController: UISplitViewController) -> UIViewController? {
         return self.viewControllers.last
-    }
-    
-    private func loadViewControllers() {
-        self.sidebarViewController = SidebarViewController()
-        self.templateViewController = PaperTemplateSelectViewController()
-        self.storageViewController = PaperStorageViewController()
-        self.mainViewController = MainViewController()
-        self.settingViewController = SettingScreenViewController()
-        self.sidebarViewController.delegate = self
-        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
-        let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        self.viewControllers = [sidebar, templateViewController]
     }
 }
