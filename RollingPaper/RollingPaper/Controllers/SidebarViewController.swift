@@ -85,7 +85,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view = UIView()
         view.backgroundColor = .systemGray6
         bind()
         setupSubviews()
