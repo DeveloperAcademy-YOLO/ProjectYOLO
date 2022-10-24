@@ -79,7 +79,6 @@ class CardRootViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-        button.tag = 1
         return button
     }()
     
@@ -91,7 +90,6 @@ class CardRootViewController: UIViewController {
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
-        button.tag = 2
         return button
     }()
     

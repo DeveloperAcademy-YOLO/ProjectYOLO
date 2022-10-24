@@ -214,8 +214,14 @@ class WrittenPaperViewController: UIViewController {
     
     func presentSignUpModal(_ sender: UIButton) {
         let signInVC = SignInViewController()
-        signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
-        self.present(signInVC, animated: true)
+        
+        let navVC = UINavigationController(rootViewController: signInVC)
+        navVC.modalPresentationStyle = .formSheet
+        present(navVC, animated: true)
+        
+        //signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
+        //self.present(signInVC, animated: true)
+        
         authManager
             .signedInSubject
             .receive(on: DispatchQueue.main)
@@ -243,6 +249,7 @@ class WrittenPaperViewController: UIViewController {
         let popover = activityViewController.popoverPresentationController
         popover?.sourceView = sender
         present(activityViewController, animated: true)
+
     }
     
     func setPopOverView(_ sender: UIButton) {

@@ -115,7 +115,7 @@ class PaperTemplateSelectViewController: UIViewController {
         collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
         collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
         collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
-        self.templateCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: true)
+        self.templateCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: false)
     }
     
     // 컬렉션 뷰 초기화
@@ -263,6 +263,7 @@ private class PaperTemplateCollectionCell: UICollectionViewCell {
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = Length.templateThumbnailCornerRadius
+        imageView.contentMode = .scaleAspectFill
         imageView.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
