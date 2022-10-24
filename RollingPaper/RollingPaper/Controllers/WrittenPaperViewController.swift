@@ -77,7 +77,7 @@ class WrittenPaperViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
-
+        
         viewModel
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
@@ -100,7 +100,6 @@ class WrittenPaperViewController: UIViewController {
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -202,6 +201,7 @@ class WrittenPaperViewController: UIViewController {
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15) ])
         
         let allertController = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
+        
         allertController.addAction(UIAlertAction(title: "수정", style: .default,
                                                  handler: {_ in
             print("수정")
@@ -217,7 +217,6 @@ class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.addAction(edit)
             alert.addTextField { (editTitleTextField) in
-                self.titleEmbedingTextField = editTitleTextField
                 editTitleTextField.text = self.viewModel.currentPaper?.title
             }
             alert.preferredAction = edit
@@ -234,22 +233,21 @@ class WrittenPaperViewController: UIViewController {
             alert.preferredAction = stop
             self.present(alert, animated: true, completion: nil)
         }))
+        
         allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
                                                  handler: {_ in
             print("삭제")
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
-            let delete = UIAlertAction(title: "삭제", style: .destructive) { (deletion) in
-                //                if self.titleEmbedingTextField.text == self.viewModel.currentPaper?.title {
-                //                    self.viewModel.deletePaper(self.viewModel.currentPaper?.paperId!, from: self.viewModel.paperFrom!)
-                //                }
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
+                self.deletePaper()
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
             alert.addAction(cancel)
             alert.preferredAction = delete
-            alert.addTextField { (editTitleTextField) in
-                self.titleEmbedingTextField = editTitleTextField
-                editTitleTextField.placeholder = self.viewModel.currentPaper?.title
+            alert.addTextField { (deleteTitleTextField) in
+                self.titleEmbedingTextField = deleteTitleTextField
+                deleteTitleTextField.placeholder = self.viewModel.currentPaper?.title
             }
             self.present(alert, animated: true, completion: nil)
         }))
@@ -261,6 +259,26 @@ class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = UIColor.white
         present(allertController, animated: true)
+    }
+    
+    func deletePaper() {
+        let deleteVerifyText = self.titleEmbedingTextField.text
+        if deleteVerifyText == self.viewModel.currentPaper?.title {
+            if viewModel.isPaperLinkMade{
+                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
+            }
+            else {
+                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
+            }
+            self.moveToPaperStorageView()
+        } else {
+            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
+            let confirm = UIAlertAction(title: "확인", style: .default)
+            alert.addAction(confirm)
+            alert.preferredAction = confirm
+            self.present(alert, animated: true, completion: nil)
+        }
+        
     }
     
     func setCollectionView() -> UICollectionView {
