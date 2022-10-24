@@ -142,7 +142,13 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
-        paperLinkBtn.addAction(UIAction(handler: {_ in self.presentSignUpModal(paperLinkBtn)}), for: .touchUpInside)
+        paperLinkBtn.addAction(UIAction(handler: {_ in
+            if self.viewModel.currentUser != nil {
+                self.presentShareSheet(paperLinkBtn)
+            } else {
+                self.presentSignUpModal(paperLinkBtn)
+            }
+        }), for: .touchUpInside)
         
         let createCardBtnImage = UIImage(systemName: "plus.rectangle.fill")!.resized(to: CGSize(width: 40, height: 30))
         let createCardBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -188,9 +194,24 @@ class WrittenPaperViewController: UIViewController {
         let signInVC = SignInViewController()
         signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
         self.present(signInVC, animated: true)
-        //        if {
-        //            viewModel.authManager.signedInSubject.
-        //        }
+    }
+    
+    func presentShareSheet(_ sender: UIButton) {
+        let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
+        let url = "https://www.google.com" // 실제 페이퍼나 앱의 링크가 들어가는 곳
+        //TODO : 카톡으로 공유하기
+        let urlToShare = [ url ]
+        let applicationActivities: [UIActivity]? = nil
+        
+        let activityViewController = UIActivityViewController(
+            activityItems: urlToShare,
+            applicationActivities: applicationActivities)
+        
+        activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
+        
+        let popover = activityViewController.popoverPresentationController
+        popover?.sourceView = sender
+        present(activityViewController, animated: true)
     }
     
     func setPopOverView(_ sender: UIButton) {
@@ -208,7 +229,7 @@ class WrittenPaperViewController: UIViewController {
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
             let edit = UIAlertAction(title: "수정", style: .default) { (edit) in
                 if let changedPaperTitle = self.titleEmbedingTextField.text {
-                    self.viewModel.changePaperTitle(input: changedPaperTitle)
+                    //self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
                     print(changedPaperTitle)
                     //이거 아직 subscribe에 전달 안 해줘서 실시간으로 바뀌진 않음
                 }
@@ -227,7 +248,7 @@ class WrittenPaperViewController: UIViewController {
             print("마감")
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { (stop) in  }
-            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
             alert.addAction(stop)
             alert.preferredAction = stop
@@ -241,7 +262,7 @@ class WrittenPaperViewController: UIViewController {
             let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
                 self.deletePaper()
             }
-            let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
+            let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(delete)
             alert.addAction(cancel)
             alert.preferredAction = delete
@@ -257,7 +278,7 @@ class WrittenPaperViewController: UIViewController {
         
         let popover = allertController.popoverPresentationController
         popover?.sourceView = sender
-        popover?.backgroundColor = UIColor.white
+        popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
     }
     

@@ -86,14 +86,15 @@ class WrittenPaperViewModel {
             .store(in: &cancellables)
     }
     
-    func changePaperTitle(input: String) {
+    func changePaperTitle(input: String, from paperFrom: DataSource) {
         currentPaper?.title = input
-        //        switch self.paperFrom {
-        //        case .fromLocal:
-        //            localDatabaseManager.updatePaper(paper: currentPaper)
-        //        case .fromServer:
-        //            serverDatabaseManager.updatePaper(paper: currentPaper)
-        //        }
+//        switch paperFrom {
+//        case .fromLocal:
+//            localDatabaseManager.updatePaper(paper: self.currentPaper ?? <#default value#>)
+//        case .fromServer:
+//            serverDatabaseManager.updatePaper(paper: self?.currentPaper)
+        //TODO: 페이퍼 업뎃 때 페이퍼 아이디 받기 논의
+//        }
     }
     
     func getRemainingTime(_ paperID: String) {}
