@@ -162,9 +162,10 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func presentSignUpModal(_ sender: UIButton) {
-        let signUpVC = SignUpViewController()
-        signUpVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
-        self.present(signUpVC, animated: true)
+        let signInVC = SignInViewController()
+        let navVC = UINavigationController(rootViewController: signInVC)
+        navVC.modalPresentationStyle = .formSheet
+        present(navVC, animated: true)
     }
     
     func setPopOverView(_ sender: UIButton) {

@@ -233,7 +233,7 @@ extension SignUpTextField {
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
                 checkImageView.isHidden = true
-                setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다f")
+                setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
                 passedSubject.send(false)
                 warningShownSubject.send(true)
             case .focused:
