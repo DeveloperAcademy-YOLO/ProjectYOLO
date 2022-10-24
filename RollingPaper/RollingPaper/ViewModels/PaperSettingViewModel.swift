@@ -14,6 +14,9 @@ class PaperSettingViewModel {
     private var template: TemplateEnum
     private let databaseManager: DatabaseManager
     
+    let authManager: AuthManager = FirebaseAuthManager.shared
+    var currentUser: UserModel?
+    
     init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
         self.template = template
@@ -49,12 +52,23 @@ class PaperSettingViewModel {
     
     // 페이퍼 만들기
     private func createPaper() {
+        setCurrentPaperCreator()
         let currentTime = Date()
         guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
             return
         }
-        let paper = PaperModel(cards: [], date: currentTime, endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
+        let paper = PaperModel(creator: currentUser, cards: [], date: currentTime, endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
         databaseManager.addPaper(paper: paper)
         databaseManager.fetchPaper(paperId: paper.paperId)
+    }
+    
+    private func setCurrentPaperCreator() {
+        authManager
+            .userProfileSubject
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink { [weak self] userProfile in
+                self?.currentUser = userProfile
+            }
+            .store(in: &cancellables)
     }
 }

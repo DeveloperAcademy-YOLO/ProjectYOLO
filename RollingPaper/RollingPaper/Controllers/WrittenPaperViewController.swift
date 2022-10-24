@@ -11,10 +11,15 @@ import SnapKit
 import Combine
 
 class WrittenPaperViewController: UIViewController {
-    lazy private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
+    private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     lazy private var changedPaperTitle: String = ""
+    
+    let authManager: AuthManager = FirebaseAuthManager.shared
+    private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
+    var currentUser: UserModel?
+    var currentPaper: PaperModel?
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
@@ -62,25 +67,39 @@ class WrittenPaperViewController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
+    func getCurrentUserAndPaper() {
+        viewModel
+            .currentUserSubject
+            .receive(on: DispatchQueue.main)
+            .sink{ [weak self] userProfile in
+                if let userProfile = userProfile {
+                    self?.currentUser = userProfile
+                }
+            }
+            .store(in: &cancellables)
+
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink{ [weak self] paperModel in
+                if let paperModel = paperModel {
+                    self?.titleLabel.text = paperModel.title
+                    self?.currentPaper = paperModel
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         self.splitViewController?.hide(.primary)
         self.navigationController?.navigationBar.tintColor = .systemGray
-        
+        getCurrentUserAndPaper()
         navigationItem.titleView = stackView
         setCustomNavBarButtons()
         self.cardsList = setCollectionView()
         view.addSubview(self.cardsList ?? UICollectionView())
-        
-        viewModel.currentPaperPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] paperModel in
-                if let paperModel = paperModel {
-                    self?.titleLabel.text = paperModel.title
-                }
-            }
-            .store(in: &cancellables)
         
     }
     
@@ -88,6 +107,8 @@ class WrittenPaperViewController: UIViewController {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
+        getCurrentUserAndPaper()
+        currentPaper?.creator = currentUser
     }
     
     private func titleLabelConstraints() {
@@ -113,6 +134,11 @@ class WrittenPaperViewController: UIViewController {
         customBackBtn.addAction(UIAction(handler: {_ in self.moveToPaperStorageView()}), for: .touchUpInside)
         customBackBtn.addLeftPadding(5)
         
+        let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
+        let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        managePaperBtn.setImage(managePaperBtnImage, for: .normal)
+        managePaperBtn.addAction(UIAction(handler: {_ in self.setPopOverView(managePaperBtn)}), for: .touchUpInside)
+        
         let paperLinkBtnImage = UIImage(systemName: "square.and.arrow.up")!.resized(to: CGSize(width: 30, height: 30))
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
@@ -124,17 +150,15 @@ class WrittenPaperViewController: UIViewController {
         createCardBtn.setImage(createCardBtnImage, for: .normal)
         createCardBtn.addAction(UIAction(handler: {_ in self.moveToCardRootView()}), for: .touchUpInside)
         
-        let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
-        let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        managePaperBtn.setImage(managePaperBtnImage, for: .normal)
-        managePaperBtn.addAction(UIAction(handler: {_ in self.setPopOverView(managePaperBtn)}), for: .touchUpInside)
-        
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
         let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
         let fourthBarButton = UIBarButtonItem(customView: createCardBtn)
         
-        navigationItem.rightBarButtonItems = [fourthBarButton, thirdBarButton, secondBarButton]
+        let signInSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton, secondBarButton]
+        let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
+        
+        navigationItem.rightBarButtonItems = currentUser?.email == currentPaper?.creator?.email ? signInSetting : signOutSetting
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
@@ -162,9 +186,12 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func presentSignUpModal(_ sender: UIButton) {
-        let signUpVC = SignUpViewController()
-        signUpVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
-        self.present(signUpVC, animated: true)
+        let signInVC = SignInViewController()
+        signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
+        self.present(signInVC, animated: true)
+        //        if {
+        //            viewModel.authManager.signedInSubject.
+        //        }
     }
     
     func setPopOverView(_ sender: UIButton) {
@@ -212,9 +239,9 @@ class WrittenPaperViewController: UIViewController {
             print("삭제")
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
             let delete = UIAlertAction(title: "삭제", style: .destructive) { (deletion) in
-//                if self.titleEmbedingTextField.text == self.viewModel.currentPaper?.title {
-//                    self.viewModel.deletePaper(self.viewModel.currentPaper?.paperId!, from: self.viewModel.paperFrom!)
-//                }
+                //                if self.titleEmbedingTextField.text == self.viewModel.currentPaper?.title {
+                //                    self.viewModel.deletePaper(self.viewModel.currentPaper?.paperId!, from: self.viewModel.paperFrom!)
+                //                }
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel) { (cancel) in }
             alert.addAction(delete)
@@ -259,7 +286,7 @@ class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 9 // How many cells to display
+        return self.viewModel.currentPaper?.cards.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
