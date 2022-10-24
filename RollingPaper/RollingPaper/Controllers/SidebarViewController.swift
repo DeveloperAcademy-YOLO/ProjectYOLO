@@ -14,6 +14,28 @@ protocol SidebarViewControllerDelegate: AnyObject {
     func didSelectCategory(_ category: CategoryModel)
 }
 
+private class Layout {
+    static let userPhotoFrameWidthHeight = 44
+    static let userNameFontSize: CGFloat = 20
+    static let userPhotoToNamePadding: CGFloat = 16
+    static let userChevronFrameWidth = Int(Double(userInfoStackWidthSuperView) * 0.3 * 0.24)
+    static let userChevronWidthHeight = 15
+    static let tableCellBackgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
+    static let tableCellimageToTextPadding: CGFloat = 16
+    static let tableCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+    static let tableCellHeight: CGFloat = 56
+    static let tableCellImageSize = CGSize(width: 25, height: 25)
+    static let tableViewLeadingOffset = 128
+    static let tableViewTrailingOffset = -28
+    static let tableViewToUserInfoStackPadding = 24
+    static let userInfoStackRadius: CGFloat = 12
+    static let userInfoStackInset = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
+    static let userInfoStackWidthSuperView = -156
+    static let userInfoStackLeadingSuperView = 128
+    static let userInfoStackTrailingSuperView = -28
+    static let userInfoStackTopSafeArea = 40
+}
+
 class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var delegate: SidebarViewControllerDelegate?
@@ -22,7 +44,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     private var cancellables = Set<AnyCancellable>()
     
     private let userPhoto: UIImageView = {
-        let photo = UIImageView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
+        let photo = UIImageView()
         photo.image = UIImage(systemName: "person.circle")
         photo.layer.cornerRadius = photo.frame.width / 2
         photo.layer.masksToBounds = true
@@ -31,19 +53,16 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     }()
     
     private let chevron: UIImageView = {
-        let chevron = UIImageView(frame: CGRect(x: 0, y: 0, width: 15, height: 15))
+        let chevron = UIImageView()
         chevron.image = UIImage(systemName: "chevron.forward")
         chevron.contentMode = UIView.ContentMode.scaleAspectFit
-        chevron.snp.makeConstraints { make in
-            make.height.width.equalTo(15)
-        }
         return chevron
     }()
     
     private let userName: UILabel = {
         let name = UILabel()
-        name.text = "Guest"
-        name.font = .boldSystemFont(ofSize: 20)
+        name.text = "요셉"
+        name.font = UIFont.preferredFont(forTextStyle: .title3)
         name.sizeToFit()
         return name
     }()
@@ -51,7 +70,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     lazy var userInfoStack: UIStackView = {
         let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName, chevron])
         userInfo.axis = .horizontal
-        userInfo.spacing = 16
+        userInfo.alignment = .center
+        userInfo.distribution = .fillProportionally
+        userInfo.spacing = 0
+        userInfo.setCustomSpacing(Layout.userPhotoToNamePadding, after: userPhoto)
         return userInfo
     }()
     
@@ -63,14 +85,12 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view = UIView()
-        view.backgroundColor = .customSidebarBackgroundColor
+        view.backgroundColor = .systemGray6
         bind()
         setupSubviews()
         let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
         userInfoStack.addGestureRecognizer(tapUserInfo)
         tableView.separatorStyle = .none
-        print("Load View")
     }
     
     private func bind() {
@@ -78,7 +98,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .currentUserSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userModel in
-                // self?.userPhoto.image = userModel.profileUrl
                 print("SideBar Called!")
                 if let userModel = userModel {
                     self?.convertURL(from: userModel.profileUrl)
@@ -93,6 +112,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     
     private func convertURL(from urlString: String?) {
         guard let urlString = urlString else { return}
+        // 먼저 캐시를 체크, 로컬 스토리지 체크, 네트워크 다운로드! -> 다운로드받은 뒤에는 캐시에 일단 저장.
+        // 로컬 스토리지에 URLString -> 프로필 다운로드 가능한지 체크
+        // 다운로드 가능하면 캐시 매니저에 일단 저장, 해당 이미지 사용
+        // 다운로드 불가능 -> 네트워크로 다운로드 -> 캐시 매니저에 저장
         FirebaseStorageManager
             .downloadData(urlString: urlString)
             .receive(on: DispatchQueue.global(qos: .background))
@@ -124,16 +147,17 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         let cell = UITableViewCell()
         let category = self.categories[indexPath.row]
         var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
-        backgroundConfig.backgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
+        backgroundConfig.backgroundInsets = Layout.tableCellBackgroundInsets
         cell.backgroundConfiguration = backgroundConfig
-        cell.selectionStyle = .none
-        
+        cell.selectionStyle = .gray
         var content = cell.defaultContentConfiguration()
         content.image = UIImage(systemName: category.icon)
         content.text = category.name
-        content.imageToTextPadding = 16
+        content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
+        content.imageToTextPadding = Layout.tableCellimageToTextPadding
         content.imageProperties.tintColor = .systemGray3
-        content.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 0)
+        content.imageProperties.maximumSize = Layout.tableCellImageSize
+        content.directionalLayoutMargins = Layout.tableCellInsets
         cell.contentConfiguration = content
         
         return cell
@@ -149,8 +173,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         self.delegate?.didSelectCategory(category)
     }
     
+    
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 56
+        return Layout.tableCellHeight
     }
     
     @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
@@ -169,29 +195,32 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         tableView.backgroundColor = .clear
         
         tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(128)
-            make.trailing.equalToSuperview().offset(-28)
+            make.leading.equalToSuperview().offset(Layout.tableViewLeadingOffset)
+            make.trailing.equalToSuperview().offset(Layout.tableViewTrailingOffset)
             make.bottom.equalToSuperview()
-            make.top.equalTo(userInfoStack.snp.bottom).offset(24)
+            make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.tableViewToUserInfoStackPadding)
         }
     }
     
     private func setupProfileView() {
         view.addSubview(userInfoStack)
-        userInfoStack.backgroundColor = .white
-        userInfoStack.layer.cornerRadius = 12
+        userInfoStack.backgroundColor = .systemBackground
+        userInfoStack.layer.cornerRadius = Layout.userInfoStackRadius
         userInfoStack.isLayoutMarginsRelativeArrangement = true
-        userInfoStack.layoutMargins = UIEdgeInsets(top: 15, left: 16, bottom: 15, right: 16)
-        
-        userPhoto.snp.makeConstraints { make in
-            make.width.height.equalTo(50)
-        }
+        userInfoStack.layoutMargins = Layout.userInfoStackInset
         
         userInfoStack.snp.makeConstraints { make in
-            make.width.equalToSuperview().offset(-156)
-            make.height.equalTo(74)
-            make.leading.equalToSuperview().offset(128)
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+            make.leading.equalToSuperview().offset(Layout.userInfoStackLeadingSuperView)
+            make.trailing.equalToSuperview().offset(Layout.userInfoStackTrailingSuperView)
+            make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
+        }
+        
+        userPhoto.snp.makeConstraints { make in
+            make.top.height.equalToSuperview().inset(14)
+        }
+        chevron.snp.makeConstraints { make in
+            make.height.equalToSuperview().multipliedBy(0.24)
         }
     }
 }
