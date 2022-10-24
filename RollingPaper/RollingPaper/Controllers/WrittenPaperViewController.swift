@@ -138,23 +138,12 @@ class WrittenPaperViewController: UIViewController {
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
-    func moveToPaperStorageView() {
-        if
-            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperTemplateSelectViewController }).first,
-            let splitVC = currentVC.parent?.parent as? SplitViewController {
-            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
-            if viewModel.paperFrom == .fromLocal {
-                viewModel.localDatabaseManager.resetPaper()
-            }
-        } else if
-            let currentVC = self.navigationController?.viewControllers.filter({ $0 is PaperStorageViewController }).first,
-            let splitVC = currentVC.parent?.parent as? SplitViewController {
-            splitVC.didSelectCategory(CategoryModel(name: "페이퍼 보관함", icon: "folder"))
-            if viewModel.paperFrom == .fromLocal {
-                viewModel.localDatabaseManager.resetPaper()
-            }
-            
-        }
+    private func moveToPaperStorageView() {
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChange,
+            object: nil,
+            userInfo: [NotificationViewKey.view: "페이퍼 보관함"]
+        )
     }
     
     func moveToCardRootView() {

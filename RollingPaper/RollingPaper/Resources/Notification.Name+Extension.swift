@@ -9,6 +9,7 @@ import Foundation
 
 extension Notification.Name {
     static let viewChange = Notification.Name("viewChange")
+    static let viewChangeFromSidebar = Notification.Name("ViewChangeFromSidebar")
 }
 
 enum NotificationViewKey {

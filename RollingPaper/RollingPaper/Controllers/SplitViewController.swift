@@ -9,15 +9,11 @@ import UIKit
 import Combine
 import CombineCocoa
 
-class SplitViewController: UISplitViewController, UISplitViewControllerDelegate, SidebarViewControllerDelegate {
+class SplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
     private var sidebarViewController: SidebarViewController!
-    // private var templateViewController: PaperTemplateSelectViewController!
-    // private var storageViewController: PaperStorageViewController!
-    // private var mainViewController: MainViewController!
-    // private var settingViewController: SettingScreenViewController!
     private var current = "페이퍼 템플릿"
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
@@ -31,7 +27,18 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(changeSecondaryView(noitificaiton:)), name: Notification.Name.viewChange, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeSecondaryView(noitificaiton:)),
+            name: Notification.Name.viewChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeSecondaryViewFromSidebar(noitificaiton:)),
+            name: Notification.Name.viewChangeFromSidebar,
+            object: nil
+        )
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
         self.loadViewControllers()
@@ -42,7 +49,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
     }
     
     private func loadViewControllers() {
-        self.sidebarViewController.delegate = self
+        // self.sidebarViewController.delegate = self
         self.sidebarViewController = SidebarViewController()
         self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
@@ -50,36 +57,23 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate,
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
     }
-    /*
-    func didSelectCategory(_ category: CategoryModel) {
-        let templateViewController = UINavigationController(rootViewController: self.templateViewController)
-        let paperStorageViewController = UINavigationController(rootViewController: self.storageViewController)
-        let settingScreenViewController = UINavigationController(rootViewController: self.settingViewController)
-        
-        switch category.name {
+    
+    @objc func changeSecondaryView(noitificaiton: Notification) {
+        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+        switch object {
         case "페이퍼 템플릿":
-            if !(self.viewControllers[1] is PaperTemplateSelectViewController) {
-                self.viewControllers[1] = templateViewController
-            }
+            self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-            if !(self.viewControllers[1] is PaperStorageViewController) {
-                self.viewControllers[1] = paperStorageViewController
-            }
+            self.viewControllers[1] = UINavigationController(rootViewController: PaperStorageViewController())
         case "설정":
-            if !(self.viewControllers[1] is SettingScreenViewController) {
-                if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-                    print(currentUserEmail)
-                    self.viewControllers[1] = settingScreenViewController
-                } else {
-                    self.viewControllers[1] = UINavigationController(rootViewController: SignInViewController())
-                }
-            }
-        default:
+            self.viewControllers[1] = settingScreenViewController
+        default :
             break
         }
+        self.current = object
     }
-    */
-    @objc func changeSecondaryView(noitificaiton: Notification) {
+    
+    @objc func changeSecondaryViewFromSidebar(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         if self.current == object {
             return

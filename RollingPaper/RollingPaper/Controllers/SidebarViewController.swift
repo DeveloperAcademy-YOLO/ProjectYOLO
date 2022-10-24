@@ -147,8 +147,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let category = self.categories[indexPath.row]
-        NotificationCenter.default.post(name : Notification.Name.viewChange, object: nil, userInfo: [NotificationViewKey.view: category.name])
-        // self.delegate?.didSelectCategory(category)
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChangeFromSidebar,
+            object: nil,
+            userInfo: [NotificationViewKey.view: category.name])
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
