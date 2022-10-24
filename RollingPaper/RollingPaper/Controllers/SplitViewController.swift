@@ -64,7 +64,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
             if currentSecondaryView == "페이퍼 보관함" {
-                self.viewControllers[1] = UINavigationController(rootViewController: PaperStorageViewController())
+                self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+                self.viewControllers[1] = paperStorageViewController
             } else {
                 self.viewControllers[1] = paperStorageViewController
             }
