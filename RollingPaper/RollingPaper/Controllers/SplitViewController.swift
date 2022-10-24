@@ -14,7 +14,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
     private var sidebarViewController: SidebarViewController!
-    private var current = "페이퍼 템플릿"
+    private var currentSecondaryView = "페이퍼 템플릿"
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
@@ -49,7 +49,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     private func loadViewControllers() {
-        // self.sidebarViewController.delegate = self
         self.sidebarViewController = SidebarViewController()
         self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
@@ -64,18 +63,22 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 템플릿":
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-            self.viewControllers[1] = UINavigationController(rootViewController: PaperStorageViewController())
+            if currentSecondaryView == "페이퍼 보관함" {
+                self.viewControllers[1] = UINavigationController(rootViewController: PaperStorageViewController())
+            } else {
+                self.viewControllers[1] = paperStorageViewController
+            }
         case "설정":
             self.viewControllers[1] = settingScreenViewController
         default :
             break
         }
-        self.current = object
+        self.currentSecondaryView = object
     }
     
     @objc func changeSecondaryViewFromSidebar(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
-        if self.current == object {
+        if self.currentSecondaryView == object {
             return
         }
         switch object {
@@ -88,7 +91,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         default :
             break
         }
-        self.current = object
+        self.currentSecondaryView = object
     }
     
     func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewController.DisplayMode) {
