@@ -33,7 +33,11 @@ class WrittenPaperViewController: UIViewController {
     }()
     
     lazy private var timeLabel: BasePaddingLabel = {
+        let now: Date = Date()
+        //이거 야매라서 리팩토링 해야함
+        let timeInterval = Int(viewModel.currentPaper?.endTime.timeIntervalSince(now) ?? 3600*2-1)
         let timeLabel = BasePaddingLabel()
+        
         //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
         timeLabel.textAlignment = .center
         
@@ -43,14 +47,32 @@ class WrittenPaperViewController: UIViewController {
         let attachmentString = NSAttributedString(attachment: imageAttachment)
         let completeText = NSMutableAttributedString(string: "")
         completeText.append(attachmentString)
-        let textAfterIcon = NSAttributedString(string: "  " + "99:99")
+        let textAfterIcon = timeInterval > 0
+                ? NSAttributedString(string: "  " + "\(changeTimeFormat(second: timeInterval))")
+                : NSAttributedString(string: "  " + "\(changeTimeFormat(second: 0))")
         completeText.append(textAfterIcon)
         timeLabel.attributedText = completeText
         
         timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
         timeLabel.textColor = .white
         timeLabel.layer.cornerRadius = 18
-        timeLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
+        timeLabel.layer.backgroundColor = timeInterval > 0
+                ? UIColor(rgb: 0xADADAD).cgColor
+                : UIColor(rgb: 0xFF3B30).cgColor
+        
+        func changeTimeFormat(second: Int) -> String {
+            let hour = Int(second/3600)
+            let minute = Int((second - (hour*3600))/60)
+            var hourString = String(hour)
+            var minuteString = String(minute)
+            if hourString.count == 1 {
+                hourString = "0" + hourString
+            }
+            if minuteString.count == 1 {
+                minuteString = "0" + minuteString
+            }
+            return hourString + ":" + minuteString
+        }
         return timeLabel
     }()
     
@@ -194,6 +216,15 @@ class WrittenPaperViewController: UIViewController {
         let signInVC = SignInViewController()
         signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
         self.present(signInVC, animated: true)
+        authManager
+            .signedInSubject
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { receivedValue in
+                if receivedValue == .signInSucceed {
+                    signInVC.dismiss(animated: true)
+                }
+            })
+            .store(in: &cancellables)
     }
     
     func presentShareSheet(_ sender: UIButton) {
