@@ -84,12 +84,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         input.send(.viewDidLoad)
         bind()
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        //canvasViewInteractionEnabled()
-//        //toolPickerAppear()
-//    }
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())

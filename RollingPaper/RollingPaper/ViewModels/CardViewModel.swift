@@ -10,13 +10,10 @@ import Combine
 
 class CardViewModel {
     
-    let currentCard: CurrentValueSubject<CardModel?, Never> = .init(nil)
-
-    private var card = [CardModel]()
-    
-    
     let localDatabaseManager: DatabaseManager
     let serverDatabaseManager: DatabaseManager
+    private let output: PassthroughSubject<Output, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
     init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
@@ -26,8 +23,8 @@ class CardViewModel {
     enum Input {
         case viewDidLoad
         case resultShown
-        case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImgGet
-        case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImageSet
+        case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImg Set
+        case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImage Set
         case resultSend(paperID: String, isLocalDB: Bool)
     }
     
@@ -36,11 +33,7 @@ class CardViewModel {
         case getRecentCardBackgroundImgFail
         case getRecentCardResultImgSuccess(result: UIImage?)
         case getRecentCardResultImgFail
-        //case getPaperID
     }
-    
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input.sink(receiveValue: { [weak self] event in
@@ -88,51 +81,46 @@ class CardViewModel {
     }
     
     private func createCard(paperID: String, isLocalDB: Bool) {
-        print("card view model에서 보냄 \(isLocalDB)")
+        print("WrittenPaperViewController에서 보냄 \(isLocalDB)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
-       
+        
         let currentTime = Date()
         var currentCardURL: String = ""
-       
         var resultCardModel: CardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
         
-        print("업로드전\(currentCardURL)")
-        print("카드모델 넣기 전 모델 \(resultCardModel)")
+        print("currentCardURL 넣기 전 CardModel \(resultCardModel)")
         
         if isLocalDB {
             LocalStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
-                switch completion {
-                case .finished: break
-                case .failure(let error):
-                    print(error.localizedDescription)
+                    switch completion {
+                    case .finished: break
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                } receiveValue: { [weak self] cardURL in
+                    guard let currentCardURL = cardURL?.absoluteString else { return }
+                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
                 }
-            } receiveValue: { [weak self] cardURL in
-                guard let currentCardURL = cardURL?.absoluteString else { return }
-                print("업로드후\(currentCardURL)")
-                resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                 //   print("Output Send!")
-            }
-            print("카드모델 넣은후 모델 \(resultCardModel)")
+            print("currentCardURL 넣은후 CardModel \(resultCardModel)")
             localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
+            
         } else {
             FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
-                switch completion {
-                case .finished: break
-                case .failure(let error):
-                    print(error.localizedDescription)
+                    switch completion {
+                    case .finished: break
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                } receiveValue: { [weak self] cardURL in
+                    guard let currentCardURL = cardURL?.absoluteString else { return }
+                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
                 }
-            } receiveValue: { [weak self] cardURL in
-                guard let currentCardURL = cardURL?.absoluteString else { return }
-                print("업로드후\(currentCardURL)")
-                resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                   // print("Output Send!")
-            }
+            print("currentCardURL 넣은후 CardModel \(resultCardModel)")
             serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
         }
-        
     }
     
     private func getRecentCardResultImg() {

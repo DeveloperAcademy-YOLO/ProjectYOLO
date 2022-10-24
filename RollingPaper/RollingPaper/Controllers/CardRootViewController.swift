@@ -38,17 +38,11 @@ class CardRootViewController: UIViewController {
     }
     
     private var backgroundImg = UIImage(named: "Rectangle")
-    
-    private var firstStepView: UIView!
-    private var secondStepView: UIView!
-    private var thirdStepView: UIView!
-    
     private let viewModel: CardViewModel
     private let paperID: String
     private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    
     
     init(viewModel: CardViewModel, paperID: String, isLocalDB: Bool) {
         self.viewModel = viewModel
@@ -99,6 +93,53 @@ class CardRootViewController: UIViewController {
         return button
     }()
     
+    lazy var firstStepView: UIView = {
+        let firstStepView = UIView()
+        return firstStepView
+    }()
+
+    lazy var secondStepView: UIView = {
+        let secondStepView = UIView()
+        return secondStepView
+    }()
+    
+    func firstStepViewConstraints() {
+        firstStepView.snp.makeConstraints({ make in
+            make.top.equalTo(self.view).offset(30)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        })
+    }
+    
+    func secondStepViewConstraints() {
+        secondStepView.snp.makeConstraints({ make in
+            make.top.equalTo(self.view).offset(30)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        })
+    }
+    
+    private func instantiateSegmentedViewControllers() {
+        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
+        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
+        
+        self.addChild(secondStepViewVC)
+        self.addChild(firstStepViewVC)
+        
+        firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
+        secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(secondStepViewVC.view)
+        self.view.addSubview(firstStepViewVC.view)
+       
+        self.firstStepView = firstStepViewVC.view
+        firstStepViewConstraints()
+        self.secondStepView = secondStepViewVC.view
+        secondStepViewConstraints()
+    }
+    
     private func setCustomNavBarButtons() {
         self.navigationItem.titleView = segmentedControl
         
@@ -145,9 +186,6 @@ class CardRootViewController: UIViewController {
     }
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        
-        //self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
-        
         if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
             secondStepViewVC.resultImageSend()
             print("CardPencilKit here!")
@@ -165,35 +203,6 @@ class CardRootViewController: UIViewController {
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
         print("cancelBtnPressed")
         self.navigationController?.popViewController(animated: true)
-    }
-    
-    private func instantiateSegmentedViewControllers() {
-        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
-        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
-        
-        self.addChild(secondStepViewVC)
-        self.addChild(firstStepViewVC)
-        
-        firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view.addSubview(secondStepViewVC.view)
-        self.view.addSubview(firstStepViewVC.view)
-        
-        NSLayoutConstraint.activate([
-            firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-            firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-            firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-            firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
-            
-            secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-            secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-            secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-            secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
-            
-        ])
-        self.firstStepView = firstStepViewVC.view
-        self.secondStepView = secondStepViewVC.view
     }
 }
 
