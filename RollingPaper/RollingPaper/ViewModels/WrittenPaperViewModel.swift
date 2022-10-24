@@ -38,7 +38,7 @@ class WrittenPaperViewModel {
 
     private var cards: [CardModel] = []
     
-    init(localDatabaseManager: DatabaseManager = LocalDatabaseMockManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
+    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
         print("WrittenViewModel Init")
@@ -50,7 +50,8 @@ class WrittenPaperViewModel {
         self.localDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Local Paper: \(paper)")
+                   // print("Local Paper: \(paper)")
+                    print("Local Paper Cell count: \(paper.cards.count)")
                     self?.currentPaper = paper
                     self?.currentPaperPublisher.send(paper)
                     self?.paperFrom = DataSource.fromLocal

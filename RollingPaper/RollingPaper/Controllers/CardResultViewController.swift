@@ -38,7 +38,16 @@ final class CardResultViewController: UIViewController {
         someImageViewConstraints()
         
         setCustomNavBarButtons()
+        
+        input.send(.viewDidLoad)
+        bind()
     }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+    }
+
+    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -123,7 +132,12 @@ final class CardResultViewController: UIViewController {
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
         print(paperID)
+        
         self.input.send(.resultSend(paperID: paperID))
+     
+        self.navigationController?.popViewController(false, completion: {
+            self.navigationController?.popViewController(animated: false)
+        })
     }
     
 }

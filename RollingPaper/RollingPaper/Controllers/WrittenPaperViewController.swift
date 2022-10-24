@@ -158,7 +158,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaper?.paperId ?? "paperID send fail"), animated: true) // TODO:
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID send fail"), animated: true) // TODO:
     }
     
     func presentSignUpModal(_ sender: UIButton) {
@@ -256,7 +256,9 @@ class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 9 // How many cells to display
+     //   return 9 // How many cells to display
+        print("값 : \(self.viewModel.currentPaper?.cards.count)")
+                return self.viewModel.currentPaper?.cards.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
