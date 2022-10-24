@@ -9,16 +9,20 @@ import Foundation
 import FirebaseDynamicLinks
 import Combine
 
-func getDynamicLink(with paper: PaperModel) -> AnyPublisher<URL, Error> {
+enum PaperShareRoute: String {
+    case write
+    case present
+}
+
+func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String, paperThumbnailURLString: String?, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
     let prefix = "https://yolo.page.link"
-    let paperId = paper.paperId
     let fallbackURLString = "https://github.com/DeveloperAcademy-YOLO/ProjectYOLO"
     var components = URLComponents()
     components.scheme = "https"
     components.host = "www.example.com"
-    components.path = "/paperid"
     let paperIDQueryItem = URLQueryItem(name: "paperId", value: paperId)
-    components.queryItems = [paperIDQueryItem]
+    let routeQueryItem = URLQueryItem(name: "route", value: route.rawValue)
+    components.queryItems = [paperIDQueryItem, routeQueryItem]
     guard
         let linkParameter = components.url,
         let linkBuilder = DynamicLinkComponents(link: linkParameter, domainURIPrefix: prefix),
@@ -27,11 +31,11 @@ func getDynamicLink(with paper: PaperModel) -> AnyPublisher<URL, Error> {
     }
     linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: bundleID)
     let socialMetaTagPaprams = DynamicLinkSocialMetaTagParameters()
-    socialMetaTagPaprams.title = paper.title
-    if let thumnailURLString = paper.thumbnailURLString {
+    socialMetaTagPaprams.title = paperTitle
+    if let thumnailURLString = paperThumbnailURLString {
         socialMetaTagPaprams.imageURL = URL(string: thumnailURLString)
     }
-    socialMetaTagPaprams.descriptionText = "\(paper.creator?.name ?? "YOLO")님과 함께 페이퍼를 만들어주세요!"
+    socialMetaTagPaprams.descriptionText = "\(creator?.name ?? "YOLO")님과 함께 페이퍼를 만들어주세요!"
     guard
         let longDynamicLinkString = linkBuilder.url?.absoluteString,
         let resultURL = URL(string: longDynamicLinkString + "&ofl=\(fallbackURLString)") else {
@@ -39,7 +43,7 @@ func getDynamicLink(with paper: PaperModel) -> AnyPublisher<URL, Error> {
     }
     
     return Future({ promise in
-        DynamicLinkComponents.shortenURL(resultURL, options: nil) { url, warings, error in
+        DynamicLinkComponents.shortenURL(resultURL, options: nil) { url, _, error in
             if let error = error {
                 promise(.failure(error))
             } else if let url = url {
@@ -50,5 +54,9 @@ func getDynamicLink(with paper: PaperModel) -> AnyPublisher<URL, Error> {
         }
     })
     .eraseToAnyPublisher()
-    
+}
+
+
+func getPaperShareLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
+    return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: route)
 }

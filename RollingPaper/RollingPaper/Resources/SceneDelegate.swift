@@ -33,12 +33,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        if let incomingURL = userActivity.webpageURL {
-            let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { dynamicLink, error in
-                if let urlString = dynamicLink?.url?.absoluteString {
-                    print(urlString)
-                }
-            }
+        guard let incomingURL = userActivity.webpageURL else { return }
+        DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { [weak self] dynamicLink, error in
+            guard
+                error == nil,
+                let urlString = dynamicLink?.url?.absoluteString,
+                let components = URLComponents(string: urlString),
+                let items = components.queryItems,
+                let paperId = items.first(where: {$0.name == "paperId"})?.value,
+                let routeString = items.first(where: {$0.name == "route"})?.value,
+                let route = PaperShareRoute(rawValue: routeString) else { return }
+            self?.handleDynamicLink(paperId: paperId, route: route)
+        }
+    }
+    
+    private func handleDynamicLink(paperId: String, route: PaperShareRoute) {
+        if route == .write {
+            guard let rootVC = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController as? SplitViewController else { return }
+            let paperView = PaperStorageViewController()
+            let navVC = UINavigationController(rootViewController: paperView)
+            rootVC.viewControllers[1] = navVC
+            paperView.setSelectedPaper(paperId: paperId)
         }
     }
 
