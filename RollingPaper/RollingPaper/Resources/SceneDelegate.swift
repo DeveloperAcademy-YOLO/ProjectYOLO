@@ -49,7 +49,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func handleDynamicLink(paperId: String, route: PaperShareRoute) {
         if route == .write {
-            guard let rootVC = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController as? SplitViewController else { return }
+            guard let rootVC = window?.rootViewController as? SplitViewController else { return }
             let paperView = PaperStorageViewController()
             let navVC = UINavigationController(rootViewController: paperView)
             rootVC.viewControllers[1] = navVC
