@@ -12,9 +12,10 @@ import SnapKit
 import Combine
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
+    
 
     let toolPicker = PKToolPicker()
-    
+    var drawing = PKDrawing()
     private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin2", "Halloween_Hat", "Halloween_Blood", "Halloween_Ghost2", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Pumpkin2", "Halloween_StickCandy", "Halloween_Blood"]
     
     private var backgroundImg = UIImage(named: "Rectangle")
@@ -55,7 +56,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
                 selectedStickerView.superview?.bringSubviewToFront(selectedStickerView)
             }
         }
-    } 
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,11 +86,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         bind()
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        //canvasViewInteractionEnabled()
-//        //toolPickerAppear()
-//    }
     // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
