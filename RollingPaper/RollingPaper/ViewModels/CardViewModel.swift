@@ -91,31 +91,48 @@ class CardViewModel {
         print("card view model에서 보냄 \(isLocalDB)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
+       
         let currentTime = Date()
         var currentCardURL: String = ""
+       
+        var resultCardModel: CardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+        
         print("업로드전\(currentCardURL)")
+        print("카드모델 넣기 전 모델 \(resultCardModel)")
         
-        LocalStorageManager.uploadData(dataId: "test", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
-            .sink { completion in
-            switch completion {
-            case .finished: break
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        } receiveValue: { [weak self] cardURL in
-            guard let currentCardURL = cardURL?.absoluteString else { return }
-            print("업로드후\(currentCardURL)")
-                print("Output Send!")
-        }
-        
-        print("카드모델 넣기 전\(currentCardURL)")
-        let resultCard = CardModel(date: currentTime, contentURLString: currentCardURL)
-      
         if isLocalDB {
-            localDatabaseManager.addCard(paperId: paperID, card: resultCard)
+            LocalStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+                .sink { completion in
+                switch completion {
+                case .finished: break
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            } receiveValue: { [weak self] cardURL in
+                guard let currentCardURL = cardURL?.absoluteString else { return }
+                print("업로드후\(currentCardURL)")
+                resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                 //   print("Output Send!")
+            }
+            print("카드모델 넣은후 모델 \(resultCardModel)")
+            localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
         } else {
-            serverDatabaseManager.addCard(paperId: paperID, card: resultCard)
+            FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+                .sink { completion in
+                switch completion {
+                case .finished: break
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            } receiveValue: { [weak self] cardURL in
+                guard let currentCardURL = cardURL?.absoluteString else { return }
+                print("업로드후\(currentCardURL)")
+                resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                   // print("Output Send!")
+            }
+            serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
         }
+        
     }
     
     private func getRecentCardResultImg() {
