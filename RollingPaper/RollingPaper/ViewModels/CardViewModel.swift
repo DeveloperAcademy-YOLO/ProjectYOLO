@@ -91,14 +91,26 @@ class CardViewModel {
         print("card view model에서 보냄 \(isLocalDB)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
-        
-        
-//        FirebaseStorageManager.uploadData(dataId: self.currentCard.value?.cardId ?? "", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
-        
-        
-        print("Local Paper Cell count: \(localDatabaseManager.paperSubject.value?.cards.count)")
         let currentTime = Date()
-        let resultCard = CardModel(date: currentTime, contentURLString: "") // TODO:
+        var currentCardURL: String = ""
+        print("업로드전\(currentCardURL)")
+        
+        LocalStorageManager.uploadData(dataId: "test", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+            .sink { completion in
+            switch completion {
+            case .finished: break
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        } receiveValue: { [weak self] cardURL in
+            guard let currentCardURL = cardURL?.absoluteString else { return }
+            print("업로드후\(currentCardURL)")
+                print("Output Send!")
+        }
+        
+        print("카드모델 넣기 전\(currentCardURL)")
+        let resultCard = CardModel(date: currentTime, contentURLString: currentCardURL)
+      
         if isLocalDB {
             localDatabaseManager.addCard(paperId: paperID, card: resultCard)
         } else {
