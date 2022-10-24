@@ -15,10 +15,12 @@ class CardViewModel {
     private var card = [CardModel]()
     
     
-    private let localdatabaseManager: DatabaseManager
+    let localDatabaseManager: DatabaseManager
+    let serverDatabaseManager: DatabaseManager
     
-    init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared) {
-        self.localdatabaseManager = databaseManager
+    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
+        self.localDatabaseManager = localDatabaseManager
+        self.serverDatabaseManager = serverDatabaseManager
     }
     
     enum Input {
@@ -26,7 +28,7 @@ class CardViewModel {
         case resultShown
         case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImgGet
         case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImageSet
-        case resultSend(paperID: String)
+        case resultSend(paperID: String, dataSource: String)
     }
     
     enum Output {
@@ -55,9 +57,9 @@ class CardViewModel {
                 self.getRecentCardResultImg()
             case.resultShown:
                 self.getRecentCardResultImg()
-            case.resultSend(let paperID):
+            case.resultSend(let paperID, let dataSource):
                 print("resultSend Good!!!!!!!")
-                self.createCard(paperID: paperID)
+                self.createCard(paperID: paperID, dataSource: dataSource)
             }
         })
         .store(in: &cancellables)
@@ -85,16 +87,19 @@ class CardViewModel {
         UserDefaults.standard.set(result, forKey: "cardResultImg")
     }
     
-    private func createCard(paperID: String) {
-        print("Local Paper Cell count: \(localdatabaseManager.paperSubject.value?.cards.count)")
+    private func createCard(paperID: String, dataSource: String) {
+        print("card view model에서 보냄 \(dataSource)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
-//        FirebaseStorageManager.uploadData(dataId: self.currentCard.value?.cardId ?? "", data: recentResultImg, contentType: .jpeg, pathRoot: .card) // TODO:
-// 조건문 처리해야함 local인지 서버인지?
-        print("Local Paper Cell count: \(localdatabaseManager.paperSubject.value?.cards.count)")
+//        FirebaseStorageManager.uploadData(dataId: self.currentCard.value?.cardId ?? "", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+        print("Local Paper Cell count: \(localDatabaseManager.paperSubject.value?.cards.count)")
         let currentTime = Date()
         let resultCard = CardModel(date: currentTime, contentURLString: "") // TODO:
-        localdatabaseManager.addCard(paperId: paperID, card: resultCard) // TODO:
+        if dataSource == "fromLocal" {
+            localDatabaseManager.addCard(paperId: paperID, card: resultCard)
+        } else {
+            serverDatabaseManager.addCard(paperId: paperID, card: resultCard)
+        }
     }
     
     private func getRecentCardResultImg() {
