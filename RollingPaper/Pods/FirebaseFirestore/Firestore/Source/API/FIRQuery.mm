@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#import "FIRAggregateQuery+Internal.h"
 #import "FIRDocumentReference.h"
 #import "FIRFirestoreErrors.h"
 #import "Firestore/Source/API/FIRDocumentReference+Internal.h"
@@ -472,6 +473,10 @@ int32_t SaturatedLimitValue(NSInteger limit) {
 - (FIRQuery *)queryEndingAtValues:(NSArray *)fieldValues {
   Bound bound = [self boundFromFieldValues:fieldValues isInclusive:YES];
   return Wrap(_query.EndAt(std::move(bound)));
+}
+
+- (FIRAggregateQuery *)count {
+  return [[FIRAggregateQuery alloc] initWithQuery:self];
 }
 
 #pragma mark - Private Methods
