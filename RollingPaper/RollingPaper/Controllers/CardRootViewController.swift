@@ -45,13 +45,15 @@ class CardRootViewController: UIViewController {
     
     private let viewModel: CardViewModel
     private let paperID: String
+    private let dataSource: String
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
     
-    init(viewModel: CardViewModel, paperID: String) {
+    init(viewModel: CardViewModel, paperID: String, dataSource: String) {
         self.viewModel = viewModel
         self.paperID = paperID
+        self.dataSource = dataSource
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -154,7 +156,7 @@ class CardRootViewController: UIViewController {
             print("Fail!")
         }
         DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel)
+            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, dataSource: self.dataSource)
             
             self.navigationController?.pushViewController(pushVC, animated: false)
         }) // TODO: 리팩토링 필요

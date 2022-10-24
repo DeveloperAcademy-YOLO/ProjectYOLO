@@ -15,13 +15,15 @@ final class CardResultViewController: UIViewController {
     let image: UIImage
     private let paperID: String
     private let viewModel: CardViewModel
+    private let dataSource: String
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel) {
+    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel, dataSource: String) {
         self.image = resultImage
         self.paperID = paperID
         self.viewModel = viewModel
+        self.dataSource = dataSource
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -44,10 +46,8 @@ final class CardResultViewController: UIViewController {
     }
     
     private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
-
-    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -132,11 +132,11 @@ final class CardResultViewController: UIViewController {
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
         print(paperID)
-        
-        self.input.send(.resultSend(paperID: paperID))
+        print(dataSource)
+        self.input.send(.resultSend(paperID: paperID, dataSource: dataSource))
      
         self.navigationController?.popViewController(false, completion: {
-            self.navigationController?.popViewController(animated: false)
+        self.navigationController?.popViewController(animated: false)
         })
     }
     
