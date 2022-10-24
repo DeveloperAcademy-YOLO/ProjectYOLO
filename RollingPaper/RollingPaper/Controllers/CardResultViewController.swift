@@ -135,9 +135,8 @@ final class CardResultViewController: UIViewController {
         print(isLocalDB)
         self.input.send(.resultSend(paperID: paperID, isLocalDB: isLocalDB))
      
-        self.navigationController?.popViewController(false, completion: {
-        self.navigationController?.popViewController(animated: false)
-        })
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
+        self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
     }
     
 }
