@@ -15,15 +15,15 @@ final class CardResultViewController: UIViewController {
     let image: UIImage
     private let paperID: String
     private let viewModel: CardViewModel
-    private let dataSource: String
+    private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel, dataSource: String) {
+    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel, isLocalDB: Bool) {
         self.image = resultImage
         self.paperID = paperID
         self.viewModel = viewModel
-        self.dataSource = dataSource
+        self.isLocalDB = isLocalDB
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -132,8 +132,8 @@ final class CardResultViewController: UIViewController {
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
         print(paperID)
-        print(dataSource)
-        self.input.send(.resultSend(paperID: paperID, dataSource: dataSource))
+        print(isLocalDB)
+        self.input.send(.resultSend(paperID: paperID, isLocalDB: isLocalDB))
      
         self.navigationController?.popViewController(false, completion: {
         self.navigationController?.popViewController(animated: false)

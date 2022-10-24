@@ -15,7 +15,6 @@ class WrittenPaperViewController: UIViewController {
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     lazy private var changedPaperTitle: String = ""
-    var dataSourceType: String = ""
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
@@ -158,13 +157,14 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
+        var isLocalDB: Bool
         if viewModel.paperFrom == .fromLocal {
-            dataSourceType = "fromLocal"
+            isLocalDB = true
         } else {
-            dataSourceType = "fromServer"
+            isLocalDB = false
         }
         
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID send fail", dataSource: dataSourceType), animated: true) // TODO:
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID send fail", isLocalDB: isLocalDB), animated: true) // TODO:
     }
     
     func presentSignUpModal(_ sender: UIButton) {
