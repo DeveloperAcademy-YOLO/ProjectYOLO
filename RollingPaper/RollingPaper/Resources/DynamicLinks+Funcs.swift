@@ -1,5 +1,5 @@
 //
-//  URL+Extensions.swift
+//  DynamicLinks+Funcs.swift
 //  RollingPaper
 //
 //  Created by Junyeong Park on 2022/10/24.
