@@ -90,9 +90,9 @@ class CardViewModel {
         var resultCardModel: CardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
         
         print("currentCardURL 넣기 전 CardModel \(resultCardModel)")
-        
+        print("!!!!\(resultCardModel.cardId)")
         if isLocalDB {
-            LocalStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+            LocalStorageManager.uploadData(dataId: resultCardModel.cardId, data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
                     switch completion {
                     case .finished: break
@@ -102,10 +102,9 @@ class CardViewModel {
                 } receiveValue: { [weak self] cardURL in
                     guard let currentCardURL = cardURL?.absoluteString else { return }
                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                    self?.localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
                 }
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
-            localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
-            
         } else {
             FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
@@ -117,9 +116,9 @@ class CardViewModel {
                 } receiveValue: { [weak self] cardURL in
                     guard let currentCardURL = cardURL?.absoluteString else { return }
                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                    self?.serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
                 }
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
-            serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
         }
     }
     
