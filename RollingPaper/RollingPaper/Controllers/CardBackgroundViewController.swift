@@ -243,7 +243,7 @@ extension CardBackgroundViewController {
         actionSheet.addAction(libraryAction)
         actionSheet.addAction(cancelAction)
         
-        present(actionSheet, animated: true, completion: nil)
+        present(actionSheet, animated: false, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
@@ -255,18 +255,18 @@ extension CardBackgroundViewController {
     }
     
     func backgroundImageSend() {
-        guard let image = someImageView.image else { return }
-        self.input.send(.setCardBackgroundImg(background: image))
+        guard let backgroundImg = someImageView.image else { return }
+        self.input.send(.setCardBackgroundImg(background: backgroundImg))
     }
     
-    private func cameraImagePicker() {
-        let pushVC = CameraCustomPicker()
-        pushVC.delegate = self
-        pushVC.sourceType = .camera
-        pushVC.cameraFlashMode = .off
-        pushVC.cameraDevice = .front
-        pushVC.modalPresentationStyle = .overFullScreen
-        present(pushVC, animated: true)
+        private func cameraImagePicker() {
+            let pushVC = CameraCustomPicker()
+            pushVC.delegate = self
+            pushVC.sourceType = .camera
+            pushVC.cameraFlashMode = .off
+            pushVC.cameraDevice = .front
+            pushVC.modalPresentationStyle = .overFullScreen
+            present(pushVC, animated: true)
     }
     
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
@@ -378,4 +378,3 @@ extension CardBackgroundViewController {
         })
     }
 }
-

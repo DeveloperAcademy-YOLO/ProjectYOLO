@@ -38,18 +38,14 @@ class CardRootViewController: UIViewController {
     }
     
     private var backgroundImg = UIImage(named: "Rectangle")
-    
-    private var firstStepView: UIView!
-    private var secondStepView: UIView!
-    private var thirdStepView: UIView!
-    
     private let viewModel: CardViewModel
+    private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, isLocalDB: Bool) {
         self.viewModel = viewModel
+        self.isLocalDB = isLocalDB
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,6 +75,7 @@ class CardRootViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
+        button.tag = 1
         return button
     }()
     
@@ -90,8 +87,56 @@ class CardRootViewController: UIViewController {
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
+        button.tag = 2
         return button
     }()
+    
+    lazy var firstStepView: UIView = {
+        let firstStepView = UIView()
+        return firstStepView
+    }()
+
+    lazy var secondStepView: UIView = {
+        let secondStepView = UIView()
+        return secondStepView
+    }()
+    
+    func firstStepViewConstraints() {
+        firstStepView.snp.makeConstraints({ make in
+            make.top.equalTo(self.view).offset(30)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        })
+    }
+    
+    func secondStepViewConstraints() {
+        secondStepView.snp.makeConstraints({ make in
+            make.top.equalTo(self.view).offset(30)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        })
+    }
+    
+    private func instantiateSegmentedViewControllers() {
+        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
+        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
+        
+        self.addChild(secondStepViewVC)
+        self.addChild(firstStepViewVC)
+        
+        firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
+        secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(secondStepViewVC.view)
+        self.view.addSubview(firstStepViewVC.view)
+       
+        self.firstStepView = firstStepViewVC.view
+        firstStepViewConstraints()
+        self.secondStepView = secondStepViewVC.view
+        secondStepViewConstraints()
+    }
     
     private func setCustomNavBarButtons() {
         self.navigationItem.titleView = segmentedControl
@@ -147,7 +192,7 @@ class CardRootViewController: UIViewController {
             print("Fail!")
         }
         DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!)
+            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
             
             self.navigationController?.pushViewController(pushVC, animated: false)
         }) // TODO: 리팩토링 필요
@@ -156,35 +201,6 @@ class CardRootViewController: UIViewController {
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
         print("cancelBtnPressed")
         self.navigationController?.popViewController(animated: true)
-    }
-    
-    private func instantiateSegmentedViewControllers() {
-        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
-        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
-        
-        self.addChild(secondStepViewVC)
-        self.addChild(firstStepViewVC)
-        
-        firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view.addSubview(secondStepViewVC.view)
-        self.view.addSubview(firstStepViewVC.view)
-        
-        NSLayoutConstraint.activate([
-            firstStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-            firstStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-            firstStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-            firstStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
-            
-            secondStepViewVC.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
-            secondStepViewVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-            secondStepViewVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
-            secondStepViewVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
-            
-        ])
-        self.firstStepView = firstStepViewVC.view
-        self.secondStepView = secondStepViewVC.view
     }
 }
 

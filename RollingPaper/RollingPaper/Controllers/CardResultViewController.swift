@@ -13,9 +13,15 @@ final class CardResultViewController: UIViewController {
     
     private var backgroundImg = UIImage(named: "Rectangle")
     let image: UIImage
+    private let viewModel: CardViewModel
+    private let isLocalDB: Bool
+    private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
-    init(resultImage: UIImage) {
+    init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
         self.image = resultImage
+        self.viewModel = viewModel
+        self.isLocalDB = isLocalDB
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,6 +38,13 @@ final class CardResultViewController: UIViewController {
         someImageViewConstraints()
         
         setCustomNavBarButtons()
+        
+        input.send(.viewDidLoad)
+        bind()
+    }
+    
+    private func bind() {
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -116,6 +129,11 @@ final class CardResultViewController: UIViewController {
     
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
+        print(isLocalDB)
+        self.input.send(.resultSend(isLocalDB: isLocalDB))
+     
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
+        self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
     }
     
 }
