@@ -63,8 +63,7 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Local Paper: \(paper)")
                     self?.currentPaper = paper
-                    self?.currentPaper?.creator = self?.currentUser
-                    self?.currentPaperPublisher.send(self?.currentPaper)
+                    self?.currentPaperPublisher.send(paper)
                     self?.paperFrom = DataSource.fromLocal
                 }
                 else {

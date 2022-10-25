@@ -25,7 +25,7 @@ class CardViewModel {
         case resultShown
         case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImg Set
         case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImage Set
-        case resultSend(isLocalDB: Bool)
+        case resultSend(paperID: String, isLocalDB: Bool)
     }
     
     enum Output {
@@ -50,9 +50,9 @@ class CardViewModel {
                 self.getRecentCardResultImg()
             case.resultShown:
                 self.getRecentCardResultImg()
-            case.resultSend(let isLocalDB):
+            case.resultSend(let paperID, let isLocalDB):
                 print("resultSend Good!!!!!!!")
-                self.createCard(isLocalDB: isLocalDB)
+                self.createCard(paperID: paperID ,isLocalDB: isLocalDB)
             }
         })
         .store(in: &cancellables)
@@ -80,7 +80,7 @@ class CardViewModel {
         UserDefaults.standard.set(result, forKey: "cardResultImg")
     }
     
-    private func createCard(isLocalDB: Bool) {
+    private func createCard(paperID: String, isLocalDB: Bool) {
         print("WrittenPaperViewController에서 보냄 \(isLocalDB)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
@@ -100,12 +100,14 @@ class CardViewModel {
                         print(error.localizedDescription)
                     }
                 } receiveValue: { [weak self] cardURL in
-                    guard let currentCardURL = cardURL?.absoluteString else { return }
-                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                    if let currentPaper = self?.localDatabaseManager.paperSubject.value {
-                        self?.localDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
-                    }
+                    guard
+                        let currentCardURL = cardURL?.absoluteString,
+                        let recentImage = UIImage(data: recentResultImg) else { return }
+                    NSCacheManager.shared.setImage(image: recentImage, name: currentCardURL)
+                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                    self?.localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
                 }
+                .store(in: &cancellables)
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         } else {
             FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
@@ -118,9 +120,7 @@ class CardViewModel {
                 } receiveValue: { [weak self] cardURL in
                     guard let currentCardURL = cardURL?.absoluteString else { return }
                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                    if let currentPaper = self?.serverDatabaseManager.paperSubject.value {
-                        self?.serverDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
-                    }
+                    self?.serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
                 }
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         }

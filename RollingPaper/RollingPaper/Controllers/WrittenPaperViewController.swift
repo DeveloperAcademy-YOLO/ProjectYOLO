@@ -221,6 +221,8 @@ class WrittenPaperViewController: UIViewController {
     }
     
     private func moveToPaperStorageView() {
+        guard let paper = viewModel.currentPaper else { return }
+        viewModel.localDatabaseManager.updatePaper(paper: paper)
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,
@@ -236,7 +238,7 @@ class WrittenPaperViewController: UIViewController {
                isLocalDB = false
            }
            
-           self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB), animated: true) // TODO:
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB), animated: true) // TODO:
        }
     
     func presentSignUpModal(_ sender: UIButton) {
@@ -388,9 +390,47 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
-        myCell.backgroundColor = UIColor.blue
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
+        guard let currentPaper = viewModel.currentPaper else { return myCell }
+        let card = currentPaper.cards[indexPath.row]
+        
+        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+            let imageView = UIImageView(image: image)
+            imageView.layer.masksToBounds = true
+            myCell.contentMode = .scaleAspectFill
+            myCell.contentView.addSubview(imageView)
+            imageView.snp.makeConstraints { make in
+                make.top.bottom.leading.trailing.equalTo(myCell)
+            }
+            return myCell
+        } else {
+            LocalStorageManager.downloadData(urlString: card.contentURLString)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    switch completion {
+                    case .failure(let error): print(error)
+                    case .finished: break
+                    }
+                } receiveValue: { [weak self] data in
+                    if
+                        let data = data,
+                        let image = UIImage(data: data) {
+                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                        let imageView = UIImageView(image: image)
+                        imageView.layer.masksToBounds = true
+                        myCell.contentView.addSubview(imageView)
+                        myCell.contentMode = .scaleAspectFill
+                        imageView.snp.makeConstraints { make in
+                            make.top.bottom.leading.trailing.equalTo(myCell)
+                        }
+                    } else {
+                        myCell.contentView.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                    }
+                }
+                .store(in: &cancellables)
+        }
+        
         return myCell
     }
 }

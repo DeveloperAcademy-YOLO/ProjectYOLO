@@ -115,6 +115,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
     func addCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
+        paperSubject.send(currentPaper)
     }
     
     /// 페이퍼 데이터 삭제, 페이퍼 프리뷰 데이터 삭제, 페이퍼 프리뷰를 현재 로컬 데이터 퍼블리셔에서 삭제한 데이터 반영
