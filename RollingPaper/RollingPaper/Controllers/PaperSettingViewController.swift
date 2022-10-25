@@ -228,7 +228,11 @@ class PaperSettingViewController: UIViewController {
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
         self.input.send(.endSettingPaper)
-        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChange,
+            object: nil,
+            userInfo: [NotificationViewKey.view:"보관함 이동 후 카드 뷰"]
+        )
     }
     
     // 뒤로가기 버튼 눌렀을 때 동작

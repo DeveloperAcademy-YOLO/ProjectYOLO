@@ -18,6 +18,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
+    private var signInViewController: UINavigationController!
     
     var sideBarCategories: [CategoryModel] = [
         CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
@@ -53,6 +54,10 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+        
+        if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+            settingScreenViewController.pushViewController(SignInViewController(), animated: false)
+        }
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
     }
@@ -69,8 +74,28 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             } else {
                 self.viewControllers[1] = paperStorageViewController
             }
+        case "보관함 이동 후 카드 뷰":
+            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: true)
+            self.viewControllers[1] = paperStorageViewController
         case "설정":
-            self.viewControllers[1] = settingScreenViewController
+            print("설정 변경 called")
+            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+//                print("현재 로그인 상태")
+//                DispatchQueue.main.async {
+//                    self.viewControllers[1] = self.settingScreenViewController
+//                }
+                if let vc = self.viewControllers[1] as? UINavigationController {
+                    vc.popViewController(animated: false)
+                }
+            } else {
+                print("현재 로그아웃 상태")
+//                DispatchQueue.main.async {
+//                    self.viewControllers[1] =  self.signInViewController
+//                }
+                if let vc = self.viewControllers[1] as? UINavigationController {
+                    vc.pushViewController(SignInViewController(), animated: false)
+                }
+            }
         default :
             break
         }
