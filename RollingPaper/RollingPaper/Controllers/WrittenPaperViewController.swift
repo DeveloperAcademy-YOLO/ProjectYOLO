@@ -14,7 +14,8 @@ class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
-    lazy private var changedPaperTitle: String = ""
+//    lazy private var changedPaperTitle: String = ""
+    
     
     
     let authManager: AuthManager = FirebaseAuthManager.shared
@@ -50,8 +51,8 @@ class WrittenPaperViewController: UIViewController {
         let completeText = NSMutableAttributedString(string: "")
         completeText.append(attachmentString)
         let textAfterIcon = timeInterval > 0
-                ? NSAttributedString(string: "  " + "\(changeTimeFormat(second: timeInterval))")
-                : NSAttributedString(string: "  " + "\(changeTimeFormat(second: 0))")
+        ? NSAttributedString(string: "  " + "\(changeTimeFormat(second: timeInterval))")
+        : NSAttributedString(string: "  " + "\(changeTimeFormat(second: 0))")
         completeText.append(textAfterIcon)
         timeLabel.attributedText = completeText
         
@@ -59,8 +60,8 @@ class WrittenPaperViewController: UIViewController {
         timeLabel.textColor = .white
         timeLabel.layer.cornerRadius = 18
         timeLabel.layer.backgroundColor = timeInterval > 0
-                ? UIColor(rgb: 0xADADAD).cgColor
-                : UIColor(rgb: 0xFF3B30).cgColor
+        ? UIColor(rgb: 0xADADAD).cgColor
+        : UIColor(rgb: 0xFF3B30).cgColor
         
         func changeTimeFormat(second: Int) -> String {
             let hour = Int(second/3600)
@@ -112,18 +113,6 @@ class WrittenPaperViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
-//        guard let paper = viewModel.currentPaper else {return}
-//        getPaperShareLink(with: paper, route: .write)
-//            .sink { (completion) in
-//                switch completion {
-//                case .finished: break
-//                case .failure(let error): print(error)
-//                }
-//            } receiveValue: { [weak self] url in
-//                self?.urlToShare = [url]
-//            }
-//            .store(in: &cancellables)
-        
     }
     
     override func viewDidLoad() {
@@ -231,15 +220,15 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-           var isLocalDB: Bool
-           if viewModel.paperFrom == .fromLocal {
-               isLocalDB = true
-           } else {
-               isLocalDB = false
-           }
-           
+        var isLocalDB: Bool
+        if viewModel.paperFrom == .fromLocal {
+            isLocalDB = true
+        } else {
+            isLocalDB = false
+        }
+        
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB), animated: true) // TODO:
-       }
+    }
     
     func presentSignUpModal(_ sender: UIButton) {
         let signInVC = SignInViewController()
@@ -260,6 +249,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func presentShareSheet(_ sender: UIButton) {
+        viewModel.isPaperLinkMade = true
         let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
         //TODO : 카톡으로 공유하기
         let applicationActivities: [UIActivity]? = nil
@@ -287,11 +277,14 @@ class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             print("수정")
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
-            let edit = UIAlertAction(title: "수정", style: .default) { (edit) in
-                if let changedPaperTitle = self.titleEmbedingTextField.text {
-                    //self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
-                    print(changedPaperTitle)
-                    //이거 아직 subscribe에 전달 안 해줘서 실시간으로 바뀌진 않음
+            let edit = UIAlertAction(title: "수정", style: .default) { _ in
+                guard let changedPaperTitle = self.titleEmbedingTextField.text else { return }
+                
+                if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
+                    self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
+                    print(self.viewModel.isPaperLinkMade)
+                } else {
+                    self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
                 }
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -299,6 +292,7 @@ class WrittenPaperViewController: UIViewController {
             alert.addAction(edit)
             alert.addTextField { (editTitleTextField) in
                 editTitleTextField.text = self.viewModel.currentPaper?.title
+                self.titleEmbedingTextField = editTitleTextField
             }
             alert.preferredAction = edit
             self.present(alert, animated: true, completion: nil)
@@ -327,8 +321,8 @@ class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.preferredAction = delete
             alert.addTextField { (deleteTitleTextField) in
-                self.titleEmbedingTextField = deleteTitleTextField
                 deleteTitleTextField.placeholder = self.viewModel.currentPaper?.title
+                self.titleEmbedingTextField = deleteTitleTextField
             }
             self.present(alert, animated: true, completion: nil)
         }))
@@ -345,10 +339,9 @@ class WrittenPaperViewController: UIViewController {
     func deletePaper() {
         let deleteVerifyText = self.titleEmbedingTextField.text
         if deleteVerifyText == self.viewModel.currentPaper?.title {
-            if viewModel.isPaperLinkMade{
+            if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                 viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
-            }
-            else {
+            } else {
                 viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
             }
             self.moveToPaperStorageView()
@@ -398,7 +391,6 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             let imageView = UIImageView(image: image)
             imageView.layer.masksToBounds = true
-            myCell.contentMode = .scaleAspectFill
             myCell.contentView.addSubview(imageView)
             imageView.snp.makeConstraints { make in
                 make.top.bottom.leading.trailing.equalTo(myCell)
@@ -420,7 +412,6 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                         let imageView = UIImageView(image: image)
                         imageView.layer.masksToBounds = true
                         myCell.contentView.addSubview(imageView)
-                        myCell.contentMode = .scaleAspectFill
                         imageView.snp.makeConstraints { make in
                             make.top.bottom.leading.trailing.equalTo(myCell)
                         }
@@ -437,6 +428,43 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("User tapped on item \(indexPath.row)")
+        guard let currentPaper = viewModel.currentPaper else { return  }
+        let card = currentPaper.cards[indexPath.row]
+        var presentingVC = MagnifiedCardViewController()
+        if case presentingVC.cardContentURLString = card.contentURLString {
+//            presentingVC.cardContentURLString = card.contentURLString
+            presentingVC.modalPresentationStyle = .formSheet
+            present(presentingVC, animated: true)
+        }
+//        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+//            
+//            
+//        }
+//        else {
+//            LocalStorageManager.downloadData(urlString: card.contentURLString)
+//                .receive(on: DispatchQueue.main)
+//                .sink { completion in
+//                    switch completion {
+//                    case .failure(let error): print(error)
+//                    case .finished: break
+//                    }
+//                } receiveValue: { [weak self] data in
+//                    if
+//                        let data = data,
+//                        let image = UIImage(data: data) {
+//                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+//                        let imageView = UIImageView(image: image)
+//                        imageView.layer.masksToBounds = true
+//                        myCell.contentView.addSubview(imageView)
+//                        imageView.snp.makeConstraints { make in
+//                            make.top.bottom.leading.trailing.equalTo(myCell)
+//                        }
+//                    } else {
+//                        myCell.contentView.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+//                    }
+//                }
+//                .store(in: &cancellables)
+//        }
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }

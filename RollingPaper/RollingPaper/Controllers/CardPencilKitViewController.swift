@@ -448,8 +448,8 @@ extension UIButton {
 extension CardPencilKitViewController {
     func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
-            make.width.equalTo(920)
-            make.height.equalTo(650)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
             make.top.equalTo(self.view.snp.top).offset(90)
@@ -461,8 +461,8 @@ extension CardPencilKitViewController {
     
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(920)
-            make.height.equalTo(650)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
             make.top.equalTo(self.view.snp.top).offset(90)
@@ -474,8 +474,8 @@ extension CardPencilKitViewController {
     
     func canvasViewConstraints() {
         canvasView.snp.makeConstraints({ make in
-            make.width.equalTo(920)
-            make.height.equalTo(650)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
             make.top.equalTo(self.view.snp.top).offset(90)
