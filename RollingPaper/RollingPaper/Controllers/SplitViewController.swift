@@ -63,16 +63,12 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 템플릿":
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-            if currentSecondaryView == "페이퍼 보관함" {
-//                self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-                self.viewControllers[1] = paperStorageViewController
-            } else {
-                if let currentNav = self.viewControllers[1] as? UINavigationController {
-                    currentNav.popToRootViewController(true) {
-                        self.viewControllers[1] = self.paperStorageViewController
-                    }
-                }
-            }
+             if currentSecondaryView == "페이퍼 보관함" {
+                 self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+                 setViewController(paperStorageViewController, for: .secondary)
+             } else {
+                 setViewController(paperStorageViewController, for: .secondary)
+             }
         case "보관함 이동 후 카드 뷰":
             self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: true)
             self.viewControllers[1] = paperStorageViewController
@@ -104,19 +100,12 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 보관함":
             self.viewControllers[1] = paperStorageViewController
         case "설정":
-            if
-                let navVC = self.viewControllers[1] as? UINavigationController {
-                var navViewControllers = navVC.viewControllers
-                if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-                    navViewControllers = [SettingScreenViewController()]
-                } else {
-                    navViewControllers = [SignInViewController()]
-                }
-                navVC.setViewControllers(navViewControllers, animated: false)
-            }
+            self.viewControllers[1] = settingScreenViewController
         default :
             break
         }
+        print("currentSecondaryView: \(self.currentSecondaryView)")
+        print("object: \(object)")
         self.currentSecondaryView = object
     }
     
