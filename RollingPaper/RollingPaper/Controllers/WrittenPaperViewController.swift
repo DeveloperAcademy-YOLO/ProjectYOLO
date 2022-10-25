@@ -16,10 +16,12 @@ class WrittenPaperViewController: UIViewController {
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     lazy private var changedPaperTitle: String = ""
     
+    
     let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
     var currentUser: UserModel?
     var currentPaper: PaperModel?
+    var urlToShare: [URL]?
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
@@ -110,6 +112,18 @@ class WrittenPaperViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
+//        guard let paper = viewModel.currentPaper else {return}
+//        getPaperShareLink(with: paper, route: .write)
+//            .sink { (completion) in
+//                switch completion {
+//                case .finished: break
+//                case .failure(let error): print(error)
+//                }
+//            } receiveValue: { [weak self] url in
+//                self?.urlToShare = [url]
+//            }
+//            .store(in: &cancellables)
+        
     }
     
     override func viewDidLoad() {
@@ -130,6 +144,21 @@ class WrittenPaperViewController: UIViewController {
         cardsList?.reloadData()
         getCurrentUserAndPaper()
         currentPaper?.creator = currentUser
+        applyPaperLink()
+    }
+    
+    private func applyPaperLink() {
+        guard let paper = viewModel.currentPaper else {return}
+        getPaperShareLink(with: paper, route: .write)
+            .sink { (completion) in
+                switch completion {
+                case .finished: break
+                case .failure(let error): print(error)
+                }
+            } receiveValue: { [weak self] url in
+                self?.urlToShare = [url] // 실제 페이퍼나 앱의 링크가 들어가는 곳
+            }
+            .store(in: &cancellables)
     }
     
     private func titleLabelConstraints() {
@@ -167,8 +196,10 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtn.addAction(UIAction(handler: {_ in
             if self.viewModel.currentUser != nil {
                 self.presentShareSheet(paperLinkBtn)
+                print(self.viewModel.currentUser)
             } else {
                 self.presentSignUpModal(paperLinkBtn)
+                print(self.viewModel.currentUser)
             }
         }), for: .touchUpInside)
         
@@ -228,21 +259,17 @@ class WrittenPaperViewController: UIViewController {
     
     func presentShareSheet(_ sender: UIButton) {
         let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
-        let url = "https://www.google.com" // 실제 페이퍼나 앱의 링크가 들어가는 곳
         //TODO : 카톡으로 공유하기
-        let urlToShare = [ url ]
         let applicationActivities: [UIActivity]? = nil
-        
         let activityViewController = UIActivityViewController(
-            activityItems: urlToShare,
+            activityItems: self.urlToShare ?? [],
             applicationActivities: applicationActivities)
         
         activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
         
         let popover = activityViewController.popoverPresentationController
         popover?.sourceView = sender
-        present(activityViewController, animated: true)
-
+        self.present(activityViewController, animated: true)
     }
     
     func setPopOverView(_ sender: UIButton) {
