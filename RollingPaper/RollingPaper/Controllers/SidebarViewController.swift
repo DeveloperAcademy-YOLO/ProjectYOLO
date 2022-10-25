@@ -39,6 +39,7 @@ private class Layout {
 class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var delegate: SidebarViewControllerDelegate?
+    
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
@@ -170,7 +171,10 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let category = self.categories[indexPath.row]
-        self.delegate?.didSelectCategory(category)
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChangeFromSidebar,
+            object: nil,
+            userInfo: [NotificationViewKey.view: category.name])
     }
     
     

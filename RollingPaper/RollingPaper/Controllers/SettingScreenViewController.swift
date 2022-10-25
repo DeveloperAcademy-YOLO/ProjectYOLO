@@ -303,7 +303,11 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 switch output {
                 case .signOutDidSucceed:
                     if let parentView = self.navigationController?.parent as? SplitViewController {
-                        parentView.didSelectCategory(CategoryModel(name: "설정", icon: ""))
+                        NotificationCenter.default.post(
+                            name: Notification.Name.viewChange,
+                            object: nil,
+                            userInfo: [NotificationViewKey.view: "설정"]
+                        )
                     }
                 case .userProfileChangeDidSuccess:
                     print("Output Received!")
