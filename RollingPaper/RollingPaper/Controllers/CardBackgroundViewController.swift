@@ -227,7 +227,7 @@ extension CardBackgroundViewController {
         
         let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
             DispatchQueue.main.async(execute: {
-                self.cameraImagePicker()
+                self.cameraImagePicker(withType: .camera)
             })
         }
         
@@ -243,30 +243,28 @@ extension CardBackgroundViewController {
         actionSheet.addAction(libraryAction)
         actionSheet.addAction(cancelAction)
         
-        present(actionSheet, animated: true, completion: nil)
+        present(actionSheet, animated: false, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             someImageView.image = pickedImage
         }
-        picker.dismiss(animated: true)
+        dismiss(animated: true, completion: nil)
         backgroundImageSend()
     }
     
     func backgroundImageSend() {
-        guard let image = someImageView.image else { return }
-        self.input.send(.setCardBackgroundImg(background: image))
+        self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
     }
     
-    private func cameraImagePicker() {
-        let pushVC = CameraCustomPicker()
-        pushVC.delegate = self
-        pushVC.sourceType = .camera
-        pushVC.cameraFlashMode = .off
-        pushVC.cameraDevice = .front
-        pushVC.modalPresentationStyle = .overFullScreen
-        present(pushVC, animated: true)
+    private func cameraImagePicker(withType type: UIImagePickerController.SourceType) {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.sourceType = type
+        pickerController.cameraFlashMode = .off
+        pickerController.cameraDevice = .front
+        present(pickerController, animated: false)
     }
     
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
@@ -378,4 +376,3 @@ extension CardBackgroundViewController {
         })
     }
 }
-

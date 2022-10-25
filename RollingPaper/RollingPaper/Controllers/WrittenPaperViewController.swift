@@ -198,8 +198,15 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel()), animated: true)
-    }
+           var isLocalDB: Bool
+           if viewModel.paperFrom == .fromLocal {
+               isLocalDB = true
+           } else {
+               isLocalDB = false
+           }
+           
+           self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID send fail", isLocalDB: isLocalDB), animated: true) // TODO:
+       }
     
     func presentSignUpModal(_ sender: UIButton) {
         let signInVC = SignInViewController()
