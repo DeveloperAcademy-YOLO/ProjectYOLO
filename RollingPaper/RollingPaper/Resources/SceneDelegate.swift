@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseDynamicLinks
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -19,6 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.rootViewController = splitVC
         window.makeKeyAndVisible()
         self.window = window
+        if let userActivity = connectionOptions.userActivities.first {
+            self.scene(scene, continue: userActivity)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -26,6 +30,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This occurs shortly after the scene enters the background, or when its session is discarded.
         // Release any resources associated with this scene that can be re-created the next time the scene connects.
         // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+    }
+    
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard let incomingURL = userActivity.webpageURL else { return }
+        DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { [weak self] dynamicLink, error in
+            guard
+                error == nil,
+                let urlString = dynamicLink?.url?.absoluteString,
+                let components = URLComponents(string: urlString),
+                let items = components.queryItems,
+                let paperId = items.first(where: {$0.name == "paperId"})?.value,
+                let routeString = items.first(where: {$0.name == "route"})?.value,
+                let route = PaperShareRoute(rawValue: routeString) else { return }
+            self?.handleDynamicLink(paperId: paperId, route: route)
+        }
+    }
+    
+    private func handleDynamicLink(paperId: String, route: PaperShareRoute) {
+        if route == .write {
+            guard let rootVC = window?.rootViewController as? SplitViewController else { return }
+            let paperView = PaperStorageViewController()
+            let navVC = UINavigationController(rootViewController: paperView)
+            rootVC.viewControllers[1] = navVC
+            paperView.setSelectedPaper(paperId: paperId)
+        }
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {

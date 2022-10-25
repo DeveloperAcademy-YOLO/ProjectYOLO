@@ -70,7 +70,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let navVC = UINavigationController(rootViewController: paperView)
         rootVC.viewControllers[1] = navVC
         paperView.setSelectedPaper(paperId: paperId)
-        // TODO: 사이먼 뷰로 이동
         // navVC.pushViewController(SimonView(), animated: true)
     }
     
