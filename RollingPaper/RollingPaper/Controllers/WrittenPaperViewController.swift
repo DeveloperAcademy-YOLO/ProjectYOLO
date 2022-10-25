@@ -205,7 +205,7 @@ class WrittenPaperViewController: UIViewController {
                isLocalDB = false
            }
            
-           self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID send fail", isLocalDB: isLocalDB), animated: true) // TODO:
+           self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB), animated: true) // TODO:
        }
     
     func presentSignUpModal(_ sender: UIButton) {

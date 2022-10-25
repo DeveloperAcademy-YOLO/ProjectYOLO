@@ -25,7 +25,7 @@ class CardViewModel {
         case resultShown
         case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImg Set
         case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImage Set
-        case resultSend(paperID: String, isLocalDB: Bool)
+        case resultSend(isLocalDB: Bool)
     }
     
     enum Output {
@@ -50,9 +50,9 @@ class CardViewModel {
                 self.getRecentCardResultImg()
             case.resultShown:
                 self.getRecentCardResultImg()
-            case.resultSend(let paperID, let isLocalDB):
+            case.resultSend(let isLocalDB):
                 print("resultSend Good!!!!!!!")
-                self.createCard(paperID: paperID, isLocalDB: isLocalDB)
+                self.createCard(isLocalDB: isLocalDB)
             }
         })
         .store(in: &cancellables)
@@ -80,7 +80,7 @@ class CardViewModel {
         UserDefaults.standard.set(result, forKey: "cardResultImg")
     }
     
-    private func createCard(paperID: String, isLocalDB: Bool) {
+    private func createCard(isLocalDB: Bool) {
         print("WrittenPaperViewController에서 보냄 \(isLocalDB)")
         guard let recentResultImg = UserDefaults.standard.data(forKey: "cardResultImg")
         else { return }
@@ -102,7 +102,9 @@ class CardViewModel {
                 } receiveValue: { [weak self] cardURL in
                     guard let currentCardURL = cardURL?.absoluteString else { return }
                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                    self?.localDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
+                    if let currentPaper = self?.localDatabaseManager.paperSubject.value {
+                        self?.localDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
+                    }
                 }
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         } else {
@@ -116,7 +118,9 @@ class CardViewModel {
                 } receiveValue: { [weak self] cardURL in
                     guard let currentCardURL = cardURL?.absoluteString else { return }
                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                    self?.serverDatabaseManager.addCard(paperId: paperID, card: resultCardModel)
+                    if let currentPaper = self?.serverDatabaseManager.paperSubject.value {
+                        self?.serverDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
+                    }
                 }
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         }
