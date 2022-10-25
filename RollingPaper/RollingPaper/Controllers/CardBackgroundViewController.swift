@@ -255,7 +255,8 @@ extension CardBackgroundViewController {
     }
     
     func backgroundImageSend() {
-        self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
+        guard let backgroundImg = someImageView.image else { return }
+        self.input.send(.setCardBackgroundImg(background: backgroundImg))
     }
     
         private func cameraImagePicker() {
