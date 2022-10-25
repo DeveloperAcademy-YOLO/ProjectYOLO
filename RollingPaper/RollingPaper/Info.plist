@@ -3,7 +3,18 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleURLTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Bundle</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>Yolo.RollingPaper</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
