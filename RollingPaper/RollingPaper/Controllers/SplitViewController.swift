@@ -70,28 +70,22 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 보관함":
             if currentSecondaryView == "페이퍼 보관함" {
                 self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-                self.viewControllers[1] = paperStorageViewController
+                setViewController(paperStorageViewController, for: .secondary)
             } else {
-                self.viewControllers[1] = paperStorageViewController
+                setViewController(paperStorageViewController, for: .secondary)
             }
         case "보관함 이동 후 카드 뷰":
-            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: true)
-            self.viewControllers[1] = paperStorageViewController
+            self.paperTemplateSelectViewController.popToRootViewController(animated: false)
+            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
+            setViewController(paperStorageViewController, for: .secondary)
         case "설정":
             print("설정 변경 called")
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-//                print("현재 로그인 상태")
-//                DispatchQueue.main.async {
-//                    self.viewControllers[1] = self.settingScreenViewController
-//                }
                 if let vc = self.viewControllers[1] as? UINavigationController {
                     vc.popViewController(animated: false)
                 }
             } else {
                 print("현재 로그아웃 상태")
-//                DispatchQueue.main.async {
-//                    self.viewControllers[1] =  self.signInViewController
-//                }
                 if let vc = self.viewControllers[1] as? UINavigationController {
                     vc.pushViewController(SignInViewController(), animated: false)
                 }
@@ -109,11 +103,14 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         }
         switch object {
         case "페이퍼 템플릿":
-            self.viewControllers[1] = paperTemplateSelectViewController
+            // self.viewControllers[1] = paperTemplateSelectViewController
+            setViewController(paperTemplateSelectViewController, for: .secondary)
         case "페이퍼 보관함":
-            self.viewControllers[1] = paperStorageViewController
+            //self.viewControllers[1] = paperStorageViewController
+            setViewController(paperStorageViewController, for: .secondary)
         case "설정":
-            self.viewControllers[1] = settingScreenViewController
+            //self.viewControllers[1] = settingScreenViewController
+            setViewController(settingScreenViewController, for: .secondary)
         default :
             break
         }
@@ -129,10 +126,11 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-         return true
-     }
+        return true
+    }
     
     func primaryViewController(forExpanding splitViewController: UISplitViewController) -> UIViewController? {
         return self.viewControllers.last
     }
 }
+
