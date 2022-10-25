@@ -227,7 +227,7 @@ extension CardBackgroundViewController {
         
         let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
             DispatchQueue.main.async(execute: {
-                self.cameraImagePicker(withType: .camera)
+                self.cameraImagePicker()
             })
         }
         
@@ -250,7 +250,7 @@ extension CardBackgroundViewController {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             someImageView.image = pickedImage
         }
-        dismiss(animated: true, completion: nil)
+        picker.dismiss(animated: true)
         backgroundImageSend()
     }
     
@@ -258,13 +258,14 @@ extension CardBackgroundViewController {
         self.input.send(.setCardBackgroundImg(background: someImageView.image ?? UIImage(systemName: "heart.fill")!))
     }
     
-    private func cameraImagePicker(withType type: UIImagePickerController.SourceType) {
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        pickerController.sourceType = type
-        pickerController.cameraFlashMode = .off
-        pickerController.cameraDevice = .front
-        present(pickerController, animated: false)
+        private func cameraImagePicker() {
+            let pushVC = CameraCustomPicker()
+            pushVC.delegate = self
+            pushVC.sourceType = .camera
+            pushVC.cameraFlashMode = .off
+            pushVC.cameraDevice = .front
+            pushVC.modalPresentationStyle = .overFullScreen
+            present(pushVC, animated: true)
     }
     
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
