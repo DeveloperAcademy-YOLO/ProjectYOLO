@@ -303,14 +303,16 @@ class SignUpViewController: UIViewController {
     }
     
     private func navigateToSignIn() {
-        if
-            let splitVC = presentingViewController as? SplitViewController,
-            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
-            currentNavVC.dismiss(animated: true) {
-                let signInVC = SignInViewController()
-                let navVC = UINavigationController(rootViewController: signInVC)
-                navVC.modalPresentationStyle = .pageSheet
-                splitVC.present(navVC, animated: true)
+        if let modalPresentingVC = presentationController as? SplitViewController {
+            if
+                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
+                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+                dismiss(animated: true) {
+                    let signInVC = SignInViewController()
+                    let navVC = UINavigationController(rootViewController: signInVC)
+                    navVC.modalPresentationStyle = .pageSheet
+                    modalPresentingVC.present(navVC, animated: true)
+                }
             }
         } else {
             navigationController?.popViewController(animated: true)

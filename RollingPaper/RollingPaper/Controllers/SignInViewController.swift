@@ -219,15 +219,18 @@ class SignInViewController: UIViewController {
     }
         
     private func navigateToCurrentFlow() {
-        if
-            let splitVC = presentingViewController as? SplitViewController,
-            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
-            if let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true)
-                }
-            } else {
-                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "설정"])
+        if let modalPresentingVC = presentationController as? SplitViewController {
+            if
+                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
+                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+                dismiss(animated: true)
+            }
+        } else {
+            if
+                let currentNavVC = navigationController,
+                let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
+                print("Current is SignInView!")
+                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
             }
         }
     }
@@ -391,7 +394,6 @@ extension SignInViewController {
             let originalHeight = UIScreen.main.bounds.height
             let currentViewHeight = view.frame.height
             let offsetHeight = (originalHeight - currentViewHeight) / 2
-            print(originalHeight, currentViewHeight, offsetHeight, currentFocusedTextfieldY, keyboardY)
             if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
                 view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
             }

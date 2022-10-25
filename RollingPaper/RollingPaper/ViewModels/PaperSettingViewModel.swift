@@ -32,7 +32,7 @@ class PaperSettingViewModel {
     // 어떤 행동이 Input으로 들어오면 그것에 맞는 행동을 Output에 저장한 뒤 반환해주기
     func transform(input: AnyPublisher<Input, Never>) {
         input
-            .receive(on: DispatchQueue.global(qos: .background))
+//            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {

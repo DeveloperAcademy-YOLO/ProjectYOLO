@@ -83,7 +83,7 @@ class PaperStorageViewModel {
     // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-            .receive(on: DispatchQueue.global(qos: .background))
+//            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
