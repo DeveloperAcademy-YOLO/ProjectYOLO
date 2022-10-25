@@ -222,20 +222,20 @@ class SignInViewController: UIViewController {
         if
             let splitVC = presentingViewController as? SplitViewController,
             let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
-            // dismiss and connect to server paper flow
-            DispatchQueue.main.async {
-                self.dismiss(animated: true)
+            if let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+                DispatchQueue.main.async {
+                    self.dismiss(animated: true)
+                }
+            } else {
+                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "설정"])
             }
-        } else {
-//             Call SplitVC and refresh this settingView
-            print("navigation call! from sign In")
-            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "설정"])
         }
     }
     
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
+            .removeDuplicates(by: {$0 == $1})
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }

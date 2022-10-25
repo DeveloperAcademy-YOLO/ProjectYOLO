@@ -24,7 +24,7 @@ final class SignInViewModel {
         case normalBoundTap
     }
     
-    enum Output {
+    enum Output: Equatable {
         case signInDidFail(error: AuthManagerEnum)
         case emailDidMiss
         case passwordDidMiss
