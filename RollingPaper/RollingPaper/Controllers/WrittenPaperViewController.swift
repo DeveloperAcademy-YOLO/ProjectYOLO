@@ -14,7 +14,7 @@ class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
-//    lazy private var changedPaperTitle: String = ""
+    //    lazy private var changedPaperTitle: String = ""
     
     
     
@@ -226,6 +226,7 @@ class WrittenPaperViewController: UIViewController {
         } else {
             isLocalDB = false
         }
+//        self.navigationController?.pushViewController(MagnifiedCardViewController(), animated: true)
         
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB), animated: true) // TODO:
     }
@@ -391,7 +392,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             let imageView = UIImageView(image: image)
             imageView.layer.masksToBounds = true
-            myCell.contentView.addSubview(imageView)
+            myCell.addSubview(imageView)
             imageView.snp.makeConstraints { make in
                 make.top.bottom.leading.trailing.equalTo(myCell)
             }
@@ -411,12 +412,12 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                         NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
                         let imageView = UIImageView(image: image)
                         imageView.layer.masksToBounds = true
-                        myCell.contentView.addSubview(imageView)
+                        myCell.addSubview(imageView)
                         imageView.snp.makeConstraints { make in
                             make.top.bottom.leading.trailing.equalTo(myCell)
                         }
                     } else {
-                        myCell.contentView.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                        myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
                     }
                 }
                 .store(in: &cancellables)
@@ -430,41 +431,39 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         print("User tapped on item \(indexPath.row)")
         guard let currentPaper = viewModel.currentPaper else { return  }
         let card = currentPaper.cards[indexPath.row]
-        var presentingVC = MagnifiedCardViewController()
-        if case presentingVC.cardContentURLString = card.contentURLString {
-//            presentingVC.cardContentURLString = card.contentURLString
-            presentingVC.modalPresentationStyle = .formSheet
+        let presentingVC = MagnifiedCardViewController()
+        presentingVC.cardContentURLString = card.contentURLString
+
+        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+            presentingVC.magnifiedCardImage.image = image
+            presentingVC.modalPresentationStyle = .overCurrentContext
             present(presentingVC, animated: true)
         }
-//        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-//            
-//            
-//        }
-//        else {
-//            LocalStorageManager.downloadData(urlString: card.contentURLString)
-//                .receive(on: DispatchQueue.main)
-//                .sink { completion in
-//                    switch completion {
-//                    case .failure(let error): print(error)
-//                    case .finished: break
-//                    }
-//                } receiveValue: { [weak self] data in
-//                    if
-//                        let data = data,
-//                        let image = UIImage(data: data) {
-//                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-//                        let imageView = UIImageView(image: image)
-//                        imageView.layer.masksToBounds = true
-//                        myCell.contentView.addSubview(imageView)
-//                        imageView.snp.makeConstraints { make in
-//                            make.top.bottom.leading.trailing.equalTo(myCell)
-//                        }
-//                    } else {
-//                        myCell.contentView.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
-//                    }
-//                }
-//                .store(in: &cancellables)
-//        }
+        else {
+            LocalStorageManager.downloadData(urlString: card.contentURLString)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    switch completion {
+                    case .failure(let error): print(error)
+                    case .finished: break
+                    }
+                } receiveValue: { [weak self] data in
+                    if
+                        let data = data,
+                        let image = UIImage(data: data) {
+                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                        presentingVC.magnifiedCardImage.image = image
+                        presentingVC.modalPresentationStyle = .overCurrentContext
+                        self?.present(presentingVC, animated: true)
+                    } else {
+                        let image = UIImage(systemName: "person.circle")
+                        presentingVC.magnifiedCardImage.image = image
+                        presentingVC.modalPresentationStyle = .overCurrentContext
+                        self?.present(presentingVC, animated: true)
+                    }
+                }
+                .store(in: &cancellables)
+        }
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }

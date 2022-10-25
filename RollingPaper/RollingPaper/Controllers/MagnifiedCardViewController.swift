@@ -7,49 +7,48 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 class MagnifiedCardViewController: UIViewController {
     var cardContentURLString: String?
     var magnifiedCardImage = UIImageView()
-
+    var closeBtn: UIButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
+        magnifiedCardImage.backgroundColor = .clear
+        magnifiedCardImage.layer.cornerRadius = 50
+        magnifiedCardImage.clipsToBounds = true
+        view.addSubview(magnifiedCardImage)
+        view.addSubview(closeBtn)
         setImageSize()
-        showImage()
+        setBtnSize()
+    }
+    
+    @objc func closeAction() {
+        dismiss(animated: true)
+    }
+    
+    func setBtnSize() {
+        closeBtn.snp.makeConstraints { make in
+            make.top.equalTo(self.view).offset(0)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        }
     }
     
     func setImageSize() {
         magnifiedCardImage.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalTo(200)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.1)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.1))
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
         }
     } //확대된 카드의 사이즈 결정
-    
-    func showImage() {
-        guard let contentURLString = cardContentURLString else {return}
-        if let image = NSCacheManager.shared.getImage(name: contentURLString) {
-            magnifiedCardImage.image = image
-        }
-        else {
-            LocalStorageManager.downloadData(urlString: contentURLString)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    switch completion {
-                    case .failure(let error): print(error)
-                    case .finished: break
-                    }
-                } receiveValue: { [weak self] data in
-                    if
-                        let data = data,
-                        let image = UIImage(data: data) {
-                        NSCacheManager.shared.setImage(image: image, name: contentURLString)
-                        self?.magnifiedCardImage.image = image
-                    } else {
-                        self?.magnifiedCardImage.image = UIImage(systemName: "person.circle")
-                    }
-                }
-        }
-    } // 선택된 카드를 불러오는 로직
-    
 }
