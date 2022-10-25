@@ -221,12 +221,15 @@ class SignInViewController: UIViewController {
     private func navigateToCurrentFlow() {
         if
             let splitVC = presentingViewController as? SplitViewController,
-            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController,
-            let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+            let currentNavVC = splitVC.viewControllers[1] as? UINavigationController {
             // dismiss and connect to server paper flow
-            dismiss(animated: true)
+            DispatchQueue.main.async {
+                self.dismiss(animated: true)
+            }
         } else {
-            // Call SplitVC and refresh this settingView
+//             Call SplitVC and refresh this settingView
+            print("navigation call! from sign In")
+            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "설정"])
         }
     }
     

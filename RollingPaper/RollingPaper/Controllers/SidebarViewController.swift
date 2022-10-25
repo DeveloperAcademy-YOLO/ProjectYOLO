@@ -10,10 +10,6 @@ import SnapKit
 import Combine
 import CombineCocoa
 
-protocol SidebarViewControllerDelegate: AnyObject {
-    func didSelectCategory(_ category: CategoryModel)
-}
-
 private class Layout {
     static let userPhotoFrameWidthHeight = 44
     static let userNameFontSize: CGFloat = 20
@@ -37,13 +33,10 @@ private class Layout {
 }
 
 class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
-    var delegate: SidebarViewControllerDelegate?
-    
+
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
-    
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
         photo.image = UIImage(systemName: "person.circle")
@@ -177,8 +170,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             userInfo: [NotificationViewKey.view: category.name])
     }
     
-    
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return Layout.tableCellHeight
     }
@@ -219,7 +210,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
-        
         userPhoto.snp.makeConstraints { make in
             make.top.height.equalToSuperview().inset(14)
         }
