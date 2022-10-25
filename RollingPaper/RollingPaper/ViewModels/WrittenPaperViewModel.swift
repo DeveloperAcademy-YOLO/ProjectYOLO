@@ -122,8 +122,10 @@ class WrittenPaperViewModel {
         switch paperFrom {
         case .fromLocal:
             localDatabaseManager.removePaper(paperId: paperID)
+            localDatabaseManager.resetPaper()
         case .fromServer:
             serverDatabaseManager.removePaper(paperId: paperID)
+            serverDatabaseManager.resetPaper()
         }
     }
     

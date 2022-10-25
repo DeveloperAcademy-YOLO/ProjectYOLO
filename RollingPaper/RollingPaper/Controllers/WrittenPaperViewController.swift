@@ -212,18 +212,15 @@ class WrittenPaperViewController: UIViewController {
         let signInVC = SignInViewController()
         
         let navVC = UINavigationController(rootViewController: signInVC)
-        navVC.modalPresentationStyle = .formSheet
+        navVC.modalPresentationStyle = .formSheet //모달에 x버튼 넣기 위함
         present(navVC, animated: true)
-        
-        //signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
-        //self.present(signInVC, animated: true)
         
         authManager
             .signedInSubject
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { receivedValue in
                 if receivedValue == .signInSucceed {
-                    signInVC.dismiss(animated: true)
+                    navVC.dismiss(animated: true)
                 }
             })
             .store(in: &cancellables)
