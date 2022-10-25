@@ -115,6 +115,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
     func addCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
+
         paperSubject.send(currentPaper)
         print("!!!!!!LocalDatabaseFileManager's\(card)")
     }

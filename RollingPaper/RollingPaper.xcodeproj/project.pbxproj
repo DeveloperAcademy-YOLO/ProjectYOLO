@@ -12,6 +12,7 @@
 		1573563328FFA80F00EA565B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1573563228FFA80F00EA565B /* GoogleService-Info.plist */; };
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
+		AF6FEE3C2902E2E400E44E7D /* CameraCustomPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */; };
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
@@ -32,6 +33,7 @@
 		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
 		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
+		CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -85,6 +87,7 @@
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
+		AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCustomPicker.swift; sourceTree = "<group>"; };
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
 		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
@@ -107,6 +110,7 @@
 		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
+		CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -244,6 +248,7 @@
 				C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */,
 				D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */,
 				C5B5853B29001AFF00454C75 /* UIImage+Extension.swift */,
+				CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -279,6 +284,7 @@
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
 				1573562E28FFA79B00EA565B /* SettingScreenViewController.swift */,
+				AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -528,6 +534,7 @@
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
 				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
 				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
+				AF6FEE3C2902E2E400E44E7D /* CameraCustomPicker.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
 				CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */,
@@ -540,6 +547,7 @@
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,
+				CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
@@ -742,14 +750,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = H4DUZUZV8Z;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "${PRODUCT_NAME} Camera Private";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "${PRODUCT_NAME} Photo Library Private";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -760,10 +769,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
+				PRODUCT_BUNDLE_IDENTIFIER = uyggyu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -777,14 +785,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = H4DUZUZV8Z;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "${PRODUCT_NAME} Camera Private";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "${PRODUCT_NAME} Photo Library Private";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -795,10 +804,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
+				PRODUCT_BUNDLE_IDENTIFIER = uyggyu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
