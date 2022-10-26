@@ -201,22 +201,18 @@ class CardRootViewController: UIViewController {
                   }))
                present(alert, animated: true)
            } else {
-               input.send(.resultShown)
-               bind()
                if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
                    secondStepViewVC.resultImageSend()
                    print("CardPencilKit here!")
                } else {
                    print("Fail!")
                }
-               
                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
                    let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
                    
                    self.navigationController?.pushViewController(pushVC, animated: false)
                })
            }
-    // TODO: 리팩토링 필요
     }
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {

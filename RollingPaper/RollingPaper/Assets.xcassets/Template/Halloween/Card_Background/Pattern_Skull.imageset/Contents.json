@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "BonePatternCard.pdf",
-      "idiom" : "universal"
+      "filename" : "Pattern_Skull.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Pattern_Skull 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Pattern_Skull 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
