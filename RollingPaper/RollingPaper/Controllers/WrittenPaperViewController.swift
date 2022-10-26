@@ -89,7 +89,6 @@ class WrittenPaperViewController: UIViewController {
         view.backgroundColor = .systemBackground
         self.splitViewController?.hide(.primary)
         self.navigationController?.navigationBar.tintColor = .systemGray
-        //        setCurrentUserAndPaper()
         navigationItem.titleView = stackView
         self.cardsList = setCollectionView()
         bind()
@@ -104,8 +103,6 @@ class WrittenPaperViewController: UIViewController {
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
         resetCurrentPaper()
-        //        viewModel.currentPaper?.creator = currentUser
-//        applyPaperLink()
     }
     
     private func titleLabelConstraints() {
@@ -157,21 +154,6 @@ class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    private func applyPaperLink() {
-        guard let paper = viewModel.currentPaper else {return}
-        getPaperShareLink(with: paper, route: .write)
-            .sink { (completion) in
-                switch completion {
-                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
-                case .finished: self.viewModel.isPaperLinkMade = true
-                case .failure(let error): print(error)
-                }
-            } receiveValue: { [weak self] url in
-                self?.viewModel.urlToShare = [url] // 실제 페이퍼나 앱의 링크가 들어가는 곳
-            }
-            .store(in: &cancellables)
-    }
-    
     func setCustomNavBarButtons() {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
@@ -191,7 +173,7 @@ class WrittenPaperViewController: UIViewController {
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
         paperLinkBtn.addAction(UIAction(handler: {_ in
-            if self.viewModel.currentUser != nil {
+            if self.viewModel.isSameCurrentUserAndCreator {
                 self.presentShareSheet(paperLinkBtn)
             } else {
                 self.presentSignUpModal(paperLinkBtn)
@@ -211,11 +193,26 @@ class WrittenPaperViewController: UIViewController {
         let signInSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton, secondBarButton]
         let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
         
-        navigationItem.rightBarButtonItems = (self.viewModel.currentPaper?.creator != nil && self.viewModel.currentPaper?.creator?.email == self.viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
+        makeCurrentPaperLink()
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
-    
+    private func makeCurrentPaperLink() {
+        guard let paper = viewModel.currentPaper else {return}
+        getPaperShareLink(with: paper, route: .write)
+            .sink { (completion) in
+                switch completion {
+                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
+                case .finished: self.viewModel.isPaperLinkMade = true
+                case .failure(let error): print(error)
+                }
+            } receiveValue: { [weak self] url in
+                self?.viewModel.urlToShare = [url] // 실제 페이퍼나 앱의 링크가 들어가는 곳
+            }
+            .store(in: &cancellables)
+    }
     
     private func moveToPaperStorageView() {
         guard let paper = viewModel.currentPaper else { return }
@@ -248,7 +245,6 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func presentShareSheet(_ sender: UIButton) {
-        viewModel.isPaperLinkMade = true
         let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
         //TODO : 카톡으로 공유하기
         let applicationActivities: [UIActivity]? = nil
@@ -281,10 +277,8 @@ class WrittenPaperViewController: UIViewController {
                 
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
-                    print("wwwwopqkwdqwww : \(self.viewModel.isPaperLinkMade)")
                 } else {
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
-                    print("wwwwopqkwdqwww : \(self.viewModel.isPaperLinkMade)")
                 }
                 
             }

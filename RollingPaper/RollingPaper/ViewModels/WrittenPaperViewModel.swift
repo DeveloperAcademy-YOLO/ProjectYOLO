@@ -33,6 +33,7 @@ class WrittenPaperViewModel {
     private var timeRemaing: Date?
     
     var isPaperLinkMade: Bool = false
+    var isSameCurrentUserAndCreator: Bool = false
     private var paperLinkForShare: String?
     
     private var isPaperStopped: Bool?
