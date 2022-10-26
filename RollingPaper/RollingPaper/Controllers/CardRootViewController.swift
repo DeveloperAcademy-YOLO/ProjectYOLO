@@ -37,7 +37,7 @@ class CardRootViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    private var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg: UIImage?
     private let viewModel: CardViewModel
     private let paperID: String
     private let isLocalDB: Bool
@@ -85,7 +85,7 @@ class CardRootViewController: UIViewController {
     
     lazy var rightButton: UIBarButtonItem = {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        customCompleteBtn.setTitle("완료", for: .normal)
+        customCompleteBtn.setTitle("작성완료", for: .normal)
         customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         customCompleteBtn.setTitleColor(.black, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
@@ -191,19 +191,32 @@ class CardRootViewController: UIViewController {
     }
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
-            secondStepViewVC.resultImageSend()
-            print("CardPencilKit here!")
-            
-        } else {
-            print("Fail!")
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-            
-            let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
-            
-            self.navigationController?.pushViewController(pushVC, animated: false)
-        }) // TODO: 리팩토링 필요
+        let secondStepViewVC = self.children[0] as? CardPencilKitViewController
+        print("###\(secondStepViewVC?.someImageView.image)")
+        
+        if secondStepViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
+               let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
+               alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+                   alert.dismiss(animated: true, completion: nil)
+                  }))
+               present(alert, animated: true)
+           } else {
+               input.send(.resultShown)
+               bind()
+               if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
+                   secondStepViewVC.resultImageSend()
+                   print("CardPencilKit here!")
+               } else {
+                   print("Fail!")
+               }
+               
+               DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
+                   let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
+                   
+                   self.navigationController?.pushViewController(pushVC, animated: false)
+               })
+           }
+    // TODO: 리팩토링 필요
     }
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
@@ -217,7 +230,6 @@ class CardRootViewController: UIViewController {
          alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
              self.navigationController?.popViewController(animated: true)
             }))
-         
          present(alert, animated: true)
      }
 }

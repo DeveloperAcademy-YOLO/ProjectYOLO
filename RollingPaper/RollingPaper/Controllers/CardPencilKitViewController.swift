@@ -14,8 +14,6 @@ import Combine
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
 
     let toolPicker = PKToolPicker()
-    
- 
     private let arrStickers: [String]
     private var backgroundImg = UIImage(named: "Rectangle")
     
@@ -118,11 +116,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.backgroundColor = .systemBackground
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
-        theImageView.contentMode = .scaleAspectFill
+//        theImageView.translatesAutoresizingMaskIntoConstraints = false
+//        theImageView.backgroundColor = .lightGray
+//        theImageView.layer.borderWidth = 1
+//        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+//        theImageView.layer.masksToBounds = true
+//        theImageView.layer.cornerRadius = 50
+//        theImageView.contentMode = .scaleAspectFill
         theImageView.isUserInteractionEnabled = true
         return theImageView
     }()
@@ -144,11 +144,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
-        theImageView.image = backgroundImg
+        theImageView.layer.borderWidth = 0.5
+        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+        theImageView.image = UIImage(named: "Rectangle_default")
         return theImageView
     }()
     
