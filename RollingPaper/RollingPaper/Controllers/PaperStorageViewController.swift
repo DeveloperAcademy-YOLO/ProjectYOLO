@@ -50,6 +50,7 @@ class PaperStorageViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var paperCollectionView: PaperStorageCollectionView?
     private var splitViewIsOpened: Bool = true
+    private var viewIsChange: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +69,7 @@ class PaperStorageViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
+        viewIsChange = false
     }
     
     // view가 사라지면 알려주기
@@ -94,17 +96,21 @@ class PaperStorageViewController: UIViewController {
     
     // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
     private func splitViewBind() {
+        viewIsChange = false
         let output = splitViewManager.getOutput()
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] event in
-                switch event {
-                case .viewIsOpened:
-                    self?.splitViewIsOpened = true
-                case .viewIsClosed:
-                    self?.splitViewIsOpened = false
+                guard let self = self else {return}
+                if !self.viewIsChange {
+                    switch event {
+                    case .viewIsOpened:
+                        self.splitViewIsOpened = true
+                    case .viewIsClosed:
+                        self.splitViewIsOpened = false
+                    }
+                    self.updateLayout()
                 }
-                self?.updateLayout()
             })
             .store(in: &cancellables)
     }
@@ -214,6 +220,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         self.setSelectedPaper(paperId: papers[indexPath.item].paperId )
+        viewIsChange = true
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
         return true
     }
