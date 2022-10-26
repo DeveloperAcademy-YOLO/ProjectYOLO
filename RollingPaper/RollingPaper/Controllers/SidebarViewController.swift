@@ -97,8 +97,19 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
 //                    self?.convertURL(from: userModel.profileUrl)
                     self?.userName.text = userModel.name
                 } else {
-                    self?.userPhoto.image = UIImage(systemName: "person.circle")
+//                    self?.userPhoto.image = UIImage(systemName: "person.circle")
                     self?.userName.text = "Guest"
+                }
+            }
+            .store(in: &cancellables)
+        viewModel
+            .currentPhotoSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] image in
+                if let image = image {
+                    self?.userPhoto.image = image
+                } else {
+                    self?.userPhoto.image = UIImage(systemName: "person.circle")
                 }
             }
             .store(in: &cancellables)
