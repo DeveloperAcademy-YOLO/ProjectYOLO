@@ -199,9 +199,19 @@ class CardRootViewController: UIViewController {
     }
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
-        print("cancelBtnPressed")
-        self.navigationController?.popViewController(animated: true)
-    }
+         print("cancelBtnPressed")
+         let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
+     
+         alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
+             alert.dismiss(animated: true, completion: nil)
+            }))
+         
+         alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+             self.navigationController?.popViewController(animated: true)
+            }))
+         
+         present(alert, animated: true)
+     }
 }
 
 extension UIImage {
