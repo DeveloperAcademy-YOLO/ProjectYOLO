@@ -17,6 +17,7 @@ class WrittenPaperViewModel {
     let authManager: AuthManager = FirebaseAuthManager.shared
     let currentUserSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     var currentUser: UserModel?
+    var urlToShare: [URL]?
     
     enum DataSource {
         case fromLocal
