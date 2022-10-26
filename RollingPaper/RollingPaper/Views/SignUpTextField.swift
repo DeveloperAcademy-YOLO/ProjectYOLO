@@ -122,10 +122,12 @@ extension SignUpTextField {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .emailAddress
+            textField.clearButtonMode = .always
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .oneTimeCode
             textField.isSecureTextEntry = false
+            textField.clearButtonMode = .always
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .name

@@ -275,7 +275,6 @@ class SignUpViewController: UIViewController {
     
     private func navigateToSignIn() {
         if let modalPresentingVC = presentingViewController as? SplitViewController {
-            print("modal dismiss")
             modalPresentingVC.dismiss(animated: true) {
                 let signInVC = SignInViewController()
                 let navVC = UINavigationController(rootViewController: signInVC)
@@ -283,11 +282,7 @@ class SignUpViewController: UIViewController {
                 modalPresentingVC.present(navVC, animated: true)
             }
         } else {
-            self.navigationController?.popViewController(true, completion: {
-                if
-                    let currentVC = self.navigationController?.viewControllers.last as? SignInViewController {
-                }
-            })
+            self.navigationController?.popViewController(animated: true)
         }
     }
     
