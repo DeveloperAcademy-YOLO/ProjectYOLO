@@ -227,13 +227,21 @@ class PaperSettingViewController: UIViewController {
     
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
-        self.input.send(.endSettingPaper)
-        NotificationCenter.default.post(
-            name: Notification.Name.viewChange,
-            object: nil,
-            userInfo: [NotificationViewKey.view:"보관함 이동 후 카드 뷰"]
-        )
-    }
+          if paperTitleTextField.text == "" {
+          let alert = UIAlertController(title: "잠깐!", message: "페이퍼 제목을 입력해주세요.", preferredStyle: .alert)
+          alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+              alert.dismiss(animated: true, completion: nil)
+             }))
+          present(alert, animated: true)
+          } else {
+              self.input.send(.endSettingPaper)
+              NotificationCenter.default.post(
+                  name: Notification.Name.viewChange,
+                  object: nil,
+                  userInfo: [NotificationViewKey.view: "보관함 이동 후 카드 뷰"]
+              )
+          }
+      }
     
     // 뒤로가기 버튼 눌렀을 때 동작
     @objc private func backBtnPressed() {
