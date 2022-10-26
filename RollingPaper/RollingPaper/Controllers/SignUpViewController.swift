@@ -78,7 +78,7 @@ class SignUpViewController: UIViewController {
     
     private func layoutIfModalView() {
         if presentingViewController != nil {
-            let topOffset = (view.frame.height - 380) / 2
+            let topOffset = (view.frame.height - 320) / 2
             emailTextField.snp.updateConstraints({ make in
                 make.top.equalToSuperview().offset(topOffset)
             })
@@ -89,7 +89,7 @@ class SignUpViewController: UIViewController {
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
         view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
-        let topOffset = (view.frame.height - 380) / 2
+        let topOffset = (view.frame.height - 320) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
@@ -126,7 +126,7 @@ class SignUpViewController: UIViewController {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
                 case .signUpDidSuccess:
-                    //TODO: mark sign up success
+                    print("SignUpDidSuccess")
                     self?.navigateToSignIn()
                 }
             })
@@ -274,16 +274,13 @@ class SignUpViewController: UIViewController {
     }
     
     private func navigateToSignIn() {
-        if let modalPresentingVC = presentationController as? SplitViewController {
-            if
-                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
-                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
-                dismiss(animated: true) {
-                    let signInVC = SignInViewController()
-                    let navVC = UINavigationController(rootViewController: signInVC)
-                    navVC.modalPresentationStyle = .pageSheet
-                    modalPresentingVC.present(navVC, animated: true)
-                }
+        if let modalPresentingVC = presentingViewController as? SplitViewController {
+            print("modal dismiss")
+            modalPresentingVC.dismiss(animated: true) {
+                let signInVC = SignInViewController()
+                let navVC = UINavigationController(rootViewController: signInVC)
+                navVC.modalPresentationStyle = .pageSheet
+                modalPresentingVC.present(navVC, animated: true)
             }
         } else {
             self.navigationController?.popViewController(true, completion: {
