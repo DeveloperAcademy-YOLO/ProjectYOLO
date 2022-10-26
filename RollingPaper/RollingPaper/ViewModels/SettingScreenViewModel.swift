@@ -30,7 +30,7 @@ class SettingScreenViewModel {
     var cancellables = Set<AnyCancellable>()
     private let output: PassthroughSubject<Output, Never> = .init()
     let currentUserSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
-    let currentPhotoSubject: CurrentValueSubject<UIImage?, Never> = .init(UIImage(systemName: "person"))
+    let currentPhotoSubject: CurrentValueSubject<UIImage?, Never> = .init(UIImage(systemName: "person.circle"))
     
     init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
@@ -55,86 +55,13 @@ class SettingScreenViewModel {
             }
             .store(in: &cancellables)
         self.currentUserSubject.send(authManager.userProfileSubject.value)
-        currentUserSubject
-            .removeDuplicates(by: { past, current in
-                if
-                    past?.name == current?.name,
-                    past?.profileUrl == current?.profileUrl,
-                    past?.email == current?.email {
-                    return true
+        authManager
+            .userProfileImageSubject
+            .sink { [weak self] image in
+                if let image = image {
+                    self?.currentPhotoSubject.send(image)
                 } else {
-                    return false
-                }
-            })
-            .sink { userModel in
-                var photoStorage = Set<AnyCancellable>()
-                if let photoURLString = userModel?.profileUrl {
-                    if let image = NSCacheManager.shared.getImage(name: photoURLString) {
-                        print("CacheManager Called!")
-                        self.currentPhotoSubject.send(image)
-                    } else {
-                        print("LocalDatabaseManager Called!")
-                        LocalStorageManager.downloadData(urlString: photoURLString)
-                            .receive(on: DispatchQueue.global(qos: .background))
-                            .sink { completion in
-                                switch completion {
-                                case .failure(let error):
-                                    print(error.localizedDescription)
-                                    FirebaseStorageManager.downloadData(urlString: photoURLString)
-                                        .receive(on: DispatchQueue.global(qos: .background))
-                                        .sink { completion in
-                                            switch completion {
-                                            case .finished: break
-                                            case .failure(let error):
-                                                print(error.localizedDescription)
-                                                self.currentPhotoSubject.send(nil)
-                                            }
-                                        } receiveValue: { [weak self] data  in
-                                            if
-                                                let data = data,
-                                                let image = UIImage(data: data) {
-                                                NSCacheManager.shared.setImage(image: image, name: photoURLString)
-                                                self?.currentPhotoSubject.send(image)
-                                            } else {
-                                                self?.currentPhotoSubject.send(nil)
-                                            }
-                                        }
-                                        .store(in: &photoStorage)
-
-                                case .finished: break
-                                }
-                            } receiveValue: { [weak self] data in
-                                if
-                                    let data = data,
-                                    let image = UIImage(data: data) {
-                                    self?.currentPhotoSubject.send(image)
-                                    NSCacheManager.shared.setImage(image: image, name: photoURLString)
-                                } else {
-                                    FirebaseStorageManager.downloadData(urlString: photoURLString)
-                                        .receive(on: DispatchQueue.global(qos: .background))
-                                        .sink { [weak self] completion in
-                                            switch completion {
-                                            case .finished: break
-                                            case .failure(let error):
-                                                print(error.localizedDescription)
-                                                self?.currentPhotoSubject.send(nil)
-                                            }
-                                        } receiveValue: { [weak self] data  in
-                                            if
-                                                let data = data,
-                                                let image = UIImage(data: data) {
-                                                NSCacheManager.shared.setImage(image: image, name: photoURLString)
-                                                self?.currentPhotoSubject.send(image)
-                                            } else {
-                                                self?.currentPhotoSubject.send(nil)
-                                            }
-                                        }
-                                        .store(in: &photoStorage)
-                                }
-                            }
-                            .store(in: &photoStorage)
-
-                    }
+                    self?.currentPhotoSubject.send(UIImage(systemName: "person.circle"))
                 }
             }
             .store(in: &cancellables)

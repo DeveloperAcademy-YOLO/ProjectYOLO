@@ -41,13 +41,15 @@ class CardRootViewController: UIViewController {
     private let viewModel: CardViewModel
     private let paperID: String
     private let isLocalDB: Bool
+    private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardViewModel, paperID: String, isLocalDB: Bool) {
+    init(viewModel: CardViewModel, paperID: String, isLocalDB: Bool, currentPaper: PaperModel) {
         self.viewModel = viewModel
         self.paperID = paperID
         self.isLocalDB = isLocalDB
+        self.currentPaper = currentPaper
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -122,8 +124,11 @@ class CardRootViewController: UIViewController {
     }
     
     private func instantiateSegmentedViewControllers() {
-        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel)
-        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel)
+        let sticker = currentPaper.template.stickerNames
+        let background = currentPaper.template.backgroundImageNames
+        
+        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel, backgroundImageName: background)
+        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel, arrStickers: sticker)
         
         self.addChild(secondStepViewVC)
         self.addChild(firstStepViewVC)

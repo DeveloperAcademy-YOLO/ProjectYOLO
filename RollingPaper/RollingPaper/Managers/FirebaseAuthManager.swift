@@ -11,11 +11,13 @@ import Combine
 import AuthenticationServices
 import CryptoKit
 import FirebaseFirestore
+import UIKit
 
 protocol AuthManager {
     static var shared: AuthManager { get }
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> {get set}
     var userProfileSubject: CurrentValueSubject<UserModel?, Never> { get set }
+    var userProfileImageSubject: CurrentValueSubject<UIImage?, Never> {get set}
     func signIn(email: String, password: String)
     func appleSignIn()
     func signUp(email: String, password: String, name: String)
@@ -51,6 +53,7 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     static let shared: AuthManager = FirebaseAuthManager()
     var signedInSubject: PassthroughSubject<AuthManagerEnum, Never> = .init()
     var userProfileSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
+    var userProfileImageSubject: CurrentValueSubject<UIImage?, Never> = .init(nil)
     private let auth = FirebaseAuth.Auth.auth()
     private let database = Firestore.firestore()
     private var currentNonce: String?
@@ -59,8 +62,74 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     
     private override init() {
         super.init()
+        bind()
         fetchUserProfile()
         addSnapshotListener()
+    }
+    
+    private func bind() {
+        userProfileSubject
+            .removeDuplicates(by: {$0?.profileUrl == $1?.profileUrl })
+            .sink { [weak self] userModel in
+                if
+                    let userModel = userModel,
+                    let userProfileURLString = userModel.profileUrl {
+                    self?.handleProfileImage(with: userProfileURLString)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func localDownload(with urlString: String) {
+        LocalStorageManager.downloadData(urlString: urlString)
+            .sink { completion in
+                switch completion {
+                case .finished: break
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    self.serverDownload(with: urlString)
+                }
+            } receiveValue: { [weak self] data in
+                if
+                    let data = data,
+                    let image = UIImage(data: data) {
+                    NSCacheManager.shared.setImage(image: image, name: urlString)
+                    self?.userProfileImageSubject.send(image)
+                } else {
+                    self?.serverDownload(with: urlString)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func serverDownload(with urlString: String) {
+        FirebaseStorageManager.downloadData(urlString: urlString)
+            .sink { completion in
+                switch completion {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    self.userProfileImageSubject.send(nil)
+                case .finished: break
+                }
+            } receiveValue: { [weak self] data in
+                if
+                    let data = data,
+                    let image = UIImage(data: data) {
+                    self?.userProfileImageSubject.send(image)
+                    NSCacheManager.shared.setImage(image: image, name: urlString)
+                } else {
+                    self?.userProfileImageSubject.send(nil)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func handleProfileImage(with urlString: String) {
+        if let image = NSCacheManager.shared.getImage(name: urlString) {
+            userProfileImageSubject.send(image)
+        } else {
+            localDownload(with: urlString)
+        }
     }
     
     private func removeSnapshotListener() {
@@ -69,7 +138,6 @@ final class FirebaseAuthManager: NSObject, AuthManager {
     
     private func addSnapshotListener() {
         guard let email = UserDefaults.standard.value(forKey: "currentUserEmail") as? String else {
-            
             return
         }
         snapshotListener = database

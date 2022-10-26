@@ -14,10 +14,8 @@ import Combine
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
 
     let toolPicker = PKToolPicker()
-    
-    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin2", "Halloween_Hat", "Halloween_Blood", "Halloween_Ghost2", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Pumpkin2", "Halloween_StickCandy", "Halloween_Blood"]
-    
-  //  private var backgroundImg = UIImage(named: "Rectangle")
+    private let arrStickers: [String]
+    private var backgroundImg = UIImage(named: "Rectangle")
     
     private let viewModel: CardViewModel
     let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
@@ -27,11 +25,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, arrStickers: [String]) {
         self.viewModel = viewModel
+        self.arrStickers = arrStickers
         super.init(nibName: nil, bundle: nil)
     }
     
+   
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

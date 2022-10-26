@@ -52,42 +52,40 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         self.sidebarViewController = SidebarViewController()
         self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+        if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+            self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+        } else {
+            self.settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
+        }
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
     }
-    
     @objc func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
         case "페이퍼 템플릿":
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-            if currentSecondaryView == "페이퍼 보관함" {
-                self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-                setViewController(paperStorageViewController, for: .secondary)
-            } else {
-                setViewController(paperStorageViewController, for: .secondary)
+            if let currentNavVC = viewControllers[1] as? UINavigationController {
+                print(currentNavVC.viewControllers)
+                print("currentSecondaryView: \(currentSecondaryView)")
             }
+            self.paperStorageViewController.popToRootViewController(animated: false)
+            setViewController(paperStorageViewController, for: .secondary)
         case "보관함 이동 후 카드 뷰":
             self.paperTemplateSelectViewController.popToRootViewController(animated: false)
             self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
             setViewController(paperStorageViewController, for: .secondary)
         case "설정":
-            if
-                let navVC = self.viewControllers[1] as? UINavigationController {
-                var navViewControllers = navVC.viewControllers
-                if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-                    navViewControllers = [SettingScreenViewController()]
-                } else {
-                    navViewControllers = [SignInViewController()]
-                }
-                navVC.setViewControllers(navViewControllers, animated: false)
+            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+                self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
+            } else {
+                self.settingScreenViewController.setViewControllers([SignInViewController()], animated: false)
             }
         default :
             break
         }
-        self.currentSecondaryView = object
+        self.currentSecondaryView = (object == "보관함 이동 후 카드 뷰" ? "페이퍼 보관함" : object)
     }
     
     @objc func changeSecondaryViewFromSidebar(noitificaiton: Notification) {

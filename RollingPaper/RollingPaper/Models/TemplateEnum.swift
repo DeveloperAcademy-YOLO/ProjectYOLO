@@ -18,17 +18,17 @@ enum TemplateEnum: String, CaseIterable {
     var template: TemplateModel {
         switch self {
         case .halloween:
-            return TemplateModel(templateString: "halloween", templateTitle: "할로윈", templateDescription: "달콤하고도 으스스한 스티커와 카드로 이뤄진 테마", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "halloween", templateTitle: "할로윈", templateDescription: "달콤하고도 으스스한 스티커와 카드로 이뤄진 테마", colorHexes: [], stickerNames: ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin2", "Halloween_Hat", "Halloween_Blood", "Halloween_Ghost2", "Halloween_StickCandy"], backgroundImageNames: ["Rectangle_black", "Rectangle", "Pattern_Pumpkin", "Rectangle_pumpkin"])
         case .school:
-            return TemplateModel(templateString: "school", templateTitle: "학교", templateDescription: "학교학교", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "school", templateTitle: "학교", templateDescription: "학교학교", colorHexes: [], stickerNames: [], backgroundImageNames: [])
         case .grid:
-            return TemplateModel(templateString: "grid", templateTitle: "모눈종이", templateDescription: "모눈모눈", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "grid", templateTitle: "모눈종이", templateDescription: "모눈모눈", colorHexes: [], stickerNames: [], backgroundImageNames: [])
         case .white:
-            return TemplateModel(templateString: "white", templateTitle: "기본", templateDescription: "기본기본", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "white", templateTitle: "기본", templateDescription: "기본기본", colorHexes: [], stickerNames: [], backgroundImageNames: [])
         case .dark:
-            return TemplateModel(templateString: "dark", templateTitle: "다크", templateDescription: "다크다크", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "dark", templateTitle: "다크", templateDescription: "다크다크", colorHexes: [], stickerNames: [], backgroundImageNames: [])
         case .sunrise:
-            return TemplateModel(templateString: "sunrise", templateTitle: "일출", templateDescription: "일출일출", colorHexes: [], stickerNames: [])
+            return TemplateModel(templateString: "sunrise", templateTitle: "일출", templateDescription: "일출일출", colorHexes: [], stickerNames: [], backgroundImageNames: [])
         }
     }
 }

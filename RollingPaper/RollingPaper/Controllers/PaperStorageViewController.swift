@@ -19,7 +19,7 @@ private class Length {
     static let sectionRightMargin: CGFloat = 36
     static let sectionLeftMargin: CGFloat = 36
     
-    static var openedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+openedCellHorizontalSpace+1))/2 // 반응형
+    static var openedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+openedCellHorizontalSpace+2))/2 // 반응형
     static let openedPaperThumbnailHeight: CGFloat = openedPaperThumbnailWidth*0.33
     static let openedPaperTitleBottomMargin: CGFloat = 16
     static let openedPaperTitleRightMargin: CGFloat = 16
@@ -50,6 +50,7 @@ class PaperStorageViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var paperCollectionView: PaperStorageCollectionView?
     private var splitViewIsOpened: Bool = true
+    private var viewIsChange: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +69,7 @@ class PaperStorageViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
+        viewIsChange = false
     }
     
     // view가 사라지면 알려주기
@@ -94,17 +96,21 @@ class PaperStorageViewController: UIViewController {
     
     // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
     private func splitViewBind() {
+        viewIsChange = false
         let output = splitViewManager.getOutput()
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] event in
-                switch event {
-                case .viewIsOpened:
-                    self?.splitViewIsOpened = true
-                case .viewIsClosed:
-                    self?.splitViewIsOpened = false
+                guard let self = self else {return}
+                if !self.viewIsChange {
+                    switch event {
+                    case .viewIsOpened:
+                        self.splitViewIsOpened = true
+                    case .viewIsClosed:
+                        self.splitViewIsOpened = false
+                    }
+                    self.updateLayout()
                 }
-                self?.updateLayout()
             })
             .store(in: &cancellables)
     }
@@ -112,7 +118,7 @@ class PaperStorageViewController: UIViewController {
     // 스플릿뷰 열고닫음에 따라 뷰 업데이트하기
     private func updateLayout() {
         let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
-        Length.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin+Length.openedCellHorizontalSpace+1))/2
+        Length.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin+Length.openedCellHorizontalSpace+2))/2
         Length.closedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin))
         paperCollectionView?.reloadData()
     }
@@ -214,6 +220,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         self.setSelectedPaper(paperId: papers[indexPath.item].paperId )
+        viewIsChange = true
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
         return true
     }
