@@ -43,7 +43,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         photo.layer.cornerRadius = photo.frame.width / 2
         photo.layer.masksToBounds = true
         photo.contentMode = UIView.ContentMode.scaleAspectFit
-
         return photo
     }()
     
@@ -217,3 +216,4 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         }
     }
 }
+
