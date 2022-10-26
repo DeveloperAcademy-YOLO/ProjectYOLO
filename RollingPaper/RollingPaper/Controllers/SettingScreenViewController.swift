@@ -129,6 +129,35 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         visualEffectView.isHidden = true
         return visualEffectView
     }()
+    
+    @objc func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
+            print("cancelBtnPressed")
+            let alert = UIAlertController(title: "로그 아웃", message: "로그 아웃 하시겠습니까?", preferredStyle: .alert)
+        
+            alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
+                alert.dismiss(animated: true, completion: nil)
+               }))
+            
+            alert.addAction(UIAlertAction(title: "로그 아웃", style: .default, handler: { (_: UIAlertAction!) in
+                self.input.send(.signOutDidTap)
+//                self.navigationController?.popViewController(animated: true)
+               }))
+            present(alert, animated: true)
+        }
+    
+    @objc func resignBtnPressed(_ gesture: UITapGestureRecognizer) {
+            print("cancelBtnPressed")
+            let alert = UIAlertController(title: " 회원 탈퇴를 하면 모든 기록이 사라집니다.", message: "회원 탈퇴를 하시겠습니까?", preferredStyle: .alert)
+        
+            alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
+                alert.dismiss(animated: true, completion: nil)
+               }))
+            
+            alert.addAction(UIAlertAction(title: "회원 탈퇴", style: .default, handler: { (_: UIAlertAction!) in
+//                self.navigationController?.popViewController(animated: true)
+               }))
+            present(alert, animated: true)
+        }
 
     @objc func didCancelButton() {
         profileText.textField.resignFirstResponder()
@@ -341,14 +370,9 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 self.presentImagePicker(withType: .photoLibrary)
             }
             .store(in: &cancellables)
-
-        resignButton.tapPublisher
-            .sink { [weak self] _ in
-                print("ResignButton Tapped!")
-                self?.input.send(.resignDidTap)
-            }
-            .store(in: &cancellables)
-
+        
+        logoutButton.addTarget(self, action: #selector(logOutBtnPressed(_:)), for: .touchUpInside)
+        
         logoutButton.tapPublisher
             .sink { [weak self] _ in
                 print("LogOutButton Tapped!")
@@ -357,6 +381,18 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 // ViewModel에서는 해당 인풋을 받아서 특정한 행동을 하기
             }
             .store(in: &cancellables)
+        
+        resignButton.addTarget(self, action: #selector(resignBtnPressed(_:)), for: .touchUpInside)
+        
+        resignButton.tapPublisher
+            .sink { [weak self] _ in
+                print("ResignButton Tapped!")
+                self?.input.send(.resignDidTap)
+            }
+            .store(in: &cancellables)
+
+
+        
         // ViewModel -> current Image, current Photo를 가지고 있다! == AuthManaher에서 구독받는 UserProfileUsbject의 데이터! -> ViewModel에서 해당 데이터 퍼블리셔를 구독하고, 뷰 컨에서 해당 흘러오는 데이터를 구독하기!
         // ViewModel 완료버튼 누르면 -> ViewModel에서 authManager의 setUserProfile 함수 실행해서 현재 데이터와 다른 포토, 이름 넣기 -> AuthManager에서의 데이터 퍼블리셔 값이 변경될 것이기 때문에, 해당 데이터 퍼블리셔 구독하고 있는 ViewModel -> View Controller의 이미지, 이름 등이 자동으로 바뀐다!
         
