@@ -65,6 +65,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     private let editPhotoButton: UIButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "photo.on.rectangle.angled"), for: .normal)
+        button.tintColor = .white
         button.isHidden = true
         button.isUserInteractionEnabled = true
         return button
