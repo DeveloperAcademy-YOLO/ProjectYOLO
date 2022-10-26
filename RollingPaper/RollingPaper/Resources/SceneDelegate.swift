@@ -76,13 +76,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if route == .write {
             guard let splitVC = window?.rootViewController as? SplitViewController else { return }
             NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
-            guard
-                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
-                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
-            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
-                paperVC.setSelectedPaper(paperId: paperId)
-                print("push after: \(paperNavVC.viewControllers)")
-            }
+//            guard
+//                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
+//                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
+//            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
+//                paperVC.setSelectedPaper(paperId: paperId)
+//                print("push after: \(paperNavVC.viewControllers)")
+//            }
         }
     }
 

@@ -23,18 +23,6 @@ class SignUpViewController: UIViewController {
         let textField = SignUpTextField()
         return textField
     }()
-    private let signInButton: UIButton = {
-        let button = UIButton()
-        let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body), NSAttributedString.Key.foregroundColor: UIColor.systemGray])
-        button.setAttributedTitle(title, for: .normal)
-        return button
-    }()
-    private let signInDivider: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray
-        view.layer.masksToBounds = true
-        return view
-    }()
     private let signUpButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .systemGray
@@ -90,7 +78,7 @@ class SignUpViewController: UIViewController {
     
     private func layoutIfModalView() {
         if presentingViewController != nil {
-            let topOffset = (view.frame.height - 380) / 2
+            let topOffset = (view.frame.height - 320) / 2
             emailTextField.snp.updateConstraints({ make in
                 make.top.equalToSuperview().offset(topOffset)
             })
@@ -100,8 +88,8 @@ class SignUpViewController: UIViewController {
     
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, nameTextField, signInButton, signInDivider, signUpButton])
-        let topOffset = (view.frame.height - 380) / 2
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
+        let topOffset = (view.frame.height - 320) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
@@ -120,18 +108,8 @@ class SignUpViewController: UIViewController {
             make.width.equalTo(380)
         })
         nameTextField.setTextFieldType(type: .name)
-        signInButton.snp.makeConstraints({ make in
-            make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
-            make.centerX.equalToSuperview()
-        })
-        signInDivider.snp.makeConstraints({ make in
-            make.top.equalTo(signInButton.snp.bottom).offset(-5.75)
-            make.width.equalTo(signInButton.snp.width)
-            make.height.equalTo(1)
-            make.leading.equalTo(signInButton.snp.leading)
-        })
         signUpButton.snp.makeConstraints({ make in
-            make.top.equalTo(signInButton.snp.bottom).offset(36)
+            make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
             make.height.equalTo(38)
@@ -148,7 +126,7 @@ class SignUpViewController: UIViewController {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
                 case .signUpDidSuccess:
-                    //TODO: mark sign up success
+                    print("SignUpDidSuccess")
                     self?.navigateToSignIn()
                 }
             })
@@ -291,31 +269,20 @@ class SignUpViewController: UIViewController {
                 self?.setTextfieldLayout(textFieldType: .name, isWaringShown: isWaringShown)
             })
             .store(in: &cancellables)
-        signInButton
-            .tapPublisher
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] _ in
-                self?.navigateToSignIn()
-            })
-            .store(in: &cancellables)
         let backgroundGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
         view.addGestureRecognizer(backgroundGesture)
     }
     
     private func navigateToSignIn() {
-        if let modalPresentingVC = presentationController as? SplitViewController {
-            if
-                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
-                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
-                dismiss(animated: true) {
-                    let signInVC = SignInViewController()
-                    let navVC = UINavigationController(rootViewController: signInVC)
-                    navVC.modalPresentationStyle = .pageSheet
-                    modalPresentingVC.present(navVC, animated: true)
-                }
+        if let modalPresentingVC = presentingViewController as? SplitViewController {
+            modalPresentingVC.dismiss(animated: true) {
+                let signInVC = SignInViewController()
+                let navVC = UINavigationController(rootViewController: signInVC)
+                navVC.modalPresentationStyle = .pageSheet
+                modalPresentingVC.present(navVC, animated: true)
             }
         } else {
-            navigationController?.popViewController(animated: true)
+            self.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -362,8 +329,8 @@ extension SignUpViewController {
                 make.top.equalTo(passwordTextField.snp.top).offset(isWaringShown ? passwordTextField.frame.height + 28 : 66)
             })
         case .name:
-            signInButton.snp.updateConstraints({ make in
-                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 74)
+            signUpButton.snp.updateConstraints({ make in
+                make.top.equalTo(nameTextField.snp.top).offset(isWaringShown ? nameTextField.frame.height + 32 : 66)
             })
         }
         view.layoutIfNeeded()

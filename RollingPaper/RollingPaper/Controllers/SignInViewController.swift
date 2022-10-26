@@ -33,6 +33,7 @@ class SignInViewController: UIViewController {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+        textField.clearButtonMode = .always
         return textField
     }()
     private let passwordTextField: UITextField = {
@@ -48,6 +49,7 @@ class SignInViewController: UIViewController {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+        textField.clearButtonMode = .always
         return textField
     }()
     private let signUpButton: UIButton = {
@@ -437,8 +439,8 @@ extension SignInViewController {
             setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
             setTextFieldUI(textFieldFocused: .bothWaring)
         default:
-            setWarningMessage(isShown: true, message: "알 수 없는 오류입니다")
-            setTextFieldUI(textFieldFocused: .bothWaring)
+            setWarningMessage(isShown: false, message: nil)
+            setTextFieldUI(textFieldFocused: .normal)
         }
     }
     

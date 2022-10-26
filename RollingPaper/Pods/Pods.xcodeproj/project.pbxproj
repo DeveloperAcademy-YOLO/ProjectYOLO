@@ -27075,7 +27075,10 @@
 				TargetAttributes = {
 					3B8CAC3956E59F928387D0C6310E3B37 = {
 						DevelopmentTeam = 4JPWGVR2ZN;
+<<<<<<< HEAD
 						ProvisioningStyle = Manual;
+=======
+>>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
 					};
 				};
 			};
@@ -29915,9 +29918,13 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/gRPC-C++";
+<<<<<<< HEAD
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 4JPWGVR2ZN;
+=======
+				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
+>>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
 				IBSC_MODULE = grpcpp;
 				INFOPLIST_FILE = "Target Support Files/gRPC-C++/ResourceBundle-gRPCCertificates-Cpp-gRPC-C++-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -30289,9 +30296,13 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/gRPC-C++";
+<<<<<<< HEAD
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 4JPWGVR2ZN;
+=======
+				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
+>>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
 				IBSC_MODULE = grpcpp;
 				INFOPLIST_FILE = "Target Support Files/gRPC-C++/ResourceBundle-gRPCCertificates-Cpp-gRPC-C++-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
