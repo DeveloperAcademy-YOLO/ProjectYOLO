@@ -34,45 +34,9 @@ class PaperStorageViewModel {
     private var timer: AnyCancellable?
     private var papersFromLocal = [PaperPreviewModel]()
     private var papersFromServer = [PaperPreviewModel]()
-    private var papers: [PaperPreviewModel] {
-        // local과 server에 동일한 페이퍼가 있으면 로컬에서는 빼버림
-        var papersLocalOnly = [PaperPreviewModel]()
-        var isDuplicated: Bool
-        for paperFromLocal in papersFromLocal {
-            isDuplicated = false
-            for paperFromServer in papersFromServer where paperFromLocal.paperId == paperFromServer.paperId {
-                isDuplicated = true
-                break
-            }
-            if !isDuplicated {
-                papersLocalOnly.append(paperFromLocal)
-            }
-        }
-        // 만든 시간 순서대로 정렬
-        var totalPapers = papersLocalOnly + papersFromServer
-        totalPapers.sort(by: {return $0.date < $1.date})
-        
-        return totalPapers
-    }
-    // 현재 시간과 끝나는 시간 비교해서, 진행중인 것인지 종료된것인지에 따라 구별된 페이퍼 리스트
-    var openedPapers: [PaperPreviewModel] {
-        var opened = [PaperPreviewModel]()
-        for paper in papers {
-            if openedPaperIds.contains(paper.paperId) {
-                opened.append(paper)
-            }
-        }
-        return opened
-    }
-    var closedPapers: [PaperPreviewModel] {
-        var closed = [PaperPreviewModel]()
-        for paper in papers {
-            if closedPaperIds.contains(paper.paperId) {
-                closed.append(paper)
-            }
-        }
-        return closed
-    }
+    private var papers = [PaperPreviewModel]()
+    var openedPapers = [PaperPreviewModel]()
+    var closedPapers = [PaperPreviewModel]()
     
     init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
@@ -83,7 +47,7 @@ class PaperStorageViewModel {
     // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-//            .receive(on: DispatchQueue.global(qos: .background))
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
@@ -91,6 +55,7 @@ class PaperStorageViewModel {
                 case .viewDidAppear:
                     self.bindTimer()
                     self.updateCurrentTime()
+                    self.classifyPapers()
                     self.downloadLocalThumbnails(outputValue: .initPapers)
                     self.downloadServerThumbnails(outputValue: .initPapers)
                 // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
@@ -156,21 +121,45 @@ class PaperStorageViewModel {
         self.currentTime = date
     }
     
-    // 페이퍼가 진행중인지, 종료된건지 분류하기
+    // 서버와 로컬에 있는 페이퍼들 합쳐서, 열린 페이퍼와 닫힌 페이퍼로 구분하기
     private func classifyPapers() {
+        // 로컬과 서버에 동일한 페이퍼가 있으면 로컬에서는 빼버림
+        var papersLocalOnly = [PaperPreviewModel]()
+        var isDuplicated: Bool
+        for paperFromLocal in papersFromLocal {
+            isDuplicated = false
+            for paperFromServer in papersFromServer where paperFromLocal.paperId == paperFromServer.paperId {
+                isDuplicated = true
+                break
+            }
+            if !isDuplicated {
+                papersLocalOnly.append(paperFromLocal)
+            }
+        }
+        // 만든 시간 순서대로 정렬
+        papers = papersLocalOnly + papersFromServer
+        papers.sort(by: {return $0.date < $1.date})
+        
+        // 열린 페이퍼와 닫힌 페이퍼 구분
+        var opened = [PaperPreviewModel]()
+        var closed = [PaperPreviewModel]()
         openedPaperIds.removeAll()
         closedPaperIds.removeAll()
-
+        
         for paper in papers {
             let timeInterval = Int(paper.endTime.timeIntervalSince(currentTime))
             if timeInterval > 0 {
                 openedPaperIds.insert(paper.paperId)
+                opened.append(paper)
             } else {
                 closedPaperIds.insert(paper.paperId)
+                closed.append(paper)
             }
         }
+        
+        openedPapers = opened
+        closedPapers = closed
     }
-    
     
     // url을 통해 로컬에 저장되어있는 썸네일 다운받아오기
     private func downloadLocalThumbnails(outputValue: Output) {
@@ -183,7 +172,6 @@ class PaperStorageViewModel {
                     downloadCount += 1
                     // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                     if downloadCount == papersFromLocal.count {
-                        self.classifyPapers()
                         self.output.send(outputValue)
                     }
                 } else {
@@ -206,7 +194,6 @@ class PaperStorageViewModel {
                             downloadCount += 1
                             // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                             if downloadCount == self.papersFromLocal.count {
-                                self.classifyPapers()
                                 self.output.send(outputValue)
                             }
                         })
@@ -217,7 +204,6 @@ class PaperStorageViewModel {
                 downloadCount += 1
                 // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                 if downloadCount == papersFromLocal.count {
-                    self.classifyPapers()
                     self.output.send(outputValue)
                 }
             }
@@ -237,7 +223,6 @@ class PaperStorageViewModel {
                     downloadCount += 1
                     // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                     if downloadCount == papersFromServer.count {
-                        self.classifyPapers()
                         self.output.send(outputValue)
                     }
                 } else {
@@ -260,7 +245,6 @@ class PaperStorageViewModel {
                             downloadCount += 1
                             // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                             if downloadCount == self.papersFromServer.count {
-                                self.classifyPapers()
                                 self.output.send(outputValue)
                             }
                         })
@@ -271,7 +255,6 @@ class PaperStorageViewModel {
                 downloadCount += 1
                 // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                 if downloadCount == papersFromServer.count {
-                    self.classifyPapers()
                     self.output.send(outputValue)
                 }
             }
