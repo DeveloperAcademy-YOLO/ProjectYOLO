@@ -15,7 +15,7 @@ struct PaperModel: Codable {
     let date: Date
     let endTime: Date
     var title: String
-    var linkUrl: String?
+    var linkUrl: URL?
     var templateString: String
     var template: TemplateModel {
         return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template
