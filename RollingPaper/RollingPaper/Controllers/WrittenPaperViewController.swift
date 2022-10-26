@@ -190,6 +190,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     private func moveToPaperStorageView() {
+        print("moveToPaperStorageView")
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,
@@ -218,15 +219,15 @@ class WrittenPaperViewController: UIViewController {
         //signInVC.modalPresentationStyle = UIModalPresentationStyle.formSheet
         //self.present(signInVC, animated: true)
         
-        authManager
-            .signedInSubject
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { receivedValue in
-                if receivedValue == .signInSucceed {
-                    signInVC.dismiss(animated: true)
-                }
-            })
-            .store(in: &cancellables)
+//        authManager
+//            .signedInSubject
+//            .receive(on: DispatchQueue.main)
+//            .sink(receiveValue: { receivedValue in
+//                if receivedValue == .signInSucceed {
+//                    signInVC.dismiss(animated: true)
+//                }
+//            })
+//            .store(in: &cancellables)
     }
     
     func presentShareSheet(_ sender: UIButton) {

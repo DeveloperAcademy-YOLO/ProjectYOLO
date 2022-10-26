@@ -43,6 +43,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         photo.layer.cornerRadius = photo.frame.width / 2
         photo.layer.masksToBounds = true
         photo.contentMode = UIView.ContentMode.scaleAspectFit
+
         return photo
     }()
     
@@ -92,9 +93,8 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .currentUserSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userModel in
-                print("SideBar Called!")
                 if let userModel = userModel {
-                    self?.convertURL(from: userModel.profileUrl)
+//                    self?.convertURL(from: userModel.profileUrl)
                     self?.userName.text = userModel.name
                 } else {
                     self?.userPhoto.image = UIImage(systemName: "person.circle")
@@ -112,7 +112,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         // 다운로드 불가능 -> 네트워크로 다운로드 -> 캐시 매니저에 저장
         FirebaseStorageManager
             .downloadData(urlString: urlString)
-            .receive(on: DispatchQueue.global(qos: .background))
             .sink { completion in
                 switch completion {
                 case .failure(let error):
