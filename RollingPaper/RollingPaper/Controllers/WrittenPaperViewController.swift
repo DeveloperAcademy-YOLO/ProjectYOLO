@@ -107,6 +107,7 @@ class WrittenPaperViewController: UIViewController {
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
             .sink{ [weak self] paperModel in
+                print("viewModel paper Changed!")
                 if let paperModel = paperModel {
                     self?.titleLabel.text = paperModel.title
                     self?.currentPaper = paperModel
@@ -226,9 +227,8 @@ class WrittenPaperViewController: UIViewController {
         } else {
             isLocalDB = false
         }
-//        self.navigationController?.pushViewController(MagnifiedCardViewController(), animated: true)
-        
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB), animated: true) // TODO:
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true) // TODO:
     }
     
     func presentSignUpModal(_ sender: UIButton) {
