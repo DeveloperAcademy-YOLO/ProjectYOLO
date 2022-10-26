@@ -61,7 +61,9 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     self?.currentPaper = paper
                     self?.paperFrom = .fromLocal
-                } else {
+                    self?.currentPaperPublisher.send(paper)
+                }
+                else {
                     print("로컬 비었음")
                 }
             })
@@ -84,6 +86,7 @@ class WrittenPaperViewModel {
         guard let paper = currentPaper else { return }
         switch paperFrom {
         case .fromLocal:
+            print("from local: \(paper.title)")
             localDatabaseManager.updatePaper(paper: paper)
             currentPaperPublisher.send(paper)
         case .fromServer:

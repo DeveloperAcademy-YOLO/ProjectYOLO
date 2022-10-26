@@ -12,15 +12,14 @@ import Photos
 import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    private var backgroundImageName: [String] = ["Rectangle_black", "Rectangle", "Rectangle_red", "Rectangle_pumpkin"]
-    
+    private let backgroundImageName: [String]
     private let viewModel: CardViewModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, backgroundImageName: [String]) {
         self.viewModel = viewModel
+        self.backgroundImageName = backgroundImageName
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -118,7 +117,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[0] == "Rectangle" {
+        if backgroundImageName[0] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -132,7 +131,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[1] == "Rectangle" {
+        if backgroundImageName[1] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -146,7 +145,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[2] == "Rectangle" {
+        if backgroundImageName[2] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -160,7 +159,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[3] == "Rectangle" {
+        if backgroundImageName[3] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -170,10 +169,13 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.backgroundColor = .systemBackground
+        theImageView.backgroundColor = .lightGray
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
+        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+        theImageView.layer.borderWidth = 0.5
         theImageView.contentMode = .scaleAspectFill
+        theImageView.image = UIImage(named: "Rectangle_default")
         return theImageView
     }()
     

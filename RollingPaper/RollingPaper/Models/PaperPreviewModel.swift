@@ -15,7 +15,7 @@ struct PaperPreviewModel: Codable {
     var title: String
     let templateString: String
     var template: TemplateModel {
-        return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template
+        return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.beige.template
     }
     var thumbnailURLString: String?
 }

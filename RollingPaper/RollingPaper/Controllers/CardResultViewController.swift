@@ -89,7 +89,7 @@ final class CardResultViewController: UIViewController {
     lazy var rightButton: UIBarButtonItem = {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customCompleteBtn.setTitle("게시", for: .normal)
-        customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
+        customCompleteBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         customCompleteBtn.setTitleColor(.black, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(createBtnPressed(_:)), for: .touchUpInside)
         

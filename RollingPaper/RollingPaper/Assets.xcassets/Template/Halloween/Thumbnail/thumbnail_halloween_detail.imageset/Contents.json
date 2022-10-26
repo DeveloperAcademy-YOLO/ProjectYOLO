@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "thumbnail_halloween_detail.jpg",
+      "filename" : "HalloweenThumbnail.pdf",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "HalloweenThumbnail 1.pdf",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "HalloweenThumbnail 2.pdf",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -14,9 +14,7 @@ import Combine
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
 
     let toolPicker = PKToolPicker()
-    
-    private var arrStickers: [String] = ["Halloween_Pumpkin", "Halloween_Candy", "Halloween_Bat", "Halloween_Ghost", "Halloween_StickCandy", "Halloween_Pumpkin2", "Halloween_Hat", "Halloween_Blood", "Halloween_Ghost2", "Halloween_StickCandy", "Halloween_Pumpkin", "Halloween_Bat", "Halloween_Pumpkin2", "Halloween_StickCandy", "Halloween_Blood"]
-    
+    private let arrStickers: [String]
     private var backgroundImg = UIImage(named: "Rectangle")
     
     private let viewModel: CardViewModel
@@ -27,11 +25,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, arrStickers: [String]) {
         self.viewModel = viewModel
+        self.arrStickers = arrStickers
         super.init(nibName: nil, bundle: nil)
     }
     
+   
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -116,11 +116,13 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.backgroundColor = .systemBackground
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
-        theImageView.contentMode = .scaleAspectFill
+//        theImageView.translatesAutoresizingMaskIntoConstraints = false
+//        theImageView.backgroundColor = .lightGray
+//        theImageView.layer.borderWidth = 1
+//        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+//        theImageView.layer.masksToBounds = true
+//        theImageView.layer.cornerRadius = 50
+//        theImageView.contentMode = .scaleAspectFill
         theImageView.isUserInteractionEnabled = true
         return theImageView
     }()
@@ -142,11 +144,12 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
-        theImageView.image = backgroundImg
+        theImageView.layer.borderWidth = 0.5
+        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+        theImageView.image = UIImage(named: "Rectangle_default")
         return theImageView
     }()
     

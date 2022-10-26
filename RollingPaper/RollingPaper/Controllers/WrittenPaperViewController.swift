@@ -155,10 +155,11 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func setCustomNavBarButtons() {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("보관함", for: .normal)
-        customBackBtn.setTitleColor(.systemGray, for: .normal)
+        customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        customBackBtn.setTitleColor(.black, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addAction(UIAction(handler: {_ in self.moveToPaperStorageView()}), for: .touchUpInside)
         customBackBtn.addLeftPadding(5)
