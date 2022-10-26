@@ -82,10 +82,18 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
         bind()
-        setupSubviews()
-        let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
-        userInfoStack.addGestureRecognizer(tapUserInfo)
+        // let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
+        // userInfoStack.addGestureRecognizer(tapUserInfo)
         tableView.separatorStyle = .none
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        setupSubviews()
+    }
+    
+    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
+        print("UserInfoTapped!", sender)
     }
     
     private func bind() {
@@ -95,9 +103,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .sink { [weak self] userModel in
                 if let userModel = userModel {
                     self?.userName.text = userModel.name
-                } /*else {
+                } else {
                     self?.userName.text = "Guest"
-                }*/
+                }
             }
             .store(in: &cancellables)
         viewModel
@@ -106,39 +114,13 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             .sink { [weak self] image in
                 if let image = image {
                     self?.userPhoto.image = image
-                } /* else {
-                    self?.userPhoto.image = UIImage(systemName: "rectangle")
-                }*/
+                } else {
+                    self?.userPhoto.image = UIImage(systemName: "person.fill")
+                }
             }
             .store(in: &cancellables)
     }
-    
-    private func convertURL(from urlString: String?) {
-        guard let urlString = urlString else { return}
-        // 먼저 캐시를 체크, 로컬 스토리지 체크, 네트워크 다운로드! -> 다운로드받은 뒤에는 캐시에 일단 저장.
-        // 로컬 스토리지에 URLString -> 프로필 다운로드 가능한지 체크
-        // 다운로드 가능하면 캐시 매니저에 일단 저장, 해당 이미지 사용
-        // 다운로드 불가능 -> 네트워크로 다운로드 -> 캐시 매니저에 저장
-        FirebaseStorageManager
-            .downloadData(urlString: urlString)
-            .sink { completion in
-                switch completion {
-                case .failure(let error):
-                    print(error.localizedDescription)
-                case .finished: break
-                }
-            } receiveValue: { [weak self] data in
-                if
-                    let data = data,
-                    let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.userPhoto.image = image
-                    }
-                }
-            }
-            .store(in: &cancellables)
 
-    }
 
     func show(categories: [CategoryModel]) {
         self.categories = categories
@@ -182,10 +164,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         return Layout.tableCellHeight
     }
     
-    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
-        print("UserInfoTapped!", sender)
-    }
-    
     private func setupSubviews() {
         setupProfileView()
         setupTableView()
@@ -218,15 +196,9 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
         userPhoto.snp.makeConstraints { make in
-            make.height.equalTo(userInfoStack.snp.height).offset(-14)
-            make.width.equalTo(userInfoStack.snp.height).offset(-14)
+            make.height.equalTo(userInfoStack.snp.height).offset(-28)
+            make.width.equalTo(userPhoto.snp.height)
         }
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
-        /*
-        chevron.snp.makeConstraints { make in
-            make.height.equalToSuperview().multipliedBy(0.24)
-        }
-        */
     }
 }
-
