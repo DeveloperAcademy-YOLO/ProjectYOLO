@@ -34,10 +34,7 @@ class WrittenPaperViewModel {
     var isPaperLinkMade: Bool = false
     private var paperLinkForShare: String?
     
-    private var currentUserType: String?
-    
     private var isPaperStopped: Bool?
-    private var isPaperDeleted: Bool?
     
     private var cards: [CardModel] = []
     
@@ -50,7 +47,7 @@ class WrittenPaperViewModel {
         authManager
             .userProfileSubject
             .receive(on: DispatchQueue.global(qos: .background))
-            .sink{ [weak self] userProfile in
+            .sink { [weak self] userProfile in
                 guard let self = self else { return }
                 self.currentUser = userProfile
             }
@@ -61,11 +58,9 @@ class WrittenPaperViewModel {
         self.localDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Local Paper: \(paper)")
                     self?.currentPaper = paper
                     self?.paperFrom = .fromLocal
-                }
-                else {
+                } else {
                     print("로컬 비었음")
                 }
             })
@@ -74,7 +69,6 @@ class WrittenPaperViewModel {
         self.serverDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Server Paper")
                     self?.currentPaper = paper
                     self?.paperFrom = .fromServer
                 } else {
@@ -98,12 +92,6 @@ class WrittenPaperViewModel {
     }
     
     func getRemainingTime(_ paperID: String) {}
-    
-    func callEveryCards() {
-        
-    }
-    
-    func addCard() {} // 이건 요셉 뷰에서 추가해야하는 내용
     
     func deleteCard() {}
     

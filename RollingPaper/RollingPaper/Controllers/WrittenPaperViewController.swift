@@ -14,22 +14,19 @@ class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
-    //    lazy private var changedPaperTitle: String = ""
     
-    
-    
-    let authManager: AuthManager = FirebaseAuthManager.shared
+    private let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
     var currentUser: UserModel?
     var currentPaper: PaperModel?
     var urlToShare: [URL]?
+    private var cancellables = Set<AnyCancellable>()
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
         titleLabel.text = viewModel.currentPaper?.title
-        titleLabel.sizeToFit()
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         return titleLabel
@@ -90,7 +87,26 @@ class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
-    private var cancellables = Set<AnyCancellable>()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        self.splitViewController?.hide(.primary)
+        self.navigationController?.navigationBar.tintColor = .systemGray
+        getCurrentUserAndPaper()
+        navigationItem.titleView = stackView
+        setCustomNavBarButtons()
+        self.cardsList = setCollectionView()
+        view.addSubview(self.cardsList ?? UICollectionView())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.splitViewController?.hide(.primary)
+        cardsList?.reloadData()
+        getCurrentUserAndPaper()
+        viewModel.currentPaper?.creator = currentUser
+        applyPaperLink()
+    }
     
     func getCurrentUserAndPaper() {
         viewModel
@@ -115,33 +131,13 @@ class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        self.splitViewController?.hide(.primary)
-        self.navigationController?.navigationBar.tintColor = .systemGray
-        getCurrentUserAndPaper()
-        navigationItem.titleView = stackView
-        setCustomNavBarButtons()
-        self.cardsList = setCollectionView()
-        view.addSubview(self.cardsList ?? UICollectionView())
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.splitViewController?.hide(.primary)
-        cardsList?.reloadData()
-        getCurrentUserAndPaper()
-        currentPaper?.creator = currentUser
-        applyPaperLink()
-    }
-    
     private func applyPaperLink() {
         guard let paper = viewModel.currentPaper else {return}
         getPaperShareLink(with: paper, route: .write)
             .sink { (completion) in
                 switch completion {
-                case .finished: break
+                // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
+                case .finished: self.viewModel.isPaperLinkMade = true
                 case .failure(let error): print(error)
                 }
             } receiveValue: { [weak self] url in
@@ -211,6 +207,9 @@ class WrittenPaperViewController: UIViewController {
     
     private func moveToPaperStorageView() {
         guard let paper = viewModel.currentPaper else { return }
+//        guard let paper2 = currentPaper else {return}
+        print("PPPaper : \(paper)")
+        print("paper2 : \(currentPaper)")
         viewModel.localDatabaseManager.updatePaper(paper: paper)
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
@@ -226,8 +225,6 @@ class WrittenPaperViewController: UIViewController {
         } else {
             isLocalDB = false
         }
-//        self.navigationController?.pushViewController(MagnifiedCardViewController(), animated: true)
-        
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB), animated: true) // TODO:
     }
     
