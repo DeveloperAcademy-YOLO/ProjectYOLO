@@ -54,7 +54,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     private let profileImage: UIImageView = {
         let profileImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 180, height: 180))
         profileImage.layer.cornerRadius = profileImage.frame.size.width * 0.5
-        profileImage.image = UIImage(named: "Halloween_Pumpkin")
+        profileImage.image = UIImage(named: "person.circle")
         profileImage.contentMode = UIView.ContentMode.scaleAspectFill
         profileImage.backgroundColor = .systemBackground
         profileImage.isUserInteractionEnabled = true
