@@ -63,15 +63,16 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 템플릿":
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-             if currentSecondaryView == "페이퍼 보관함" {
-                 self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-                 setViewController(paperStorageViewController, for: .secondary)
-             } else {
-                 setViewController(paperStorageViewController, for: .secondary)
-             }
+            if currentSecondaryView == "페이퍼 보관함" {
+                self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+                setViewController(paperStorageViewController, for: .secondary)
+            } else {
+                setViewController(paperStorageViewController, for: .secondary)
+            }
         case "보관함 이동 후 카드 뷰":
-            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: true)
-            self.viewControllers[1] = paperStorageViewController
+            self.paperTemplateSelectViewController.popToRootViewController(animated: false)
+            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
+            setViewController(paperStorageViewController, for: .secondary)
         case "설정":
             if
                 let navVC = self.viewControllers[1] as? UINavigationController {
@@ -96,11 +97,14 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         }
         switch object {
         case "페이퍼 템플릿":
-            self.viewControllers[1] = paperTemplateSelectViewController
+            // self.viewControllers[1] = paperTemplateSelectViewController
+            setViewController(paperTemplateSelectViewController, for: .secondary)
         case "페이퍼 보관함":
-            self.viewControllers[1] = paperStorageViewController
+            //self.viewControllers[1] = paperStorageViewController
+            setViewController(paperStorageViewController, for: .secondary)
         case "설정":
-            self.viewControllers[1] = settingScreenViewController
+            //self.viewControllers[1] = settingScreenViewController
+            setViewController(settingScreenViewController, for: .secondary)
         default :
             break
         }
@@ -118,10 +122,11 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-         return true
-     }
+        return true
+    }
     
     func primaryViewController(forExpanding splitViewController: UISplitViewController) -> UIViewController? {
         return self.viewControllers.last
     }
 }
+
