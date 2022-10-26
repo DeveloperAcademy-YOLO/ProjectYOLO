@@ -116,6 +116,7 @@ class WrittenPaperViewModel {
             serverDatabaseManager.removePaper(paperId: paperID)
             serverDatabaseManager.resetPaper()
         }
+        currentPaper = nil
     }
     
     func makePaperLinkToShare(input: URL) {

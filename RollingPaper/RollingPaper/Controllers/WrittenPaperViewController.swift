@@ -224,8 +224,14 @@ class WrittenPaperViewController: UIViewController {
     }
     
     private func moveToPaperStorageView() {
-        guard let paper = viewModel.currentPaper else { return }
-        viewModel.localDatabaseManager.updatePaper(paper: paper)
+        if viewModel.currentPaper != nil {
+            guard let paper = viewModel.currentPaper else { return }
+            if viewModel.isPaperLinkMade {
+                viewModel.serverDatabaseManager.updatePaper(paper: paper)
+            } else {
+                viewModel.localDatabaseManager.updatePaper(paper: paper)
+            }
+        }
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,
