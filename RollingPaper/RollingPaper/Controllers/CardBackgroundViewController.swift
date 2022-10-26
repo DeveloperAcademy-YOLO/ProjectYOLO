@@ -12,15 +12,15 @@ import Photos
 import Combine
 
 final class CardBackgroundViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    private var backgroundImageName: [String] = ["Rectangle_black", "Rectangle", "Rectangle_red", "Rectangle_pumpkin"]
-    
+   
+    private let backgroundImageName: [String]
     private let viewModel: CardViewModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardViewModel) {
+    init(viewModel: CardViewModel, backgroundImageName: [String]) {
         self.viewModel = viewModel
+        self.backgroundImageName = backgroundImageName
         super.init(nibName: nil, bundle: nil)
     }
     

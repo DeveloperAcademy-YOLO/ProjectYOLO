@@ -14,6 +14,7 @@ struct TemplateModel: Codable {
     let templateDescription: String
     let colorHexes: [Int]
     let stickerNames: [String]
+    let backgroundImageNames: [String]
     var colors: [UIColor] {
         return colorHexes.map({ UIColor(rgb: $0) })
     }
