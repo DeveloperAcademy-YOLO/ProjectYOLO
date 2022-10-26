@@ -42,9 +42,6 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
         let resultURL = URL(string: longDynamicLinkString + "&ofl=\(fallbackURLString)" + "&ifl=\(fallbackURLString)" + "&ipfl=\(fallbackURLString)" + "&ipbi=\(bundleID)" + "&efr=1") else {
         return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
     }
-    
-    print("long dynamic link: \(longDynamicLinkString)")
-    print("result dynamic link: \(resultURL.absoluteString)")
     return Future({ promise in
         DynamicLinkComponents.shortenURL(resultURL, options: nil) { url, _, error in
             if let error = error {
@@ -59,17 +56,6 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
     .eraseToAnyPublisher()
 }
 
-
 func getPaperShareLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
     return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: route)
 }
-
-//func getPaperShareLinkWithRestAPI(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
-//    let webAPIKey = "AIzaSyC98JEJnnMNA3mOzM37bIhc2AtvCD8xV6I"
-//    let postURLString = "https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=\(webAPIKey)"
-//    guard let postURL = URL(string: postURLString) else { return Fail(error: URLError(.badURL)).eraseToAnyPublisher() }
-//    var postURLRequest = URLRequest(url: postURL)
-//    postURLRequest.httpMethod = "POST"
-//    postURLRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//
-//}

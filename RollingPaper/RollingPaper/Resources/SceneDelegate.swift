@@ -22,7 +22,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         if let userActivity = connectionOptions.userActivities.first {
             self.scene(scene, continue: userActivity)
+        } else {
+            self.scene(scene, openURLContexts: connectionOptions.urlContexts)
         }
+    }
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let urlToOpen = URLContexts.first?.url else { return }
+        handleURL(url: urlToOpen)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -34,26 +41,48 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         guard let incomingURL = userActivity.webpageURL else { return }
-        DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { [weak self] dynamicLink, error in
-            guard
-                error == nil,
-                let urlString = dynamicLink?.url?.absoluteString,
-                let components = URLComponents(string: urlString),
-                let items = components.queryItems,
-                let paperId = items.first(where: {$0.name == "paperId"})?.value,
-                let routeString = items.first(where: {$0.name == "route"})?.value,
-                let route = PaperShareRoute(rawValue: routeString) else { return }
-            self?.handleDynamicLink(paperId: paperId, route: route)
+        handleURL(url: incomingURL)
+    }
+    
+    private func handleURL(url: URL) {
+        if DynamicLinks.dynamicLinks().shouldHandleDynamicLink(fromCustomSchemeURL: url) {
+            guard let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) else { return }
+            handleDynamicLink(dynamicLink: dynamicLink)
+        } else {
+            DynamicLinks.dynamicLinks().dynamicLink(fromUniversalLink: url, completion: { [weak self] dynamicLink, error in
+                guard
+                    let dynamicLink = dynamicLink,
+                    error == nil else { return }
+                self?.handleDynamicLink(dynamicLink: dynamicLink)
+            })
         }
     }
     
-    private func handleDynamicLink(paperId: String, route: PaperShareRoute) {
+    private func handleDynamicLink(dynamicLink: DynamicLink) {
+        guard
+            let urlString = dynamicLink.url?.absoluteString,
+            let components = URLComponents(string: urlString),
+            let items = components.queryItems,
+            let paperId = items.first(where: {$0.name == "paperId"})?.value,
+            let routeString = items.first(where: {$0.name == "route"})?.value,
+            let route = PaperShareRoute(rawValue: routeString) else {
+            print("handleDynamicLink Fails")
+            return
+        }
+        navigateToFlow(paperId: paperId, route: route)
+    }
+    
+    private func navigateToFlow(paperId: String, route: PaperShareRoute) {
         if route == .write {
-            guard let rootVC = window?.rootViewController as? SplitViewController else { return }
-            let paperView = PaperStorageViewController()
-            let navVC = UINavigationController(rootViewController: paperView)
-            rootVC.viewControllers[1] = navVC
-            paperView.setSelectedPaper(paperId: paperId)
+            guard let splitVC = window?.rootViewController as? SplitViewController else { return }
+            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
+            guard
+                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
+                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
+            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
+                paperVC.setSelectedPaper(paperId: paperId)
+                print("push after: \(paperNavVC.viewControllers)")
+            }
         }
     }
 
