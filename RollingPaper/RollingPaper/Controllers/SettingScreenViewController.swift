@@ -29,6 +29,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         super.viewDidLoad()
         setupLayout()
         bind()
+        checkAlbumPermission()
     }
 
     private let editButton: UIButton = {
@@ -410,6 +411,21 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    private func checkAlbumPermission() {
+        PHPhotoLibrary.requestAuthorization({ status in
+            switch status {
+            case .authorized:
+                print("Album: 권한 허용")
+            case .denied:
+                print("Album: 권한 거부")
+            case .restricted, .notDetermined:
+                print("Album: 선택하지 않음")
+            default:
+                break
+            }
+        })
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
