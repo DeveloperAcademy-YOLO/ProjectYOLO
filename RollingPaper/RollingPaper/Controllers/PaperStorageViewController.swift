@@ -19,7 +19,7 @@ private class Length {
     static let sectionRightMargin: CGFloat = 36
     static let sectionLeftMargin: CGFloat = 36
     
-    static var openedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+openedCellHorizontalSpace+1))/2 // 반응형
+    static var openedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+openedCellHorizontalSpace+2))/2 // 반응형
     static let openedPaperThumbnailHeight: CGFloat = openedPaperThumbnailWidth*0.33
     static let openedPaperTitleBottomMargin: CGFloat = 16
     static let openedPaperTitleRightMargin: CGFloat = 16
@@ -118,7 +118,7 @@ class PaperStorageViewController: UIViewController {
     // 스플릿뷰 열고닫음에 따라 뷰 업데이트하기
     private func updateLayout() {
         let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
-        Length.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin+Length.openedCellHorizontalSpace+1))/2
+        Length.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin+Length.openedCellHorizontalSpace+2))/2
         Length.closedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(Length.sectionLeftMargin+Length.sectionRightMargin))
         paperCollectionView?.reloadData()
     }
