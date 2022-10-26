@@ -103,9 +103,9 @@ class WrittenPaperViewController: UIViewController {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
-        //        setCurrentUserAndPaper()
+        resetCurrentPaper()
         //        viewModel.currentPaper?.creator = currentUser
-        applyPaperLink()
+//        applyPaperLink()
     }
     
     private func titleLabelConstraints() {
@@ -145,25 +145,13 @@ class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    func setCurrentUserAndPaper() {
-        viewModel
-            .currentUserSubject
-            .receive(on: DispatchQueue.main)
-            .sink{ [weak self] userProfile in
-                if let userProfile = userProfile {
-                    //                    self?.currentUser = userProfile
-                }
-            }
-            .store(in: &cancellables)
-        
+    func resetCurrentPaper() {
         viewModel
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
             .sink{ [weak self] paperModel in
                 if let paperModel = paperModel {
                     self?.titleLabel.text = paperModel.title
-                    //                    self?.currentPaper = paperModel
-                    //                    print("alskndalksnd : \(paperModel)")
                 }
             }
             .store(in: &cancellables)
@@ -205,10 +193,8 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtn.addAction(UIAction(handler: {_ in
             if self.viewModel.currentUser != nil {
                 self.presentShareSheet(paperLinkBtn)
-                print(self.viewModel.currentUser)
             } else {
                 self.presentSignUpModal(paperLinkBtn)
-                print(self.viewModel.currentUser)
             }
         }), for: .touchUpInside)
         
@@ -295,10 +281,12 @@ class WrittenPaperViewController: UIViewController {
                 
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
-                    print(self.viewModel.isPaperLinkMade)
+                    print("wwwwopqkwdqwww : \(self.viewModel.isPaperLinkMade)")
                 } else {
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
+                    print("wwwwopqkwdqwww : \(self.viewModel.isPaperLinkMade)")
                 }
+                
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
