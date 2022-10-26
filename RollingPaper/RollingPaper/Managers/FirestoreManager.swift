@@ -136,7 +136,7 @@ final class FirestoreManager: DatabaseManager {
     }
     
     
-    /// (1). 파이어베이스 내 데이터 업데이트 (2). 프리뷰가 변경되었을 때를 대비, 프리뷰 데이터 업데이트
+    /// (1). 파이어베이스 내 데이터 업데이트 (2). 프리뷰가 변경되었을 때를 대비, 프리뷰 데이터 업데이트, (3) 제목 업데이트
     func updatePaper(paper: PaperModel) {
         guard let paperDict = getPaperDict(with: paper) else { return }
         let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)

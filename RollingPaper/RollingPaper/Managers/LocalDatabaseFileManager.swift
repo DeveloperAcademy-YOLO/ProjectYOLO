@@ -115,6 +115,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
     func addCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
+        paperSubject.send(currentPaper)
     }
     
     /// 페이퍼 데이터 삭제, 페이퍼 프리뷰 데이터 삭제, 페이퍼 프리뷰를 현재 로컬 데이터 퍼블리셔에서 삭제한 데이터 반영
@@ -142,7 +143,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
         paperSubject.send(currentPaper)
     }
     
-    /// 페이퍼 디렉토리에 페이퍼 덮어씌우기, 페이퍼 프리뷰 데이터 업데이트, 로컬 데이터 퍼블리셔 내 데이터 업데이트한 결과 반영
+    /// 페이퍼 디렉토리에 페이퍼 덮어씌우기, 페이퍼 프리뷰 데이터 업데이트, 로컬 데이터 퍼블리셔 내 데이터 업데이트한 결과 반영, 제목 변경 반영
     func updatePaper(paper: PaperModel) {
         guard
             let fileDir = getFilePath(paper: paper),
@@ -153,6 +154,13 @@ final class LocalDatabaseFileManager: DatabaseManager {
             try paperData.write(to: fileDir, options: .atomic)
             if let index = currentPapers.firstIndex(where: {$0.paperId == paper.paperId }) {
                 var currentPaper = currentPapers[index]
+                if currentPaper.title != paper.title {
+                    currentPaper.title = paper.title
+                    currentPapers[index] = currentPaper
+                    let paperPreviewData = try JSONEncoder().encode(currentPaper)
+                    try paperPreviewData.write(to: previewFileDir, options: .atomic)
+                    papersSubject.send(currentPapers)
+                }
                 if currentPaper.thumbnailURLString != paper.thumbnailURLString {
                     currentPaper.thumbnailURLString = paper.thumbnailURLString
                     currentPapers[index] = currentPaper

@@ -12,7 +12,7 @@ struct PaperPreviewModel: Codable {
     var creator: UserModel?
     let date: Date
     let endTime: Date
-    let title: String
+    var title: String
     let templateString: String
     var template: TemplateModel {
         return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.white.template

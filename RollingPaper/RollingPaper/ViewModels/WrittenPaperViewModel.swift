@@ -63,9 +63,7 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Local Paper: \(paper)")
                     self?.currentPaper = paper
-                    self?.currentPaper?.creator = self?.currentUser
-                    self?.currentPaperPublisher.send(self?.currentPaper)
-                    self?.paperFrom = DataSource.fromLocal
+                    self?.paperFrom = .fromLocal
                 }
                 else {
                     print("로컬 비었음")
@@ -78,7 +76,7 @@ class WrittenPaperViewModel {
                 if let paper = paper {
                     print("Server Paper")
                     self?.currentPaper = paper
-                    self?.paperFrom = DataSource.fromServer
+                    self?.paperFrom = .fromServer
                 } else {
                     print("서버 비었음")
                 }
@@ -88,13 +86,15 @@ class WrittenPaperViewModel {
     
     func changePaperTitle(input: String, from paperFrom: DataSource) {
         currentPaper?.title = input
-//        switch paperFrom {
-//        case .fromLocal:
-//            localDatabaseManager.updatePaper(paper: self.currentPaper ?? <#default value#>)
-//        case .fromServer:
-//            serverDatabaseManager.updatePaper(paper: self?.currentPaper)
-        //TODO: 페이퍼 업뎃 때 페이퍼 아이디 받기 논의
-//        }
+        guard let paper = currentPaper else { return }
+        switch paperFrom {
+        case .fromLocal:
+            localDatabaseManager.updatePaper(paper: paper)
+            currentPaperPublisher.send(paper)
+        case .fromServer:
+            serverDatabaseManager.updatePaper(paper: paper)
+            currentPaperPublisher.send(paper)
+        }
     }
     
     func getRemainingTime(_ paperID: String) {}
@@ -122,8 +122,10 @@ class WrittenPaperViewModel {
         switch paperFrom {
         case .fromLocal:
             localDatabaseManager.removePaper(paperId: paperID)
+            localDatabaseManager.resetPaper()
         case .fromServer:
             serverDatabaseManager.removePaper(paperId: paperID)
+            serverDatabaseManager.resetPaper()
         }
     }
     

@@ -13,13 +13,15 @@ final class CardResultViewController: UIViewController {
     
     private var backgroundImg = UIImage(named: "Rectangle")
     let image: UIImage
+    private let paperID: String
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
+    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel, isLocalDB: Bool) {
         self.image = resultImage
+        self.paperID = paperID
         self.viewModel = viewModel
         self.isLocalDB = isLocalDB
         super.init(nibName: nil, bundle: nil)
@@ -112,8 +114,8 @@ final class CardResultViewController: UIViewController {
     
     func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(920)
-            make.height.equalTo(650)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
             make.top.equalTo(self.view.snp.top).offset(120)
@@ -130,7 +132,8 @@ final class CardResultViewController: UIViewController {
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
         print("게시하기 pressed")
         print(isLocalDB)
-        self.input.send(.resultSend(isLocalDB: isLocalDB))
+        print(paperID)
+        self.input.send(.resultSend(paperID: paperID, isLocalDB: isLocalDB))
      
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
         self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)

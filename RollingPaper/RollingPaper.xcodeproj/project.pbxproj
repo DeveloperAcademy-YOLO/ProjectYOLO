@@ -25,6 +25,7 @@
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
+		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5853B29001AFF00454C75 /* UIImage+Extension.swift */; };
@@ -102,6 +103,7 @@
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
+		C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagnifiedCardViewController.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C5AB30B928ED655200C2E016 /* RollingPaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RollingPaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
 				1573562E28FFA79B00EA565B /* SettingScreenViewController.swift */,
 				AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */,
+				C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -544,6 +547,7 @@
 				CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */,
 				D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */,
 				CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */,
+				C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */,
 				D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */,
 				D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */,
 				D2B6308228EE871C008365CB /* Combine+Extensions.swift in Sources */,
