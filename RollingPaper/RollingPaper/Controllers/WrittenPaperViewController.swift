@@ -175,15 +175,19 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtn.addAction(UIAction(handler: {_ in
             if self.viewModel.isSameCurrentUserAndCreator {
                 self.makeCurrentPaperLink()
-                self.viewModel
-                    .currentPaperPublisher
-                    .receive(on: DispatchQueue.main)
-                    .sink{ [weak self] paperModel in
-                        if paperModel?.linkUrl != nil {
-                            self?.presentShareSheet(paperLinkBtn)
-                        }
-                    }
-                    .store(in: &self.cancellables)
+                if self.viewModel.currentPaper?.linkUrl == nil {
+                    self.viewModel
+                        .currentPaperPublisher
+                        .receive(on: DispatchQueue.main)
+                        .sink{ [weak self] paperModel in
+                            if self?.viewModel.isTitleChanged == false {
+                                self?.presentShareSheet(paperLinkBtn)
+                            }}
+                        .store(in: &self.cancellables)
+                } else {
+                    if self.viewModel.isTitleChanged == false {
+                        self.presentShareSheet(paperLinkBtn)
+                    }}
             } else {
                 self.presentSignUpModal(paperLinkBtn)
             }
