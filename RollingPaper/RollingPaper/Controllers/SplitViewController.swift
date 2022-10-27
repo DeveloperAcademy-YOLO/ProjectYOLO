@@ -25,6 +25,12 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         CategoryModel(name: "설정", icon: "gearshape")
     ]
     
+    enum SecondaryViews {
+        case paperTemplate
+        case paperStorage
+        case setting
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(
@@ -60,22 +66,20 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
     }
+    
     @objc func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
         case "페이퍼 템플릿":
             self.viewControllers[1] = paperTemplateSelectViewController
         case "페이퍼 보관함":
-            if let currentNavVC = viewControllers[1] as? UINavigationController {
-                print(currentNavVC.viewControllers)
-                print("currentSecondaryView: \(currentSecondaryView)")
+            if currentSecondaryView == "페이퍼 템플릿" {
+                self.paperTemplateSelectViewController.popToRootViewController(animated: false)
+                self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
+                setViewController(paperStorageViewController, for: .secondary)
+            } else {
+                self.paperStorageViewController.popToRootViewController(animated: false)
             }
-            self.paperStorageViewController.popToRootViewController(animated: false)
-            setViewController(paperStorageViewController, for: .secondary)
-        case "보관함 이동 후 카드 뷰":
-            self.paperTemplateSelectViewController.popToRootViewController(animated: false)
-            self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
-            setViewController(paperStorageViewController, for: .secondary)
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
@@ -85,7 +89,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         default :
             break
         }
-        self.currentSecondaryView = (object == "보관함 이동 후 카드 뷰" ? "페이퍼 보관함" : object)
+        self.currentSecondaryView = object
     }
     
     @objc func changeSecondaryViewFromSidebar(noitificaiton: Notification) {
