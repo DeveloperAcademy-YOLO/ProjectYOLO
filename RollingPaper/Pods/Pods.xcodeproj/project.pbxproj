@@ -27074,11 +27074,7 @@
 				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					3B8CAC3956E59F928387D0C6310E3B37 = {
-						DevelopmentTeam = 4JPWGVR2ZN;
-<<<<<<< HEAD
-						ProvisioningStyle = Manual;
-=======
->>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
+						DevelopmentTeam = 956H2C4NC8;
 					};
 				};
 			};
@@ -29916,20 +29912,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6FFE8F9FB742FA981620DAF6322AE869 /* gRPC-C++.debug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_STYLE = Manual;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/gRPC-C++";
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = 4JPWGVR2ZN;
-=======
-				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
->>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
+				DEVELOPMENT_TEAM = 956H2C4NC8;
 				IBSC_MODULE = grpcpp;
 				INFOPLIST_FILE = "Target Support Files/gRPC-C++/ResourceBundle-gRPCCertificates-Cpp-gRPC-C++-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_NAME = "gRPCCertificates-Cpp";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -30294,20 +30282,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 42C946A121713AFC5F42AD42C01F92EB /* gRPC-C++.release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_STYLE = Manual;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/gRPC-C++";
-<<<<<<< HEAD
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = 4JPWGVR2ZN;
-=======
-				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
->>>>>>> 1d24ab56496e2977c37a066f37e2ec9f5740a80b
+				DEVELOPMENT_TEAM = 956H2C4NC8;
 				IBSC_MODULE = grpcpp;
 				INFOPLIST_FILE = "Target Support Files/gRPC-C++/ResourceBundle-gRPCCertificates-Cpp-gRPC-C++-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_NAME = "gRPCCertificates-Cpp";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
