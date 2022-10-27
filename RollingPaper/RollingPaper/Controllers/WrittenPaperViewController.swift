@@ -17,8 +17,9 @@ class WrittenPaperViewController: UIViewController {
     
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
-    //    var urlToShare: [URL]?
     private var cancellables = Set<AnyCancellable>()
+    
+    private var paperLinkBtnIsPressed:Bool = false
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
@@ -175,19 +176,16 @@ class WrittenPaperViewController: UIViewController {
         paperLinkBtn.addAction(UIAction(handler: {_ in
             if self.viewModel.isSameCurrentUserAndCreator {
                 self.makeCurrentPaperLink()
-                if self.viewModel.currentPaper?.linkUrl == nil {
-                    self.viewModel
-                        .currentPaperPublisher
-                        .receive(on: DispatchQueue.main)
-                        .sink{ [weak self] paperModel in
-                            if self?.viewModel.isTitleChanged == false {
-                                self?.presentShareSheet(paperLinkBtn)
-                            }}
-                        .store(in: &self.cancellables)
-                } else {
-                    if self.viewModel.isTitleChanged == false {
-                        self.presentShareSheet(paperLinkBtn)
-                    }}
+                self.paperLinkBtnIsPressed = true
+                self.viewModel
+                    .currentPaperPublisher
+                    .receive(on: DispatchQueue.main)
+                    .sink{ [weak self] paperModel in
+                        if self?.paperLinkBtnIsPressed == true {
+                            self?.presentShareSheet(paperLinkBtn)}
+                    }
+                    .store(in: &self.cancellables)
+                
             } else {
                 self.presentSignUpModal(paperLinkBtn)
             }
@@ -270,6 +268,7 @@ class WrittenPaperViewController: UIViewController {
         let popover = activityViewController.popoverPresentationController
         popover?.sourceView = sender
         self.present(activityViewController, animated: true)
+        self.paperLinkBtnIsPressed = false
     }
     
     func setPopOverView(_ sender: UIButton) {
