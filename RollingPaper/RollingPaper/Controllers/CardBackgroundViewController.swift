@@ -172,7 +172,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
         theImageView.backgroundColor = .lightGray
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
-        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
+        theImageView.layer.borderColor = UIColor.systemGray.cgColor
         theImageView.layer.borderWidth = 0.5
         theImageView.contentMode = .scaleAspectFill
         theImageView.image = UIImage(named: "Rectangle_default")
