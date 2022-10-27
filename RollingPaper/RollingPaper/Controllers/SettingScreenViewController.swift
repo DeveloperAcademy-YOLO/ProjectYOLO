@@ -134,13 +134,13 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     
     @objc func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
             print("cancelBtnPressed")
-            let alert = UIAlertController(title: "로그 아웃", message: "로그 아웃 하시겠습니까?", preferredStyle: .alert)
+            let alert = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
         
             alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction!) in
                 alert.dismiss(animated: true, completion: nil)
                }))
             
-            alert.addAction(UIAlertAction(title: "로그 아웃", style: .destructive, handler: { (_: UIAlertAction!) in
+            alert.addAction(UIAlertAction(title: "로그아웃", style: .destructive, handler: { (_: UIAlertAction!) in
                 self.input.send(.signOutDidTap)
                }))
             present(alert, animated: true)
