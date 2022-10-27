@@ -24,13 +24,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         CategoryModel(name: "페이퍼 보관함", icon: "folder"),
         CategoryModel(name: "설정", icon: "gearshape")
     ]
-    
-    enum SecondaryViews {
-        case paperTemplate
-        case paperStorage
-        case setting
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(
@@ -99,19 +93,14 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         }
         switch object {
         case "페이퍼 템플릿":
-            // self.viewControllers[1] = paperTemplateSelectViewController
             setViewController(paperTemplateSelectViewController, for: .secondary)
         case "페이퍼 보관함":
-            //self.viewControllers[1] = paperStorageViewController
             setViewController(paperStorageViewController, for: .secondary)
         case "설정":
-            //self.viewControllers[1] = settingScreenViewController
             setViewController(settingScreenViewController, for: .secondary)
         default :
             break
         }
-        print("currentSecondaryView: \(self.currentSecondaryView)")
-        print("object: \(object)")
         self.currentSecondaryView = object
     }
     
@@ -131,4 +120,3 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         return self.viewControllers.last
     }
 }
-

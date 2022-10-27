@@ -200,5 +200,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             make.width.equalTo(userPhoto.snp.height)
         }
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
+        userPhoto.contentMode = .scaleAspectFill
     }
 }
