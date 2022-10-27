@@ -29,7 +29,7 @@ final class CardBackgroundViewController: UIViewController, UIImagePickerControl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .systemGray6
         
         view.addSubview(someImageView)
         someImageViewConstraints()

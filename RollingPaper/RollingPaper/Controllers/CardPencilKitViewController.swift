@@ -59,7 +59,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .systemGray6
        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
