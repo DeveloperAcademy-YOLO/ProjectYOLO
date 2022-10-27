@@ -21,6 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         window.overrideUserInterfaceStyle = .light
         self.window = window
+        print("Scene Delegate Come")
         if let userActivity = connectionOptions.userActivities.first {
             self.scene(scene, continue: userActivity)
         } else {
@@ -42,7 +43,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         guard let incomingURL = userActivity.webpageURL else { return }
-        handleURL(url: incomingURL)
+//        handleURL(url: incomingURL)
+        print("background terminated!")
+        DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { [weak self] dynamicLink, error in
+            guard
+                let dynamicLink = dynamicLink,
+                error == nil else { return }
+            self?.handleDynamicLink(dynamicLink: dynamicLink)
+        }
     }
     
     private func handleURL(url: URL) {
@@ -75,15 +83,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func navigateToFlow(paperId: String, route: PaperShareRoute) {
         if route == .write {
-            guard let splitVC = window?.rootViewController as? SplitViewController else { return }
-            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
-//            guard
-//                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
-//                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
-//            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
-//                paperVC.setSelectedPaper(paperId: paperId)
-//                print("push after: \(paperNavVC.viewControllers)")
-//            }
+            guard
+                let splitVC = window?.rootViewController as? SplitViewController,
+                let currentNavVC = splitVC.viewControllers[1] as? UINavigationController else { return }
+            currentNavVC.popToRootViewController(false) {
+                if !(currentNavVC.viewControllers.last is PaperStorageViewController) {
+                    NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
+                }
+            }
+            
+            guard
+                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
+                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
+            paperVC.setSelectedPaper(paperId: paperId)
+            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
+                paperVC.setSelectedPaper(paperId: paperId)
+                print("push after: \(paperNavVC.viewControllers)")
+            }
+//            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
         }
     }
 
