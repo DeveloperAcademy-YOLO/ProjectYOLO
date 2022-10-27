@@ -102,7 +102,6 @@ class WrittenPaperViewController: UIViewController {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
-        resetCurrentPaper()
     }
     
     private func titleLabelConstraints() {
@@ -180,7 +179,7 @@ class WrittenPaperViewController: UIViewController {
                     .currentPaperPublisher
                     .receive(on: DispatchQueue.main)
                     .sink{ [weak self] paperModel in
-                        if paperModel != nil {
+                        if paperModel?.linkUrl != nil {
                             self?.presentShareSheet(paperLinkBtn)
                         }
                     }
@@ -257,11 +256,11 @@ class WrittenPaperViewController: UIViewController {
     func presentShareSheet(_ sender: UIButton) {
         let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
         //TODO : 카톡으로 공유하기
+        guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
         let applicationActivities: [UIActivity]? = nil
         let activityViewController = UIActivityViewController(
-            activityItems: [self.viewModel.currentPaperPublisher.value?.linkUrl],
+            activityItems: [link] ,
             applicationActivities: applicationActivities)
-        
         activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
         
         let popover = activityViewController.popoverPresentationController
@@ -286,8 +285,10 @@ class WrittenPaperViewController: UIViewController {
                 
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
+                    self.resetCurrentPaper()
                 } else {
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
+                    self.resetCurrentPaper()
                 }
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -466,3 +467,4 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }
+
