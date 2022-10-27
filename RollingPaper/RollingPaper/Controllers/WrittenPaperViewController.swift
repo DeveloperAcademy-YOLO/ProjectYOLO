@@ -14,22 +14,17 @@ class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private var cardsList: UICollectionView?
     lazy private var titleEmbedingTextField: UITextField = UITextField()
-    //    lazy private var changedPaperTitle: String = ""
     
-    
-    
-    let authManager: AuthManager = FirebaseAuthManager.shared
+    private let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
-    var currentUser: UserModel?
-    var currentPaper: PaperModel?
-    var urlToShare: [URL]?
+    //    var urlToShare: [URL]?
+    private var cancellables = Set<AnyCancellable>()
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
         titleLabel.text = viewModel.currentPaper?.title
-        titleLabel.sizeToFit()
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         return titleLabel
@@ -43,7 +38,6 @@ class WrittenPaperViewController: UIViewController {
         
         //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
         timeLabel.textAlignment = .center
-        
         let imageAttachment = NSTextAttachment()
         imageAttachment.image = UIImage(systemName: "timer")?.withTintColor(.white)
         imageAttachment.bounds = CGRect(x: 0, y: -5, width: 20, height: 20)
@@ -90,41 +84,17 @@ class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
-    private var cancellables = Set<AnyCancellable>()
-    
-    func getCurrentUserAndPaper() {
-        viewModel
-            .currentUserSubject
-            .receive(on: DispatchQueue.main)
-            .sink{ [weak self] userProfile in
-                if let userProfile = userProfile {
-                    self?.currentUser = userProfile
-                }
-            }
-            .store(in: &cancellables)
-        
-        viewModel
-            .currentPaperPublisher
-            .receive(on: DispatchQueue.main)
-            .sink{ [weak self] paperModel in
-                print("viewModel paper Changed!")
-                if let paperModel = paperModel {
-                    self?.titleLabel.text = paperModel.title
-                    self?.currentPaper = paperModel
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         self.splitViewController?.hide(.primary)
         self.navigationController?.navigationBar.tintColor = .systemGray
-        getCurrentUserAndPaper()
         navigationItem.titleView = stackView
-        setCustomNavBarButtons()
         self.cardsList = setCollectionView()
+        bind()
+        setCustomNavBarButtons()
+        print("페이퍼 뷰컨에서 보이는 페이퍼 : \(viewModel.currentPaper)")
+        print("페이퍼 뷰컨에서 보이는 currentUser : \(viewModel.currentUser)")
         view.addSubview(self.cardsList ?? UICollectionView())
     }
     
@@ -132,23 +102,7 @@ class WrittenPaperViewController: UIViewController {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
         cardsList?.reloadData()
-        getCurrentUserAndPaper()
-        currentPaper?.creator = currentUser
-        applyPaperLink()
-    }
-    
-    private func applyPaperLink() {
-        guard let paper = viewModel.currentPaper else {return}
-        getPaperShareLink(with: paper, route: .write)
-            .sink { (completion) in
-                switch completion {
-                case .finished: break
-                case .failure(let error): print(error)
-                }
-            } receiveValue: { [weak self] url in
-                self?.urlToShare = [url] // 실제 페이퍼나 앱의 링크가 들어가는 곳
-            }
-            .store(in: &cancellables)
+        resetCurrentPaper()
     }
     
     private func titleLabelConstraints() {
@@ -163,6 +117,41 @@ class WrittenPaperViewController: UIViewController {
             make.width.equalTo(120)
             make.height.equalTo(36)
         })
+    }
+    
+    private func bind() {
+        FirebaseAuthManager.shared
+            .userProfileSubject
+            .sink { [weak self] userModel in
+                if
+                    let userModel = userModel,
+                    var currentPaper = self?.viewModel.currentPaper {
+                    self?.viewModel.setCurrentUser()
+                    if currentPaper.creator == nil {
+                        currentPaper.creator = userModel
+                        self?.viewModel.localDatabaseManager.updatePaper(paper: currentPaper)
+                        self?.viewModel.localDatabaseManager.fetchPaper(paperId: currentPaper.paperId)
+                        // 게스트가 생성 후 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
+                    } else {
+                        self?.viewModel.localDatabaseManager.fetchPaper(paperId: currentPaper.paperId)
+                        // creator 있던 페이퍼에 만든 사람이 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
+                    }
+                    self?.setCustomNavBarButtons()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    func resetCurrentPaper() {
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink{ [weak self] paperModel in
+                if let paperModel = paperModel {
+                    self?.titleLabel.text = paperModel.title
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func setCustomNavBarButtons() {
@@ -185,12 +174,19 @@ class WrittenPaperViewController: UIViewController {
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
         paperLinkBtn.addAction(UIAction(handler: {_ in
-            if self.viewModel.currentUser != nil {
-                self.presentShareSheet(paperLinkBtn)
-                print(self.viewModel.currentUser)
+            if self.viewModel.isSameCurrentUserAndCreator {
+                self.makeCurrentPaperLink()
+                self.viewModel
+                    .currentPaperPublisher
+                    .receive(on: DispatchQueue.main)
+                    .sink{ [weak self] paperModel in
+                        if paperModel != nil {
+                            self?.presentShareSheet(paperLinkBtn)
+                        }
+                    }
+                    .store(in: &self.cancellables)
             } else {
                 self.presentSignUpModal(paperLinkBtn)
-                print(self.viewModel.currentUser)
             }
         }), for: .touchUpInside)
         
@@ -207,13 +203,36 @@ class WrittenPaperViewController: UIViewController {
         let signInSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton, secondBarButton]
         let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
         
-        navigationItem.rightBarButtonItems = currentUser?.email == currentPaper?.creator?.email ? signInSetting : signOutSetting
+        navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
         navigationItem.leftBarButtonItem = firstBarButton
     }
     
+    private func makeCurrentPaperLink() {
+        guard let paper = viewModel.currentPaper else {return}
+        getPaperShareLink(with: paper, route: .write)
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink{ (completion) in
+                switch completion {
+                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
+                case .finished: break
+                case .failure(let error): print(error)
+                }
+            } receiveValue: { [weak self] url in
+                self?.viewModel.makePaperLinkToShare(input: url)
+            }
+            .store(in: &cancellables)
+    }
+    
     private func moveToPaperStorageView() {
-        guard let paper = viewModel.currentPaper else { return }
-        viewModel.localDatabaseManager.updatePaper(paper: paper)
+        if viewModel.currentPaper != nil {
+            guard let paper = viewModel.currentPaper else { return }
+            if viewModel.isPaperLinkMade {
+                viewModel.serverDatabaseManager.updatePaper(paper: paper)
+            } else {
+                viewModel.localDatabaseManager.updatePaper(paper: paper)
+            }
+        }
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,
@@ -222,41 +241,25 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        var isLocalDB: Bool
-        if viewModel.paperFrom == .fromLocal {
-            isLocalDB = true
-        } else {
-            isLocalDB = false
-        }
+        var isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
+        
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true) // TODO:
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
     
     func presentSignUpModal(_ sender: UIButton) {
         let signInVC = SignInViewController()
-        
         let navVC = UINavigationController(rootViewController: signInVC)
         navVC.modalPresentationStyle = .formSheet //모달에 x버튼 넣기 위함
         present(navVC, animated: true)
-        
-        authManager
-            .signedInSubject
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { receivedValue in
-                if receivedValue == .signInSucceed {
-                    navVC.dismiss(animated: true)
-                }
-            })
-            .store(in: &cancellables)
     }
     
     func presentShareSheet(_ sender: UIButton) {
-        viewModel.isPaperLinkMade = true
         let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
         //TODO : 카톡으로 공유하기
         let applicationActivities: [UIActivity]? = nil
         let activityViewController = UIActivityViewController(
-            activityItems: self.urlToShare ?? [],
+            activityItems: [self.viewModel.currentPaperPublisher.value?.linkUrl],
             applicationActivities: applicationActivities)
         
         activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
@@ -277,14 +280,12 @@ class WrittenPaperViewController: UIViewController {
         
         allertController.addAction(UIAlertAction(title: "수정", style: .default,
                                                  handler: {_ in
-            print("수정")
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
             let edit = UIAlertAction(title: "수정", style: .default) { _ in
                 guard let changedPaperTitle = self.titleEmbedingTextField.text else { return }
                 
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
-                    print(self.viewModel.isPaperLinkMade)
                 } else {
                     self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
                 }
@@ -301,7 +302,6 @@ class WrittenPaperViewController: UIViewController {
         }))
         allertController.addAction(UIAlertAction(title: "마감", style: .default,
                                                  handler: {_ in
-            print("마감")
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { (stop) in  }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -313,7 +313,6 @@ class WrittenPaperViewController: UIViewController {
         
         allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
                                                  handler: {_ in
-            print("삭제")
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
             let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
                 self.deletePaper()
@@ -429,12 +428,11 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 }
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("User tapped on item \(indexPath.row)")
         guard let currentPaper = viewModel.currentPaper else { return  }
         let card = currentPaper.cards[indexPath.row]
         let presentingVC = MagnifiedCardViewController()
         presentingVC.cardContentURLString = card.contentURLString
-
+        
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             presentingVC.magnifiedCardImage.image = image
             presentingVC.modalPresentationStyle = .overCurrentContext

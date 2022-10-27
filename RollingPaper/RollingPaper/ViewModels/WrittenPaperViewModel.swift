@@ -32,12 +32,10 @@ class WrittenPaperViewModel {
     private var timeRemaing: Date?
     
     var isPaperLinkMade: Bool = false
+    var isSameCurrentUserAndCreator: Bool = false
     private var paperLinkForShare: String?
     
-    private var currentUserType: String?
-    
     private var isPaperStopped: Bool?
-    private var isPaperDeleted: Bool?
     
     private var cards: [CardModel] = []
     
@@ -50,7 +48,7 @@ class WrittenPaperViewModel {
         authManager
             .userProfileSubject
             .receive(on: DispatchQueue.global(qos: .background))
-            .sink{ [weak self] userProfile in
+            .sink { [weak self] userProfile in
                 guard let self = self else { return }
                 self.currentUser = userProfile
             }
@@ -61,7 +59,6 @@ class WrittenPaperViewModel {
         self.localDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Local Paper: \(paper)")
                     self?.currentPaper = paper
                     self?.paperFrom = .fromLocal
                     self?.currentPaperPublisher.send(paper)
@@ -75,7 +72,6 @@ class WrittenPaperViewModel {
         self.serverDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    print("Server Paper")
                     self?.currentPaper = paper
                     self?.paperFrom = .fromServer
                 } else {
@@ -101,12 +97,6 @@ class WrittenPaperViewModel {
     
     func getRemainingTime(_ paperID: String) {}
     
-    func callEveryCards() {
-        
-    }
-    
-    func addCard() {} // 이건 요셉 뷰에서 추가해야하는 내용
-    
     func deleteCard() {}
     
     func showCardDetail() {}
@@ -129,8 +119,16 @@ class WrittenPaperViewModel {
             serverDatabaseManager.removePaper(paperId: paperID)
             serverDatabaseManager.resetPaper()
         }
+        currentPaper = nil
     }
     
-    func makePaperLinkForShare() {}
-    
+    func makePaperLinkToShare(input: URL) {
+        currentPaper?.linkUrl = input
+        isPaperLinkMade = true
+        guard let paper = currentPaper else { return }
+        localDatabaseManager.updatePaper(paper: paper)
+        serverDatabaseManager.updatePaper(paper: paper)
+        //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
+        currentPaperPublisher.send(paper)
+    }
 }

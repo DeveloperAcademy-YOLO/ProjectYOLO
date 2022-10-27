@@ -20,6 +20,8 @@ class PaperSettingViewModel {
     init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
         self.template = template
+        //처음에 로그인 한 상태로 생성하기 버튼을 눌렀을 떄 페이퍼의 creator를 넣어주기 위함
+        setCurrentPaperCreator()
     }
     
     enum Input {
@@ -52,7 +54,6 @@ class PaperSettingViewModel {
     
     // 페이퍼 만들기
     private func createPaper() {
-        setCurrentPaperCreator()
         let currentTime = Date()
         guard let endTime = Calendar.current.date(byAdding: .hour, value: paperDurationHour, to: currentTime) else {
             return

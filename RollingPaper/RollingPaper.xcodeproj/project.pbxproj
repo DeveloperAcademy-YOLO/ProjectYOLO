@@ -771,6 +771,7 @@
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "네모네모";
 				INFOPLIST_KEY_NSCameraUsageDescription = "RollingPaper Camera Private";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "RollingPaper Photo Library Private";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -808,6 +809,7 @@
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "네모네모";
 				INFOPLIST_KEY_NSCameraUsageDescription = "RollingPaper Camera Private";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "RollingPaper Photo Library Private";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
