@@ -29,6 +29,7 @@ class WrittenPaperViewModel {
     private var paperID: String = ""
     private var paperTemplate: TemplateModel?
     private var paperTitle: String?
+    var isTitleChanged: Bool = false
     private var timeRemaing: Date?
     
     var isPaperLinkMade: Bool = false
@@ -83,6 +84,7 @@ class WrittenPaperViewModel {
     
     func changePaperTitle(input: String, from paperFrom: DataSource) {
         currentPaper?.title = input
+        isTitleChanged = true
         guard let paper = currentPaper else { return }
         switch paperFrom {
         case .fromLocal:
