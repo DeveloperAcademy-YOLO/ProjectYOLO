@@ -221,7 +221,7 @@ class SignInViewController: UIViewController {
     }
         
     private func navigateToCurrentFlow() {
-        if let modalPresentingVC = presentationController as? SplitViewController {
+        if let modalPresentingVC = presentingViewController as? SplitViewController {
             if
                 let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
                 let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
