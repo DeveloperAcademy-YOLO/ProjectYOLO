@@ -263,7 +263,6 @@ class WrittenPaperViewController: UIViewController {
         let activityViewController = UIActivityViewController(
             activityItems: [link] ,
             applicationActivities: applicationActivities)
-        activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
         
         let popover = activityViewController.popoverPresentationController
         popover?.sourceView = sender
