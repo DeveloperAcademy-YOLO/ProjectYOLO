@@ -8,47 +8,81 @@
 import Foundation
 import UIKit
 import SnapKit
+import FSPagerView
 
-class MagnifiedCardViewController: UIViewController {
-    var cardContentURLString: String?
-    var magnifiedCardImage = UIImageView()
+class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPagerViewDelegate {
+
     var closeBtn: UIButton = UIButton()
+    var pagerView = FSPagerView()
+    var pageControl = FSPageControl()
+    var images = ["Rectangle_light_pumpkin", "Rectangle_pumpkin", "Rectangle_red", "Rectangle_yellow"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.isOpaque = false
         view.backgroundColor = .clear
-        self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        magnifiedCardImage.backgroundColor = .clear
-        magnifiedCardImage.layer.cornerRadius = 50
-        magnifiedCardImage.clipsToBounds = true
-        view.addSubview(magnifiedCardImage)
         view.addSubview(closeBtn)
-        setImageSize()
-        setBtnSize()
+        view.addSubview(pagerView)
+        view.addSubview(pageControl)
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeAction))
+        view.addGestureRecognizer(tapGesture)
+        setPagerView()
     }
     
     @objc func closeAction() {
         dismiss(animated: true)
     }
     
-    func setBtnSize() {
-        closeBtn.snp.makeConstraints { make in
-            make.top.equalTo(self.view).offset(0)
-            make.leading.equalTo(self.view).offset(0)
-            make.bottom.equalTo(self.view).offset(0)
-            make.trailing.equalTo(self.view).offset(0)
-        }
-    }
-    
-    func setImageSize() {
-        magnifiedCardImage.snp.makeConstraints { make in
+    func setPagerView() {
+        // Create a pager view
+        pagerView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.75)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.1)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.1))
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
-        }
-    } //확대된 카드의 사이즈 결정
+        })
+        pageControl.snp.makeConstraints({ make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(pagerView.snp.bottom).offset(30)
+        })
+        pagerView.isInfinite = true
+        pagerView.transformer = FSPagerViewTransformer(type: .overlap)
+        pagerView.dataSource = self
+        pagerView.delegate = self
+        pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "cell")
+        
+        pageControl.numberOfPages = images.count
+        pageControl.itemSpacing = 16
+        pageControl.interitemSpacing = 16
+        pageControl.setFillColor(.systemGray, for: .selected)
+        pageControl.setFillColor(.systemGray3, for: .normal)
+    }
+    
+    func numberOfItems(in pagerView: FSPagerView) -> Int {
+        return images.count
+    }
+    
+    func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
+        let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "cell", at: index)
+        cell.imageView?.image = UIImage(named: images[index])
+        cell.imageView?.backgroundColor = .clear
+        cell.imageView?.layer.cornerRadius = 50
+        cell.imageView?.clipsToBounds = true
+        return cell
+    }
+    
+    func pagerViewWillEndDragging(_ pagerView: FSPagerView, targetIndex: Int) {
+        pageControl.currentPage = targetIndex
+    }
+    
+    func pagerViewDidEndScrollAnimation(_ pagerView: FSPagerView) {
+        pageControl.currentPage = pagerView.currentIndex
+    }
+    
+    func pagerView(_ pagerView: FSPagerView, shouldHighlightItemAt index: Int) -> Bool {
+        return false
+    }
 }
