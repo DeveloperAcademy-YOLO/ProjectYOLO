@@ -642,6 +642,7 @@ PODS:
     - FirebaseCore (~> 10.0)
     - FirebaseCoreExtension (~> 10.0)
     - GTMSessionFetcher/Core (~> 2.1)
+  - FSPagerView (0.8.3)
   - GoogleUtilities/AppDelegateSwizzler (7.8.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -733,6 +734,7 @@ DEPENDENCIES:
   - FirebaseDynamicLinks
   - FirebaseFirestore
   - FirebaseStorage
+  - FSPagerView
   - SnapKit
   - StickerView
   - SwiftLint (= 0.39.1)
@@ -752,6 +754,7 @@ SPEC REPOS:
     - FirebaseDynamicLinks
     - FirebaseFirestore
     - FirebaseStorage
+    - FSPagerView
     - GoogleUtilities
     - "gRPC-C++"
     - gRPC-Core
@@ -778,6 +781,7 @@ SPEC CHECKSUMS:
   FirebaseDynamicLinks: 37dcd9f082b9c5ea9eb5826e82aef58bbd6fd5c1
   FirebaseFirestore: 5007583f3db2129de8e87f18ee63f4c86f07e7a3
   FirebaseStorage: 8b0b0630e11b9f3e4a479a26cfccb70ec790ec50
+  FSPagerView: 670405b2f18e2a87fa37f20b00de783e562c25a8
   GoogleUtilities: 1d20a6ad97ef46f67bbdec158ce00563a671ebb7
   "gRPC-C++": 9675f953ace2b3de7c506039d77be1f2e77a8db2
   gRPC-Core: 943e491cb0d45598b0b0eb9e910c88080369290b
@@ -790,6 +794,6 @@ SPEC CHECKSUMS:
   StickerView: c486fbc722bddaff4f521afd9028ea4dc3e25a62
   SwiftLint: 55e96a4a4d537d4a3156859fc1c54bd24851a046
 
-PODFILE CHECKSUM: 4a5ff92a1541e50105cb80a8c7c63f1625afa304
+PODFILE CHECKSUM: 4b7d13d56852c2fdba482190c9c13d4e465d8858
 
 COCOAPODS: 1.11.3
