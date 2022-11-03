@@ -13,7 +13,7 @@ import FSPagerView
 class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPagerViewDelegate {
     var closeBtn: UIButton = UIButton()
     var pagerView = FSPagerView()
-    var pageControl = FSPageControl()
+//    var pageControl = FSPageControl()
     var images = [UIImage?]()
     var selectedIndex = 0
     
@@ -33,7 +33,7 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
         view.backgroundColor = .clear
         view.addSubview(closeBtn)
         view.addSubview(pagerView)
-        view.addSubview(pageControl)
+//        view.addSubview(pageControl)
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeAction))
         view.addGestureRecognizer(tapGesture)
@@ -54,10 +54,10 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
-        pageControl.snp.makeConstraints({ make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(pagerView.snp.bottom).offset(30)
-        })
+//        pageControl.snp.makeConstraints({ make in
+//            make.centerX.equalToSuperview()
+//            make.top.equalTo(pagerView.snp.bottom).offset(30)
+//        })
         if images.count != 1 {
             pagerView.isInfinite = true
         }
@@ -66,12 +66,12 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
         pagerView.delegate = self
         pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "cell")
         
-        pageControl.currentPage = selectedIndex
-        pageControl.numberOfPages = images.count
-        pageControl.itemSpacing = 16
-        pageControl.interitemSpacing = 16
-        pageControl.setFillColor(.systemGray, for: .selected)
-        pageControl.setFillColor(.systemGray3, for: .normal)
+//        pageControl.currentPage = selectedIndex
+//        pageControl.numberOfPages = images.count
+//        pageControl.itemSpacing = 16
+//        pageControl.interitemSpacing = 16
+//        pageControl.setFillColor(.systemGray, for: .selected)
+//        pageControl.setFillColor(.systemGray3, for: .normal)
     }
     // 페이지 개수
     func numberOfItems(in pagerView: FSPagerView) -> Int {
@@ -86,13 +86,13 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
         cell.imageView?.clipsToBounds = true
         return cell
     }
-    // 페이지 이동에 따라 컨트롤러도 바뀌기 (아래 점점점 나오는거)
-    func pagerViewWillEndDragging(_ pagerView: FSPagerView, targetIndex: Int) {
-        pageControl.currentPage = (selectedIndex+targetIndex)%images.count
-    }
-    func pagerViewDidEndScrollAnimation(_ pagerView: FSPagerView) {
-        pageControl.currentPage = (selectedIndex+pagerView.currentIndex)%images.count
-    }
+//    // 페이지 이동에 따라 컨트롤러도 바뀌기 (아래 점점점 나오는거)
+//    func pagerViewWillEndDragging(_ pagerView: FSPagerView, targetIndex: Int) {
+//        pageControl.currentPage = (selectedIndex+targetIndex)%images.count
+//    }
+//    func pagerViewDidEndScrollAnimation(_ pagerView: FSPagerView) {
+//        pageControl.currentPage = (selectedIndex+pagerView.currentIndex)%images.count
+//    }
     // 사진 클릭 안되도록 하기
     func pagerView(_ pagerView: FSPagerView, shouldHighlightItemAt index: Int) -> Bool {
         return false
