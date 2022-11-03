@@ -58,7 +58,9 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
             make.centerX.equalToSuperview()
             make.top.equalTo(pagerView.snp.bottom).offset(30)
         })
-        pagerView.isInfinite = true
+        if images.count != 1 {
+            pagerView.isInfinite = true
+        }
         pagerView.transformer = FSPagerViewTransformer(type: .overlap)
         pagerView.dataSource = self
         pagerView.delegate = self
