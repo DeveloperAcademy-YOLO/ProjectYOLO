@@ -11,11 +11,11 @@ import SnapKit
 import FSPagerView
 
 class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPagerViewDelegate {
-
     var closeBtn: UIButton = UIButton()
     var pagerView = FSPagerView()
     var pageControl = FSPageControl()
-    var images = ["Rectangle_light_pumpkin", "Rectangle_pumpkin", "Rectangle_red", "Rectangle_yellow"]
+    var images = [UIImage?]()
+    var selectedIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,11 +27,18 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeAction))
         view.addGestureRecognizer(tapGesture)
+        setImagesOrder()
         setPagerView()
     }
     
     @objc func closeAction() {
         dismiss(animated: true)
+    }
+    
+    func setImagesOrder() {
+        let front = Array(images[selectedIndex..<images.count])
+        let back = Array(images[0..<selectedIndex])
+        images = front + back
     }
     
     func setPagerView() {
@@ -54,6 +61,7 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
         pagerView.delegate = self
         pagerView.register(FSPagerViewCell.self, forCellWithReuseIdentifier: "cell")
         
+        pageControl.currentPage = selectedIndex
         pageControl.numberOfPages = images.count
         pageControl.itemSpacing = 16
         pageControl.interitemSpacing = 16
@@ -67,7 +75,7 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
     
     func pagerView(_ pagerView: FSPagerView, cellForItemAt index: Int) -> FSPagerViewCell {
         let cell = pagerView.dequeueReusableCell(withReuseIdentifier: "cell", at: index)
-        cell.imageView?.image = UIImage(named: images[index])
+        cell.imageView?.image = images[index]
         cell.imageView?.backgroundColor = .clear
         cell.imageView?.layer.cornerRadius = 50
         cell.imageView?.clipsToBounds = true
@@ -75,11 +83,11 @@ class MagnifiedCardViewController: UIViewController, FSPagerViewDataSource, FSPa
     }
     
     func pagerViewWillEndDragging(_ pagerView: FSPagerView, targetIndex: Int) {
-        pageControl.currentPage = targetIndex
+        pageControl.currentPage = (selectedIndex+targetIndex)%images.count
     }
     
     func pagerViewDidEndScrollAnimation(_ pagerView: FSPagerView) {
-        pageControl.currentPage = pagerView.currentIndex
+        pageControl.currentPage = (selectedIndex+pagerView.currentIndex)%images.count
     }
     
     func pagerView(_ pagerView: FSPagerView, shouldHighlightItemAt index: Int) -> Bool {
