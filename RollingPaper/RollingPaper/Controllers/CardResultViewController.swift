@@ -124,7 +124,7 @@ final class CardResultViewController: UIViewController {
     }
     
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
-        self.navigationController?.popViewController(animated: true)
+        self.navigationController?.popViewController(animated: false)
     }
     
     @objc func createBtnPressed(_ sender: UISegmentedControl) {

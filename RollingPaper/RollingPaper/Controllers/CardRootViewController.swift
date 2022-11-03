@@ -208,7 +208,7 @@ class CardRootViewController: UIViewController {
                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
                    let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
                    
-                   self.navigationController?.pushViewController(pushVC, animated: true)
+                   self.navigationController?.pushViewController(pushVC, animated: false)
                })
            }
     }
