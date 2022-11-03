@@ -79,7 +79,6 @@ class CardRootViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-        button.tag = 1
         return button
     }()
     
@@ -91,7 +90,6 @@ class CardRootViewController: UIViewController {
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
-        button.tag = 2
         return button
     }()
     
@@ -210,7 +208,7 @@ class CardRootViewController: UIViewController {
                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
                    let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
                    
-                   self.navigationController?.pushViewController(pushVC, animated: false)
+                   self.navigationController?.pushViewController(pushVC, animated: true)
                })
            }
     }

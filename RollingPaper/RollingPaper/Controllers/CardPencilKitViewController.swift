@@ -12,7 +12,7 @@ import SnapKit
 import Combine
 
 class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
-
+    
     let toolPicker = PKToolPicker()
     private let arrStickers: [String]
     private var backgroundImg = UIImage(named: "Rectangle")
@@ -31,7 +31,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         super.init(nibName: nil, bundle: nil)
     }
     
-   
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -60,10 +60,10 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-       
+        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
-
+        
         rootUIImageView.addSubview(someImageView)
         someImageViewConstraints()
         
@@ -80,11 +80,11 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerButtonOn()
         imageViewInteractionEnabled()
         stickerCollectionViewAppear()
-
+        
         input.send(.viewDidLoad)
         bind()
     }
-    // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
+
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -116,13 +116,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
-//        theImageView.translatesAutoresizingMaskIntoConstraints = false
-//        theImageView.backgroundColor = .lightGray
-//        theImageView.layer.borderWidth = 1
-//        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
-//        theImageView.layer.masksToBounds = true
-//        theImageView.layer.cornerRadius = 50
-//        theImageView.contentMode = .scaleAspectFill
         theImageView.isUserInteractionEnabled = true
         return theImageView
     }()
@@ -235,8 +228,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     func resultImageSend() {
         self.selectedStickerView?.showEditingHandlers = false
-        let image = self.mergeImages(imageView: self.rootUIImageView)
-        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
+        guard let image = self.mergeImages(imageView: self.rootUIImageView) else { return }
+        self.input.send(.setCardResultImg(result: image))
     }
     
     func canvasViewInteractionDisabled() {

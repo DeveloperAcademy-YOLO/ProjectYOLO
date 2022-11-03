@@ -390,6 +390,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
+        myCell.contentMode = .scaleAspectFill
         guard let currentPaper = viewModel.currentPaper else { return myCell }
         let card = currentPaper.cards[indexPath.row]
         

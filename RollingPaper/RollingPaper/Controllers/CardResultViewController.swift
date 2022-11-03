@@ -82,7 +82,6 @@ final class CardResultViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-        button.tag = 1
         return button
     }()
     
@@ -94,7 +93,6 @@ final class CardResultViewController: UIViewController {
         customCompleteBtn.addTarget(self, action: #selector(createBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
-        button.tag = 2
         return button
     }()
     
@@ -126,7 +124,7 @@ final class CardResultViewController: UIViewController {
     }
     
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
-        self.navigationController?.popViewController(animated: false)
+        self.navigationController?.popViewController(animated: true)
     }
     
     @objc func createBtnPressed(_ sender: UISegmentedControl) {
