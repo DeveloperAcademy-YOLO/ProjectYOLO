@@ -10,45 +10,58 @@ import UIKit
 import SnapKit
 
 class MagnifiedCardViewController: UIViewController {
-    var cardContentURLString: String?
-    var magnifiedCardImage = UIImageView()
     var closeBtn: UIButton = UIButton()
+    var scrollView = UIScrollView()
+    var images = [UIImage?]()
+    var selectedIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.isOpaque = false
-        view.backgroundColor = .clear
-        self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        magnifiedCardImage.backgroundColor = .clear
-        magnifiedCardImage.layer.cornerRadius = 50
-        magnifiedCardImage.clipsToBounds = true
-        view.addSubview(magnifiedCardImage)
-        view.addSubview(closeBtn)
-        setImageSize()
-        setBtnSize()
+        setView()
+        setPagerView()
     }
-    
+    // 현재 창 닫기
     @objc func closeAction() {
         dismiss(animated: true)
     }
-    
-    func setBtnSize() {
-        closeBtn.snp.makeConstraints { make in
-            make.top.equalTo(self.view).offset(0)
-            make.leading.equalTo(self.view).offset(0)
-            make.bottom.equalTo(self.view).offset(0)
-            make.trailing.equalTo(self.view).offset(0)
+    // 뷰 설정하기
+    func setView() {
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        view.addSubview(closeBtn)
+        view.addSubview(scrollView)
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeAction))
+        view.addGestureRecognizer(tapGesture)
+    }
+    // 페이저 설정하기
+    func setPagerView() {
+        let contentWidth = view.bounds.width * 0.75
+        let contentHeight = view.bounds.width * 0.75 * 0.75
+        
+        scrollView.snp.makeConstraints({ make in
+            make.width.equalTo(contentWidth)
+            make.height.equalTo(contentHeight)
+            make.centerX.equalTo(view)
+            make.centerY.equalTo(view)
+        })
+        scrollView.contentSize = CGSize(width: contentWidth * CGFloat(images.count), height: contentHeight)
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.isScrollEnabled = true
+        scrollView.isPagingEnabled = true
+        scrollView.bounces = false
+        scrollView.contentOffset = CGPoint(x: contentWidth*CGFloat(selectedIndex), y: 0)
+        
+        for (index, image) in images.enumerated() {
+            let imageView = UIImageView(image: image)
+            scrollView.addSubview(imageView)
+            imageView.snp.makeConstraints({ make in
+                make.centerY.equalToSuperview()
+                make.centerX.equalToSuperview().offset(contentWidth*CGFloat(index))
+                make.width.equalTo(contentWidth)
+                make.height.equalTo(contentHeight)
+            })
         }
     }
-    
-    func setImageSize() {
-        magnifiedCardImage.snp.makeConstraints { make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.1)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.1))
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        }
-    } //확대된 카드의 사이즈 결정
 }
