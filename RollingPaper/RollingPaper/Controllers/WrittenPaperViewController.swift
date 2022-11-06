@@ -31,55 +31,12 @@ class WrittenPaperViewController: UIViewController {
         return titleLabel
     }()
     
-    lazy private var timeLabel: BasePaddingLabel = {
-        let now: Date = Date()
-        //이거 야매라서 리팩토링 해야함
-        let timeInterval = Int(viewModel.currentPaper?.endTime.timeIntervalSince(now) ?? 3600*2-1)
-        let timeLabel = BasePaddingLabel()
-        
-        //   timeLabel.frame = CGRect(x: 0, y: 0, width: 120, height: 36)
-        timeLabel.textAlignment = .center
-        let imageAttachment = NSTextAttachment()
-        imageAttachment.image = UIImage(systemName: "timer")?.withTintColor(.white)
-        imageAttachment.bounds = CGRect(x: 0, y: -5, width: 20, height: 20)
-        let attachmentString = NSAttributedString(attachment: imageAttachment)
-        let completeText = NSMutableAttributedString(string: "")
-        completeText.append(attachmentString)
-        let textAfterIcon = timeInterval > 0
-        ? NSAttributedString(string: "  " + "\(changeTimeFormat(second: timeInterval))")
-        : NSAttributedString(string: "  " + "\(changeTimeFormat(second: 0))")
-        completeText.append(textAfterIcon)
-        timeLabel.attributedText = completeText
-        
-        timeLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.body, weight: UIFont.Weight.bold)
-        timeLabel.textColor = .white
-        timeLabel.layer.cornerRadius = 18
-        timeLabel.layer.backgroundColor = timeInterval > 0
-        ? UIColor(rgb: 0xADADAD).cgColor
-        : UIColor(rgb: 0xFF3B30).cgColor
-        
-        func changeTimeFormat(second: Int) -> String {
-            let hour = Int(second/3600)
-            let minute = Int((second - (hour*3600))/60)
-            var hourString = String(hour)
-            var minuteString = String(minute)
-            if hourString.count == 1 {
-                hourString = "0" + hourString
-            }
-            if minuteString.count == 1 {
-                minuteString = "0" + minuteString
-            }
-            return hourString + ":" + minuteString
-        }
-        return timeLabel
-    }()
-    
+    lazy private var timeLabel = TimerOfPaperViewController()
     lazy private var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = NSLayoutConstraint.Axis.horizontal
         stackView.distribution = UIStackView.Distribution.equalSpacing
-        stackView.addArrangedSubview(self.timeLabel)
-        timeLabelConstraints()
+        stackView.addArrangedSubview(self.timeLabel.view)
         stackView.addArrangedSubview(self.titleLabel)
         titleLabelConstraints()
         return stackView
@@ -108,14 +65,7 @@ class WrittenPaperViewController: UIViewController {
     private func titleLabelConstraints() {
         titleLabel.snp.makeConstraints({ make in
             make.height.equalTo(36)
-            make.leading.equalTo(timeLabel.snp.trailing).offset(10)
-        })
-    }
-    
-    private func timeLabelConstraints() {
-        timeLabel.snp.makeConstraints({ make in
-            make.width.equalTo(120)
-            make.height.equalTo(36)
+            make.leading.equalTo(timeLabel.view.snp.trailing).offset(10)
         })
     }
     
