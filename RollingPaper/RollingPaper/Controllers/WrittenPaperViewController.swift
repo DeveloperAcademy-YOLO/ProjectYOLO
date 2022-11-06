@@ -434,6 +434,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         guard let currentPaper = viewModel.currentPaper else { return  }
         let card = currentPaper.cards[indexPath.row]
         let presentingVC = MagnifiedCardViewController()
+        presentingVC.parentNavigationBarHeight = self.navigationController?.navigationBar.frame.maxY
         presentingVC.cardContentURLString = card.contentURLString
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
