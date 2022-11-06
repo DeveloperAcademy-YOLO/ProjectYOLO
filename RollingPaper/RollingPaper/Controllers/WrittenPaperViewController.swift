@@ -433,40 +433,38 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return  }
-        let card = currentPaper.cards[indexPath.row]
+
+        var images = [UIImage?]()
+        for card in currentPaper.cards {
+            if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                images.append(image)
+            } else {
+                LocalStorageManager.downloadData(urlString: card.contentURLString)
+                    .receive(on: DispatchQueue.main)
+                    .sink { completion in
+                        switch completion {
+                        case .failure(let error): print(error)
+                        case .finished: break
+                        }
+                    } receiveValue: { data in
+                        if
+                            let data = data,
+                            let image = UIImage(data: data) {
+                            NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                            images.append(image)
+                        } else {
+                            let image = UIImage(systemName: "person.circle")
+                            images.append(image)
+                        }
+                    }
+                    .store(in: &cancellables)
+            }
+        }
         let presentingVC = MagnifiedCardViewController()
-        presentingVC.cardContentURLString = card.contentURLString
-        
-        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            presentingVC.magnifiedCardImage.image = image
-            presentingVC.modalPresentationStyle = .overCurrentContext
-            present(presentingVC, animated: true)
-        }
-        else {
-            LocalStorageManager.downloadData(urlString: card.contentURLString)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    switch completion {
-                    case .failure(let error): print(error)
-                    case .finished: break
-                    }
-                } receiveValue: { [weak self] data in
-                    if
-                        let data = data,
-                        let image = UIImage(data: data) {
-                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                        presentingVC.magnifiedCardImage.image = image
-                        presentingVC.modalPresentationStyle = .overCurrentContext
-                        self?.present(presentingVC, animated: true)
-                    } else {
-                        let image = UIImage(systemName: "person.circle")
-                        presentingVC.magnifiedCardImage.image = image
-                        presentingVC.modalPresentationStyle = .overCurrentContext
-                        self?.present(presentingVC, animated: true)
-                    }
-                }
-                .store(in: &cancellables)
-        }
+        presentingVC.selectedIndex = indexPath.row
+        presentingVC.images = images
+        presentingVC.modalPresentationStyle = .overCurrentContext
+        present(presentingVC, animated: true)
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }
