@@ -10,10 +10,10 @@ import UIKit
 import SnapKit
 
 class MagnifiedCardViewController: UIViewController {
-    var closeBtn: UIButton = UIButton()
-    var scrollView = UIScrollView()
-    var images = [UIImage?]()
-    var selectedIndex = 0
+    private var closeBtn: UIButton = UIButton()
+    private var scrollView = UIScrollView()
+    private var images = [UIImage?]()
+    private var selectedIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,7 @@ class MagnifiedCardViewController: UIViewController {
         dismiss(animated: true)
     }
     // 뷰 설정하기
-    func setView() {
+    private func setView() {
         view.isOpaque = false
         view.backgroundColor = .clear
         view.addSubview(closeBtn)
@@ -35,7 +35,7 @@ class MagnifiedCardViewController: UIViewController {
         view.addGestureRecognizer(tapGesture)
     }
     // 페이저 설정하기
-    func setPagerView() {
+    private func setPagerView() {
         let contentWidth = view.bounds.width * 0.75
         let contentHeight = view.bounds.width * 0.75 * 0.75
         
