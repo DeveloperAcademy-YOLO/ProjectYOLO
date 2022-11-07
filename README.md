@@ -7,9 +7,11 @@
 ## 📱  Preview
 
 ### ⭐️ 1st Sprint
-|<img src="https://user-images.githubusercontent.com/103012086/182745986-fcb82d5f-11e0-4ddb-af1f-f5ac62ca0b60.gif"/>|<img src="https://user-images.githubusercontent.com/103012086/182746014-64023863-af95-4964-a07e-8533e0e1be17.gif"/>|<img src="https://user-images.githubusercontent.com/103012086/182746028-4c7690f2-1fd8-4aba-9aa0-5b370032eefa.gif"/>|<img src="https://user-images.githubusercontent.com/103012086/182746031-2a549f46-0fe9-4648-9af2-1c42540e6561.gif"/>|
-|:---:|:---:|:---:|:---:|
-|<center>새로 가입하기</center>|<center>과일 주문하기</center>|<center>주문상태 보기</center>|<center>내 정보 보기</center>|
+
+
+|<img src="https://user-images.githubusercontent.com/103012086/182745986-fcb82d5f-11e0-4ddb-af1f-f5ac62ca0b60.gif"/>|<img src=""/>|<img src="https://user-images.githubusercontent.com/103012086/182746028-4c7690f2-1fd8-4aba-9aa0-5b370032eefa.gif"/>|<img src="https://user-images.githubusercontent.com/103012086/182746031-2a549f46-0fe9-4648-9af2-1c42540e6561.gif"/>|
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|<center>로그인</center>|<center>페이퍼 생성</center>|<center>카드 생성</center>|<center>카드 자세히 보기</center>|<center>페이퍼 방 관리</center>|<center>페이퍼 보관함</center>|
 
 <br><br>
 
