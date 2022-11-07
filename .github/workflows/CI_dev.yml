@@ -17,8 +17,10 @@ jobs:
       run: |
         cd ./RollingPaper
         pod install
+    - name: Select Xcode Verson
+        run: sudo xcode-select -s '/Applications/Xcode_13.1.app//Contents/Developer'
     - name: Build & Test (xcodeproj)
       run: |
         xcodebuild clean build \
         -workspace RollingPaper/RollingPaper.xcworkspace \
-        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=16.0'
+        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=15.0'
