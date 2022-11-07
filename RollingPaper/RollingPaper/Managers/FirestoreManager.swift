@@ -87,6 +87,7 @@ final class FirestoreManager: DatabaseManager {
     func addCard(paperId: String, card: CardModel) {
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
+        currentPaper.thumbnailURLString = currentPaper.cards.randomElement()?.contentURLString
         guard let paperDict = getPaperDict(with: currentPaper) else { return }
         database
             .collection(FireStoreConstants.papersPath.rawValue)
