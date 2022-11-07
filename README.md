@@ -19,10 +19,10 @@
 <br><br> 
 
 ## 👥  Authors
-|[Berry](https://www.behance.net/eunji_an)|[Dinner](https://github.com/CreoHwan)|[Ginger](https://github.com/Guel-git)|[Noah](https://github.com/PJunyeong)|[Willow](https://github.com/Willowwryu)|
-|:---:|:---:|:---:|:---:|:---:|
+|[Noah](https://github.com/PJunyeong)|[Yosep](https://github.com/pis3120)|[Dophi](https://github.com/ddophi98)|[Simon](https://github.com/dgfghsjd)|[Kelly](https://github.com/Kelly-Chui)|[Grizzly](https://github.com/Lim-YongKwan)|[Teemo](https://github.com/teethemoji)|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |<img src="https://user-images.githubusercontent.com/81340603/182752802-4c068440-c027-4fdd-ba8c-6572aecd1c95.PNG"/>|<img src="https://user-images.githubusercontent.com/81340603/182753751-20b1dd3f-0b0c-4e0f-9192-f7f4030d3867.PNG"/>|<img src="https://user-images.githubusercontent.com/81340603/182752782-45613980-b928-48c8-965f-c68a50bf316d.PNG"/>|<img src="https://user-images.githubusercontent.com/81340603/182752792-c78d7062-f8a0-47fb-b341-248839ceffe3.PNG"/>|<img src="https://user-images.githubusercontent.com/81340603/182752794-2c8f41fd-929f-4b8b-93ff-11bc1900927b.PNG"/>|
-|다이아손 디자이너|냉철한 기획자|제너럴리스트 개발자|대체불가능한 개발자|소나무같은 개발자|
+|냉철한 기획자|냉철한 기획자|제너럴리스트 개발자|대체불가능한 개발자|소나무같은 개발자|곰같은 개발자|다이아손 디자이너|
 
 <br><br>
 
