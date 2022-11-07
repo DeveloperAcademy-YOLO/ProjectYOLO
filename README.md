@@ -8,10 +8,17 @@
 
 ### ⭐️ 1st Sprint
 
+|<img src="https://user-images.githubusercontent.com/95460398/200222506-741d120a-14ac-4f85-a494-87c12a75e66a.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/200221395-46f6cebc-e369-4f66-95cc-3c9958e2d6ab.gif"/>
+|:---:|:---:|
+|<center>로그인</center>|<center>페이퍼 생성</center>|
 
-|<img src="https://user-images.githubusercontent.com/103012086/182745986-fcb82d5f-11e0-4ddb-af1f-f5ac62ca0b60.gif"/>|<img src=""/>|<img src="https://user-images.githubusercontent.com/103012086/182746028-4c7690f2-1fd8-4aba-9aa0-5b370032eefa.gif"/>|<img src="https://user-images.githubusercontent.com/103012086/182746031-2a549f46-0fe9-4648-9af2-1c42540e6561.gif"/>|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|<center>로그인</center>|<center>페이퍼 생성</center>|<center>카드 생성</center>|<center>카드 자세히 보기</center>|<center>페이퍼 방 관리</center>|<center>페이퍼 보관함</center>|
+|<img src="https://user-images.githubusercontent.com/95460398/200222545-f0afe505-c98d-474f-8189-808e9eab05d1.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/200223222-b4faeea2-6fc4-4921-aa7a-c4bacf317522.gif"/>|
+|:---:|:---:|
+|<center>카드 생성</center>|<center>카드 자세히 보기</center>|
+
+|<img src="https://user-images.githubusercontent.com/95460398/200222185-733a83e1-0614-4c16-a266-bbde8df297a3.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/200221449-a7912baf-cbc0-4d81-bbbe-9cbd48db97b6.gif"/>|
+|:---:|:---:|
+|<center>페이퍼 방 관리</center>|<center>페이퍼 보관함</center>|
 
 <br><br>
 
