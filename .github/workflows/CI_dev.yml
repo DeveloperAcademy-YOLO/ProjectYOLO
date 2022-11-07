@@ -14,10 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Select Xcode Verson
-      run: |
-        sudo xcode-select --switch '/Applications/Xcode_13.3.1.app//Contents/Developer'
+      run: sudo xcode-select --switch '/Applications/Xcode_13.1.app//Contents/Developer'
     - name: Build & Test (xcodeproj)
       run: |
         xcodebuild clean build \
         -workspace RollingPaper/RollingPaper.xcworkspace \
-        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=15.4'
+        -scheme RollingPaper -destination 'platform=iOS Simulator,name=iPad mini (6th generation),OS=15.0'
