@@ -24,6 +24,7 @@
 		BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */; };
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
+		C5951E122919250600D55BC7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5951E112919250600D55BC7 /* GoogleService-Info.plist */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
@@ -70,7 +71,6 @@
 		D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */; };
 		D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */; };
 		D2EF708F29066FA10007E611 /* DynamicLinks+Funcs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EF708E29066FA10007E611 /* DynamicLinks+Funcs.swift */; };
-		D2EF70912906736D0007E611 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D2EF70902906736D0007E611 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +103,7 @@
 		BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
+		C5951E112919250600D55BC7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
 		C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagnifiedCardViewController.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
@@ -153,7 +154,6 @@
 		D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCacheManager.swift; sourceTree = "<group>"; };
 		D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UNUserNotificationCenter+Extensions.swift"; sourceTree = "<group>"; };
 		D2EF708E29066FA10007E611 /* DynamicLinks+Funcs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DynamicLinks+Funcs.swift"; sourceTree = "<group>"; };
-		D2EF70902906736D0007E611 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,8 +224,8 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
+				C5951E112919250600D55BC7 /* GoogleService-Info.plist */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
-				D2EF70902906736D0007E611 /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
@@ -438,7 +438,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				D2EF70912906736D0007E611 /* GoogleService-Info.plist in Resources */,
+				C5951E122919250600D55BC7 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
