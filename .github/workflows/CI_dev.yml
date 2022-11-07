@@ -19,7 +19,7 @@ jobs:
         pod install
     - name: Select Xcode Verson
       run: |
-        sudo xcode-select --switch '/Applications/Xcode_13.1.app//Contents/Developer'
+        sudo xcode-select --switch '/Applications/Xcode_13.3.app//Contents/Developer'
     - name: Build & Test (xcodeproj)
       run: |
         xcodebuild build \
