@@ -79,19 +79,17 @@ class CardRootViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-        button.tag = 1
         return button
     }()
     
     lazy var rightButton: UIBarButtonItem = {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        customCompleteBtn.setTitle("작성완료", for: .normal)
+        customCompleteBtn.setTitle("완료", for: .normal)
         customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         customCompleteBtn.setTitleColor(.black, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
-        button.tag = 2
         return button
     }()
     
@@ -125,29 +123,29 @@ class CardRootViewController: UIViewController {
     
     private func instantiateSegmentedViewControllers() {
         let sticker = currentPaper.template.stickerNames
-        let background = currentPaper.template.backgroundImageNames
+      //  let background = currentPaper.template.backgroundImageNames
         
-        let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel, backgroundImageName: background)
-        let secondStepViewVC = CardPencilKitViewController(viewModel: viewModel, arrStickers: sticker)
+       // let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel, backgroundImageName: background)
+        let secondStepViewVC = CardCreateViewController(viewModel: viewModel, arrStickers: sticker)
         
         self.addChild(secondStepViewVC)
-        self.addChild(firstStepViewVC)
+        // self.addChild(firstStepViewVC)
         
-        firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
+      //  firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         
         self.view.addSubview(secondStepViewVC.view)
-        self.view.addSubview(firstStepViewVC.view)
+       // self.view.addSubview(firstStepViewVC.view)
        
-        self.firstStepView = firstStepViewVC.view
-        firstStepViewConstraints()
+//        self.firstStepView = firstStepViewVC.view
+//        firstStepViewConstraints()
         self.secondStepView = secondStepViewVC.view
         secondStepViewConstraints()
     }
     
     private func setCustomNavBarButtons() {
-        self.navigationItem.titleView = segmentedControl
-        
+        //self.navigationItem.titleView = segmentedControl
+        navigationItem.title = "카드작성"
         navigationItem.leftBarButtonItem = leftButton
         navigationItem.rightBarButtonItem = rightButton
         
@@ -159,39 +157,40 @@ class CardRootViewController: UIViewController {
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
     
-    lazy var segmentedControl: UISegmentedControl = {
-        let items = ["Step1", "Step2"]
-        let control = UISegmentedControl(items: items)
-        control.selectedSegmentIndex = 0
-        control.layer.cornerRadius = 9
-        control.layer.masksToBounds = true
-        control.clipsToBounds = true
-        control.selectedSegmentTintColor = UIColor.systemGray
-        control.translatesAutoresizingMaskIntoConstraints = false
-        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "rectangle.dashed.and.paperclip")!, string: "배경 고르기", color: .systemBackground), forSegmentAt: 0)
-        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "paintbrush")!, string: "꾸미기", color: .systemBackground), forSegmentAt: 1)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
-        control.setTitleTextAttributes([.foregroundColor: UIColor.systemBackground], for: .selected)
-        control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
-        return control
-    }()
+//    lazy var segmentedControl: UISegmentedControl = {
+//        let items = ["Step1", "Step2"]
+//        let control = UISegmentedControl(items: items)
+//        control.selectedSegmentIndex = 0
+//        control.layer.cornerRadius = 9
+//        control.layer.masksToBounds = true
+//        control.clipsToBounds = true
+//        control.selectedSegmentTintColor = UIColor.systemGray
+//        control.translatesAutoresizingMaskIntoConstraints = false
+//        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "rectangle.dashed.and.paperclip")!, string: "배경 고르기", color: .systemBackground), forSegmentAt: 0)
+//        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "paintbrush")!, string: "꾸미기", color: .systemBackground), forSegmentAt: 1)
+//        control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
+//        control.setTitleTextAttributes([.foregroundColor: UIColor.systemBackground], for: .selected)
+//        control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
+//        return control
+//    }()
+
     
-    @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
-        switch sender.selectedSegmentIndex {
-        case 0:
-            firstStepView.alpha = 1
-            secondStepView.alpha = 0
-        case 1:
-            firstStepView.alpha = 0
-            secondStepView.alpha = 1
-        default:
-            firstStepView.alpha = 1
-            secondStepView.alpha = 0
-        }
-    }
+//    @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
+//        switch sender.selectedSegmentIndex {
+//        case 0:
+//            firstStepView.alpha = 1
+//            secondStepView.alpha = 0
+//        case 1:
+//            firstStepView.alpha = 0
+//            secondStepView.alpha = 1
+//        default:
+//            firstStepView.alpha = 1
+//            secondStepView.alpha = 0
+//        }
+//    }
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        let secondStepViewVC = self.children[0] as? CardPencilKitViewController
+        let secondStepViewVC = self.children[0] as? CardCreateViewController
         print("###\(secondStepViewVC?.someImageView.image)")
         
         if secondStepViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
@@ -201,7 +200,7 @@ class CardRootViewController: UIViewController {
                   }))
                present(alert, animated: true)
            } else {
-               if let secondStepViewVC = self.children[0] as? CardPencilKitViewController {
+               if let secondStepViewVC = self.children[0] as? CardCreateViewController {
                    secondStepViewVC.resultImageSend()
                    print("CardPencilKit here!")
                } else {
@@ -229,28 +228,28 @@ class CardRootViewController: UIViewController {
          present(alert, animated: true)
      }
 }
-
-extension UIImage {
-    class func textEmbededImage(image: UIImage, string: String, color: UIColor, imageAlignment: Int = 0, segFont: UIFont? = nil) -> UIImage {
-        let font = segFont ?? UIFont.boldSystemFont(ofSize: 16.0)
-        let expectedTextSize: CGSize = (string as NSString).size(withAttributes: [NSAttributedString.Key.font: font])
-        let width: CGFloat = expectedTextSize.width + image.size.width + 5.0
-        let height: CGFloat = max(expectedTextSize.height, image.size.width)
-        let size: CGSize = CGSize(width: width, height: height)
-        UIGraphicsBeginImageContextWithOptions(size, false, 0)
-        let context: CGContext = UIGraphicsGetCurrentContext()!
-        context.setFillColor(color.cgColor)
-        let fontTopPosition: CGFloat = (height - expectedTextSize.height) / 2.0
-        let textOrigin: CGFloat = (imageAlignment == 0) ? image.size.width + 5 : 0
-        let textPoint: CGPoint = CGPoint.init(x: textOrigin, y: fontTopPosition)
-        string.draw(at: textPoint, withAttributes: [NSAttributedString.Key.font: font])
-        let flipVertical: CGAffineTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height)
-        context.concatenate(flipVertical)
-        let alignment: CGFloat =  (imageAlignment == 0) ? 0.0 : expectedTextSize.width + 5.0
-        context.draw(image.cgImage!, in: CGRect.init(x: alignment, y: ((height - image.size.height) / 2.0), width: image.size.width, height: image.size.height))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage ?? UIImage(systemName: "heart.fill")!
-    }
-}
+//
+//extension UIImage {
+//    class func textEmbededImage(image: UIImage, string: String, color: UIColor, imageAlignment: Int = 0, segFont: UIFont? = nil) -> UIImage {
+//        let font = segFont ?? UIFont.boldSystemFont(ofSize: 16.0)
+//        let expectedTextSize: CGSize = (string as NSString).size(withAttributes: [NSAttributedString.Key.font: font])
+//        let width: CGFloat = expectedTextSize.width + image.size.width + 5.0
+//        let height: CGFloat = max(expectedTextSize.height, image.size.width)
+//        let size: CGSize = CGSize(width: width, height: height)
+//        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+//        let context: CGContext = UIGraphicsGetCurrentContext()!
+//        context.setFillColor(color.cgColor)
+//        let fontTopPosition: CGFloat = (height - expectedTextSize.height) / 2.0
+//        let textOrigin: CGFloat = (imageAlignment == 0) ? image.size.width + 5 : 0
+//        let textPoint: CGPoint = CGPoint.init(x: textOrigin, y: fontTopPosition)
+//        string.draw(at: textPoint, withAttributes: [NSAttributedString.Key.font: font])
+//        let flipVertical: CGAffineTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height)
+//        context.concatenate(flipVertical)
+//        let alignment: CGFloat =  (imageAlignment == 0) ? 0.0 : expectedTextSize.width + 5.0
+//        context.draw(image.cgImage!, in: CGRect.init(x: alignment, y: ((height - image.size.height) / 2.0), width: image.size.width, height: image.size.height))
+//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//
+//        return newImage ?? UIImage(systemName: "heart.fill")!
+//    }
+//}

@@ -10,9 +10,11 @@ import PencilKit
 import StickerView
 import SnapKit
 import Combine
+import AVFoundation
+import Photos
 
-class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToolPickerObserver {
-
+class CardCreateViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PKCanvasViewDelegate, PKToolPickerObserver {
+    
     let toolPicker = PKToolPicker()
     private let arrStickers: [String]
     private var backgroundImg = UIImage(named: "Rectangle")
@@ -31,7 +33,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         super.init(nibName: nil, bundle: nil)
     }
     
-   
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -60,10 +62,10 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-       
+        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
-
+        
         rootUIImageView.addSubview(someImageView)
         someImageViewConstraints()
         
@@ -80,11 +82,14 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         stickerButtonOn()
         imageViewInteractionEnabled()
         stickerCollectionViewAppear()
-
+        
+        checkCameraPermission()
+        checkAlbumPermission()
+        
         input.send(.viewDidLoad)
         bind()
     }
-    // TODO: viewDidDisappear이런데에 input 코드 넣으면 네이게이션 돌아 올떄 터짐
+
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -116,13 +121,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
-//        theImageView.translatesAutoresizingMaskIntoConstraints = false
-//        theImageView.backgroundColor = .lightGray
-//        theImageView.layer.borderWidth = 1
-//        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
-//        theImageView.layer.masksToBounds = true
-//        theImageView.layer.cornerRadius = 50
-//        theImageView.contentMode = .scaleAspectFill
         theImageView.isUserInteractionEnabled = true
         return theImageView
     }()
@@ -175,6 +173,28 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
         return label
     }()
     
+    lazy var cameraBackgroundButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "camera")
+        button.tintColor = .darkGray
+        button.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var backgroundButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "paintpalette.fill")
+        button.tintColor = .black
+    //    button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var divider: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .lightGray
+        return label
+    }()
+    
     lazy var pencilOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
@@ -193,16 +213,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var stickerOnButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogleOn"), for: .normal)
-        button.setImage(UIImage(named: "stickerToogleOn"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToogleOn"), for: .normal)
+        button.setImage(UIImage(named: "StickerToogleOn"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
     lazy var stickerOffButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
-        button.setImage(UIImage(named: "stickerToogleOff"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToogleOff"), for: .normal)
+        button.setImage(UIImage(named: "StickerToogleOff"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
@@ -235,8 +255,8 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     func resultImageSend() {
         self.selectedStickerView?.showEditingHandlers = false
-        let image = self.mergeImages(imageView: self.rootUIImageView)
-        self.input.send(.setCardResultImg(result: image ?? UIImage(systemName: "heart.fill")!))
+        guard let image = self.mergeImages(imageView: self.rootUIImageView) else { return }
+        self.input.send(.setCardResultImg(result: image))
     }
     
     func canvasViewInteractionDisabled() {
@@ -310,7 +330,7 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     }
 }
 
-extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func mergeImages(imageView: UIImageView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
@@ -367,7 +387,7 @@ extension CardPencilKitViewController: UICollectionViewDelegate, UICollectionVie
     }
 }
 
-extension CardPencilKitViewController: StickerViewDelegate {
+extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
         self.selectedStickerView = stickerView
     }
@@ -448,7 +468,7 @@ extension UIButton {
     }
 }
 
-extension CardPencilKitViewController {
+extension CardCreateViewController {
     func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.75)
@@ -546,3 +566,91 @@ extension CardPencilKitViewController {
         })
     }
 }
+
+
+extension CardCreateViewController {
+    
+    @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        var alertStyle = UIAlertController.Style.actionSheet
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            alertStyle = UIAlertController.Style.alert
+        }
+        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        
+        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.cameraImagePicker()
+            })
+        }
+        
+        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.libraryImagePicker(withType: .photoLibrary)
+            })
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(cameraAction)
+        actionSheet.addAction(libraryAction)
+        actionSheet.addAction(cancelAction)
+        
+        present(actionSheet, animated: false, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            someImageView.image = pickedImage
+        }
+        picker.dismiss(animated: true)
+        backgroundImageSend()
+    }
+    
+    func backgroundImageSend() {
+        guard let backgroundImg = someImageView.image else { return }
+        self.input.send(.setCardBackgroundImg(background: backgroundImg))
+    }
+    
+        private func cameraImagePicker() {
+            let pushVC = CameraCustomPicker()
+            pushVC.delegate = self
+            pushVC.sourceType = .camera
+            pushVC.cameraFlashMode = .off
+            pushVC.cameraDevice = .front
+            pushVC.modalPresentationStyle = .overFullScreen
+            present(pushVC, animated: true)
+    }
+    
+    private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.sourceType = type
+        present(pickerController, animated: true)
+    }
+    
+    private func checkCameraPermission() {
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+            if granted {
+                print("Camera: 권한 허용")
+            } else {
+                print("Camera: 권한 거부")
+            }
+        })
+    }
+    
+    func checkAlbumPermission() {
+        PHPhotoLibrary.requestAuthorization({ status in
+            switch status {
+            case .authorized:
+                print("Album: 권한 허용")
+            case .denied:
+                print("Album: 권한 거부")
+            case .restricted, .notDetermined:
+                print("Album: 선택하지 않음")
+            default:
+                break
+            }
+        })
+    }
+}
+
