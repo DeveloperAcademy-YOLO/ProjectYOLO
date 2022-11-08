@@ -99,6 +99,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 보관함":
             if currentSecondaryView == "페이퍼 템플릿" {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
+                self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
                 setViewController(paperStorageViewController, for: .secondary)
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
