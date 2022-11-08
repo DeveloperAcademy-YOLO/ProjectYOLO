@@ -49,6 +49,7 @@
 		D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */; };
 		D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */; };
 		D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */; };
+		D24145192919E8F700437FE7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D24145182919E8F700437FE7 /* GoogleService-Info.plist */; };
 		D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */; };
 		D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBC28ED206F0094ECD9 /* UserModel.swift */; };
 		D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBE28ED219D0094ECD9 /* PaperModel.swift */; };
@@ -69,7 +70,6 @@
 		D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */; };
 		D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */; };
 		D2EF708F29066FA10007E611 /* DynamicLinks+Funcs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EF708E29066FA10007E611 /* DynamicLinks+Funcs.swift */; };
-		D2EF70912906736D0007E611 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D2EF70902906736D0007E611 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +131,7 @@
 		D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RollingPaper.entitlements; sourceTree = "<group>"; };
 		D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
+		D24145182919E8F700437FE7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorageManager.swift; sourceTree = "<group>"; };
 		D251BDBC28ED206F0094ECD9 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		D251BDBE28ED219D0094ECD9 /* PaperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModel.swift; sourceTree = "<group>"; };
@@ -151,7 +152,6 @@
 		D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSCacheManager.swift; sourceTree = "<group>"; };
 		D2CB508E28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UNUserNotificationCenter+Extensions.swift"; sourceTree = "<group>"; };
 		D2EF708E29066FA10007E611 /* DynamicLinks+Funcs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DynamicLinks+Funcs.swift"; sourceTree = "<group>"; };
-		D2EF70902906736D0007E611 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,7 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
-				D2EF70902906736D0007E611 /* GoogleService-Info.plist */,
+				D24145182919E8F700437FE7 /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
@@ -435,7 +435,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				D2EF70912906736D0007E611 /* GoogleService-Info.plist in Resources */,
+				D24145192919E8F700437FE7 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
@@ -780,7 +780,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -822,7 +822,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
