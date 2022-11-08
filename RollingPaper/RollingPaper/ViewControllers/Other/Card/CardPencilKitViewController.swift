@@ -116,13 +116,6 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
-//        theImageView.translatesAutoresizingMaskIntoConstraints = false
-//        theImageView.backgroundColor = .lightGray
-//        theImageView.layer.borderWidth = 1
-//        theImageView.layer.borderColor = CGColor(red: 100, green: 100, blue: 100, alpha: 1)
-//        theImageView.layer.masksToBounds = true
-//        theImageView.layer.cornerRadius = 50
-//        theImageView.contentMode = .scaleAspectFill
         theImageView.isUserInteractionEnabled = true
         return theImageView
     }()
@@ -193,16 +186,16 @@ class CardPencilKitViewController: UIViewController, PKCanvasViewDelegate, PKToo
     
     lazy var stickerOnButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogleOn"), for: .normal)
-        button.setImage(UIImage(named: "stickerToogleOn"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToogleOn"), for: .normal)
+        button.setImage(UIImage(named: "StickerToogleOn"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
     lazy var stickerOffButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "stickerToogleOff"), for: .normal)
-        button.setImage(UIImage(named: "stickerToogleOff"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToogleOff"), for: .normal)
+        button.setImage(UIImage(named: "StickerToogleOff"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
@@ -443,7 +436,6 @@ extension UIButton {
         contentHorizontalAlignment = .fill
         contentVerticalAlignment = .fill
         imageView?.contentMode = .scaleAspectFit
-        imageEdgeInsets = .zero
         setImage(UIImage(systemName: systemName), for: .normal)
     }
 }
