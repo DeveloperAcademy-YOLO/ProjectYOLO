@@ -28,11 +28,16 @@ private class Length {
     static let textfieldWithBorderSpacing: CGFloat = 9
     static let textfieldBorderWidth: CGFloat = 2
     static let textfieldWithBorderHeight: CGFloat = textfieldHeight + textfieldWithBorderSpacing + textfieldBorderWidth
+    static let textfieldTitleLengthSpacing: CGFloat = 10
+    static let titleLengthLabelWidth: CGFloat = 60
+    static let titleLengthLabelHeight: CGFloat = 28
 }
 
 class PaperSettingViewController: UIViewController {
+    private let textLimit = 30
     private let template: TemplateEnum
     private let paperTitleTextField = UITextField()
+    private let titleLengthLabel = UILabel()
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var viewModel: PaperSettingViewModel
@@ -93,14 +98,17 @@ class PaperSettingViewController: UIViewController {
         let thumbnailDescription = UILabel()
         let title1 = getTitle(text: "롤링페이퍼 제목")
         let subtitle1 = getSubTitle(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요")
-        let textField = getTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
         let title2 = getTitle(text: "타이머 설정")
         let subtitle2 = getSubTitle(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다")
+        
+        setTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
+        setTextLengthView()
         
         view.addSubview(thumbnail)
         view.addSubview(title1)
         view.addSubview(subtitle1)
-        view.addSubview(textField)
+        view.addSubview(paperTitleTextField)
+        view.addSubview(titleLengthLabel)
         view.addSubview(title2)
         view.addSubview(subtitle2)
         thumbnail.addSubview(thumbnailTitle)
@@ -146,14 +154,20 @@ class PaperSettingViewController: UIViewController {
             make.leading.equalTo(title1)
             make.trailing.equalTo(title1)
         })
-        textField.snp.makeConstraints({ make in
+        paperTitleTextField.snp.makeConstraints({ make in
             make.top.equalTo(subtitle1.snp.bottom).offset(Length.sectionSubTitleBottomMargin)
             make.leading.equalTo(title1)
-            make.trailing.equalTo(title1)
+            make.trailing.equalTo(titleLengthLabel.snp.leading).offset(-Length.textfieldTitleLengthSpacing)
             make.height.equalTo(Length.textfieldWithBorderHeight)
         })
+        titleLengthLabel.snp.makeConstraints({ make in
+            make.bottom.equalTo(paperTitleTextField.snp.bottom)
+            make.trailing.equalTo(title1)
+            make.width.equalTo(Length.titleLengthLabelWidth)
+            make.height.equalTo(Length.titleLengthLabelHeight)
+        })
         title2.snp.makeConstraints({ make in
-            make.top.equalTo(textField.snp.bottom).offset(Length.sectionSpacing)
+            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.sectionSpacing)
             make.leading.equalTo(title1)
             make.trailing.equalTo(title1)
         })
@@ -188,7 +202,7 @@ class PaperSettingViewController: UIViewController {
     }
     
     // 텍스트필드 뷰 가져오기
-    private func getTextField(placeHolder: String) -> UITextField {
+    private func setTextField(placeHolder: String) {
         let border = UIView()
         paperTitleTextField.addSubview(border)
         paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
@@ -200,6 +214,8 @@ class PaperSettingViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { _ in
                 self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
+                self.titleLengthLabel.text = "\(self.paperTitleTextField.text?.count ?? 0)/\(self.textLimit)"
+                self.titleLengthLabel.backgroundColor = (self.paperTitleTextField.text?.count ?? 0) <= self.textLimit ? .systemGray : .systemRed
             })
             .store(in: &cancellables)
         
@@ -218,8 +234,17 @@ class PaperSettingViewController: UIViewController {
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(Length.textfieldBorderWidth)
         })
-        
-        return paperTitleTextField
+    }
+    
+    // 텍스트 글자 수 보여주는 뷰 세팅하기
+    private func setTextLengthView() {
+        titleLengthLabel.text = "0/\(textLimit)"
+        titleLengthLabel.font = UIFont.preferredFont(for: .body, weight: .semibold)
+        titleLengthLabel.textAlignment = .center
+        titleLengthLabel.textColor = .white
+        titleLengthLabel.backgroundColor = .systemGray
+        titleLengthLabel.layer.cornerRadius = 9
+        titleLengthLabel.layer.masksToBounds = true
     }
     
     func setCurrentPaperTitle() {
@@ -258,10 +283,9 @@ class PaperSettingViewController: UIViewController {
 // 텍스트 길이 제한
 extension PaperSettingViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let limit = 30
         let currentString = (textField.text ?? "") as NSString
         let newString = currentString.replacingCharacters(in: range, with: string)
 
-        return newString.count <= limit
+        return newString.count <= textLimit
     }
 }
