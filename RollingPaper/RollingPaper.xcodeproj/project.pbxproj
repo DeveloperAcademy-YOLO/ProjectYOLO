@@ -51,6 +51,7 @@
 		D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */; };
 		D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */; };
 		D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */; };
+		D24145192919E8F700437FE7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D24145182919E8F700437FE7 /* GoogleService-Info.plist */; };
 		D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */; };
 		D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBC28ED206F0094ECD9 /* UserModel.swift */; };
 		D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBE28ED219D0094ECD9 /* PaperModel.swift */; };
@@ -134,6 +135,7 @@
 		D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RollingPaper.entitlements; sourceTree = "<group>"; };
 		D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
+		D24145182919E8F700437FE7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorageManager.swift; sourceTree = "<group>"; };
 		D251BDBC28ED206F0094ECD9 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		D251BDBE28ED219D0094ECD9 /* PaperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModel.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				C5951E1A2919E2D500D55BC7 /* GoogleService-Info.plist */,
 				C5951E14291951FE00D55BC7 /* Info.plist */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
+				D24145182919E8F700437FE7 /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
 				D22E4ABE28EBF7D8001091DA /* Managers */,
 				D22E4AB528EBDC7D001091DA /* Resources */,
@@ -438,6 +441,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
+				D24145192919E8F700437FE7 /* GoogleService-Info.plist in Resources */,
 				C5951E1B2919E2D500D55BC7 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
@@ -702,6 +706,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -755,6 +760,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -767,7 +773,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -780,7 +786,9 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -790,10 +798,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO_Distribution;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -805,7 +816,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -818,7 +829,9 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -828,10 +841,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO_Distribution;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
