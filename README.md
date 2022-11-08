@@ -4,7 +4,7 @@
 
 <br><br>
 
-## 🔗 AppStore
+## [🔗 AppStore](https://apps.apple.com/kr/app/%EB%84%A4%EB%AA%A8%EB%84%A4%EB%AA%A8/id6444035444)
 <br><br>
 
 ## 📱  Preview
