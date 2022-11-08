@@ -29,7 +29,7 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGray6
+        view.backgroundColor = .blue
         selfConstraints()
         
         view.addSubview(firstColorBackgroundButton)
@@ -46,6 +46,14 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         
         input.send(.viewDidLoad)
         bind()
+    }
+    
+    override func viewWillLayoutSubviews() {
+        self.changeFrmae()
+    }
+    
+    func changeFrmae() {
+        self.view.frame = CGRectMake(0, 0, 100, 400)
     }
     
     private func bind() {
@@ -178,7 +186,7 @@ extension BackgroundButtonViewController {
         firstColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(self.view.snp.leading).offset(25)
+            make.leading.equalTo(self.view.snp.leading).offset(28)
             make.top.equalTo(self.view.snp.top).offset(20)
         })
     }
@@ -187,7 +195,7 @@ extension BackgroundButtonViewController {
         secondColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(self.view.snp.leading).offset(25)
+            make.leading.equalTo(self.view.snp.leading).offset(28)
             make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
         })
     }
@@ -196,7 +204,7 @@ extension BackgroundButtonViewController {
         thirdColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(self.view.snp.leading).offset(25)
+            make.leading.equalTo(self.view.snp.leading).offset(28)
             make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
         })
     }
@@ -205,7 +213,7 @@ extension BackgroundButtonViewController {
         fourthColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(self.view.snp.leading).offset(25)
+            make.leading.equalTo(self.view.snp.leading).offset(28)
             make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
         })
     }
