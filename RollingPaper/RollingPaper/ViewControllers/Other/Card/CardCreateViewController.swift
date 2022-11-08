@@ -180,8 +180,8 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     
     lazy var cameraButton: UIButton = {
         let button = UIButton()
-        button.setUIImage(systemName: "camera")
-        button.tintColor = .darkGray
+        button.setUIImage(systemName: "camera.fill")
+        button.tintColor = UIColor(red: 217, green: 217, blue: 217)
         button.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
         return button
     }()
@@ -189,14 +189,14 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     lazy var backgroundButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
-        button.tintColor = .black
+        button.tintColor = UIColor(red: 217, green: 217, blue: 217)
     //    button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
     lazy var divider: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .lightGray
+        label.backgroundColor = UIColor(red: 217, green: 217, blue: 217)
         return label
     }()
     
@@ -211,7 +211,7 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     lazy var pencilOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
-        button.tintColor = .lightGray
+        button.tintColor = UIColor(red: 217, green: 217, blue: 217)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
