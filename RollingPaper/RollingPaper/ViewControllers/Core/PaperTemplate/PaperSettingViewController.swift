@@ -212,10 +212,11 @@ class PaperSettingViewController: UIViewController {
         paperTitleTextField
             .controlPublisher(for: .editingChanged)
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { _ in
+            .sink(receiveValue: { [weak self] _ in
+                guard let self = self else {return}
                 self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
                 self.titleLengthLabel.text = "\(self.paperTitleTextField.text?.count ?? 0)/\(self.textLimit)"
-                self.titleLengthLabel.backgroundColor = (self.paperTitleTextField.text?.count ?? 0) <= self.textLimit ? .systemGray : .systemRed
+                self.titleLengthLabel.backgroundColor = (self.paperTitleTextField.text?.count ?? 0) < self.textLimit ? .systemGray : .systemRed
             })
             .store(in: &cancellables)
         
@@ -223,7 +224,8 @@ class PaperSettingViewController: UIViewController {
         paperTitleTextField
             .controlPublisher(for: .editingDidEndOnExit)
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { _ in
+            .sink(receiveValue: { [weak self] _ in
+                guard let self = self else {return}
                 self.paperTitleTextField.resignFirstResponder()
             })
             .store(in: &cancellables)
@@ -254,13 +256,13 @@ class PaperSettingViewController: UIViewController {
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
           if paperTitleTextField.text == "" {
-          let alert = UIAlertController(title: "잠깐!", message: "페이퍼 제목을 입력해주세요.", preferredStyle: .alert)
-          alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
-              alert.dismiss(animated: true, completion: nil)
-             }))
-          present(alert, animated: true)
+              let alert = UIAlertController(title: "잠깐!", message: "페이퍼 제목을 입력해주세요.", preferredStyle: .alert)
+              alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+                  alert.dismiss(animated: true, completion: nil)
+                 }))
+              present(alert, animated: true)
           } else {
-              self.input.send(.endSettingPaper)
+              input.send(.endSettingPaper)
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
                   object: nil,
@@ -285,7 +287,6 @@ extension PaperSettingViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentString = (textField.text ?? "") as NSString
         let newString = currentString.replacingCharacters(in: range, with: string)
-
         return newString.count <= textLimit
     }
 }
