@@ -24,12 +24,14 @@
 		BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */; };
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
+		C5951E1B2919E2D500D55BC7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5951E1A2919E2D500D55BC7 /* GoogleService-Info.plist */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
 		C5AB30BC28ED655200C2E016 /* RollingPaperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */; };
 		C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5853B29001AFF00454C75 /* UIImage+Extension.swift */; };
 		C5B5853E2900DF1700454C75 /* WrittenPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B5853D2900DF1700454C75 /* WrittenPaperViewModel.swift */; };
+		C5F26FE729183F050060109B /* TimerOfPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F26FE629183F050060109B /* TimerOfPaperViewController.swift */; };
 		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
 		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
@@ -102,6 +104,8 @@
 		BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
+		C5951E14291951FE00D55BC7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C5951E1A2919E2D500D55BC7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
 		C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagnifiedCardViewController.swift; sourceTree = "<group>"; };
 		C5AB305528EC119300C2E016 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
@@ -109,6 +113,7 @@
 		C5AB30BB28ED655200C2E016 /* RollingPaperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingPaperTests.swift; sourceTree = "<group>"; };
 		C5B5853B29001AFF00454C75 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		C5B5853D2900DF1700454C75 /* WrittenPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewModel.swift; sourceTree = "<group>"; };
+		C5F26FE629183F050060109B /* TimerOfPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerOfPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
@@ -122,7 +127,6 @@
 		D22E4AA528EBDC72001091DA /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		D22E4AAA28EBDC73001091DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D22E4AAD28EBDC73001091DA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		D22E4AAF28EBDC73001091DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D22E4ABF28EBF805001091DA /* FirebaseAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthManager.swift; sourceTree = "<group>"; };
 		D22E4AC128EBFD7B001091DA /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
 		D22E4AC328EBFD91001091DA /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
@@ -222,6 +226,8 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
+				C5951E1A2919E2D500D55BC7 /* GoogleService-Info.plist */,
+				C5951E14291951FE00D55BC7 /* Info.plist */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
 				D24145182919E8F700437FE7 /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
@@ -232,7 +238,6 @@
 				D22E4AB628EBDC86001091DA /* Models */,
 				D22E4AAA28EBDC73001091DA /* Assets.xcassets */,
 				D22E4AB828EBDC9E001091DA /* Views */,
-				D22E4AAF28EBDC73001091DA /* Info.plist */,
 			);
 			path = RollingPaper;
 			sourceTree = "<group>";
@@ -288,6 +293,7 @@
 				CFDA52C428F48E96006774E2 /* SidebarViewController.swift */,
 				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */,
+				C5F26FE629183F050060109B /* TimerOfPaperViewController.swift */,
 				1573562E28FFA79B00EA565B /* SettingScreenViewController.swift */,
 				AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */,
 				C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */,
@@ -436,6 +442,7 @@
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
 				D24145192919E8F700437FE7 /* GoogleService-Info.plist in Resources */,
+				C5951E1B2919E2D500D55BC7 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
@@ -517,6 +524,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1573562F28FFA79B00EA565B /* SettingScreenViewController.swift in Sources */,
+				C5F26FE729183F050060109B /* TimerOfPaperViewController.swift in Sources */,
 				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				C5B5853E2900DF1700454C75 /* WrittenPaperViewModel.swift in Sources */,
@@ -781,6 +789,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -823,6 +832,7 @@
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -180,7 +180,12 @@ class PaperStorageViewModel {
                         .sink(receiveCompletion: { completion in
                             switch completion {
                             case .failure(let error):
-                                print("error in download local paper thumbnail: \(error)")
+                                print(error)
+                                downloadCount += 1
+                                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                                if downloadCount == self.papersFromLocal.count {
+                                    self.output.send(outputValue)
+                                }
                             case .finished: break
                             }
                         }, receiveValue: { [weak self] data in
@@ -230,8 +235,14 @@ class PaperStorageViewModel {
                         .receive(on: DispatchQueue.global(qos: .background))
                         .sink(receiveCompletion: { completion in
                             switch completion {
+                            // 진입 경로2 - 캐시 데이터를 통한 다운로드
                             case .failure(let error):
-                                print("error in download server paper thumbnail: \(error)")
+                                print(error)
+                                downloadCount += 1
+                                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                                if downloadCount == self.papersFromServer.count {
+                                    self.output.send(outputValue)
+                                }
                             case .finished: break
                             }
                         }, receiveValue: { [weak self] data in
