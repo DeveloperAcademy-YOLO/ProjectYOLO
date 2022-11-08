@@ -192,6 +192,7 @@ class PaperSettingViewController: UIViewController {
         let border = UIView()
         paperTitleTextField.addSubview(border)
         paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
+        paperTitleTextField.delegate = self
         
         // 제목 입력할때마다 입력한 글자 저장
         paperTitleTextField
@@ -247,12 +248,20 @@ class PaperSettingViewController: UIViewController {
     @objc private func backBtnPressed() {
         navigationController?.popViewController(animated: true)
     }
-    
 
-    
-    
     // 배경 눌렀을 때 동작
     @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
         paperTitleTextField.resignFirstResponder()
+    }
+}
+
+// 텍스트 길이 제한
+extension PaperSettingViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let limit = 30
+        let currentString = (textField.text ?? "") as NSString
+        let newString = currentString.replacingCharacters(in: range, with: string)
+
+        return newString.count <= limit
     }
 }
