@@ -34,7 +34,7 @@
 		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
 		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
-		CF6D80CB291A6DB0004CAAD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF6D80CA291A6DB0004CAAD7 /* GoogleService-Info.plist */; };
+		CF6D80CD291A763B004CAAD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */; };
 		CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
@@ -113,7 +113,7 @@
 		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
-		CF6D80CA291A6DB0004CAAD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
@@ -223,7 +223,7 @@
 			children = (
 				D22E4AA128EBDC72001091DA /* AppDelegate.swift */,
 				D22E4AA328EBDC72001091DA /* SceneDelegate.swift */,
-				CF6D80CA291A6DB0004CAAD7 /* GoogleService-Info.plist */,
+				CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */,
 				C5951E14291951FE00D55BC7 /* Info.plist */,
 				D22E4AAA28EBDC73001091DA /* Assets.xcassets */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
@@ -568,7 +568,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				CF6D80CB291A6DB0004CAAD7 /* GoogleService-Info.plist in Resources */,
+				CF6D80CD291A763B004CAAD7 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
