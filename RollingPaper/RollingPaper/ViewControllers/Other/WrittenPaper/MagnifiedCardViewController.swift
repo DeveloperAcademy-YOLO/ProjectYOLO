@@ -11,41 +11,32 @@ import SnapKit
 
 class MagnifiedCardViewController: UIViewController {
     var cardContentURLString: String?
+    var magnifiedCardImage = UIImageView()
+    var closeBtn: UIButton = UIButton()
     var parentNavigationBarHeight: CGFloat?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.isOpaque = false
         view.backgroundColor = .clear
-     
-        view.addSubview(magnifiedCardImage)
+        self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
+        magnifiedCardImage.translatesAutoresizingMaskIntoConstraints = false
+        magnifiedCardImage.isUserInteractionEnabled = true
+        magnifiedCardImage.backgroundColor = .systemBackground
+        magnifiedCardImage.layer.masksToBounds = true
+        magnifiedCardImage.layer.cornerRadius = 50
+        magnifiedCardImage.contentMode = .scaleAspectFill
         setCustomBlurEffect()
-        setImageSize()
-       
+        view.addSubview(magnifiedCardImage)
         view.addSubview(closeBtn)
+        setImageSize()
         setBtnSize()
     }
     
     @objc func closeAction() {
         dismiss(animated: true)
     }
-    
-    lazy var magnifiedCardImage: UIImageView = {
-        let theImageView = UIImageView()
-        theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.isUserInteractionEnabled = true
-        theImageView.backgroundColor = .systemBackground
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
-        theImageView.contentMode = .scaleAspectFill
-        return theImageView
-    }()
-    
-    lazy var closeBtn: UIButton = {
-        let button = UIButton()
-        button.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        return button
-    }()
     
     func setCustomBlurEffect() {
         let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
