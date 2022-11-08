@@ -75,6 +75,11 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
+        cameraButtonAppear()
+        backgroundButtonAppear()
+        
+        dividerAppear()
+        
         pencilButtonOff()
         canvasViewInteractionDisabled()
         toolPickerDisappear()
@@ -173,7 +178,7 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         return label
     }()
     
-    lazy var cameraBackgroundButton: UIButton = {
+    lazy var cameraButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera")
         button.tintColor = .darkGray
@@ -291,6 +296,21 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     func toolPickerDisappear() {
         toolPicker.addObserver(canvasView)
         toolPicker.setVisible(false, forFirstResponder: canvasView)
+    }
+    
+    func cameraButtonAppear() {
+        view.addSubview(cameraButton)
+        cameraButtonConstraints()
+    }
+    
+    func backgroundButtonAppear() {
+        view.addSubview(backgroundButton)
+        backgroundButtonConstraints()
+    }
+    
+    func dividerAppear() {
+        view.addSubview(divider)
+        dividerConstraints()
     }
     
     func pencilButtonOn() {
@@ -463,7 +483,6 @@ extension UIButton {
         contentHorizontalAlignment = .fill
         contentVerticalAlignment = .fill
         imageView?.contentMode = .scaleAspectFit
-        imageEdgeInsets = .zero
         setImage(UIImage(systemName: systemName), for: .normal)
     }
 }
@@ -526,13 +545,39 @@ extension CardCreateViewController {
         })
     }
     
+    func cameraButtonConstraints() {
+        cameraButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    func backgroundButtonConstraints() {
+        backgroundButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+        })
+    }
+    
+    func dividerConstraints() {
+        divider.snp.makeConstraints({ make in
+            make.width.equalTo(65)
+            make.height.equalTo(1)
+            make.centerX.equalTo(backgroundButton.snp.centerX)
+            make.top.equalTo(backgroundButton.snp.bottom).offset(20)
+        })
+    }
+    
     func pencilOnButtonConstraints() {
         pencilOnButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(buttonLabel.snp.top).offset(20)
+            make.top.equalTo(divider.snp.bottom).offset(20)
         })
     }
     
@@ -540,9 +585,8 @@ extension CardCreateViewController {
         pencilOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
-            make.leading.equalTo(20)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(buttonLabel.snp.top).offset(20)
+            make.top.equalTo(divider.snp.bottom).offset(20)
         })
     }
     
@@ -551,7 +595,7 @@ extension CardCreateViewController {
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(buttonLabel.snp.top).offset(90)
+            make.top.equalTo(divider.snp.bottom).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
@@ -561,7 +605,7 @@ extension CardCreateViewController {
             make.width.equalTo(80.7)
             make.height.equalTo(63.76)
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
-            make.top.equalTo(buttonLabel.snp.top).offset(90)
+            make.top.equalTo(divider.snp.bottom).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
         })
     }
