@@ -12,6 +12,10 @@
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
 		AF6FEE3C2902E2E400E44E7D /* CameraCustomPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */; };
+<<<<<<< fc28b1c41d34c3c5a39cc20916e29720836096d3
+=======
+		AFE1D5292919E81200C64796 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AFE1D5282919E81200C64796 /* GoogleService-Info.plist */; };
+>>>>>>> [feat] #203 GoogleInfo Update
 		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
@@ -89,6 +93,10 @@
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
 		AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCustomPicker.swift; sourceTree = "<group>"; };
+<<<<<<< fc28b1c41d34c3c5a39cc20916e29720836096d3
+=======
+		AFE1D5282919E81200C64796 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+>>>>>>> [feat] #203 GoogleInfo Update
 		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
 		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
@@ -222,6 +230,10 @@
 		D22E4AA028EBDC72001091DA /* RollingPaper */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< fc28b1c41d34c3c5a39cc20916e29720836096d3
+=======
+				AFE1D5282919E81200C64796 /* GoogleService-Info.plist */,
+>>>>>>> [feat] #203 GoogleInfo Update
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
 				D2EF70902906736D0007E611 /* GoogleService-Info.plist */,
 				D22E4AC728EBFDCE001091DA /* ViewModels */,
@@ -435,7 +447,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
+<<<<<<< 4d918c5f597e3cc2fc41bbe0da8a6c19bdb8d81f
 				D2EF70912906736D0007E611 /* GoogleService-Info.plist in Resources */,
+=======
+<<<<<<< b95b3fbab72dfe22dbfd02eb74f8c7d9ab21c069
+				AF3CB30D29197C7B00539B96 /* GoogleService-Info.plist in Resources */,
+=======
+<<<<<<< fc28b1c41d34c3c5a39cc20916e29720836096d3
+				AF3CB310291993CE00539B96 /* GoogleService-Info.plist in Resources */,
+=======
+				AFE1D5292919E81200C64796 /* GoogleService-Info.plist in Resources */,
+>>>>>>> [feat] #203 GoogleInfo Update
+>>>>>>> [feat] #203 GoogleInfo Update
+>>>>>>> [feat] #203 GoogleInfo Update
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);
