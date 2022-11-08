@@ -17,6 +17,7 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     
     let toolPicker = PKToolPicker()
     private let arrStickers: [String]
+    private let backgroundImageName: [String]
     private var backgroundImg = UIImage(named: "Rectangle")
     
     private let viewModel: CardViewModel
@@ -27,9 +28,10 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     private var isStickerToggle: Bool = true
     private var imageSticker: UIImage!
     
-    init(viewModel: CardViewModel, arrStickers: [String]) {
+    init(viewModel: CardViewModel, arrStickers: [String], backgroundImageName: [String]) {
         self.viewModel = viewModel
         self.arrStickers = arrStickers
+        self.backgroundImageName = backgroundImageName
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -190,7 +192,7 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
         button.tintColor = UIColor(red: 217, green: 217, blue: 217)
-    //    button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(setPopOverView(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -348,6 +350,18 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         collectionView.isHidden = true
         collectionViewConstraints()
     }
+    
+    @objc func setPopOverView(_ sender: UIButton) {
+        let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
+        controller.modalPresentationStyle = UIModalPresentationStyle.popover
+     
+        let popover = controller.popoverPresentationController
+        popover?.sourceView = sender
+        popover?.backgroundColor = .systemBackground
+        popover?.sourceRect = CGRect(x: 25, y: 0, width: 50, height: 50)
+        present(controller, animated: true)
+    }
+    
 }
 
 extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDataSource {

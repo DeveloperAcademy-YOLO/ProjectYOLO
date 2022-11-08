@@ -123,10 +123,10 @@ class CardRootViewController: UIViewController {
     
     private func instantiateSegmentedViewControllers() {
         let sticker = currentPaper.template.stickerNames
-      //  let background = currentPaper.template.backgroundImageNames
+        let background = currentPaper.template.backgroundImageNames
         
        // let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel, backgroundImageName: background)
-        let secondStepViewVC = CardCreateViewController(viewModel: viewModel, arrStickers: sticker)
+        let secondStepViewVC = CardCreateViewController(viewModel: viewModel, arrStickers: sticker, backgroundImageName: background)
         
         self.addChild(secondStepViewVC)
         // self.addChild(firstStepViewVC)
