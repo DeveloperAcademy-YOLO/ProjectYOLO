@@ -31,6 +31,7 @@ private class Length {
     static let textfieldTitleLengthSpacing: CGFloat = 10
     static let titleLengthLabelWidth: CGFloat = 60
     static let titleLengthLabelHeight: CGFloat = 28
+    static let warningLabelTopMargin: CGFloat = 10
 }
 
 class PaperSettingViewController: UIViewController {
@@ -38,11 +39,27 @@ class PaperSettingViewController: UIViewController {
     private let template: TemplateEnum
     private let paperTitleTextField = UITextField()
     private let titleLengthLabel = UILabel()
+    private let warningLabel = UILabel()
+    private let warningImage = UIImageView()
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    private var viewModel: PaperSettingViewModel
     
+    private var cancellables = Set<AnyCancellable>()
+    private var textState: TextState = .noText
+    private var viewModel: PaperSettingViewModel
     private var currentPaperTitle: String = ""
+    enum TextState {
+        case normal, noText, tooLong
+        var sentence: String {
+            switch self {
+            case .normal:
+                return ""
+            case .noText:
+                return "페이퍼 제목을 입력해주세요!"
+            case .tooLong:
+                return "페이퍼 제목이 너무 길어요!"
+            }
+        }
+    }
     
     // 이전 뷰에서 골랐던 템플릿 설정해주기
     init(template: TemplateEnum) {
@@ -101,14 +118,17 @@ class PaperSettingViewController: UIViewController {
         let title2 = getTitle(text: "타이머 설정")
         let subtitle2 = getSubTitle(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다")
         
-        setTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
-        setTextLengthView()
+        initTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
+        initTextLengthView()
+        initWarningLabel()
         
         view.addSubview(thumbnail)
         view.addSubview(title1)
         view.addSubview(subtitle1)
         view.addSubview(paperTitleTextField)
         view.addSubview(titleLengthLabel)
+        view.addSubview(warningImage)
+        view.addSubview(warningLabel)
         view.addSubview(title2)
         view.addSubview(subtitle2)
         thumbnail.addSubview(thumbnailTitle)
@@ -166,8 +186,16 @@ class PaperSettingViewController: UIViewController {
             make.width.equalTo(Length.titleLengthLabelWidth)
             make.height.equalTo(Length.titleLengthLabelHeight)
         })
+        warningImage.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.warningLabelTopMargin)
+            make.leading.equalTo(title1)
+        })
+        warningLabel.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.warningLabelTopMargin)
+            make.leading.equalTo(warningImage.snp.trailing).offset(10)
+        })
         title2.snp.makeConstraints({ make in
-            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.sectionSpacing)
+            make.top.equalTo(warningLabel.snp.bottom).offset(Length.sectionSpacing)
             make.leading.equalTo(title1)
             make.trailing.equalTo(title1)
         })
@@ -202,11 +230,10 @@ class PaperSettingViewController: UIViewController {
     }
     
     // 텍스트필드 뷰 가져오기
-    private func setTextField(placeHolder: String) {
+    private func initTextField(placeHolder: String) {
         let border = UIView()
         paperTitleTextField.addSubview(border)
         paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
-        paperTitleTextField.delegate = self
         
         // 제목 입력할때마다 입력한 글자 저장
         paperTitleTextField
@@ -215,8 +242,9 @@ class PaperSettingViewController: UIViewController {
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else {return}
                 self.input.send(.setPaperTitle(title: self.paperTitleTextField.text ?? ""))
-                self.titleLengthLabel.text = "\(self.paperTitleTextField.text?.count ?? 0)/\(self.textLimit)"
-                self.titleLengthLabel.backgroundColor = (self.paperTitleTextField.text?.count ?? 0) < self.textLimit ? .systemGray : .systemRed
+                let textCount = self.paperTitleTextField.text?.count ?? 0
+                self.titleLengthLabel.text = "\(textCount)/\(self.textLimit)"
+                self.titleLengthLabel.backgroundColor = textCount <= self.textLimit ? .systemGray : .systemRed
             })
             .store(in: &cancellables)
         
@@ -229,6 +257,16 @@ class PaperSettingViewController: UIViewController {
                 self.paperTitleTextField.resignFirstResponder()
             })
             .store(in: &cancellables)
+        
+        // 텍스트 입력을 시작하면 경고 메시지 지우기
+        paperTitleTextField
+            .controlPublisher(for: .editingDidBegin)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                guard let self = self else {return}
+                self.setWarningLabel(state: .normal)
+            })
+            .store(in: &cancellables)
     
         border.backgroundColor = .opaqueSeparator
         border.snp.makeConstraints({ make in
@@ -239,7 +277,7 @@ class PaperSettingViewController: UIViewController {
     }
     
     // 텍스트 글자 수 보여주는 뷰 세팅하기
-    private func setTextLengthView() {
+    private func initTextLengthView() {
         titleLengthLabel.text = "0/\(textLimit)"
         titleLengthLabel.font = UIFont.preferredFont(for: .body, weight: .semibold)
         titleLengthLabel.textAlignment = .center
@@ -249,19 +287,42 @@ class PaperSettingViewController: UIViewController {
         titleLengthLabel.layer.masksToBounds = true
     }
     
+    // 경고 라벨 세팅하기
+    private func initWarningLabel() {
+        warningLabel.textColor = .systemGray
+        warningLabel.font = .preferredFont(forTextStyle: .body)
+        
+        warningImage.contentMode = .center
+        warningImage.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
+        warningImage.isHidden = true
+    }
+    
+    // 경고 라벨 종류 설정하기
+    private func setWarningLabel(state: TextState) {
+        warningLabel.text = state.sentence
+        if state == .normal {
+            warningImage.isHidden = true
+            warningLabel.isHidden = true
+        } else {
+            warningImage.isHidden = false
+            warningLabel.isHidden = false
+        }
+    }
+    
     func setCurrentPaperTitle() {
         currentPaperTitle = paperTitleTextField.text ?? "제목을 입력하지 않으셨습니다."
     }
     
     // 생성하기 버튼 눌렀을 때 동작
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
-          if paperTitleTextField.text == "" {
-              let alert = UIAlertController(title: "잠깐!", message: "페이퍼 제목을 입력해주세요.", preferredStyle: .alert)
-              alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
-                  alert.dismiss(animated: true, completion: nil)
-                 }))
-              present(alert, animated: true)
-          } else {
+        let textCount = paperTitleTextField.text?.count ?? 0
+        if textCount == 0 {
+            setWarningLabel(state: .noText)
+            paperTitleTextField.resignFirstResponder()
+        } else if textCount > textLimit {
+            setWarningLabel(state: .tooLong)
+            paperTitleTextField.resignFirstResponder()
+        } else {
               input.send(.endSettingPaper)
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
@@ -279,14 +340,5 @@ class PaperSettingViewController: UIViewController {
     // 배경 눌렀을 때 동작
     @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
         paperTitleTextField.resignFirstResponder()
-    }
-}
-
-// 텍스트 길이 제한
-extension PaperSettingViewController: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let currentString = (textField.text ?? "") as NSString
-        let newString = currentString.replacingCharacters(in: range, with: string)
-        return newString.count <= textLimit
     }
 }
