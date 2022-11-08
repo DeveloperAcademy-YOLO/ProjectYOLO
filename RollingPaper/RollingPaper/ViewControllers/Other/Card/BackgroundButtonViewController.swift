@@ -53,34 +53,26 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     }
     
     func changeFrmae() {
-        self.view.frame = CGRectMake(0, 0, 100, 400)
+        self.view.frame = CGRect(x: 0, y: 0, width: 100, height: 400)
     }
     
     private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher())
-        output
-            .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .getRecentCardBackgroundImgSuccess(let background):
-                    DispatchQueue.main.async(execute: {
-                //        self.someImageView.image = background
-                        print("CardBackgroundViewController import background image from view Model")
-                    })
-                case .getRecentCardBackgroundImgFail:
-                    DispatchQueue.main.async(execute: {
-                        //  self.someImageView.image = UIImage(named: "Rectangle")
-                    })
-                case .getRecentCardResultImgSuccess(_):
-                    DispatchQueue.main.async(execute: {
-                    })
-                case .getRecentCardResultImgFail:
-                    DispatchQueue.main.async(execute: {
-                    })
-                }
-            })
-            .store(in: &cancellables)
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
+    
+    func backgroundImageSend() {
+         self.input.send(.setCardBackgroundImg(background: backgroundImageName[0]))
+     }
+    func backgroundImageSend2() {
+         self.input.send(.setCardBackgroundImg(background: backgroundImageName[1]))
+     }
+    func backgroundImageSend3() {
+         self.input.send(.setCardBackgroundImg(background: backgroundImageName[2]))
+     }
+    
+    func backgroundImageSend4() {
+         self.input.send(.setCardBackgroundImg(background: backgroundImageName[3]))
+     }
     
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
@@ -140,26 +132,27 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("firstImageViewColor clicked")
+        print(backgroundImageName[0])
         guard let image = UIImage(named: "\(backgroundImageName[0])") else { return }
-     //   self.someImageView.image = image
+        backgroundImageSend()
     }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[1])") else { return }
-     //   self.someImageView.image = image
+        backgroundImageSend2()
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("secondImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[2])") else { return }
-     //   self.someImageView.image = image
+        backgroundImageSend3()
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
         print("fourthImageViewColor clicked")
         guard let image = UIImage(named: "\(backgroundImageName[3])") else { return }
-     //   self.someImageView.image = image
+        backgroundImageSend4()
     }
 }
 

@@ -105,7 +105,7 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
-                        self.someImageView.image = background
+                        self.someImageView.image = UIImage(named: "\(background ?? "Rectangle")")
                         print("get background ImgSuccess")
                     })
                 case .getRecentCardBackgroundImgFail:
@@ -662,12 +662,6 @@ extension CardCreateViewController {
             someImageView.image = pickedImage
         }
         picker.dismiss(animated: true)
-        backgroundImageSend()
-    }
-    
-    func backgroundImageSend() {
-        guard let backgroundImg = someImageView.image else { return }
-        self.input.send(.setCardBackgroundImg(background: backgroundImg))
     }
     
         private func cameraImagePicker() {

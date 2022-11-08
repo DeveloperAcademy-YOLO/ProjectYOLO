@@ -12,6 +12,7 @@ class CardViewModel {
     
     let localDatabaseManager: DatabaseManager
     let serverDatabaseManager: DatabaseManager
+    private var backString: String = "setting"
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
@@ -23,13 +24,13 @@ class CardViewModel {
     enum Input {
         case viewDidLoad
         case resultShown
-        case setCardBackgroundImg(background: UIImage) //CardBackgroundViewController 으로부터 backgroundImg Set
+        case setCardBackgroundImg(background: String) //CardBackgroundViewController 으로부터 backgroundImg Set
         case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImage Set
         case resultSend(paperID: String, isLocalDB: Bool)
     }
     
     enum Output {
-        case getRecentCardBackgroundImgSuccess(background: UIImage?)
+        case getRecentCardBackgroundImgSuccess(background: String?)
         case getRecentCardBackgroundImgFail
         case getRecentCardResultImgSuccess(result: UIImage?)
         case getRecentCardResultImgFail
@@ -52,23 +53,20 @@ class CardViewModel {
                 self.getRecentCardResultImg()
             case.resultSend(let paperID, let isLocalDB):
                 print("resultSend Good!!!!!!!")
-                self.createCard(paperID: paperID ,isLocalDB: isLocalDB)
+                self.createCard(paperID: paperID, isLocalDB: isLocalDB)
             }
         })
         .store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
     
-    private func setCardBackgroundImg(background: UIImage) {
-        guard let jpeg = background.jpegData(compressionQuality: 1)
-        else { return }
-        UserDefaults.standard.set(jpeg, forKey: "cardBackgroundImg")
+    private func setCardBackgroundImg(background: String) {
+        backString = background
     }
     
     private func getRecentCardBackgroundImg() {
-        if let recentBackgroundImg = UserDefaults.standard.data(forKey: "cardBackgroundImg") {
-            let backImg = UIImage(data: recentBackgroundImg)
-            output.send(.getRecentCardBackgroundImgSuccess(background: backImg))
+        if backString != "setting" {
+            output.send(.getRecentCardBackgroundImgSuccess(background: backString))
         } else {
             output.send(.getRecentCardBackgroundImgFail)
         }
