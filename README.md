@@ -4,6 +4,9 @@
 
 <br><br>
 
+## 🔗 AppStore
+<br><br>
+
 ## 📱  Preview
 
 ### ⭐️ 1st Sprint
@@ -12,7 +15,7 @@
 |:---:|:---:|
 |<center>로그인</center>|<center>페이퍼 생성</center>|
 
-|<img src="https://user-images.githubusercontent.com/95460398/200222545-f0afe505-c98d-474f-8189-808e9eab05d1.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/200223222-b4faeea2-6fc4-4921-aa7a-c4bacf317522.gif"/>|
+|<img src="https://user-images.githubusercontent.com/95460398/200453685-17409af0-920f-42d1-a15c-424915be3b3e.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/200223222-b4faeea2-6fc4-4921-aa7a-c4bacf317522.gif"/>|
 |:---:|:---:|
 |<center>카드 생성</center>|<center>카드 자세히 보기</center>|
 
