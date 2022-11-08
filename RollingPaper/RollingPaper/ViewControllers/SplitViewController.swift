@@ -39,6 +39,11 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             name: Notification.Name.viewChangeFromSidebar,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeFromDeeplink),
+            name: .deeplink,
+            object: nil)
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
         self.loadViewControllers()
@@ -61,6 +66,31 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
     }
     
+    @objc func changeFromDeeplink(notification: Notification) {
+        guard
+            let paperId = notification.userInfo?["paperId"] as? String,
+            let routeString = notification.userInfo?["route"] as? String,
+            let route = PaperShareRoute(rawValue: routeString) else { return }
+        navigateToFlow(paperId: paperId, route: route)
+    }
+    
+    private func navigateToFlow(paperId: String, route: PaperShareRoute) {
+        if route == .write {
+            if let currentNavVC = viewControllers[1] as? UINavigationController {
+                currentNavVC.popToRootViewController(true) {
+                    self.setViewController(self.paperStorageViewController, for: .secondary)
+                    if let paperVC = self.paperStorageViewController.viewControllers.first as? PaperStorageViewController {
+                        let writtenVC = WrittenPaperViewController()
+                        self.paperStorageViewController.pushViewController(writtenVC, animated: true) {
+                            LocalDatabaseFileManager.shared.fetchPaper(paperId: paperId)
+                            FirestoreManager.shared.fetchPaper(paperId: paperId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     @objc func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
@@ -69,7 +99,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "페이퍼 보관함":
             if currentSecondaryView == "페이퍼 템플릿" {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
-                self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
                 setViewController(paperStorageViewController, for: .secondary)
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)

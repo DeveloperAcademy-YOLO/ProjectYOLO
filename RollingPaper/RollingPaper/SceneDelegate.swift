@@ -13,7 +13,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-   
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         let splitVC = SplitViewController(style: .doubleColumn)
@@ -22,34 +21,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.overrideUserInterfaceStyle = .light
         self.window = window
         print("Scene Delegate Come")
-        if let userActivity = connectionOptions.userActivities.first {
-            self.scene(scene, continue: userActivity)
-        } else {
-            self.scene(scene, openURLContexts: connectionOptions.urlContexts)
+        
+        for userActivity in connectionOptions.userActivities {
+            if let incomingURL = userActivity.webpageURL {
+                let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { dynamicLink, error in
+                    guard
+                        let dynamicLink = dynamicLink,
+                        error == nil else { return }
+                    self.handleDynamicLink(dynamicLink: dynamicLink)
+                }
+            }
         }
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let urlToOpen = URLContexts.first?.url else { return }
-        handleURL(url: urlToOpen)
+        guard
+            let url = URLContexts.first?.url,
+            let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) else { return }
+        handleDynamicLink(dynamicLink: dynamicLink)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+
     }
     
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         guard let incomingURL = userActivity.webpageURL else { return }
-//        handleURL(url: incomingURL)
-        print("background terminated!")
-        DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { [weak self] dynamicLink, error in
+        let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { dynamicLink, error in
             guard
                 let dynamicLink = dynamicLink,
                 error == nil else { return }
-            self?.handleDynamicLink(dynamicLink: dynamicLink)
+            self.handleDynamicLink(dynamicLink: dynamicLink)
         }
     }
     
@@ -73,35 +75,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let components = URLComponents(string: urlString),
             let items = components.queryItems,
             let paperId = items.first(where: {$0.name == "paperId"})?.value,
-            let routeString = items.first(where: {$0.name == "route"})?.value,
-            let route = PaperShareRoute(rawValue: routeString) else {
+            let routeString = items.first(where: {$0.name == "route"})?.value else {
             print("handleDynamicLink Fails")
             return
         }
-        navigateToFlow(paperId: paperId, route: route)
-    }
-    
-    private func navigateToFlow(paperId: String, route: PaperShareRoute) {
-        if route == .write {
-            guard
-                let splitVC = window?.rootViewController as? SplitViewController,
-                let currentNavVC = splitVC.viewControllers[1] as? UINavigationController else { return }
-            currentNavVC.popToRootViewController(false) {
-                if !(currentNavVC.viewControllers.last is PaperStorageViewController) {
-                    NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
-                }
-            }
-            
-            guard
-                let paperNavVC = splitVC.viewControllers[1] as? UINavigationController,
-                let paperVC = paperNavVC.viewControllers.last as? PaperStorageViewController else { return }
-            paperVC.setSelectedPaper(paperId: paperId)
-            paperNavVC.pushViewController(WrittenPaperViewController(), animated: true) {
-                paperVC.setSelectedPaper(paperId: paperId)
-                print("push after: \(paperNavVC.viewControllers)")
-            }
-//            NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view : "페이퍼 보관함"])
-        }
+        NotificationCenter.default.post(name: .deeplink, object: nil, userInfo: ["paperId": paperId, "route": routeString])
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {

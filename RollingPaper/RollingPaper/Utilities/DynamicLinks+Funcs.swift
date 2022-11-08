@@ -31,8 +31,6 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
     }
     let iOSparameters = DynamicLinkIOSParameters(bundleID: bundleID)
     iOSparameters.appStoreID = "6444035444"
-//    iOSparameters.fallbackURL = URL(string: fallbackURLString)
-//    iOSparameters.iPadFallbackURL = URL(string: fallbackURLString)
     linkBuilder.iOSParameters = iOSparameters
     let socialMetaTagPaprams = DynamicLinkSocialMetaTagParameters()
     socialMetaTagPaprams.title = paperTitle
@@ -43,7 +41,7 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
     linkBuilder.socialMetaTagParameters = socialMetaTagPaprams
     guard
         let longDynamicLinkString = linkBuilder.url?.absoluteString,
-        let resultURL = URL(string: longDynamicLinkString + "&efr=1") else {
+        let resultURL = URL(string: longDynamicLinkString) else {
         return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
     }
     return Future({ promise in
