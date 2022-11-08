@@ -75,7 +75,7 @@ class CardViewModel {
     }
     
     private func setCardResultImg(result: UIImage) {
-        guard let result = result.jpegData(compressionQuality: 0.2)
+        guard let result = result.jpegData(compressionQuality: 1)
         else { return }
         UserDefaults.standard.set(result, forKey: "cardResultImg")
     }
