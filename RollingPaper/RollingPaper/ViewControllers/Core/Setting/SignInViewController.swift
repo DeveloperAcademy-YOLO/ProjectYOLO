@@ -101,8 +101,7 @@ final class SignInViewController: UIViewController {
         return label
     }()
     private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView()
-        spinner.hidesWhenStopped = true
+        let spinner = UIActivityIndicatorView(style: .large)
         return spinner
     }()
     private let viewModel = SignInViewModel()
@@ -128,7 +127,7 @@ final class SignInViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
-                self.spinner.isHidden = true
+                self.spinner.stopAnimating()
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
                 case .emailDidMiss:
@@ -410,7 +409,6 @@ extension SignInViewController {
         })
         spinner.snp.makeConstraints({ make in
             make.center.equalToSuperview()
-            make.width.height.equalTo(100)
         })
         setCloseButton()
     }

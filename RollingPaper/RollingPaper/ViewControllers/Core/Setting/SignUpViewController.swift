@@ -32,6 +32,10 @@ final class SignUpViewController: UIViewController {
         button.setAttributedTitle(title, for: .normal)
         return button
     }()
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .large)
+        return spinner
+    }()
     private let viewModel = SignUpViewModel()
     private let input: PassthroughSubject<SignUpViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
@@ -54,11 +58,11 @@ final class SignUpViewController: UIViewController {
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
+                self?.spinner.stopAnimating()
                 switch receivedValue {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
                 case .signUpDidSuccess:
-                    print("SignUpDidSuccess")
                     self?.navigateToSignIn()
                 }
             })
@@ -67,6 +71,7 @@ final class SignUpViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else { return }
+                self.spinner.startAnimating()
                 self.input.send(.signUpButtonDidTap)
             })
             .store(in: &cancellables)
@@ -289,7 +294,7 @@ extension SignUpViewController {
 extension SignUpViewController {
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton, spinner])
         let topOffset = (view.frame.height - 320) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -315,6 +320,9 @@ extension SignUpViewController {
             make.width.equalTo(380)
             make.height.equalTo(38)
         })
+        spinner.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
         setCloseButton()
     }
     
