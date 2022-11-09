@@ -10,20 +10,20 @@ import SnapKit
 import Combine
 import CombineCocoa
 
-private class Layout {
+final private class Layout {
     static let userPhotoFrameWidthHeight = 44
     static let userNameFontSize: CGFloat = 20
     static let userPhotoToNamePadding: CGFloat = 16
     // static let userChevronFrameWidth = Int(Double(userInfoStackWidthSuperView) * 0.3 * 0.24)
     // static let userChevronWidthHeight = 15
-    static let tableCellBackgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
-    static let tableCellimageToTextPadding: CGFloat = 16
-    static let tableCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-    static let tableCellHeight: CGFloat = 56
-    static let tableCellImageSize = CGSize(width: 25, height: 25)
-    static let tableViewLeadingOffset = 128
-    static let tableViewTrailingOffset = -28
-    static let tableViewToUserInfoStackPadding = 24
+    static let collectionViewCellBackgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
+    static let collectionViewCellimageToTextPadding: CGFloat = 16
+    static let collectionViewCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+    static let collectionViewHeight: CGFloat = 56
+    static let collectionViewCellImageSize = CGSize(width: 25, height: 25)
+    static let collectionViewLeadingOffset = 128
+    static let collectionViewTrailingOffset = -28
+    static let collectionViewToUserInfoStackPadding = 24
     static let userInfoStackRadius: CGFloat = 12
     static let userInfoStackInset = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
     static let userInfoStackWidthSuperView = -156
@@ -32,10 +32,18 @@ private class Layout {
     static let userInfoStackTopSafeArea = 40
 }
 
-class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
+class SidebarViewController: UIViewController {
+    
+    private var dataSource: UICollectionViewDiffableDataSource<Section, CategoryModel>! = nil
+    private var collectionView: UICollectionView! = nil
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
+    var sideBarCategories: [CategoryModel] = [
+        CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
+        CategoryModel(name: "페이퍼 보관함", icon: "folder"),
+        CategoryModel(name: "설정", icon: "gearshape")
+    ]
+    
     private var cancellables = Set<AnyCancellable>()
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
@@ -44,15 +52,6 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         photo.contentMode = UIView.ContentMode.scaleAspectFit
         return photo
     }()
-    
-    /*
-    private let chevron: UIImageView = {
-        let chevron = UIImageView()
-        chevron.image = UIImage(systemName: "chevron.forward")
-        chevron.contentMode = UIView.ContentMode.scaleAspectFit
-        return chevron
-    }()
-    */
     
     private let userName: UILabel = {
         let name = UILabel()
@@ -72,28 +71,13 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         return userInfo
     }()
     
-    private let tableView: UITableView = {
-        let tableview = UITableView()
-        tableview.register(UITableViewCell.self, forCellReuseIdentifier: "DefaultCell")
-        return tableview
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
         bind()
-        // let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
-        // userInfoStack.addGestureRecognizer(tapUserInfo)
-        tableView.separatorStyle = .none
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        setupSubviews()
-    }
-    
-    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
-        print("UserInfoTapped!", sender)
+        setProfileView()
+        setCollectionView()
+        configureDataSource()
     }
     
     private func bind() {
@@ -120,70 +104,30 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             }
             .store(in: &cancellables)
     }
-
-
-    func show(categories: [CategoryModel]) {
-        self.categories = categories
-        tableView.reloadData()
-    }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        let category = self.categories[indexPath.row]
-        var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
-        backgroundConfig.backgroundInsets = Layout.tableCellBackgroundInsets
-        cell.backgroundConfiguration = backgroundConfig
-        cell.selectionStyle = .gray
-        var content = cell.defaultContentConfiguration()
-        content.image = UIImage(systemName: category.icon)
-        content.text = category.name
-        content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
-        content.imageToTextPadding = Layout.tableCellimageToTextPadding
-        content.imageProperties.tintColor = .systemGray3
-        content.imageProperties.maximumSize = Layout.tableCellImageSize
-        content.directionalLayoutMargins = Layout.tableCellInsets
-        cell.contentConfiguration = content
-        
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.categories.count
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let category = self.categories[indexPath.row]
-        NotificationCenter.default.post(
-            name: Notification.Name.viewChangeFromSidebar,
-            object: nil,
-            userInfo: [NotificationViewKey.view: category.name])
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return Layout.tableCellHeight
-    }
-    
-    private func setupSubviews() {
-        setupProfileView()
-        setupTableView()
-    }
-    
-    private func setupTableView() {
-        view.addSubview(tableView)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.backgroundColor = .clear
-        
-        tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.tableViewLeadingOffset)
-            make.trailing.equalToSuperview().offset(Layout.tableViewTrailingOffset)
-            make.bottom.equalToSuperview()
-            make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.tableViewToUserInfoStackPadding)
+    private func setLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout { section, layoutEnvironment in
+            var config = UICollectionLayoutListConfiguration(appearance: .sidebar)
+            config.headerMode = .none
+            return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
         }
     }
     
-    private func setupProfileView() {
+    private func setCollectionView() {
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
+        view.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.backgroundColor = .clear
+        
+        collectionView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(Layout.collectionViewLeadingOffset)
+            make.trailing.equalToSuperview().offset(Layout.collectionViewTrailingOffset)
+            make.bottom.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.collectionViewToUserInfoStackPadding)
+        }
+    }
+    
+    private func setProfileView() {
         view.addSubview(userInfoStack)
         userInfoStack.backgroundColor = .systemBackground
         userInfoStack.layer.cornerRadius = Layout.userInfoStackRadius
@@ -202,4 +146,47 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
         userPhoto.contentMode = .scaleAspectFill
     }
+    
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, CategoryModel> { (cell, indexPath, category) in
+            var content = cell.defaultContentConfiguration()
+            content.text = category.name
+            content.image = UIImage(systemName: category.icon)
+            cell.contentConfiguration = content
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource<Section, CategoryModel>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+        }
+
+        let sections: [Section] = [.main]
+        var snapshot = NSDiffableDataSourceSnapshot<Section, CategoryModel>()
+        snapshot.appendSections(sections)
+        dataSource.apply(snapshot, animatingDifferences: false)
+
+        for section in sections {
+            switch section {
+            case .main:
+                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<CategoryModel>()
+                sectionSnapshot.append(sideBarCategories)
+                dataSource.apply(sectionSnapshot, to: section)
+            }
+        }
+    }
+}
+
+extension SidebarViewController: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let category = self.sideBarCategories[indexPath.row]
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChangeFromSidebar,
+            object: nil,
+            userInfo: [NotificationViewKey.view: category.name])
+    }
+}
+
+enum Section: String {
+    case main
 }
