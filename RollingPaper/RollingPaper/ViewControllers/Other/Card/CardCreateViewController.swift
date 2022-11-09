@@ -344,7 +344,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         
         let popover = controller.popoverPresentationController
         popover?.sourceView = sender
-        popover?.sourceRect = CGRect(x: 25, y: -60, width: 50, height: 180)
+        popover?.sourceRect = CGRect(x: 25, y: 0, width: 50, height: 50)
         present(controller, animated: true)
     }
     
@@ -356,21 +356,19 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             stickerButtonOff()
             selectedStickerView?.showEditingHandlers = false
             stickerCollectionViewDisappear()
-            
+    
             pencilButtonOn()
             toolPickerAppear()
-            
-            //  imageViewInteractionDisabled()
-            canvasViewInteractionEnabled() // 여기 순서가 중요함
+      
+            canvasViewInteractionEnabled()
         } else {
             print("sticker button On")
             stickerButtonOn()
             stickerCollectionViewAppear()
             pencilButtonOff()
             toolPickerDisappear()
-            
-            // imageViewInteractionEnabled()
-            canvasViewInteractionDisabled() // 여기 순서가 중요함
+    
+            canvasViewInteractionDisabled()
         }
     }
 }
