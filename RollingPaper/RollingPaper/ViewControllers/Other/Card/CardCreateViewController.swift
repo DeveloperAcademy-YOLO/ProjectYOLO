@@ -169,7 +169,17 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         setCollectionView.backgroundColor = .systemBackground
         setCollectionView.showsHorizontalScrollIndicator = false
         setCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        setCollectionView.layer.masksToBounds = true
+        setCollectionView.layer.masksToBounds = false
+       
+        setCollectionView.layer.borderWidth = 0.1
+        setCollectionView.layer.borderColor = UIColor.white.cgColor
+
+        // shadow
+        setCollectionView.layer.shadowColor = UIColor.lightGray.cgColor
+        setCollectionView.layer.shadowOffset = CGSize(width: 3, height: 3)
+        setCollectionView.layer.shadowOpacity = 0.7
+        setCollectionView.layer.shadowRadius = 20.0
+ 
         setCollectionView.layer.cornerRadius = 60
         return setCollectionView
     }()
