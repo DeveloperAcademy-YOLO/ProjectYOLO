@@ -340,13 +340,13 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     
     func stickerCollectionViewAppear() {
         view.addSubview(collectionView)
-      //  collectionView.fadeIn()
         collectionViewConstraints()
+        collectionView.animateShowingUP()
     }
     
     func stickerCollectionViewDisappear() {
         view.addSubview(collectionView)
-        collectionView.animateShowUp()
+        collectionView.isHidden = true
         collectionViewConstraints()
     }
     
@@ -724,19 +724,17 @@ extension UIView {
         }, completion: completion)
     }
     
-    func animateShowUp() {
-           // self.isHidden = true
-            let identityY = center.y
-        UIView.animateKeyframes(withDuration: 0.8, delay: 0.1) { [weak self] in
-                guard let height = self?.bounds.height else {
-                    return
-                }
-                self?.alpha = 0
-                self?.center.y = -height/2
-            } completion: { [weak self] _ in
-                self?.alpha = 1
-                self?.center.y = identityY
-                self?.isHidden = false
+    func animateShowingUP() {
+
+        let identityY = center.y
+
+        UIView.animateKeyframes(withDuration: 0.8, delay: 0) { [weak self] in
+            guard let height = self?.bounds.height else {
+                return
             }
+            self?.alpha = 1
+            self?.center.y = -height/4
+            self?.isHidden = false
         }
+    }
 }
