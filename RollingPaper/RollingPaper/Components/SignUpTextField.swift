@@ -5,10 +5,10 @@
 //  Created by Junyeong Park on 2022/10/08.
 //
 
-import UIKit
-import SnapKit
 import Combine
 import CombineCocoa
+import SnapKit
+import UIKit
 
 final class SignUpTextField: UIView {
     enum SignUpTextFieldEnum {
@@ -33,7 +33,6 @@ final class SignUpTextField: UIView {
         imageView.image = UIImage(systemName: "checkmark.circle")?.withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
         return imageView
     }()
-    
     private let nameCountView: UILabel = {
         let label = UILabel()
         label.text = "0/8"
@@ -45,7 +44,6 @@ final class SignUpTextField: UIView {
         label.layer.masksToBounds = true
         return label
     }()
-    
     let textField: UITextField = {
         let textField = UITextField()
         textField.borderStyle = .none
@@ -63,14 +61,12 @@ final class SignUpTextField: UIView {
         textField.font = .preferredFont(forTextStyle: .body)
         return textField
     }()
-    
     private let waringImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .center
         imageView.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
         return imageView
     }()
-    
     private let waringLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
@@ -86,32 +82,6 @@ final class SignUpTextField: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setDefaultLayout() {
-        addSubviews([textField, waringImage, waringLabel, checkImageView])
-        textField.snp.makeConstraints({ make in
-            make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(38)
-        })
-        waringImage.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset(56)
-            make.leading.equalToSuperview().offset(16)
-            make.height.equalTo(21.52)
-            make.width.equalTo(20.26)
-            make.bottom.equalToSuperview()
-        })
-        waringLabel.snp.makeConstraints({ make in
-            make.top.equalTo(waringImage.snp.top)
-            make.leading.equalToSuperview().offset(49.05)
-            make.bottom.equalTo(waringImage.snp.bottom)
-        })
-        checkImageView.snp.makeConstraints({ make in
-            make.top.equalTo(snp.top).offset(9)
-            make.width.height.equalTo(19.92)
-            make.trailing.equalTo(snp.trailing).offset(-9.08)
-        })
-        checkImageView.isHidden = true
     }
 }
 
@@ -322,17 +292,6 @@ extension SignUpTextField {
             }
         }
     }
-}
-
-extension SignUpTextField {
-    func setWaringView(waringShown: Bool, text: String?) {
-        waringImage.isHidden = !waringShown
-        waringLabel.text = text
-        waringLabel.snp.updateConstraints({ make in
-            make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
-        })
-        layoutIfNeeded()
-    }
     
     private func isValidEmail(text: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
@@ -355,5 +314,43 @@ extension SignUpTextField {
             state = text.isEmpty ? .warning(error: .invalidName) : text.count <= 8 ? .passed : .warning(error: .invalidName)
         }
         return state
+    }
+}
+
+// extension for SnapKit
+extension SignUpTextField {
+    private func setDefaultLayout() {
+        addSubviews([textField, waringImage, waringLabel, checkImageView])
+        textField.snp.makeConstraints({ make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(38)
+        })
+        waringImage.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(56)
+            make.leading.equalToSuperview().offset(16)
+            make.height.equalTo(21.52)
+            make.width.equalTo(20.26)
+            make.bottom.equalToSuperview()
+        })
+        waringLabel.snp.makeConstraints({ make in
+            make.top.equalTo(waringImage.snp.top)
+            make.leading.equalToSuperview().offset(49.05)
+            make.bottom.equalTo(waringImage.snp.bottom)
+        })
+        checkImageView.snp.makeConstraints({ make in
+            make.top.equalTo(snp.top).offset(9)
+            make.width.height.equalTo(19.92)
+            make.trailing.equalTo(snp.trailing).offset(-9.08)
+        })
+        checkImageView.isHidden = true
+    }
+    
+    func setWaringView(waringShown: Bool, text: String?) {
+        waringImage.isHidden = !waringShown
+        waringLabel.text = text
+        waringLabel.snp.updateConstraints({ make in
+            make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
+        })
+        layoutIfNeeded()
     }
 }

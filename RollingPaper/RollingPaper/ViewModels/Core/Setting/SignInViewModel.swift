@@ -5,17 +5,10 @@
 //  Created by Junyeong Park on 2022/10/04.
 //
 
-import Foundation
 import Combine
-import SnapKit
+import Foundation
 
 final class SignInViewModel {
-    var email = CurrentValueSubject<String, Never>("")
-    var password = CurrentValueSubject<String, Never>("")
-    private let authManager: AuthManager
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
     enum Input {
         case signInButtonTap
         case appleSignInButtonTap
@@ -33,6 +26,11 @@ final class SignInViewModel {
         case passwordFocused
         case normalBoundTap
     }
+    let email = CurrentValueSubject<String, Never>("")
+    let password = CurrentValueSubject<String, Never>("")
+    private let authManager: AuthManager
+    private let output: PassthroughSubject<Output, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
     init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
