@@ -5,13 +5,13 @@
 //  Created by Junyeong Park on 2022/10/04.
 //
 
-import UIKit
-import Combine
-import SnapKit
 import AuthenticationServices
+import Combine
 import CombineCocoa
+import SnapKit
+import UIKit
 
-class SignInViewController: UIViewController {
+final class SignInViewController: UIViewController {
     enum TextFieldFocused {
         case normal
         case emailFocused
@@ -100,7 +100,6 @@ class SignInViewController: UIViewController {
         label.isHidden = true
         return label
     }()
-    
     private let viewModel = SignInViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
@@ -116,125 +115,6 @@ class SignInViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         layoutIfModalView()
-    }
-    
-    private func layoutIfModalView() {
-        if presentingViewController != nil {
-            let topOffset = (view.frame.height - 332) / 2
-            emailTextField.snp.updateConstraints({ make in
-                make.top.equalToSuperview().offset(topOffset)
-            })
-            view.layoutIfNeeded()
-        }
-    }
-    
-    private func setSignInViewUI() {
-        view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
-        let topOffset = (view.frame.height - 332) / 2
-        emailTextField.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset(topOffset)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(38)
-            make.width.equalTo(380)
-        })
-        passwordTextField.snp.makeConstraints({ make in
-            make.top.equalTo(emailTextField.snp.bottom).offset(28)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(38)
-            make.width.equalTo(380)
-        })
-        waringImage.snp.makeConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(19)
-            make.leading.equalTo(passwordTextField.snp.leading).offset(16)
-            make.height.equalTo(21.52)
-            make.width.equalTo(21.57)
-        })
-        waringLabel.snp.makeConstraints({ make in
-            make.top.equalTo(waringImage.snp.top)
-            make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
-        })
-        signUpButton.snp.makeConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(36)
-            make.centerX.equalToSuperview()
-        })
-        signUpDivider.snp.makeConstraints({ make in
-            make.top.equalTo(signUpButton.snp.bottom).offset(-5.75)
-            make.width.equalTo(signUpButton.snp.width)
-            make.height.equalTo(1)
-            make.leading.equalTo(signUpButton.snp.leading)
-        })
-        signInButton.snp.makeConstraints({ make in
-            make.top.equalTo(signUpButton.snp.bottom).offset(36)
-            make.width.equalTo(375)
-            make.height.equalTo(48)
-            make.centerX.equalToSuperview()
-        })
-        divider.snp.makeConstraints({ make in
-            make.width.equalTo(340)
-            make.height.equalTo(2)
-            make.top.equalTo(signInButton.snp.bottom).offset(24)
-            make.centerX.equalToSuperview()
-        })
-        appleSignInButton.snp.makeConstraints({ make in
-            make.top.equalTo(divider.snp.bottom).offset(24)
-            make.width.equalTo(375)
-            make.height.equalTo(48)
-            make.centerX.equalToSuperview()
-        })
-        setCloseButton()
-    }
-    
-    private func setTextFieldUI(textFieldFocused: TextFieldFocused) {
-        switch textFieldFocused {
-        case .normal:
-            emailTextField.layer.borderWidth = 1.0
-            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
-            passwordTextField.layer.borderWidth = 1.0
-            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
-        case .emailFocused:
-            emailTextField.layer.borderWidth = 2.0
-            emailTextField.layer.borderColor = UIColor.systemBlue.cgColor
-            passwordTextField.layer.borderWidth = 1.0
-            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
-        case .emailWaring:
-            emailTextField.layer.borderWidth = 2.0
-            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
-            passwordTextField.layer.borderWidth = 1.0
-            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
-        case .passwordFocused:
-            emailTextField.layer.borderWidth = 1.0
-            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
-            passwordTextField.layer.borderWidth = 2.0
-            passwordTextField.layer.borderColor = UIColor.systemBlue.cgColor
-        case .passwordWaring:
-            emailTextField.layer.borderWidth = 1.0
-            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
-            passwordTextField.layer.borderWidth = 2.0
-            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
-        case .bothWaring:
-            emailTextField.layer.borderWidth = 2.0
-            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
-            passwordTextField.layer.borderWidth = 2.0
-            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
-        }
-    }
-        
-    private func navigateToCurrentFlow() {
-        if let modalPresentingVC = presentingViewController as? SplitViewController {
-            if
-                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
-                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
-                dismiss(animated: true)
-            }
-        } else {
-            if
-                let currentNavVC = navigationController,
-                let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
-                print("Current is SignInView!")
-                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
-            }
-        }
     }
     
     private func bind() {
@@ -374,48 +254,10 @@ class SignInViewController: UIViewController {
         view.addGestureRecognizer(backgroundGesture)
     }
     
-    @objc private func backgroundDidTap() {
-        view.endEditing(true)
-        emailTextField.resignFirstResponder()
-        passwordTextField.resignFirstResponder()
-    }
-}
-
-extension SignInViewController {
-    private func setKeyboardObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        if
-            let userInfo = notification.userInfo,
-            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
-            let keyboardRect = keyboardInfo.cgRectValue
-            let keyboardY = keyboardRect.origin.y
-            let originalHeight = UIScreen.main.bounds.height
-            let currentViewHeight = view.frame.height
-            let offsetHeight = (originalHeight - currentViewHeight) / 2
-            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
-                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
-            }
-        }
-    }
-    
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if view.frame.origin.y != 0 {
-            view.frame.origin.y = 0
-        }
-    }
-    
     private func setCloseButton() {
         if presentingViewController != nil {
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
         }
-    }
-    
-    @objc private func close() {
-        dismiss(animated: true)
     }
     
     private func handleError(error: AuthManagerEnum) {
@@ -443,6 +285,158 @@ extension SignInViewController {
             setTextFieldUI(textFieldFocused: .normal)
         }
     }
+        
+    private func navigateToCurrentFlow() {
+        if let modalPresentingVC = presentingViewController as? SplitViewController {
+            if
+                let currentNavVC = modalPresentingVC.viewControllers[1] as? UINavigationController,
+                let currentVC = currentNavVC.viewControllers.last as? WrittenPaperViewController {
+                dismiss(animated: true)
+            }
+        } else {
+            if
+                let currentNavVC = navigationController,
+                let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
+                print("Current is SignInView!")
+                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
+            }
+        }
+    }
+    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
+        emailTextField.resignFirstResponder()
+        passwordTextField.resignFirstResponder()
+    }
+    
+    @objc private func close() {
+        dismiss(animated: true)
+    }
+}
+
+// extension for keyboard setting
+extension SignInViewController {
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            let originalHeight = UIScreen.main.bounds.height
+            let currentViewHeight = view.frame.height
+            let offsetHeight = (originalHeight - currentViewHeight) / 2
+            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
+            }
+        }
+    }
+    
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
+    }
+}
+
+
+// extension for SnapKit
+extension SignInViewController {
+    private func setSignInViewUI() {
+        view.backgroundColor = .systemBackground
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
+        let topOffset = (view.frame.height - 332) / 2
+        emailTextField.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(38)
+            make.width.equalTo(380)
+        })
+        passwordTextField.snp.makeConstraints({ make in
+            make.top.equalTo(emailTextField.snp.bottom).offset(28)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(38)
+            make.width.equalTo(380)
+        })
+        waringImage.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(19)
+            make.leading.equalTo(passwordTextField.snp.leading).offset(16)
+            make.height.equalTo(21.52)
+            make.width.equalTo(21.57)
+        })
+        waringLabel.snp.makeConstraints({ make in
+            make.top.equalTo(waringImage.snp.top)
+            make.leading.equalTo(waringImage.snp.trailing).offset(11.48)
+        })
+        signUpButton.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.bottom).offset(36)
+            make.centerX.equalToSuperview()
+        })
+        signUpDivider.snp.makeConstraints({ make in
+            make.top.equalTo(signUpButton.snp.bottom).offset(-5.75)
+            make.width.equalTo(signUpButton.snp.width)
+            make.height.equalTo(1)
+            make.leading.equalTo(signUpButton.snp.leading)
+        })
+        signInButton.snp.makeConstraints({ make in
+            make.top.equalTo(signUpButton.snp.bottom).offset(36)
+            make.width.equalTo(375)
+            make.height.equalTo(48)
+            make.centerX.equalToSuperview()
+        })
+        divider.snp.makeConstraints({ make in
+            make.width.equalTo(340)
+            make.height.equalTo(2)
+            make.top.equalTo(signInButton.snp.bottom).offset(24)
+            make.centerX.equalToSuperview()
+        })
+        appleSignInButton.snp.makeConstraints({ make in
+            make.top.equalTo(divider.snp.bottom).offset(24)
+            make.width.equalTo(375)
+            make.height.equalTo(48)
+            make.centerX.equalToSuperview()
+        })
+        setCloseButton()
+    }
+    
+    private func setTextFieldUI(textFieldFocused: TextFieldFocused) {
+        switch textFieldFocused {
+        case .normal:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .emailFocused:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemBlue.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .emailWaring:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
+            passwordTextField.layer.borderWidth = 1.0
+            passwordTextField.layer.borderColor = UIColor.systemGray.cgColor
+        case .passwordFocused:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemBlue.cgColor
+        case .passwordWaring:
+            emailTextField.layer.borderWidth = 1.0
+            emailTextField.layer.borderColor = UIColor.systemGray.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
+        case .bothWaring:
+            emailTextField.layer.borderWidth = 2.0
+            emailTextField.layer.borderColor = UIColor.systemRed.cgColor
+            passwordTextField.layer.borderWidth = 2.0
+            passwordTextField.layer.borderColor = UIColor.systemRed.cgColor
+        }
+    }
     
     private func setWarningMessage(isShown: Bool, message: String?) {
         waringLabel.isHidden = !isShown
@@ -454,5 +448,15 @@ extension SignInViewController {
             make.top.equalTo(passwordTextField.snp.bottom).offset(isShown ? 69 : 36)
         })
         view.layoutIfNeeded()
+    }
+    
+    private func layoutIfModalView() {
+        if presentingViewController != nil {
+            let topOffset = (view.frame.height - 332) / 2
+            emailTextField.snp.updateConstraints({ make in
+                make.top.equalToSuperview().offset(topOffset)
+            })
+            view.layoutIfNeeded()
+        }
     }
 }
