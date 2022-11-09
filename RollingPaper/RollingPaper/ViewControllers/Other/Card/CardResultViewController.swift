@@ -10,46 +10,13 @@ import SnapKit
 import Combine
 
 final class CardResultViewController: UIViewController {
-    
-    private var backgroundImg = UIImage(named: "Rectangle")
-    let image: UIImage
+   
+    private let image: UIImage
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var backgroundImg = UIImage(named: "Rectangle")
     private var cancellables = Set<AnyCancellable>()
-    
-    init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
-        self.image = resultImage
-        self.viewModel = viewModel
-        self.isLocalDB = isLocalDB
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemGray6
-        
-        view.addSubview(someImageView)
-        
-        someImageViewConstraints()
-        
-        setCustomNavBarButtons()
-        
-        input.send(.viewDidLoad)
-        bind()
-    }
-    
-    private func bind() {
-        _ = viewModel.transform(input: input.eraseToAnyPublisher())
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
@@ -94,6 +61,39 @@ final class CardResultViewController: UIViewController {
         return button
     }()
     
+    init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
+        self.image = resultImage
+        self.viewModel = viewModel
+        self.isLocalDB = isLocalDB
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemGray6
+        
+        view.addSubview(someImageView)
+        
+        someImageViewConstraints()
+        
+        setCustomNavBarButtons()
+        
+        input.send(.viewDidLoad)
+        bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    private func bind() {
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
+    }
+    
     private func setCustomNavBarButtons() {
         self.navigationItem.titleView = navigationTitle
         
@@ -108,19 +108,7 @@ final class CardResultViewController: UIViewController {
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
     
-    func someImageViewConstraints() {
-        someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(120)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
+
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
         self.navigationController?.popViewController(animated: false)
     }
@@ -135,3 +123,19 @@ final class CardResultViewController: UIViewController {
     }
     
 }
+
+extension CardResultViewController {
+    private func someImageViewConstraints() {
+        someImageView.snp.makeConstraints({ make in
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
+            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
+            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(120)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+}
+

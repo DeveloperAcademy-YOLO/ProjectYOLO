@@ -17,49 +17,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardViewModel, backgroundImageName: [String]) {
-        self.viewModel = viewModel
-        self.backgroundImageName = backgroundImageName
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .clear
-
-        selfConstraints()
-        
-        view.addSubview(firstColorBackgroundButton)
-        firstColorButtonConstraints()
-        
-        view.addSubview(secondColorBackgroundButton)
-        secondColorButtonConstraints()
-        
-        view.addSubview(thirdColorBackgroundButton)
-        thirdColorButtonConstraints()
-        
-        view.addSubview(fourthColorBackgroundButton)
-        fourthColorButtonConstraints()
-        
-        input.send(.viewDidLoad)
-        bind()
-    }
-    
-    override func viewWillLayoutSubviews() {
-        self.changeFrmae()
-    }
-    
-    func changeFrmae() {
-        self.view.frame = CGRect(x: 0, y: 0, width: 128, height: 400)
-    }
-    
-    private func bind() {
-        _ = viewModel.transform(input: input.eraseToAnyPublisher())
-    }
     
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
@@ -117,6 +74,49 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         return button
     }()
     
+    init(viewModel: CardViewModel, backgroundImageName: [String]) {
+        self.viewModel = viewModel
+        self.backgroundImageName = backgroundImageName
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .clear
+
+        selfConstraints()
+        
+        view.addSubview(firstColorBackgroundButton)
+        firstColorButtonConstraints()
+        
+        view.addSubview(secondColorBackgroundButton)
+        secondColorButtonConstraints()
+        
+        view.addSubview(thirdColorBackgroundButton)
+        thirdColorButtonConstraints()
+        
+        view.addSubview(fourthColorBackgroundButton)
+        fourthColorButtonConstraints()
+        
+        input.send(.viewDidLoad)
+        bind()
+    }
+    
+    private func bind() {
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
+    }
+    
+    override func viewWillLayoutSubviews() {
+        self.changeFrmae()
+    }
+    
+    func changeFrmae() {
+        self.view.frame = CGRect(x: 0, y: 0, width: 128, height: 400)
+    }
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
         self.input.send(.setCardBackgroundImg(background: backgroundImageName[0]))
     }
@@ -146,14 +146,14 @@ extension UIButton {
 
 extension BackgroundButtonViewController {
     
-    func selfConstraints() {
+    private func selfConstraints() {
         self.view.snp.makeConstraints({ make in
             make.width.equalTo(100)
             make.height.equalTo(200)
         })
     }
     
-    func firstColorButtonConstraints() {
+    private func firstColorButtonConstraints() {
         firstColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(100)
             make.height.equalTo(80)
@@ -162,7 +162,7 @@ extension BackgroundButtonViewController {
         })
     }
     
-    func secondColorButtonConstraints() {
+    private func secondColorButtonConstraints() {
         secondColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(100)
             make.height.equalTo(80)
@@ -171,7 +171,7 @@ extension BackgroundButtonViewController {
         })
     }
     
-    func thirdColorButtonConstraints() {
+    private func thirdColorButtonConstraints() {
         thirdColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(100)
             make.height.equalTo(80)
@@ -180,7 +180,7 @@ extension BackgroundButtonViewController {
         })
     }
     
-    func fourthColorButtonConstraints() {
+    private func fourthColorButtonConstraints() {
         fourthColorBackgroundButton.snp.makeConstraints({ make in
             make.width.equalTo(100)
             make.height.equalTo(80)

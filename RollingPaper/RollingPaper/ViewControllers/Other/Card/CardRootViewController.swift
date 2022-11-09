@@ -10,61 +10,14 @@ import SnapKit
 import Combine
 
 class CardRootViewController: UIViewController {
-    
-    private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher())
-        output
-            .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .getRecentCardBackgroundImgSuccess(_):
-                    DispatchQueue.main.async(execute: {
-                    })
-                case .getRecentCardBackgroundImgFail:
-                    DispatchQueue.main.async(execute: {
-                    })
-                case .getRecentCardResultImgSuccess(let result):
-                    DispatchQueue.main.async(execute: {
-                        self.backgroundImg = result
-                        print("CardrootView ResultImg import sueccess")
-                    })
-                case .getRecentCardResultImgFail:
-                    DispatchQueue.main.async(execute: {
-                        print("result Page bind fail")
-                    })
-                }
-            })
-            .store(in: &cancellables)
-    }
-    
+   
     private var backgroundImg: UIImage?
+    private var cancellables = Set<AnyCancellable>()
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
-    init(viewModel: CardViewModel, isLocalDB: Bool, currentPaper: PaperModel) {
-        self.viewModel = viewModel
-        self.isLocalDB = isLocalDB
-        self.currentPaper = currentPaper
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        
-        instantiateSegmentedViewControllers()
-        setCustomNavBarButtons()
-        
-        input.send(.resultShown)
-        bind()
-    }
+   
     
     lazy var leftButton: UIBarButtonItem = {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
@@ -96,13 +49,52 @@ class CardRootViewController: UIViewController {
         return secondStepView
     }()
     
-    func cardCreateStepViewConstraints() {
-        cardCreateStepView.snp.makeConstraints({ make in
-            make.top.equalTo(self.view).offset(30)
-            make.leading.equalTo(self.view).offset(0)
-            make.bottom.equalTo(self.view).offset(0)
-            make.trailing.equalTo(self.view).offset(0)
-        })
+    init(viewModel: CardViewModel, isLocalDB: Bool, currentPaper: PaperModel) {
+        self.viewModel = viewModel
+        self.isLocalDB = isLocalDB
+        self.currentPaper = currentPaper
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        
+        instantiateSegmentedViewControllers()
+        setCustomNavBarButtons()
+        
+        input.send(.resultShown)
+        bind()
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .getRecentCardBackgroundImgSuccess(_):
+                    DispatchQueue.main.async(execute: {
+                    })
+                case .getRecentCardBackgroundImgFail:
+                    DispatchQueue.main.async(execute: {
+                    })
+                case .getRecentCardResultImgSuccess(let result):
+                    DispatchQueue.main.async(execute: {
+                        self.backgroundImg = result
+                        print("CardrootView ResultImg import sueccess")
+                    })
+                case .getRecentCardResultImgFail:
+                    DispatchQueue.main.async(execute: {
+                        print("result Page bind fail")
+                    })
+                }
+            })
+            .store(in: &cancellables)
     }
     
     private func instantiateSegmentedViewControllers() {
@@ -120,7 +112,6 @@ class CardRootViewController: UIViewController {
     }
     
     private func setCustomNavBarButtons() {
-        //self.navigationItem.titleView = segmentedControl
         navigationItem.title = "카드작성"
         navigationItem.leftBarButtonItem = leftButton
         navigationItem.rightBarButtonItem = rightButton
@@ -169,4 +160,15 @@ class CardRootViewController: UIViewController {
             }))
          present(alert, animated: true)
      }
+}
+
+extension CardRootViewController {
+    private func cardCreateStepViewConstraints() {
+        cardCreateStepView.snp.makeConstraints({ make in
+            make.top.equalTo(self.view).offset(30)
+            make.leading.equalTo(self.view).offset(0)
+            make.bottom.equalTo(self.view).offset(0)
+            make.trailing.equalTo(self.view).offset(0)
+        })
+    }
 }
