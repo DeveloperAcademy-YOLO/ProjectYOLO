@@ -43,7 +43,7 @@
 <br><br>
 
 ## 🛠  Development Environment
-<img width="100" src="https://img.shields.io/badge/iOS-14.0-silver"> <img width="125" src="https://img.shields.io/badge/Xcode-14.0-blue">
+<img width="100" src="https://img.shields.io/badge/iOS-15.0-silver"> <img width="125" src="https://img.shields.io/badge/Xcode-14.1-blue">
 
 <br><br>
 
