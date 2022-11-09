@@ -5,17 +5,10 @@
 //  Created by Junyeong Park on 2022/10/04.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 final class SignUpViewModel {
-    var email = CurrentValueSubject<String, Never>("")
-    var password = CurrentValueSubject<String, Never>("")
-    var name = CurrentValueSubject<String, Never>("")
-    private let authManager: AuthManager
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    
     enum Input {
         case signUpButtonDidTap
     }
@@ -23,6 +16,12 @@ final class SignUpViewModel {
         case signUpDidFail(error: AuthManagerEnum)
         case signUpDidSuccess
     }
+    let email = CurrentValueSubject<String, Never>("")
+    let password = CurrentValueSubject<String, Never>("")
+    let name = CurrentValueSubject<String, Never>("")
+    private let authManager: AuthManager
+    private let output: PassthroughSubject<Output, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
     
     init(authManager: AuthManager = FirebaseAuthManager.shared) {
         self.authManager = authManager
@@ -32,7 +31,7 @@ final class SignUpViewModel {
     private func bind() {
         authManager
             .signedInSubject
-//            .receive(on: DispatchQueue.global(qos: .background))
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
                 switch receivedValue {
