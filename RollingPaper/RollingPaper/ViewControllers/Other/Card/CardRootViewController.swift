@@ -39,15 +39,13 @@ class CardRootViewController: UIViewController {
     
     private var backgroundImg: UIImage?
     private let viewModel: CardViewModel
-    private let paperID: String
     private let isLocalDB: Bool
     private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(viewModel: CardViewModel, paperID: String, isLocalDB: Bool, currentPaper: PaperModel) {
+    init(viewModel: CardViewModel, isLocalDB: Bool, currentPaper: PaperModel) {
         self.viewModel = viewModel
-        self.paperID = paperID
         self.isLocalDB = isLocalDB
         self.currentPaper = currentPaper
         super.init(nibName: nil, bundle: nil)
@@ -152,8 +150,7 @@ class CardRootViewController: UIViewController {
                    print("Fail!")
                }
                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                   let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, paperID: self.paperID, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
-                   
+                   let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
                    self.navigationController?.pushViewController(pushVC, animated: false)
                })
            }
