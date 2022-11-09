@@ -92,28 +92,14 @@ class CardRootViewController: UIViewController {
         let button = UIBarButtonItem(customView: customCompleteBtn)
         return button
     }()
-    
-    lazy var firstStepView: UIView = {
-        let firstStepView = UIView()
-        return firstStepView
-    }()
 
-    lazy var secondStepView: UIView = {
+    lazy var cardCreateStepView: UIView = {
         let secondStepView = UIView()
         return secondStepView
     }()
     
-    func firstStepViewConstraints() {
-        firstStepView.snp.makeConstraints({ make in
-            make.top.equalTo(self.view).offset(30)
-            make.leading.equalTo(self.view).offset(0)
-            make.bottom.equalTo(self.view).offset(0)
-            make.trailing.equalTo(self.view).offset(0)
-        })
-    }
-    
-    func secondStepViewConstraints() {
-        secondStepView.snp.makeConstraints({ make in
+    func cardCreateStepViewConstraints() {
+        cardCreateStepView.snp.makeConstraints({ make in
             make.top.equalTo(self.view).offset(30)
             make.leading.equalTo(self.view).offset(0)
             make.bottom.equalTo(self.view).offset(0)
@@ -125,22 +111,14 @@ class CardRootViewController: UIViewController {
         let sticker = currentPaper.template.stickerNames
         let background = currentPaper.template.backgroundImageNames
         
-       // let firstStepViewVC = CardBackgroundViewController(viewModel: viewModel, backgroundImageName: background)
-        let secondStepViewVC = CardCreateViewController(viewModel: viewModel, arrStickers: sticker, backgroundImageName: background)
+        let cardCreateViewVC = CardCreateViewController(viewModel: viewModel, arrStickers: sticker, backgroundImageName: background)
         
-        self.addChild(secondStepViewVC)
-        // self.addChild(firstStepViewVC)
+        self.addChild(cardCreateViewVC)
+        cardCreateViewVC.view.translatesAutoresizingMaskIntoConstraints = false
         
-      //  firstStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        secondStepViewVC.view.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.view.addSubview(secondStepViewVC.view)
-       // self.view.addSubview(firstStepViewVC.view)
-       
-//        self.firstStepView = firstStepViewVC.view
-//        firstStepViewConstraints()
-        self.secondStepView = secondStepViewVC.view
-        secondStepViewConstraints()
+        self.view.addSubview(cardCreateViewVC.view)
+        self.cardCreateStepView = cardCreateViewVC.view
+        cardCreateStepViewConstraints()
     }
     
     private func setCustomNavBarButtons() {
@@ -157,41 +135,8 @@ class CardRootViewController: UIViewController {
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
     
-//    lazy var segmentedControl: UISegmentedControl = {
-//        let items = ["Step1", "Step2"]
-//        let control = UISegmentedControl(items: items)
-//        control.selectedSegmentIndex = 0
-//        control.layer.cornerRadius = 9
-//        control.layer.masksToBounds = true
-//        control.clipsToBounds = true
-//        control.selectedSegmentTintColor = UIColor.systemGray
-//        control.translatesAutoresizingMaskIntoConstraints = false
-//        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "rectangle.dashed.and.paperclip")!, string: "배경 고르기", color: .systemBackground), forSegmentAt: 0)
-//        control.setImage(UIImage.textEmbededImage(image: UIImage(systemName: "paintbrush")!, string: "꾸미기", color: .systemBackground), forSegmentAt: 1)
-//        control.setTitleTextAttributes([.foregroundColor: UIColor.darkGray], for: .normal)
-//        control.setTitleTextAttributes([.foregroundColor: UIColor.systemBackground], for: .selected)
-//        control.addTarget(self, action: #selector(segmentedControlViewChanged(_:)), for: .valueChanged)
-//        return control
-//    }()
-
-    
-//    @objc func segmentedControlViewChanged(_ sender: UISegmentedControl) {
-//        switch sender.selectedSegmentIndex {
-//        case 0:
-//            firstStepView.alpha = 1
-//            secondStepView.alpha = 0
-//        case 1:
-//            firstStepView.alpha = 0
-//            secondStepView.alpha = 1
-//        default:
-//            firstStepView.alpha = 1
-//            secondStepView.alpha = 0
-//        }
-//    }
-    
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         let secondStepViewVC = self.children[0] as? CardCreateViewController
-        print("###\(secondStepViewVC?.someImageView.image)")
         
         if secondStepViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
                let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
@@ -228,28 +173,3 @@ class CardRootViewController: UIViewController {
          present(alert, animated: true)
      }
 }
-//
-//extension UIImage {
-//    class func textEmbededImage(image: UIImage, string: String, color: UIColor, imageAlignment: Int = 0, segFont: UIFont? = nil) -> UIImage {
-//        let font = segFont ?? UIFont.boldSystemFont(ofSize: 16.0)
-//        let expectedTextSize: CGSize = (string as NSString).size(withAttributes: [NSAttributedString.Key.font: font])
-//        let width: CGFloat = expectedTextSize.width + image.size.width + 5.0
-//        let height: CGFloat = max(expectedTextSize.height, image.size.width)
-//        let size: CGSize = CGSize(width: width, height: height)
-//        UIGraphicsBeginImageContextWithOptions(size, false, 0)
-//        let context: CGContext = UIGraphicsGetCurrentContext()!
-//        context.setFillColor(color.cgColor)
-//        let fontTopPosition: CGFloat = (height - expectedTextSize.height) / 2.0
-//        let textOrigin: CGFloat = (imageAlignment == 0) ? image.size.width + 5 : 0
-//        let textPoint: CGPoint = CGPoint.init(x: textOrigin, y: fontTopPosition)
-//        string.draw(at: textPoint, withAttributes: [NSAttributedString.Key.font: font])
-//        let flipVertical: CGAffineTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height)
-//        context.concatenate(flipVertical)
-//        let alignment: CGFloat =  (imageAlignment == 0) ? 0.0 : expectedTextSize.width + 5.0
-//        context.draw(image.cgImage!, in: CGRect.init(x: alignment, y: ((height - image.size.height) / 2.0), width: image.size.width, height: image.size.height))
-//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//
-//        return newImage ?? UIImage(systemName: "heart.fill")!
-//    }
-//}
