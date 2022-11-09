@@ -21,15 +21,17 @@ class MagnifiedCardViewController: UIViewController {
         view.isOpaque = false
         view.backgroundColor = .clear
         self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        magnifiedCardImage.backgroundColor = .clear
+        magnifiedCardImage.translatesAutoresizingMaskIntoConstraints = false
+        magnifiedCardImage.isUserInteractionEnabled = true
+        magnifiedCardImage.backgroundColor = .systemBackground
+        magnifiedCardImage.layer.masksToBounds = true
         magnifiedCardImage.layer.cornerRadius = 50
-        magnifiedCardImage.clipsToBounds = true
+        magnifiedCardImage.contentMode = .scaleAspectFill
         setCustomBlurEffect()
         view.addSubview(magnifiedCardImage)
         view.addSubview(closeBtn)
         setImageSize()
         setBtnSize()
-        
     }
     
     @objc func closeAction() {
@@ -61,12 +63,14 @@ class MagnifiedCardViewController: UIViewController {
     
     func setImageSize() {
         magnifiedCardImage.snp.makeConstraints { make in
-            make.width.equalTo(self.view.bounds.width * 0.65)
-            make.height.equalTo(self.view.bounds.width * 0.65 * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
             make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
+            make.top.equalTo(self.view.snp.top).offset(120)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view).offset(15)
+            make.centerY.equalTo(self.view)
         }
     } //확대된 카드의 사이즈 결정
 }
