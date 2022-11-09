@@ -131,9 +131,10 @@ class PaperStorageViewController: UIViewController {
     
     // 컬렉션 뷰 레이아웃 초기화
     private func setCollectionViewLayout() {
-        let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
+        let sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
+        let collectionViewLayer = CustomViewFlowLayout(cellSpacing: Length.openedCellHorizontalSpace, inset: sectionInset)
         collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
+        collectionViewLayer.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         self.paperCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: false)
     }
     
@@ -216,7 +217,6 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             return UICollectionReusableView()
         }
     }
-    
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
@@ -452,5 +452,40 @@ private class PaperStorageClosedCollectionCell: UICollectionViewCell {
             make.width.equalTo(Length.closedPaperThumbnailWidth)
             make.height.equalTo(Length.closedPaperThumbnailHeight)
         })
+    }
+}
+
+class CustomViewFlowLayout: UICollectionViewFlowLayout {
+    let cellHorizontalSpacing: CGFloat
+    let inset: UIEdgeInsets
+
+    init(cellSpacing: CGFloat, inset: UIEdgeInsets) {
+        self.cellHorizontalSpacing = cellSpacing
+        self.inset = inset
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        sectionInset = inset
+        
+        let attributes = super.layoutAttributesForElements(in: rect)
+        var leftMargin = sectionInset.left
+        var maxY: CGFloat = -1.0
+        attributes?.forEach({ layoutAttribute in
+            if layoutAttribute.representedElementKind == UICollectionView.elementKindSectionHeader {
+                return
+            }
+            if layoutAttribute.frame.origin.y >= maxY {
+                leftMargin = sectionInset.left
+            }
+            layoutAttribute.frame.origin.x = leftMargin
+            leftMargin += layoutAttribute.frame.width + cellHorizontalSpacing
+            maxY = max(layoutAttribute.frame.maxY, maxY)
+        })
+        return attributes
     }
 }
