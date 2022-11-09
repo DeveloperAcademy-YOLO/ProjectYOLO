@@ -24,8 +24,8 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    private var isCanvasToolToggle: Bool = false
-    private var isStickerToggle: Bool = true
+    private var isCanvasToolToggle: Bool = true
+    private var isStickerToggle: Bool = false
     private var imageSticker: UIImage!
     
     init(viewModel: CardViewModel, arrStickers: [String], backgroundImageName: [String]) {
@@ -82,13 +82,19 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         
         dividerAppear()
         
-        pencilButtonOff()
-        canvasViewInteractionDisabled()
-        toolPickerDisappear()
+//        pencilButtonOff()
+//        canvasViewInteractionDisabled()
+//        toolPickerDisappear()
+        pencilButtonOn()
+        canvasViewInteractionEnabled()
+        toolPickerAppear()
         
-        stickerButtonOn()
-        imageViewInteractionEnabled()
-        stickerCollectionViewAppear()
+//        stickerButtonOn()
+//        imageViewInteractionEnabled()
+//        stickerCollectionViewAppear()
+        stickerButtonOff()
+        imageViewInteractionDisabled()
+        stickerCollectionViewDisappear()
         
         checkCameraPermission()
         checkAlbumPermission()
@@ -161,11 +167,10 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     let imageShadowView: UIView = {
             let aView = UIView()
             aView.layer.shadowOffset = CGSize(width: 3, height: 3)
-            aView.layer.shadowOpacity = 0.7
-            aView.layer.shadowRadius = 20.0
+            aView.layer.shadowOpacity = 0.2
+            aView.layer.shadowRadius = 30.0
             aView.backgroundColor = .systemBackground
             aView.layer.cornerRadius = 60
-     
             aView.layer.shadowColor = UIColor.black.cgColor
             aView.translatesAutoresizingMaskIntoConstraints = false
             return aView
