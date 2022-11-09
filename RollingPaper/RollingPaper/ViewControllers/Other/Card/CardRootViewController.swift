@@ -61,7 +61,7 @@ class CardRootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGray6
         
         instantiateSegmentedViewControllers()
         setCustomNavBarButtons()
@@ -111,13 +111,13 @@ class CardRootViewController: UIViewController {
     }
     
     private func setCustomNavBarButtons() {
-        navigationItem.title = "카드작성"
         navigationItem.leftBarButtonItem = leftButton
         navigationItem.rightBarButtonItem = rightButton
         
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = .systemBackground
+        navBarAppearance.backgroundColor = .systemGray6
+        navBarAppearance.shadowImage = UIImage.hideNavBarLine(color: UIColor.clear)
         
         self.navigationItem.standardAppearance = navBarAppearance
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
@@ -158,6 +158,19 @@ class CardRootViewController: UIViewController {
             self.navigationController?.popViewController(animated: true)
         }))
         present(alert, animated: true)
+    }
+}
+
+extension UIImage {
+    class func hideNavBarLine(color: UIColor) -> UIImage? {
+        let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        let navBarLine = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return navBarLine
     }
 }
 
