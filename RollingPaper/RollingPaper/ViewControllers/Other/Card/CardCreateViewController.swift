@@ -354,12 +354,11 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     @objc func setPopOverView(_ sender: UIButton) {
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
-        controller.preferredContentSize = CGSize(width: 80, height: 300)
+        controller.preferredContentSize = CGSize(width: 128, height: 400)
       
         let popover = controller.popoverPresentationController
         popover?.sourceView = sender
-        popover?.backgroundColor = .systemBackground
-        popover?.sourceRect = CGRect(x: 25, y: 0, width: 50, height: 50)
+        popover?.sourceRect = CGRect(x: 25, y: -60, width: 50, height: 180)
         present(controller, animated: true)
     }
     

@@ -29,7 +29,8 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .blue
+        view.backgroundColor = .clear
+
         selfConstraints()
         
         view.addSubview(firstColorBackgroundButton)
@@ -53,7 +54,7 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     }
     
     func changeFrmae() {
-        self.view.frame = CGRect(x: 0, y: 0, width: 100, height: 400)
+        self.view.frame = CGRect(x: 0, y: 0, width: 128, height: 400)
     }
     
     private func bind() {
@@ -77,9 +78,9 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[0])"), for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.layer.masksToBounds = true
-        button.layer.cornerRadius = 0.5 * button.bounds.size.width
+      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
+//        button.layer.masksToBounds = true
+//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if backgroundImageName[0] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
@@ -91,9 +92,9 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var secondColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[1])"), for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.layer.masksToBounds = true
-        button.layer.cornerRadius = 0.5 * button.bounds.size.width
+      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
+//        button.layer.masksToBounds = true
+//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if backgroundImageName[1] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
@@ -105,9 +106,9 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var thirdColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[2])"), for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.layer.masksToBounds = true
-        button.layer.cornerRadius = 0.5 * button.bounds.size.width
+      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
+//        button.layer.masksToBounds = true
+//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if backgroundImageName[2] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
@@ -119,9 +120,9 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var fourthColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[3])"), for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 50, height: 50)
-        button.layer.masksToBounds = true
-        button.layer.cornerRadius = 0.5 * button.bounds.size.width
+     //   button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
+//        button.layer.masksToBounds = true
+//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
         if backgroundImageName[3] == "Rectangle_white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
@@ -177,37 +178,37 @@ extension BackgroundButtonViewController {
     
     func firstColorButtonConstraints() {
         firstColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.height.equalTo(80)
             make.leading.equalTo(self.view.snp.leading).offset(28)
-            make.top.equalTo(self.view.snp.top).offset(20)
+            make.top.equalTo(self.view.snp.top).offset(17)
         })
     }
     
     func secondColorButtonConstraints() {
         secondColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.height.equalTo(80)
             make.leading.equalTo(self.view.snp.leading).offset(28)
-            make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(20)
+            make.top.equalTo(firstColorBackgroundButton.snp.bottom).offset(15)
         })
     }
     
     func thirdColorButtonConstraints() {
         thirdColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.height.equalTo(80)
             make.leading.equalTo(self.view.snp.leading).offset(28)
-            make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(20)
+            make.top.equalTo(secondColorBackgroundButton.snp.bottom).offset(15)
         })
     }
     
     func fourthColorButtonConstraints() {
         fourthColorBackgroundButton.snp.makeConstraints({ make in
-            make.width.equalTo(50)
-            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.height.equalTo(80)
             make.leading.equalTo(self.view.snp.leading).offset(28)
-            make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(20)
+            make.top.equalTo(thirdColorBackgroundButton.snp.bottom).offset(15)
         })
     }
 }
