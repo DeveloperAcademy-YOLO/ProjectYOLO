@@ -17,7 +17,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[0])"), for: .normal)
