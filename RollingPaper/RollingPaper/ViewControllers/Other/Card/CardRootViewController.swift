@@ -5,19 +5,19 @@
 //  Created by Yosep on 2022/10/12.
 //
 
-import UIKit
-import SnapKit
 import Combine
+import SnapKit
+import UIKit
 
 class CardRootViewController: UIViewController {
-   
+    
     private var backgroundImg: UIImage?
     private var cancellables = Set<AnyCancellable>()
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
-   
+    
     lazy var leftButton: UIBarButtonItem = {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
@@ -42,7 +42,7 @@ class CardRootViewController: UIViewController {
         let button = UIBarButtonItem(customView: customCompleteBtn)
         return button
     }()
-
+    
     lazy var cardCreateStepView: UIView = {
         let secondStepView = UIView()
         return secondStepView
@@ -127,38 +127,38 @@ class CardRootViewController: UIViewController {
         let secondStepViewVC = self.children[0] as? CardCreateViewController
         
         if secondStepViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
-               let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
-               alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
-                   alert.dismiss(animated: true, completion: nil)
-                  }))
-               present(alert, animated: true)
-           } else {
-               if let secondStepViewVC = self.children[0] as? CardCreateViewController {
-                   secondStepViewVC.resultImageSend()
-                   print("CardPencilKit here!")
-               } else {
-                   print("Fail!")
-               }
-               DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                   let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
-                   self.navigationController?.pushViewController(pushVC, animated: false)
-               })
-           }
+            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+            present(alert, animated: true)
+        } else {
+            if let secondStepViewVC = self.children[0] as? CardCreateViewController {
+                secondStepViewVC.resultImageSend()
+                print("CardPencilKit here!")
+            } else {
+                print("Fail!")
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
+                let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
+                self.navigationController?.pushViewController(pushVC, animated: false)
+            })
+        }
     }
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
-         print("cancelBtnPressed")
-         let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
-     
-         alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
-             alert.dismiss(animated: true, completion: nil)
-            }))
-         
-         alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
-             self.navigationController?.popViewController(animated: true)
-            }))
-         present(alert, animated: true)
-     }
+        print("cancelBtnPressed")
+        let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
+            alert.dismiss(animated: true, completion: nil)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+            self.navigationController?.popViewController(animated: true)
+        }))
+        present(alert, animated: true)
+    }
 }
 
 extension CardRootViewController {

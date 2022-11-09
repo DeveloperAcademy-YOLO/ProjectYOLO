@@ -5,12 +5,12 @@
 //  Created by Yosep on 2022/10/14.
 //
 
-import UIKit
-import SnapKit
 import Combine
+import SnapKit
+import UIKit
 
 final class CardResultViewController: UIViewController {
-   
+    
     private let image: UIImage
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
@@ -108,7 +108,6 @@ final class CardResultViewController: UIViewController {
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
     
-
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
         self.navigationController?.popViewController(animated: false)
     }
@@ -117,7 +116,7 @@ final class CardResultViewController: UIViewController {
         print("게시하기 pressed")
         print(isLocalDB)
         self.input.send(.resultSend(isLocalDB: isLocalDB))
-     
+        
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
         self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
     }
@@ -138,4 +137,3 @@ extension CardResultViewController {
         })
     }
 }
-

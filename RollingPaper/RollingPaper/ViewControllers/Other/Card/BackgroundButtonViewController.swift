@@ -5,11 +5,11 @@
 //  Created by Yosep on 2022/10/05.
 //
 
-import UIKit
-import SnapKit
 import AVFoundation
-import Photos
 import Combine
+import Photos
+import SnapKit
+import UIKit
 
 final class BackgroundButtonViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     private let backgroundImageName: [String]
@@ -86,7 +86,7 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
-
+        
         selfConstraints()
         
         view.addSubview(firstColorBackgroundButton)
@@ -138,7 +138,6 @@ extension UIButton {
         contentHorizontalAlignment = .fill
         contentVerticalAlignment = .fill
         imageView?.contentMode = .scaleAspectFit
-        imageEdgeInsets = .zero
         setImage(UIImage(systemName: systemName), for: .normal)
     }
 }

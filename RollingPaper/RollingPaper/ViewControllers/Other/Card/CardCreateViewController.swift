@@ -47,16 +47,16 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private let imageShadowView: UIView = {
-            let aView = UIView()
-            aView.layer.shadowOffset = CGSize(width: 3, height: 3)
-            aView.layer.shadowOpacity = 0.2
-            aView.layer.shadowRadius = 30.0
-            aView.backgroundColor = .systemBackground
-            aView.layer.cornerRadius = 60
-            aView.layer.shadowColor = UIColor.black.cgColor
-            aView.translatesAutoresizingMaskIntoConstraints = false
-            return aView
-        }()
+        let aView = UIView()
+        aView.layer.shadowOffset = CGSize(width: 3, height: 3)
+        aView.layer.shadowOpacity = 0.2
+        aView.layer.shadowRadius = 30.0
+        aView.backgroundColor = .systemBackground
+        aView.layer.cornerRadius = 60
+        aView.layer.shadowColor = UIColor.black.cgColor
+        aView.translatesAutoresizingMaskIntoConstraints = false
+        return aView
+    }()
     
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
@@ -77,7 +77,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         canvas.becomeFirstResponder()
         return canvas
     }()
-
+    
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -95,7 +95,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 100)
         layout.itemSize = CGSize(width: 100, height: 80)
         layout.scrollDirection = .horizontal
-       
+        
         let setCollectionView: UICollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         setCollectionView.dataSource = self
         setCollectionView.delegate = self
@@ -105,7 +105,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         setCollectionView.translatesAutoresizingMaskIntoConstraints = false
         setCollectionView.layer.masksToBounds = true
         setCollectionView.layer.cornerRadius = 60
-           
+        
         return setCollectionView
     }()
     
@@ -209,7 +209,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         toolPickerAppear()
         
         stickerButtonOff()
-        imageViewInteractionDisabled()
         stickerCollectionViewDisappear()
         
         checkCameraPermission()
@@ -218,7 +217,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         input.send(.viewDidLoad)
         bind()
     }
-
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
@@ -255,27 +254,22 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func canvasViewInteractionDisabled() {
+        rootUIImageView.addSubview(someImageView)
+        someImageView.isUserInteractionEnabled = true
+        someImageViewConstraints()
+        
         rootUIImageView.addSubview(canvasView)
         canvasView.isUserInteractionEnabled = false
         canvasViewConstraints()
     }
     
     private func canvasViewInteractionEnabled() {
+        rootUIImageView.addSubview(someImageView)
+        someImageViewConstraints()
+        
         rootUIImageView.addSubview(canvasView)
         canvasView.isUserInteractionEnabled = true
         canvasViewConstraints()
-    }
-    
-    private func imageViewInteractionDisabled() {
-        rootUIImageView.addSubview(someImageView)
-        someImageView.isUserInteractionEnabled = false
-        someImageViewConstraints()
-    }
-    
-    private func imageViewInteractionEnabled() {
-        rootUIImageView.addSubview(someImageView)
-        someImageView.isUserInteractionEnabled = true
-        someImageViewConstraints()
     }
     
     private func toolPickerAppear() {
@@ -347,7 +341,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
         controller.preferredContentSize = CGSize(width: 128, height: 400)
-
+        
         let popover = controller.popoverPresentationController
         popover?.sourceView = sender
         popover?.sourceRect = CGRect(x: 25, y: -60, width: 50, height: 180)
@@ -366,7 +360,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             pencilButtonOn()
             toolPickerAppear()
             
-            imageViewInteractionDisabled()
+            //  imageViewInteractionDisabled()
             canvasViewInteractionEnabled() // 여기 순서가 중요함
         } else {
             print("sticker button On")
@@ -375,7 +369,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             pencilButtonOff()
             toolPickerDisappear()
             
-            imageViewInteractionEnabled()
+            // imageViewInteractionEnabled()
             canvasViewInteractionDisabled() // 여기 순서가 중요함
         }
     }
@@ -472,10 +466,8 @@ extension CardCreateViewController: StickerViewDelegate {
     }
 }
 
-
-
 extension UIButton {
-     func setUIImage(systemName: String) {
+    func setUIImage(systemName: String) {
         contentHorizontalAlignment = .fill
         contentVerticalAlignment = .fill
         imageView?.contentMode = .scaleAspectFit
@@ -484,7 +476,7 @@ extension UIButton {
 }
 
 extension UIView {
-     func fadeOut(duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: @escaping (Bool) -> Void = {(finished: Bool) -> Void in }) {
+    func fadeOut(duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: @escaping (Bool) -> Void = {(finished: Bool) -> Void in }) {
         self.alpha = 1.0
         UIView.animate(withDuration: duration, delay: delay, options: UIView.AnimationOptions.transitionFlipFromBottom, animations: {
             self.isHidden = true
@@ -492,7 +484,7 @@ extension UIView {
         }, completion: completion)
     }
     
-     func animateShowingUP() {
+    func animateShowingUP() {
         UIView.animateKeyframes(withDuration: 0.7, delay: 0) { [weak self] in
             guard let height = self?.bounds.height else {
                 return
@@ -523,21 +515,21 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         })
     }
     
-     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             someImageView.image = pickedImage
         }
         picker.dismiss(animated: true)
     }
     
-        private func cameraImagePicker() {
-            let pushVC = CameraCustomPicker()
-            pushVC.delegate = self
-            pushVC.sourceType = .camera
-            pushVC.cameraFlashMode = .off
-            pushVC.cameraDevice = .front
-            pushVC.modalPresentationStyle = .overFullScreen
-            present(pushVC, animated: true)
+    private func cameraImagePicker() {
+        let pushVC = CameraCustomPicker()
+        pushVC.delegate = self
+        pushVC.sourceType = .camera
+        pushVC.cameraFlashMode = .off
+        pushVC.cameraDevice = .front
+        pushVC.modalPresentationStyle = .overFullScreen
+        present(pushVC, animated: true)
     }
     
     private func checkAlbumPermission() {
