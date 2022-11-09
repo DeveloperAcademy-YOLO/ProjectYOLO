@@ -13,7 +13,6 @@ class MagnifiedCardViewController: UIViewController {
     var cardContentURLString: String?
     var magnifiedCardImage = UIImageView()
     var closeBtn: UIButton = UIButton()
-    var parentNavigationBarHeight: CGFloat?
     
     
     override func viewDidLoad() {
@@ -39,16 +38,16 @@ class MagnifiedCardViewController: UIViewController {
     }
     
     func setCustomBlurEffect() {
-        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
-        let blurView = UIVisualEffectView(effect: blurEffect)
+        let blurView = UIView()
+        blurView.backgroundColor = UIColor.black.withAlphaComponent(0.32)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         view.insertSubview(blurView, at: 0)
         
         blurView.snp.makeConstraints { make in
-            make.top.equalTo(self.view).offset(parentNavigationBarHeight!)
-            make.leading.equalTo(self.view).offset(0)
-            make.bottom.equalTo(self.view).offset(0)
-            make.trailing.equalTo(self.view).offset(0)
+            make.top.equalTo(self.view)
+            make.leading.equalTo(self.view)
+            make.bottom.equalTo(self.view)
+            make.trailing.equalTo(self.view)
         }
     }
     
@@ -63,12 +62,10 @@ class MagnifiedCardViewController: UIViewController {
     
     func setImageSize() {
         magnifiedCardImage.snp.makeConstraints { make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(120)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.width.equalTo((self.view.bounds.height - 160)*(4/3))
+            make.height.equalTo(self.view.bounds.height - 160)
+            make.top.equalTo(self.view).offset(80)
+            make.bottom.equalTo(self.view).offset(-80)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         }
