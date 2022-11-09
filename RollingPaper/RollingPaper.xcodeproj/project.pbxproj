@@ -16,6 +16,11 @@
 		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
+		BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */; };
+		BCE6FEBC291B90AA0093C36E /* PaperStorageLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */; };
+		BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */; };
+		BCE6FEC0291B91D20093C36E /* PaperStorageFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBF291B91D20093C36E /* PaperStorageFlowLayout.swift */; };
+		BCE6FEC2291B921C0093C36E /* PaperStorageCollectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEC1291B921C0093C36E /* PaperStorageCollectionHeader.swift */; };
 		BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */; };
 		BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */; };
 		BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */; };
@@ -93,6 +98,11 @@
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
+		BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageOpenedCollectionCell.swift; sourceTree = "<group>"; };
+		BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageLength.swift; sourceTree = "<group>"; };
+		BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageClosedCollectionCell.swift; sourceTree = "<group>"; };
+		BCE6FEBF291B91D20093C36E /* PaperStorageFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageFlowLayout.swift; sourceTree = "<group>"; };
+		BCE6FEC1291B921C0093C36E /* PaperStorageCollectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageCollectionHeader.swift; sourceTree = "<group>"; };
 		BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewController.swift; sourceTree = "<group>"; };
 		BCF2481228ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperTemplateSelectViewModel.swift; sourceTree = "<group>"; };
 		BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSettingViewController.swift; sourceTree = "<group>"; };
@@ -344,7 +354,12 @@
 		D24145212919F94000437FE7 /* PaperStorage */ = {
 			isa = PBXGroup;
 			children = (
+				BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */,
 				BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */,
+				BCE6FEC1291B921C0093C36E /* PaperStorageCollectionHeader.swift */,
+				BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */,
+				BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */,
+				BCE6FEBF291B91D20093C36E /* PaperStorageFlowLayout.swift */,
 			);
 			path = PaperStorage;
 			sourceTree = "<group>";
@@ -651,6 +666,7 @@
 			files = (
 				1573562F28FFA79B00EA565B /* SettingScreenViewController.swift in Sources */,
 				C5F26FE729183F050060109B /* TimerOfPaperViewController.swift in Sources */,
+				BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */,
 				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				C5B5853E2900DF1700454C75 /* WrittenPaperViewModel.swift in Sources */,
@@ -675,9 +691,11 @@
 				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
 				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				AF6FEE3C2902E2E400E44E7D /* CameraCustomPicker.swift in Sources */,
+				BCE6FEC2291B921C0093C36E /* PaperStorageCollectionHeader.swift in Sources */,
 				D22E4AC428EBFD91001091DA /* SignInViewController.swift in Sources */,
 				D251BDC928ED2A310094ECD9 /* TemplateEnum.swift in Sources */,
 				CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */,
+				BCE6FEC0291B91D20093C36E /* PaperStorageFlowLayout.swift in Sources */,
 				D251BDC728ED29670094ECD9 /* TemplateModel.swift in Sources */,
 				CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */,
 				C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */,
@@ -692,10 +710,12 @@
 				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
+				BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
+				BCE6FEBC291B90AA0093C36E /* PaperStorageLength.swift in Sources */,
 				D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */,
 				BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */,
 				D2CB508D28FD2CB50065C2A9 /* NSCacheManager.swift in Sources */,
