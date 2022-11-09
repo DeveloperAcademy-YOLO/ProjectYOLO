@@ -158,10 +158,25 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         return theImageView
     }()
     
+    let imageShadowView: UIView = {
+            let aView = UIView()
+            aView.layer.shadowOffset = CGSize(width: 3, height: 3)
+            aView.layer.shadowOpacity = 0.7
+            aView.layer.shadowRadius = 20.0
+            aView.backgroundColor = .systemBackground
+            aView.layer.cornerRadius = 60
+     
+            aView.layer.shadowColor = UIColor.black.cgColor
+            aView.translatesAutoresizingMaskIntoConstraints = false
+            return aView
+        }()
+    
     lazy var collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 80, height: 80)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 100)
+        layout.itemSize = CGSize(width: 100, height: 80)
         layout.scrollDirection = .horizontal
+       
         let setCollectionView: UICollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         setCollectionView.dataSource = self
         setCollectionView.delegate = self
@@ -169,18 +184,9 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         setCollectionView.backgroundColor = .systemBackground
         setCollectionView.showsHorizontalScrollIndicator = false
         setCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        setCollectionView.layer.masksToBounds = false
-       
-        setCollectionView.layer.borderWidth = 0.1
-        setCollectionView.layer.borderColor = UIColor.white.cgColor
-
-        // shadow
-        setCollectionView.layer.shadowColor = UIColor.lightGray.cgColor
-        setCollectionView.layer.shadowOffset = CGSize(width: 3, height: 3)
-        setCollectionView.layer.shadowOpacity = 0.7
-        setCollectionView.layer.shadowRadius = 20.0
- 
+        setCollectionView.layer.masksToBounds = true
         setCollectionView.layer.cornerRadius = 60
+           
         return setCollectionView
     }()
     
@@ -349,12 +355,20 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func stickerCollectionViewAppear() {
+        view.addSubview(imageShadowView)
+        imageShadowViewConstraints()
+        imageShadowView.animateShowingUP()
+        
         view.addSubview(collectionView)
         collectionViewConstraints()
         collectionView.animateShowingUP()
     }
     
     func stickerCollectionViewDisappear() {
+        view.addSubview(imageShadowView)
+        imageShadowView.isHidden = true
+        imageShadowViewConstraints()
+        
         view.addSubview(collectionView)
         collectionView.isHidden = true
         collectionViewConstraints()
@@ -550,6 +564,15 @@ extension CardCreateViewController {
         })
     }
     
+    func imageShadowViewConstraints() {
+        imageShadowView.snp.makeConstraints({ make in
+            make.width.equalTo(740)
+            make.height.equalTo(120)
+            make.centerX.equalTo(self.view)
+            make.top.equalTo(self.view.snp.bottom).offset(-140)
+        })
+    }
+    
     func collectionViewConstraints() {
         collectionView.snp.makeConstraints({ make in
             make.width.equalTo(740)
@@ -716,18 +739,8 @@ extension CardCreateViewController {
 }
 
 extension UIView {
-    func fadeIn(duration: TimeInterval = 0.5, delay: TimeInterval = 0.0, completion: @escaping ((Bool) -> Void) = {(finished: Bool) -> Void in }) {
-        self.alpha = 0.0
-
-        UIView.animate(withDuration: duration, delay: delay, options: UIView.AnimationOptions.showHideTransitionViews, animations: {
-            self.isHidden = false
-            self.alpha = 1.0
-        }, completion: completion)
-    }
-
-    func fadeOut(duration: TimeInterval = 0.5, delay: TimeInterval = 0.0, completion: @escaping (Bool) -> Void = {(finished: Bool) -> Void in }) {
+    func fadeOut(duration: TimeInterval = 1.0, delay: TimeInterval = 0.0, completion: @escaping (Bool) -> Void = {(finished: Bool) -> Void in }) {
         self.alpha = 1.0
-
         UIView.animate(withDuration: duration, delay: delay, options: UIView.AnimationOptions.transitionFlipFromBottom, animations: {
             self.isHidden = true
             self.alpha = 0.0
@@ -735,10 +748,7 @@ extension UIView {
     }
     
     func animateShowingUP() {
-
-        let identityY = center.y
-
-        UIView.animateKeyframes(withDuration: 0.8, delay: 0) { [weak self] in
+        UIView.animateKeyframes(withDuration: 0.7, delay: 0) { [weak self] in
             guard let height = self?.bounds.height else {
                 return
             }
