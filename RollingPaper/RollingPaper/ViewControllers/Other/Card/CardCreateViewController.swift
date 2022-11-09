@@ -727,12 +727,12 @@ extension UIView {
     func animateShowUp() {
            // self.isHidden = true
             let identityY = center.y
-        UIView.animateKeyframes(withDuration: 0.7, delay: 0.3) { [weak self] in
-                guard let width = self?.bounds.width else {
+        UIView.animateKeyframes(withDuration: 0.8, delay: 0.1) { [weak self] in
+                guard let height = self?.bounds.height else {
                     return
                 }
                 self?.alpha = 0
-                self?.center.y = -width/2
+                self?.center.y = -height/2
             } completion: { [weak self] _ in
                 self?.alpha = 1
                 self?.center.y = identityY
