@@ -61,27 +61,13 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
     
-    func backgroundImageSend() {
-         self.input.send(.setCardBackgroundImg(background: backgroundImageName[0]))
-     }
-    func backgroundImageSend2() {
-         self.input.send(.setCardBackgroundImg(background: backgroundImageName[1]))
-     }
-    func backgroundImageSend3() {
-         self.input.send(.setCardBackgroundImg(background: backgroundImageName[2]))
-     }
-    
-    func backgroundImageSend4() {
-         self.input.send(.setCardBackgroundImg(background: backgroundImageName[3]))
-     }
-    
     lazy var firstColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[0])"), for: .normal)
-      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
-//        button.layer.masksToBounds = true
-//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[0] == "Rectangle_white" {
+        button.layer.cornerRadius = 10
+        button.layer.masksToBounds = true
+        let checkBorder = backgroundImageName[0].suffix(5)
+        if checkBorder == "white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -92,10 +78,10 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var secondColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[1])"), for: .normal)
-      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
-//        button.layer.masksToBounds = true
-//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[1] == "Rectangle_white" {
+        button.layer.cornerRadius = 10
+        button.layer.masksToBounds = true
+        let checkBorder = backgroundImageName[1].suffix(5)
+        if checkBorder == "white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -106,10 +92,10 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var thirdColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[2])"), for: .normal)
-      //  button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
-//        button.layer.masksToBounds = true
-//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[2] == "Rectangle_white" {
+        button.layer.cornerRadius = 10
+        button.layer.masksToBounds = true
+        let checkBorder = backgroundImageName[2].suffix(5)
+        if checkBorder == "white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -120,10 +106,10 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     lazy var fourthColorBackgroundButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "\(backgroundImageName[3])"), for: .normal)
-     //   button.frame = CGRect(x: 100, y: 100, width: 100, height: 80)
-//        button.layer.masksToBounds = true
-//        button.layer.cornerRadius = 0.5 * button.bounds.size.width
-        if backgroundImageName[3] == "Rectangle_white" {
+        button.layer.cornerRadius = 10
+        button.layer.masksToBounds = true
+        let checkBorder = backgroundImageName[3].suffix(5)
+        if checkBorder == "white" {
             button.layer.borderColor = UIColor.lightGray.cgColor
             button.layer.borderWidth = 2
         }
@@ -132,28 +118,19 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
     }()
     
     @objc func firstImageViewColor(_ gesture: UITapGestureRecognizer) {
-        print("firstImageViewColor clicked")
-        print(backgroundImageName[0])
-        guard let image = UIImage(named: "\(backgroundImageName[0])") else { return }
-        backgroundImageSend()
+        self.input.send(.setCardBackgroundImg(background: backgroundImageName[0]))
     }
     
     @objc func secondImageViewColor(_ gesture: UITapGestureRecognizer) {
-        print("secondImageViewColor clicked")
-        guard let image = UIImage(named: "\(backgroundImageName[1])") else { return }
-        backgroundImageSend2()
+        self.input.send(.setCardBackgroundImg(background: backgroundImageName[1]))
     }
     
     @objc func thirdImageViewColor(_ gesture: UITapGestureRecognizer) {
-        print("secondImageViewColor clicked")
-        guard let image = UIImage(named: "\(backgroundImageName[2])") else { return }
-        backgroundImageSend3()
+        self.input.send(.setCardBackgroundImg(background: backgroundImageName[2]))
     }
     
     @objc func fourthImageViewColor(_ gesture: UITapGestureRecognizer) {
-        print("fourthImageViewColor clicked")
-        guard let image = UIImage(named: "\(backgroundImageName[3])") else { return }
-        backgroundImageSend4()
+        self.input.send(.setCardBackgroundImg(background: backgroundImageName[3]))
     }
 }
 

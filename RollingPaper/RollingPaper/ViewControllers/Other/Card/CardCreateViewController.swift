@@ -160,7 +160,6 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     
     lazy var collectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         layout.itemSize = CGSize(width: 80, height: 80)
         layout.scrollDirection = .horizontal
         let setCollectionView: UICollectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
@@ -168,6 +167,10 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
         setCollectionView.delegate = self
         setCollectionView.register(StickerCollectionViewCell.self, forCellWithReuseIdentifier: "StickerCollectionViewCell")
         setCollectionView.backgroundColor = .systemBackground
+        setCollectionView.showsHorizontalScrollIndicator = false
+        setCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        setCollectionView.layer.masksToBounds = true
+        setCollectionView.layer.cornerRadius = 60
         return setCollectionView
     }()
     
@@ -337,16 +340,12 @@ class CardCreateViewController: UIViewController, UIImagePickerControllerDelegat
     
     func stickerCollectionViewAppear() {
         view.addSubview(collectionView)
-        collectionView.layer.masksToBounds = true
-        collectionView.layer.cornerRadius = 50
         collectionView.isHidden = false
         collectionViewConstraints()
     }
     
     func stickerCollectionViewDisappear() {
         view.addSubview(collectionView)
-        collectionView.layer.masksToBounds = true
-        collectionView.layer.cornerRadius = 50
         collectionView.isHidden = true
         collectionViewConstraints()
     }
@@ -543,10 +542,10 @@ extension CardCreateViewController {
     
     func collectionViewConstraints() {
         collectionView.snp.makeConstraints({ make in
-            make.width.equalTo(730)
-            make.height.equalTo(100)
+            make.width.equalTo(740)
+            make.height.equalTo(120)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.bottom).offset(-120)
+            make.top.equalTo(self.view.snp.bottom).offset(-140)
         })
     }
     
