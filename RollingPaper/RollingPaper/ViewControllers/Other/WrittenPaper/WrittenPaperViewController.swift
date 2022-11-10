@@ -344,6 +344,16 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         }
     }
     
+    func shareCard( _ indexPath: Int) {
+        guard let currentPaper = viewModel.currentPaper else { return }
+        let card = currentPaper.cards[indexPath]
+
+        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+//            imageShare(_ :)
+        }
+    }
+
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
@@ -405,7 +415,6 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first?.row else { return nil }
-        print(indexPath)
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let save = UIAction(
@@ -415,7 +424,6 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 discoverabilityTitle: nil,
                 state: .off
             ){ [weak self] _ in
-//                print("indexPath : \(indexPath)")
                 self?.saveCard(indexPath)
             }
             
@@ -425,7 +433,8 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
-            ){  _ in
+            ){ [weak self] _ in
+                self?.imageShare(save)
             }
             
             let delete = UIAction(
@@ -463,4 +472,21 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         }
     }
     
+    private func imageShare(_ sender: UIAction) {
+        guard let image = UIImage(systemName: "bell"), let url = URL(string: "https://www.google.com") else {
+            return
+        }
+        
+        let shareSheetVC = UIActivityViewController(
+            activityItems: [
+                image,
+                url
+            ], applicationActivities: nil
+        )
+        
+        shareSheetVC.popoverPresentationController?.sourceView = self.view
+        shareSheetVC.popoverPresentationController?.sourceRect = sender.accessibilityFrame
+        present(shareSheetVC, animated: true)
+    }
+
 }
