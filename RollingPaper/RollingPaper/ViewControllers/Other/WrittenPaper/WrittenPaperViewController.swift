@@ -57,6 +57,7 @@ class WrittenPaperViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
+        self.navigationController?.isNavigationBarHidden = false
         cardsList?.reloadData()
     }
     

@@ -227,6 +227,10 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         bind()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
