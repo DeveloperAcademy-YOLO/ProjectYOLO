@@ -86,9 +86,14 @@ final class CardResultViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var blueBoxView: UIView?
+    var animator: UIDynamicAnimator?
+    var collision: UICollisionBehavior!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
+        
         
         view.addSubview(titleLabel)
         titleLabelConstraints()
@@ -96,9 +101,43 @@ final class CardResultViewController: UIViewController {
         view.addSubview(someImageShadow)
         someImageShadowConstraints()
         
+        
         view.addSubview(someImageView)
         someImageViewConstraints()
         
+        let barrier = UIView(frame: CGRect(x: 300, y: 200, width: 130, height: 20))
+        barrier.backgroundColor = .blue
+        view.addSubview(barrier)
+        
+        
+        var frameRect = CGRect(x: 300, y: 20, width: 80, height: 80)
+                blueBoxView = UIView(frame: frameRect)
+                blueBoxView?.backgroundColor = UIColor.blue
+                self.view.addSubview(blueBoxView!)
+                animator = UIDynamicAnimator(referenceView: self.view)
+                let gravity = UIGravityBehavior(items: [blueBoxView!])
+                let vector = CGVector(dx: 0.0, dy: 1.0)
+                gravity.gravityDirection = vector
+                animator?.addBehavior(gravity)
+        
+                gravity.addItem(blueBoxView!)
+        
+                collision = UICollisionBehavior(items: [blueBoxView!])
+                collision.translatesReferenceBoundsIntoBoundary = true
+                animator?.addBehavior(collision)
+        
+        collision.addBoundary(withIdentifier: "barrier" as NSCopying, for: UIBezierPath(rect: barrier.frame))
+        
+                let behavior = UIDynamicItemBehavior(items: [blueBoxView!])
+                // 탄성 설정 값이 높을수록 높게 튀어오름
+                behavior.elasticity = 0.9
+                animator?.addBehavior(behavior)
+        
+        
+//             let behavior = UIDynamicItemBehavior(items: [blueBoxView!])
+//             // 탄성 설정 값이 높을수록 높게 튀어오름
+//            behavior.elasticity = 10.0
+            
         view.addSubview(backwardButton)
         backwardButtonConstraints()
         
