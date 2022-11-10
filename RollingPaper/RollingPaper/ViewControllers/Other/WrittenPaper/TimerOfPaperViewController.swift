@@ -52,7 +52,9 @@ class TimerOfPaperViewController: UIViewController {
         self.view.layer.cornerRadius = 18
         self.view.layer.backgroundColor = timeInterval > 0 ? UIColor(rgb: 0xADADAD).cgColor : UIColor(rgb: 0xFF3B30).cgColor
     }
-    
+}
+
+extension TimerOfPaperViewController {
     private func setLocation() {
         view.snp.makeConstraints({ make in
             make.width.equalTo(120)
@@ -69,5 +71,4 @@ class TimerOfPaperViewController: UIViewController {
 
         })
     }
-
 }
