@@ -1,5 +1,5 @@
 //
-//  CardPencilKitViewController.swift
+//  CardCreateViewController.swift
 //  RollingPaper
 //
 //  Created by Yosep on 2022/10/05.
@@ -24,6 +24,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private var backgroundImg = UIImage(named: "Rectangle")
     private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = false
+    private var isBackgroundToggle: Bool = false
     private var imageSticker: UIImage!
     private var _selectedStickerView: StickerView?
     private var selectedStickerView: StickerView? {
@@ -126,7 +127,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return button
     }()
     
-    lazy var backgroundButton: UIButton = {
+    lazy var backgroundOnButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "paintpalette.fill")
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(setPopOverView(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var backgroundOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
         button.tintColor = UIColor(red: 217, green: 217, blue: 217)
@@ -200,7 +209,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         buttonLabelConstraints()
         
         cameraButtonAppear()
-        backgroundButtonAppear()
+        backgroundOffButtonAppear()
         
         dividerAppear()
         
@@ -287,9 +296,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         cameraButtonConstraints()
     }
     
-    private func backgroundButtonAppear() {
-        view.addSubview(backgroundButton)
-        backgroundButtonConstraints()
+    private func backgroundOnButtonAppear() {
+        view.addSubview(backgroundOnButton)
+        backgroundOnButtonConstraints()
+    }
+    
+    private func backgroundOffButtonAppear() {
+        view.addSubview(backgroundOffButton)
+        backgroundOffButtonConstraints()
     }
     
     private func dividerAppear() {
@@ -338,6 +352,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
+        isBackgroundToggle = true
+        backgroundOnButtonAppear()
+        
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
         controller.preferredContentSize = CGSize(width: 128, height: 400)
@@ -375,6 +392,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        isBackgroundToggle = false
+        backgroundOffButtonAppear()
         print("Modal Dismissed!")
     }
 }
@@ -657,8 +676,17 @@ extension CardCreateViewController {
         })
     }
     
-    private func backgroundButtonConstraints() {
-        backgroundButton.snp.makeConstraints({ make in
+    private func backgroundOnButtonConstraints() {
+        backgroundOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+        })
+    }
+    
+    private func backgroundOffButtonConstraints() {
+        backgroundOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
@@ -670,8 +698,8 @@ extension CardCreateViewController {
         divider.snp.makeConstraints({ make in
             make.width.equalTo(65)
             make.height.equalTo(1)
-            make.centerX.equalTo(backgroundButton.snp.centerX)
-            make.top.equalTo(backgroundButton.snp.bottom).offset(20)
+            make.centerX.equalTo(cameraButton.snp.centerX)
+            make.top.equalTo(buttonLabel.snp.top).offset(150)
         })
     }
     
