@@ -253,7 +253,7 @@ class PaperSettingViewController: UIViewController {
     // 피커 버튼 가져오기
     private func initTimePickerButton() {
         timePickerButton.addTarget(self, action: #selector(onClickedTimePickerButton(_:)), for: .touchUpInside)
-        timePickerButton.setTitle("02:00", for: .normal)
+        timePickerButton.setTitle("00:30", for: .normal)
         timePickerButton.setTitleColor(.black, for: .normal)
         timePickerButton.backgroundColor = .black
         timePickerButton.layer.cornerRadius = Length.timePickerButtonRadius
