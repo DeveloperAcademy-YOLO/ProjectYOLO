@@ -5,53 +5,18 @@
 //  Created by Yosep on 2022/10/14.
 //
 
-import UIKit
-import SnapKit
 import Combine
+import SnapKit
+import UIKit
 
 final class CardResultViewController: UIViewController {
     
-    private var backgroundImg = UIImage(named: "Rectangle")
-    let image: UIImage
-    private let paperID: String
+    private let image: UIImage
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var backgroundImg = UIImage(named: "Rectangle")
     private var cancellables = Set<AnyCancellable>()
-    
-    init(resultImage: UIImage, paperID: String, viewModel: CardViewModel, isLocalDB: Bool) {
-        self.image = resultImage
-        self.paperID = paperID
-        self.viewModel = viewModel
-        self.isLocalDB = isLocalDB
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemGray6
-        
-        view.addSubview(someImageView)
-        
-        someImageViewConstraints()
-        
-        setCustomNavBarButtons()
-        
-        input.send(.viewDidLoad)
-        bind()
-    }
-    
-    private func bind() {
-        _ = viewModel.transform(input: input.eraseToAnyPublisher())
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
     
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
@@ -82,7 +47,6 @@ final class CardResultViewController: UIViewController {
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customBackBtn)
-        button.tag = 1
         return button
     }()
     
@@ -94,9 +58,41 @@ final class CardResultViewController: UIViewController {
         customCompleteBtn.addTarget(self, action: #selector(createBtnPressed(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
-        button.tag = 2
         return button
     }()
+    
+    init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
+        self.image = resultImage
+        self.viewModel = viewModel
+        self.isLocalDB = isLocalDB
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemGray6
+        
+        view.addSubview(someImageView)
+        
+        someImageViewConstraints()
+        
+        setCustomNavBarButtons()
+        
+        input.send(.viewDidLoad)
+        bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    private func bind() {
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
+    }
     
     private func setCustomNavBarButtons() {
         self.navigationItem.titleView = navigationTitle
@@ -112,7 +108,23 @@ final class CardResultViewController: UIViewController {
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
     
-    func someImageViewConstraints() {
+    @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
+        self.navigationController?.popViewController(animated: false)
+    }
+    
+    @objc func createBtnPressed(_ sender: UISegmentedControl) {
+        print("게시하기 pressed")
+        print(isLocalDB)
+        self.input.send(.resultSend(isLocalDB: isLocalDB))
+        
+        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
+        self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
+    }
+    
+}
+
+extension CardResultViewController {
+    private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.75)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
@@ -124,19 +136,4 @@ final class CardResultViewController: UIViewController {
             make.centerY.equalTo(self.view)
         })
     }
-    
-    @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
-        self.navigationController?.popViewController(animated: false)
-    }
-    
-    @objc func createBtnPressed(_ sender: UISegmentedControl) {
-        print("게시하기 pressed")
-        print(isLocalDB)
-        print(paperID)
-        self.input.send(.resultSend(paperID: paperID, isLocalDB: isLocalDB))
-     
-        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
-        self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
-    }
-    
 }
