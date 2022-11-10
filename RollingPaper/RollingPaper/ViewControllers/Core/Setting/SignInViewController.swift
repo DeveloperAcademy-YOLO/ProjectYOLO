@@ -21,6 +21,13 @@ final class SignInViewController: UIViewController {
         case bothWaring
     }
     
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "logo")
+        return imageView
+    }()
     private let emailTextField: UITextField = {
         let textField = UITextField()
         textField.layer.masksToBounds = true
@@ -252,7 +259,7 @@ final class SignInViewController: UIViewController {
                     currentNavVC.dismiss(animated: true) {
                         let signUpVC = SignUpViewController()
                         let navVC = UINavigationController(rootViewController: signUpVC)
-                        navVC.modalPresentationStyle = .pageSheet
+                        navVC.modalPresentationStyle = .formSheet
                         splitVC.present(navVC, animated: true)
                     }
                 } else {
@@ -310,7 +317,6 @@ final class SignInViewController: UIViewController {
             if
                 let currentNavVC = navigationController,
                 let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
-                print("Current is SignInView!")
                 NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
             }
         }
@@ -361,9 +367,15 @@ extension SignInViewController {
 extension SignInViewController {
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
+        view.addSubviews([logoImageView, emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
         signInButton.addSubview(spinner)
-        let topOffset = (view.frame.height - 332) / 2
+        let topOffset = (view.frame.height - 332 + 85 + 72) / 2
+        logoImageView.snp.makeConstraints({ make in
+            make.width.equalTo(120)
+            make.height.equalTo(85)
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(emailTextField.snp.top).offset(-72)
+        })
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
@@ -469,7 +481,7 @@ extension SignInViewController {
     
     private func layoutIfModalView() {
         if presentingViewController != nil {
-            let topOffset = (view.frame.height - 332) / 2
+            let topOffset = (view.frame.height - 332 + 85 + 72) / 2
             emailTextField.snp.updateConstraints({ make in
                 make.top.equalToSuperview().offset(topOffset)
             })
