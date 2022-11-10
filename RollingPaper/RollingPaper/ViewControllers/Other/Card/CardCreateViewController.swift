@@ -341,7 +341,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
         controller.preferredContentSize = CGSize(width: 128, height: 400)
-        
+        controller.presentationController?.delegate = self
         let popover = controller.popoverPresentationController
         popover?.sourceView = sender
         popover?.sourceRect = CGRect(x: 25, y: 0, width: 50, height: 50)
@@ -370,6 +370,12 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
             canvasViewInteractionDisabled()
         }
+    }
+}
+
+extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        print("Modal Dismissed!")
     }
 }
 
@@ -429,6 +435,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         }
     }
 }
+
 
 extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
