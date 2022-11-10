@@ -25,7 +25,7 @@ final class CardResultViewController: UIViewController {
         theImageView.backgroundColor = .systemBackground
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
-        theImageView.contentMode = .scaleAspectFill
+        theImageView.contentMode = .scaleToFill
         theImageView.image = image
         return theImageView
     }()
@@ -109,14 +109,13 @@ final class CardResultViewController: UIViewController {
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
         self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
     }
-    
 }
 
 extension CardResultViewController {
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.55)
-            make.height.equalTo(self.view.bounds.height * 0.55)
+            make.width.equalTo(self.view.bounds.width * 0.60)
+            make.height.equalTo(self.view.bounds.height * 0.60)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })

@@ -11,12 +11,12 @@ import UIKit
 
 class CardRootViewController: UIViewController {
     
-    private var backgroundImg: UIImage?
-    private var cancellables = Set<AnyCancellable>()
     private let viewModel: CardViewModel
     private let isLocalDB: Bool
     private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    private var backgroundImg: UIImage?
+    private var cancellables = Set<AnyCancellable>()
     
     lazy var leftButton: UIBarButtonItem = {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
@@ -62,7 +62,7 @@ class CardRootViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-        
+       
         instantiateSegmentedViewControllers()
         setCustomNavBarButtons()
         
@@ -125,9 +125,8 @@ class CardRootViewController: UIViewController {
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         let cardCreateViewVC = self.children[0] as? CardCreateViewController
-        
-        if cardCreateViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
-            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
+        if cardCreateViewVC?.someImageView.image == nil {
+            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 배경을 넣어주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
                 alert.dismiss(animated: true, completion: nil)
             }))

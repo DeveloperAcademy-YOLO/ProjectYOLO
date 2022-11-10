@@ -21,7 +21,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg: UIImage?
     private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = false
     private var isBackgroundToggle: Bool = false
@@ -85,9 +85,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
         theImageView.contentMode = .scaleAspectFill
-        theImageView.layer.borderWidth = 0.5
-        theImageView.layer.borderColor = UIColor.systemGray.cgColor
-        theImageView.image = UIImage(named: "Rectangle_default")
+        theImageView.image = backgroundImg
         return theImageView
     }()
     
@@ -116,6 +114,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         label.layer.masksToBounds = true
         label.layer.cornerRadius = 30
         label.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        return label
+    }()
+    
+    lazy var introWordingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "사진 또는 배경을 넣어 주세요."
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 30)
+        label.textColor = .lightGray
         return label
     }()
     
@@ -195,6 +202,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
+        view.addSubview(introWordingLabel)
+        introWordingLabelConstraints()
         
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
@@ -459,7 +468,6 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
     }
 }
 
-
 extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
         self.selectedStickerView = stickerView
@@ -607,12 +615,9 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
 extension CardCreateViewController {
     private func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -620,12 +625,9 @@ extension CardCreateViewController {
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -633,12 +635,18 @@ extension CardCreateViewController {
     
     private func canvasViewConstraints() {
         canvasView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    private func introWordingLabelConstraints() {
+        introWordingLabel.snp.makeConstraints({ make in
+            make.width.equalTo(500)
+            make.height.equalTo(50)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })

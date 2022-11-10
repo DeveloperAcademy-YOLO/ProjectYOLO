@@ -12,6 +12,7 @@ import SnapKit
 import UIKit
 
 final class BackgroundButtonViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+   
     private let backgroundImageName: [String]
     private let viewModel: CardViewModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
