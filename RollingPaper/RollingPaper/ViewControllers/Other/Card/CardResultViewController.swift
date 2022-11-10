@@ -98,7 +98,7 @@ final class CardResultViewController: UIViewController {
     }()
     
     lazy var barrierView: UIView = {
-        let barrier = UIView(frame: CGRect(x: 0, y: 145, width: view.bounds.width, height: 2))
+        let barrier = UIView(frame: CGRect(x: 0, y: 140, width: view.bounds.width, height: 0.1))
         barrier.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
         return barrier
     }()
@@ -158,7 +158,7 @@ final class CardResultViewController: UIViewController {
         collision.addBoundary(withIdentifier: "barrier" as NSCopying, for: UIBezierPath(rect: barrierView.frame))
         let behavior = UIDynamicItemBehavior(items: [titleBounceView])
         // 탄성 설정 값이 높을수록 높게 튀어오름, 단 1.0 보다 높으면 엄청 빠르게 튀어버려서 튕겨져 나감
-        behavior.elasticity = 1.0
+        behavior.elasticity = 0.975
         animator?.addBehavior(behavior)
     }
     
