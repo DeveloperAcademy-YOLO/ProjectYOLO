@@ -27,7 +27,6 @@ class CardRootViewController: UIViewController {
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
-        
         let button = UIBarButtonItem(customView: customBackBtn)
         return button
     }()
@@ -147,16 +146,20 @@ class CardRootViewController: UIViewController {
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
         print("cancelBtnPressed")
-        let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
-            alert.dismiss(animated: true, completion: nil)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
-            self.navigationController?.popViewController(animated: true)
-        }))
-        present(alert, animated: true)
+        let cardCreateViewVC = self.children[0] as? CardCreateViewController
+        if cardCreateViewVC?.someImageView.image != nil {
+            let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction!) in
+                alert.dismiss(animated: true, completion: nil)
+            }))
+            
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            present(alert, animated: true)
+        }
+        self.navigationController?.popViewController(animated: true)
     }
 }
 
