@@ -79,7 +79,7 @@ final class SidebarViewController: UIViewController {
         setProfileView()
         setCollectionView()
         configureDataSource()
-        setinitialConfig()
+        setInitialConfig()
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(changeSecondaryView(noitificaiton:)),
@@ -88,7 +88,7 @@ final class SidebarViewController: UIViewController {
         )
     }
     
-    private func setinitialConfig() {
+    private func setInitialConfig() {
         view.backgroundColor = .systemGray6
         collectionView.selectItem(at: IndexPath(row: 0, section: 0),
                                   animated: false,
