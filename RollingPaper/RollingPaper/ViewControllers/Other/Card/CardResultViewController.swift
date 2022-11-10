@@ -17,6 +17,8 @@ final class CardResultViewController: UIViewController {
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var backgroundImg = UIImage(named: "Rectangle")
     private var cancellables = Set<AnyCancellable>()
+    private var animator: UIDynamicAnimator?
+    private var collision: UICollisionBehavior!
     
     lazy var someImageShadow: UIView = {
         let aView = UIView()
@@ -75,6 +77,23 @@ final class CardResultViewController: UIViewController {
         return button
     }()
     
+    lazy var titleBounceView: UILabel = {
+        let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: 20, width: 234, height: 54))
+           titleLabel.text = "이대로 게시할까요?"
+           titleLabel.textAlignment = .center
+           titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+           titleLabel.backgroundColor = .white
+           titleLabel.layer.cornerRadius = 12
+           titleLabel.layer.masksToBounds = true
+           return titleLabel
+    }()
+
+    lazy var barrierView: UIView = {
+        let barrier = UIView(frame: CGRect(x: 0, y: 140, width: view.bounds.width, height: 0.1))
+        barrier.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
+        return barrier
+    }()
+    
     init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
         self.image = resultImage
         self.viewModel = viewModel
@@ -85,26 +104,6 @@ final class CardResultViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    lazy var titleBounceView: UILabel = {
-           let titleLabel = UILabel(frame: CGRect(x: view.bounds.midX*0.804, y: 20, width: 234, height: 54))
-           titleLabel.text = "이대로 게시할까요?"
-           titleLabel.textAlignment = .center
-           titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-           titleLabel.backgroundColor = .white
-           titleLabel.layer.cornerRadius = 12
-           titleLabel.layer.masksToBounds = true
-           return titleLabel
-    }()
-    
-    lazy var barrierView: UIView = {
-        let barrier = UIView(frame: CGRect(x: 0, y: 140, width: view.bounds.width, height: 0.1))
-        barrier.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
-        return barrier
-    }()
-
-    var animator: UIDynamicAnimator?
-    var collision: UICollisionBehavior!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -190,7 +189,6 @@ extension UIView {
 }
 
 extension CardResultViewController {
-
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.60)
@@ -226,6 +224,4 @@ extension CardResultViewController {
             make.top.equalTo(someImageView.snp.bottom).offset(30)
         })
     }
-    
 }
-
