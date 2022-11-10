@@ -14,16 +14,14 @@ final private class Layout {
     static let userPhotoFrameWidthHeight = 44
     static let userNameFontSize: CGFloat = 20
     static let userPhotoToNamePadding: CGFloat = 16
-    // static let userChevronFrameWidth = Int(Double(userInfoStackWidthSuperView) * 0.3 * 0.24)
-    // static let userChevronWidthHeight = 15
-    static let collectionViewCellBackgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
+    static let collectionViewCellBackgroundInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 6, trailing: 0)
     static let collectionViewCellimageToTextPadding: CGFloat = 16
     static let collectionViewCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
     static let collectionViewHeight: CGFloat = 56
     static let collectionViewCellImageSize = CGSize(width: 25, height: 25)
     static let collectionViewLeadingOffset = 128
     static let collectionViewTrailingOffset = -28
-    static let collectionViewToUserInfoStackPadding = 24
+    static let collectionViewToUserInfoStackPadding = 40
     static let userInfoStackRadius: CGFloat = 12
     static let userInfoStackInset = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
     static let userInfoStackWidthSuperView = -156
@@ -35,7 +33,7 @@ final private class Layout {
 class SidebarViewController: UIViewController {
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, CategoryModel>! = nil
-    private var collectionView: UICollectionView! = nil
+    // private var collectionView: UICollectionView! = nil
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     var sideBarCategories: [CategoryModel] = [
@@ -71,6 +69,12 @@ class SidebarViewController: UIViewController {
         return userInfo
     }()
     
+    private lazy var collectionView: UICollectionView = {
+        var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
+        collectionView.isScrollEnabled = false
+        return collectionView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
@@ -79,7 +83,11 @@ class SidebarViewController: UIViewController {
         setCollectionView()
         configureDataSource()
     }
-    
+    /*
+    func choose() {
+        collectionView.selectItem(at: IndexPath(index: .ini), animated: <#T##Bool#>, scrollPosition: <#T##UICollectionView.ScrollPosition#>)
+    }
+    */
     private func bind() {
         viewModel
             .currentUserSubject
@@ -114,14 +122,12 @@ class SidebarViewController: UIViewController {
     }
     
     private func setCollectionView() {
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
         view.addSubview(collectionView)
         collectionView.delegate = self
         collectionView.backgroundColor = .clear
-        
         collectionView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.collectionViewLeadingOffset)
-            make.trailing.equalToSuperview().offset(Layout.collectionViewTrailingOffset)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
             make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.collectionViewToUserInfoStackPadding)
         }
@@ -150,8 +156,13 @@ class SidebarViewController: UIViewController {
     private func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, CategoryModel> { (cell, indexPath, category) in
             var content = cell.defaultContentConfiguration()
-            content.text = category.name
             content.image = UIImage(systemName: category.icon)
+            content.text = category.name
+            content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
+            content.imageToTextPadding = Layout.collectionViewCellimageToTextPadding
+            content.imageProperties.tintColor = .systemGray3
+            content.imageProperties.maximumSize = Layout.collectionViewCellImageSize
+            content.directionalLayoutMargins = Layout.collectionViewCellInsets
             cell.contentConfiguration = content
         }
         
@@ -184,6 +195,15 @@ extension SidebarViewController: UICollectionViewDelegate {
             name: Notification.Name.viewChangeFromSidebar,
             object: nil,
             userInfo: [NotificationViewKey.view: category.name])
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            cell.contentView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) {
+                cell.contentView.backgroundColor = nil
+            }
     }
 }
 
