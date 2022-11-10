@@ -98,9 +98,15 @@ extension SignUpTextField {
             textField.textContentType = .oneTimeCode
             textField.isSecureTextEntry = false
             textField.clearButtonMode = .always
+            textField.rightViewMode = .unlessEditing
+            let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 27, height: frame.height))
+            textField.rightView = rightPaddingView
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .name
+            textField.rightViewMode = .always
+            let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 53, height: frame.height))
+            textField.rightView = rightPaddingView
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)

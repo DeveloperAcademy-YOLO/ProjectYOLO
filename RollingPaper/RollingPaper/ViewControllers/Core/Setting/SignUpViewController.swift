@@ -33,7 +33,7 @@ final class SignUpViewController: UIViewController {
         return button
     }()
     private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .large)
+        let spinner = UIActivityIndicatorView()
         spinner.color = .systemBackground
         return spinner
     }()
@@ -325,10 +325,11 @@ extension SignUpViewController {
             make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
-            make.height.equalTo(38)
+            make.height.equalTo(48)
         })
         spinner.snp.makeConstraints { make in
             make.center.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         setCloseButton()
     }

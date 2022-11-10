@@ -108,7 +108,7 @@ final class SignInViewController: UIViewController {
         return label
     }()
     private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .large)
+        let spinner = UIActivityIndicatorView()
         spinner.color = .label
         return spinner
     }()
@@ -428,6 +428,7 @@ extension SignInViewController {
         })
         spinner.snp.makeConstraints({ make in
             make.center.equalToSuperview()
+            make.height.width.equalTo(40)
         })
         setCloseButton()
     }
