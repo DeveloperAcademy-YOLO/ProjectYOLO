@@ -96,6 +96,7 @@ extension SignUpTextField {
         let width: CGFloat = type == .name ? 80 : 34
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: frame.height))
         textField.rightView = paddingView
+        textField.rightViewMode = .always
         setClearButtonLayout()
     }
     
