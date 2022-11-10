@@ -4,11 +4,14 @@
 //
 //  Created by SeungHwanKim on 2022/10/12.
 //
-
+import AVFoundation
 import Foundation
 import UIKit
 import SnapKit
 import Combine
+import PencilKit
+import Photos
+import StickerView
 
 class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
@@ -101,49 +104,6 @@ class WrittenPaperViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-
-            let save = UIAction(
-                title: "내 갤러리 저장하기",
-                image: UIImage(systemName: "arrow.down.square"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                state: .off
-            ){ _ in
-            }
-            
-            let share = UIAction(
-                title: "공유하기",
-                image: UIImage(systemName: "link"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                state: .off
-            ){  _ in
-            }
-            
-            let delete = UIAction(
-                title: "삭제하기",
-                image: UIImage(systemName: "trash.fill"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                attributes: .destructive,
-                state: .off
-            ) { _ in
-            }
-            
-            return UIMenu(
-                image: nil,
-                identifier: nil,
-                options: UIMenu.Options.displayInline,
-                children: [save, share, delete]
-            )
-        }
-        return config
-    }
-
     
     func setCustomNavBarButtons() {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
@@ -367,7 +327,6 @@ class WrittenPaperViewController: UIViewController {
         cardsCollection?.reloadData()
         return cardsCollection ?? UICollectionView()
     }
-    
 }
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
@@ -375,6 +334,16 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         return self.viewModel.currentPaper?.cards.count ?? 0
     }
     //commit collectionView
+    
+    func saveCard(_ indexPath : Int) {
+        guard let currentPaper = viewModel.currentPaper else { return }
+        let card = currentPaper.cards[indexPath]
+        
+        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
@@ -433,4 +402,65 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first?.row else { return nil }
+        print(indexPath)
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            
+            let save = UIAction(
+                title: "내 갤러리 저장하기",
+                image: UIImage(systemName: "arrow.down.square"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ){ [weak self] _ in
+//                print("indexPath : \(indexPath)")
+                self?.saveCard(indexPath)
+            }
+            
+            let share = UIAction(
+                title: "공유하기",
+                image: UIImage(systemName: "link"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ){  _ in
+            }
+            
+            let delete = UIAction(
+                title: "삭제하기",
+                image: UIImage(systemName: "trash.fill"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                attributes: .destructive,
+                state: .off
+            ) { _ in
+            }
+            
+            return UIMenu(
+                image: nil,
+                identifier: nil,
+                options: UIMenu.Options.displayInline,
+                children: [save, share, delete]
+            )
+        }
+        return config
+    }
+    
+    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        } else {
+            
+            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            
+        }
+    }
+    
 }
