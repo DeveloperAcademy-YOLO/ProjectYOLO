@@ -52,6 +52,7 @@ final class CardResultViewController: UIViewController {
     lazy var postingButton: UIButton = {
         let button = UIButton()
         button.setTitle("게시하기", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .bold)
         button.tintColor = UIColor(red: 0, green: 0, blue: 0)
         button.backgroundColor = .black
         button.layer.cornerRadius = 12
@@ -114,12 +115,8 @@ final class CardResultViewController: UIViewController {
 extension CardResultViewController {
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(120)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.width.equalTo(self.view.bounds.width * 0.55)
+            make.height.equalTo(self.view.bounds.height * 0.55)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -130,7 +127,7 @@ extension CardResultViewController {
             make.width.equalTo(63)
             make.height.equalTo(54)
             make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.35)
-            make.top.equalTo(someImageView.snp.bottom).offset(20)
+            make.top.equalTo(someImageView.snp.bottom).offset(30)
         })
     }
     
@@ -139,7 +136,7 @@ extension CardResultViewController {
             make.width.equalTo(282)
             make.height.equalTo(54)
             make.leading.equalTo(backwardButton.snp.trailing).offset(20)
-            make.top.equalTo(someImageView.snp.bottom).offset(20)
+            make.top.equalTo(someImageView.snp.bottom).offset(30)
         })
     }
     
