@@ -158,6 +158,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -166,6 +167,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -174,6 +176,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 let text: String
                 switch error {
@@ -193,6 +196,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
+                textField.clearButtonMode = .never
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
@@ -204,6 +208,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
                 passedSubject.send(false)
@@ -212,6 +217,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -220,6 +226,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
+                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 let text: String
                 switch error {
@@ -237,6 +244,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
+                textField.clearButtonMode = .never
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
@@ -284,6 +292,7 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
+                textField.clearButtonMode = .never
                 nameCountView.isHidden = true
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
