@@ -36,7 +36,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
         self.loadViewControllers()
-        // self.sidebarViewController.show(categories: self.sideBarCategories)
         self.preferredPrimaryColumnWidthFraction = 0.25
         delegate = self
         splitViewManager.transform(input: input.eraseToAnyPublisher())
