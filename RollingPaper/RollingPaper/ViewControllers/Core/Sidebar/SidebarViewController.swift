@@ -30,19 +30,17 @@ final private class Layout {
     static let userInfoStackTopSafeArea = 40
 }
 
-class SidebarViewController: UIViewController {
-    
+final class SidebarViewController: UIViewController {
     private var dataSource: UICollectionViewDiffableDataSource<Section, CategoryModel>! = nil
-    // private var collectionView: UICollectionView! = nil
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
+    private var cancellables = Set<AnyCancellable>()
     var sideBarCategories: [CategoryModel] = [
         CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
         CategoryModel(name: "페이퍼 보관함", icon: "folder"),
         CategoryModel(name: "설정", icon: "gearshape")
     ]
     
-    private var cancellables = Set<AnyCancellable>()
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
         photo.layer.cornerRadius = photo.frame.width / 2
@@ -59,7 +57,7 @@ class SidebarViewController: UIViewController {
         return name
     }()
     
-    lazy var userInfoStack: UIStackView = {
+    private lazy var userInfoStack: UIStackView = {
         let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
         userInfo.axis = .horizontal
         userInfo.alignment = .center
@@ -77,23 +75,27 @@ class SidebarViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGray6
+        bind()
+        setProfileView()
+        setCollectionView()
+        configureDataSource()
+        setinitialConfig()
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(changeSecondaryView(noitificaiton:)),
             name: Notification.Name.viewChange,
             object: nil
         )
-        bind()
-        setProfileView()
-        setCollectionView()
-        configureDataSource()
+    }
+    
+    private func setinitialConfig() {
+        view.backgroundColor = .systemGray6
         collectionView.selectItem(at: IndexPath(row: 0, section: 0),
                                   animated: false,
                                   scrollPosition: UICollectionView.ScrollPosition.centeredVertically)
     }
     
-    @objc func changeSecondaryView(noitificaiton: Notification) {
+    @objc private func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         if object == "페이퍼 보관함" {
             self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
@@ -133,6 +135,40 @@ class SidebarViewController: UIViewController {
         }
     }
     
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<CategoryCell, CategoryModel> { (cell, indexPath, category) in
+            cell.categoryData = [category.name, category.icon]
+            var content = cell.defaultContentConfiguration()
+            content.image = UIImage(systemName: category.icon)
+            content.text = category.name
+            content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
+            content.imageToTextPadding = Layout.collectionViewCellimageToTextPadding
+            content.imageProperties.tintColor = .systemGray3
+            content.imageProperties.maximumSize = Layout.collectionViewCellImageSize
+            content.directionalLayoutMargins = Layout.collectionViewCellInsets
+            cell.contentConfiguration = content
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource<Section, CategoryModel>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> CategoryCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+        }
+        
+        let sections: [Section] = [.main]
+        var snapshot = NSDiffableDataSourceSnapshot<Section, CategoryModel>()
+        snapshot.appendSections(sections)
+        dataSource.apply(snapshot, animatingDifferences: false)
+        
+        for section in sections {
+            switch section {
+            case .main:
+                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<CategoryModel>()
+                sectionSnapshot.append(sideBarCategories)
+                dataSource.apply(sectionSnapshot, to: section)
+            }
+        }
+    }
+    
     private func setCollectionView() {
         view.addSubview(collectionView)
         collectionView.delegate = self
@@ -164,39 +200,6 @@ class SidebarViewController: UIViewController {
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
         userPhoto.contentMode = .scaleAspectFill
     }
-    
-    private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<CategoryCell, CategoryModel> { (cell, indexPath, category) in
-            var content = cell.defaultContentConfiguration()
-            content.image = UIImage(systemName: category.icon)
-            content.text = category.name
-            content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
-            content.imageToTextPadding = Layout.collectionViewCellimageToTextPadding
-            content.imageProperties.tintColor = .systemGray3
-            content.imageProperties.maximumSize = Layout.collectionViewCellImageSize
-            content.directionalLayoutMargins = Layout.collectionViewCellInsets
-            cell.contentConfiguration = content
-        }
-        
-        dataSource = UICollectionViewDiffableDataSource<Section, CategoryModel>(collectionView: collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> CategoryCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
-        }
-        
-        let sections: [Section] = [.main]
-        var snapshot = NSDiffableDataSourceSnapshot<Section, CategoryModel>()
-        snapshot.appendSections(sections)
-        dataSource.apply(snapshot, animatingDifferences: false)
-        
-        for section in sections {
-            switch section {
-            case .main:
-                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<CategoryModel>()
-                sectionSnapshot.append(sideBarCategories)
-                dataSource.apply(sectionSnapshot, to: section)
-            }
-        }
-    }
 }
 
 extension SidebarViewController: UICollectionViewDelegate {
@@ -210,21 +213,18 @@ extension SidebarViewController: UICollectionViewDelegate {
 }
 
 class CategoryCell: UICollectionViewListCell {
-    /*
-    override var isSelected: Bool {
-        didSet {
-            
-        }
-    }
-    */
+    var categoryData = ["", ""]
+    
     override func updateConfiguration(using state: UICellConfigurationState) {
         super.updateConfiguration(using: state)
         guard var contentConfig = self.contentConfiguration?.updated(for: state) as? UIListContentConfiguration else { return }
         contentConfig.textProperties.colorTransformer = UIConfigurationColorTransformer { color in
             state.isSelected || state.isHighlighted ? .black : .black
         }
+        contentConfig.image = UIImage(systemName: state.isSelected || state.isHighlighted ? categoryData[1] + ".fill" : categoryData[1])
+        
         guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
-        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { color in
+        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
             state.isSelected || state.isHighlighted ? .white : .clear
         }
         
