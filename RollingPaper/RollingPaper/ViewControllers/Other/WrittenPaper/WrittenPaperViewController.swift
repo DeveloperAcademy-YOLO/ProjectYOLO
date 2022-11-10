@@ -102,6 +102,49 @@ class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+
+            let save = UIAction(
+                title: "내 갤러리 저장하기",
+                image: UIImage(systemName: "arrow.down.square"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ){ _ in
+            }
+            
+            let share = UIAction(
+                title: "공유하기",
+                image: UIImage(systemName: "link"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ){  _ in
+            }
+            
+            let delete = UIAction(
+                title: "삭제하기",
+                image: UIImage(systemName: "trash.fill"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                attributes: .destructive,
+                state: .off
+            ) { _ in
+            }
+            
+            return UIMenu(
+                image: nil,
+                identifier: nil,
+                options: UIMenu.Options.displayInline,
+                children: [save, share, delete]
+            )
+        }
+        return config
+    }
+
+    
     func setCustomNavBarButtons() {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
