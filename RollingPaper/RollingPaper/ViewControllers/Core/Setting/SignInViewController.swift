@@ -127,6 +127,9 @@ final class SignInViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
+                let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.label])
+                self.signInButton.isUserInteractionEnabled = true
+                self.signInButton.setAttributedTitle(title, for: .normal)
                 self.spinner.stopAnimating()
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
@@ -154,6 +157,8 @@ final class SignInViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.signInButtonTap)
+                self?.signInButton.isUserInteractionEnabled = false
+                self?.signInButton.setAttributedTitle(nil, for: .normal)
                 self?.spinner.isHidden = false
                 self?.spinner.startAnimating()
             })
@@ -355,7 +360,8 @@ extension SignInViewController {
 extension SignInViewController {
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton, spinner])
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
+        signInButton.addSubview(spinner)
         let topOffset = (view.frame.height - 332) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
