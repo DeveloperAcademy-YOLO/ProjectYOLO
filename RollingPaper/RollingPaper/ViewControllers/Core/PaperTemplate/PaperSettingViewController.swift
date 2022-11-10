@@ -45,6 +45,8 @@ class PaperSettingViewController: UIViewController {
     private let titleLengthLabel = UILabel()
     private let warningLabel = UILabel()
     private let warningImage = UIImageView()
+    private let timePickerButton = UIButton()
+    private let timePicker: PaperTimePicker
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
     
     private var cancellables = Set<AnyCancellable>()
@@ -69,6 +71,7 @@ class PaperSettingViewController: UIViewController {
     init(template: TemplateEnum) {
         self.template = template
         viewModel = PaperSettingViewModel(template: template)
+        timePicker = PaperTimePicker(viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -85,7 +88,17 @@ class PaperSettingViewController: UIViewController {
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
     private func bind() {
-        viewModel.transform(input: input.eraseToAnyPublisher())
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .timePickerChange(let time):
+                    self.timePickerButton.setTitle(time, for: .normal)
+                }
+            })
+            .store(in: &cancellables)
     }
     
     // 네비게이션 바 초기화
@@ -122,11 +135,11 @@ class PaperSettingViewController: UIViewController {
         let title2 = getLabel(text: "타이머 설정", style: .title2, color: .label)
         let subtitle2 = getLabel(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다", style: .body, color: .secondaryLabel)
         let limitTimeTitle = getLabel(text: "제한 시간", style: .title3, color: .label)
-        let timePickerButton = getTimePickerButton()
         
         initTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
         initTextLengthView()
         initWarningLabel()
+        initTimePickerButton()
         
         view.addSubview(thumbnail)
         view.addSubview(title1)
@@ -238,15 +251,13 @@ class PaperSettingViewController: UIViewController {
     }
     
     // 피커 버튼 가져오기
-    private func getTimePickerButton() -> UIButton {
-        let timePickerButton = UIButton()
+    private func initTimePickerButton() {
         timePickerButton.addTarget(self, action: #selector(onClickedTimePickerButton(_:)), for: .touchUpInside)
         timePickerButton.setTitle("02:00", for: .normal)
         timePickerButton.setTitleColor(.black, for: .normal)
         timePickerButton.backgroundColor = .black
         timePickerButton.layer.cornerRadius = Length.timePickerButtonRadius
         timePickerButton.backgroundColor = UIColor(rgb: 0x767680).withAlphaComponent(0.12)
-        return timePickerButton
     }
     
     // 텍스트필드 뷰 가져오기
@@ -364,7 +375,6 @@ class PaperSettingViewController: UIViewController {
     
     // 피커 버튼 눌렀을 때 피커 보여주기
     @objc private func onClickedTimePickerButton(_ sender: UIButton) {
-        let timePicker = PaperTimePicker()
         timePicker.modalPresentationStyle = .popover
         timePicker.popoverPresentationController?.sourceView = sender
         present(timePicker, animated: true)

@@ -6,16 +6,34 @@
 //
 
 import UIKit
+import Combine
 
 // 제한시간 설정할 때 쓰는 피커
 class PaperTimePicker: UIViewController {
     private let timeList = ["00:30", "01:00", "01:30", "02:00", "02:30", "03:00", "03:30", "04:00"]
     private let picker = UIPickerView()
+    private let viewModel: PaperSettingViewModel
+    private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
+    
+    init(viewModel: PaperSettingViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         setView()
         setPicker()
         compressView()
+        bind()
+    }
+    
+    // 뷰모델과 연결하기
+    private func bind() {
+        _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
     
     // 피커 설정하기
@@ -54,6 +72,6 @@ extension PaperTimePicker: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     // 선택된 아이템
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        print("Selected: \(timeList[row])")
+        input.send(.timePickerChange(time: timeList[row]))
     }
 }
