@@ -23,6 +23,7 @@ private class Length {
     static let openedPaperThumbnailHeight: CGFloat = openedPaperThumbnailWidth*0.33
     static let openedPaperTitleBottomMargin: CGFloat = 16
     static let openedPaperTitleRightMargin: CGFloat = 16
+    static let openedPaperTitleLeftMargin: CGFloat = 16
     static let openedCellHorizontalSpace: CGFloat = 18
     static let openedCellVerticalSpace: CGFloat = 18
     static let timerTopMargin: CGFloat = 8
@@ -301,10 +302,11 @@ private class PaperStorageOpenedCollectionCell: UICollectionViewCell {
         
         title.font = .preferredFont(for: .title1, weight: .semibold)
         title.textColor = UIColor.white
-        title.textAlignment = .center
+        title.textAlignment = .right
         title.snp.makeConstraints({ make in
             make.bottom.equalTo(preview.snp.bottom).offset(-Length.openedPaperTitleBottomMargin)
             make.trailing.equalTo(preview.snp.trailing).offset(-Length.openedPaperTitleRightMargin)
+            make.leading.equalTo(preview.snp.leading).offset(Length.openedPaperTitleLeftMargin)
         })
         
         timer.layer.cornerRadius = Length.timerCornerRadius
