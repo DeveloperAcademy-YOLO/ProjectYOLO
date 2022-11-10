@@ -18,31 +18,46 @@ final class CardResultViewController: UIViewController {
     private var backgroundImg = UIImage(named: "Rectangle")
     private var cancellables = Set<AnyCancellable>()
     
+    lazy var someImageShadow: UIView = {
+        let aView = UIView()
+        aView.layer.shadowOffset = CGSize(width: 3, height: 3)
+        aView.layer.shadowOpacity = 0.2
+        aView.layer.shadowRadius = 30.0
+        aView.backgroundColor = .systemBackground
+        aView.layer.cornerRadius = 60
+        aView.layer.shadowColor = UIColor.black.cgColor
+        aView.translatesAutoresizingMaskIntoConstraints = false
+        return aView
+    }()
+
     lazy var someImageView: UIImageView = {
-        let theImageView = UIImageView()
+        let theImageView = UIImageView(frame: someImageShadow.bounds)
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
         theImageView.backgroundColor = .systemBackground
+        theImageView.contentMode = .scaleToFill
         theImageView.layer.masksToBounds = true
         theImageView.layer.cornerRadius = 50
-        theImageView.contentMode = .scaleToFill
+
         theImageView.image = image
         return theImageView
     }()
     
-    lazy var navigationTitle: UILabel = {
+    lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.text = "이대로 게시할까요?"
         titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.systemFont(ofSize: 20)
+        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        titleLabel.backgroundColor = .white
+        titleLabel.layer.cornerRadius = 12
+        titleLabel.layer.masksToBounds = true
         return titleLabel
     }()
     
     lazy var backwardButton: UIButton = {
         let button = UIButton()
-        let backwardBtnImage = UIImage(systemName: "arrow.uturn.backward")!.resized(to: CGSize(width: 30, height: 30))
+        let backwardBtnImage = UIImage(systemName: "arrow.uturn.backward")!.resized(to: CGSize(width: 30, height: 30)).withTintColor(UIColor(red: 173, green: 173, blue: 173))
         button.setImage(backwardBtnImage, for: .normal)
-        button.tintColor = UIColor(red: 173, green: 173, blue: 173)
         button.backgroundColor = .white
         button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
@@ -74,6 +89,12 @@ final class CardResultViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
+        
+        view.addSubview(titleLabel)
+        titleLabelConstraints()
+        
+        view.addSubview(someImageShadow)
+        someImageShadowConstraints()
         
         view.addSubview(someImageView)
         someImageViewConstraints()
@@ -111,13 +132,45 @@ final class CardResultViewController: UIViewController {
     }
 }
 
+extension UIView {
+    func animationBounce() {
+        UIView.animateKeyframes(withDuration: 0.7, delay: 0) { [weak self] in
+            guard let height = self?.bounds.height else {
+                return
+            }
+            self?.alpha = 1
+            self?.center.y = -height/4
+            self?.isHidden = false
+        }
+    }
+}
+
 extension CardResultViewController {
+   
+    private func titleLabelConstraints() {
+        titleLabel.snp.makeConstraints({ make in
+            make.width.equalTo(234)
+            make.height.equalTo(54)
+            make.centerX.equalTo(self.view)
+            make.top.equalTo(self.view.snp.top).offset(60)
+        })
+    }
+    
+    private func someImageShadowConstraints() {
+        someImageShadow.snp.makeConstraints({ make in
+            make.width.equalTo(self.view.bounds.width * 0.60)
+            make.height.equalTo(self.view.bounds.height * 0.60)
+            make.centerX.equalTo(self.view)
+            make.top.equalTo(titleLabel.snp.bottom).offset(30)
+        })
+    }
+    
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.60)
             make.height.equalTo(self.view.bounds.height * 0.60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.top.equalTo(titleLabel.snp.bottom).offset(30)
         })
     }
     
