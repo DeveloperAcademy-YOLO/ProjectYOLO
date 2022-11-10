@@ -96,7 +96,7 @@ final class SignInViewController: UIViewController {
         button.layer.masksToBounds = false
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.1
-        button.layer.shadowOffset = .zero
+        button.layer.shadowOffset = CGSize(width: 2, height: 2)
         button.layer.shadowRadius = 10
         let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.label])
         button.setAttributedTitle(title, for: .normal)
