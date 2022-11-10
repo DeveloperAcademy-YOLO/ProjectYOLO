@@ -78,13 +78,18 @@ class PaperStorageClosedCollectionCell: UICollectionViewCell {
         return dateFormatter.string(from: date)
     }
     
-    func setCell(paper: PaperPreviewModel, thumbnail: UIImage?) {
-        date.text = changeDateFormat(date: paper.endTime)
-        title.text = paper.title
-        preview.image = thumbnail
-        preview.snp.updateConstraints({ make in
-            make.width.equalTo(PaperStorageLength.closedPaperThumbnailWidth)
-            make.height.equalTo(PaperStorageLength.closedPaperThumbnailHeight)
-        })
+    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?) {
+        if let paper = paper {
+            date.text = changeDateFormat(date: paper.endTime)
+            title.text = paper.title
+            preview.image = thumbnail
+            preview.snp.updateConstraints({ make in
+                make.width.equalTo(PaperStorageLength.closedPaperThumbnailWidth)
+                make.height.equalTo(PaperStorageLength.closedPaperThumbnailHeight)
+            })
+            isHidden = false
+        } else {
+            isHidden = true
+        }
     }
 }

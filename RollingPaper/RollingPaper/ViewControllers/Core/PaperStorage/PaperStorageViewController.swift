@@ -171,7 +171,15 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? viewModel.openedPapers.count : viewModel.closedPapers.count
+        if section == 0 {
+            return viewModel.openedPapers.count
+        } else {
+            if dataState == .onlyOpened {
+                return 1
+            } else {
+                return viewModel.closedPapers.count
+            }
+        }
     }
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -187,9 +195,13 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageClosedCollectionCell.identifier, for: indexPath) as? PaperStorageClosedCollectionCell else {return UICollectionViewCell()}
-            let paper = viewModel.closedPapers[indexPath.item]
-            let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-            cell.setCell(paper: paper, thumbnail: thumbnail)
+            if dataState == .onlyOpened {
+                cell.setCell(paper: nil, thumbnail: nil)
+            } else {
+                let paper = viewModel.closedPapers[indexPath.item]
+                let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
+                cell.setCell(paper: paper, thumbnail: thumbnail)
+            }
             return cell
         }
     }
