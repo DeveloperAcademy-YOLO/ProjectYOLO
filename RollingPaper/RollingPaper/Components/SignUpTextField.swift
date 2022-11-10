@@ -74,7 +74,12 @@ final class SignUpTextField: UIView {
         return label
     }()
     private var cancellabels = Set<AnyCancellable>()
-        
+    private var clearButton: UIButton = {
+        let button = UIButton()
+        button.setImage(systemName: "x.circle.fill")
+        button.tintColor = .systemGray4
+        return button
+    }()
     override init(frame: CGRect) {
         super.init(frame: frame)
         setDefaultLayout()
@@ -86,27 +91,30 @@ final class SignUpTextField: UIView {
 }
 
 extension SignUpTextField {
+    private func setClearButton() {
+        guard let type = textFieldEnum else { return }
+        let width: CGFloat = type == .name ? 80 : 34
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: frame.height))
+        textField.rightView = paddingView
+        setClearButtonLayout()
+    }
+    
     func setTextFieldType(type: SignUpTextFieldEnum) {
         self.textFieldEnum = type
         switch type {
         case .email:
             textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .emailAddress
-            textField.clearButtonMode = .always
+            setClearButton()
         case .password:
             textField.attributedPlaceholder = NSAttributedString(string: "비밀번호", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .oneTimeCode
             textField.isSecureTextEntry = false
-            textField.clearButtonMode = .always
-            textField.rightViewMode = .unlessEditing
-            let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 27, height: frame.height))
-            textField.rightView = rightPaddingView
+            setClearButton()
         case .name:
             textField.attributedPlaceholder = NSAttributedString(string: "닉네임", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
             textField.textContentType = .name
-            textField.rightViewMode = .always
-            let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 53, height: frame.height))
-            textField.rightView = rightPaddingView
+            setClearButton()
             addSubview(nameCountView)
             nameCountView.snp.makeConstraints({ make in
                 make.top.equalToSuperview().offset(5)
@@ -152,6 +160,27 @@ extension SignUpTextField {
                 }
             })
             .store(in: &cancellabels)
+        clearButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                self?.textField.text = ""
+                self?.textField.sendActions(for: .editingChanged)
+            }
+            .store(in: &cancellabels)
+        textField.textPublisher
+            .combineLatest(passedSubject)
+            .sink { [weak self] text, isPassed in
+                if isPassed {
+                    self?.clearButton.isHidden = true
+                } else {
+                    if text == nil || text == "" {
+                        self?.clearButton.isHidden = true
+                    } else {
+                        self?.clearButton.isHidden = false
+                    }
+                }
+            }
+            .store(in: &cancellabels)
         setTextFieldState(state: .normal)
     }
     
@@ -164,7 +193,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -173,7 +201,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -182,7 +209,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 let text: String
                 switch error {
@@ -202,7 +228,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                textField.clearButtonMode = .never
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
@@ -214,7 +239,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: "비밀번호는 6자리 이상이어야 합니다")
                 passedSubject.send(false)
@@ -223,7 +247,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemBlue.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(false)
@@ -232,7 +255,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemRed.cgColor
                 textField.layer.borderWidth = 2.0
                 textField.layer.shadowOpacity = 1.0
-                textField.clearButtonMode = .always
                 checkImageView.isHidden = true
                 let text: String
                 switch error {
@@ -250,7 +272,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                textField.clearButtonMode = .never
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
                 passedSubject.send(true)
@@ -298,7 +319,6 @@ extension SignUpTextField {
                 textField.layer.borderColor = UIColor.systemGray.cgColor
                 textField.layer.borderWidth = 1.0
                 textField.layer.shadowOpacity = 0.0
-                textField.clearButtonMode = .never
                 nameCountView.isHidden = true
                 checkImageView.isHidden = false
                 setWaringView(waringShown: false, text: nil)
@@ -367,5 +387,16 @@ extension SignUpTextField {
             make.leading.equalToSuperview().offset(waringShown ? 49.05 : 16)
         })
         layoutIfNeeded()
+    }
+    
+    private func setClearButtonLayout() {
+        guard let type = textFieldEnum else { return }
+        let trailingOffset: CGFloat = type == .name ? -57 : -11
+        textField.addSubview(clearButton)
+        clearButton.snp.makeConstraints({ make in
+            make.width.height.equalTo(22)
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(trailingOffset)
+        })
     }
 }
