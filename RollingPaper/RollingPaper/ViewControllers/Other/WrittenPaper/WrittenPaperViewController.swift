@@ -51,8 +51,6 @@ class WrittenPaperViewController: UIViewController {
         self.cardsList = setCollectionView()
         bind()
         setCustomNavBarButtons()
-        print("페이퍼 뷰컨에서 보이는 페이퍼 : \(viewModel.currentPaper)")
-        print("페이퍼 뷰컨에서 보이는 currentUser : \(viewModel.currentUser)")
         view.addSubview(self.cardsList ?? UICollectionView())
     }
     
@@ -96,7 +94,7 @@ class WrittenPaperViewController: UIViewController {
         viewModel
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
-            .sink{ [weak self] paperModel in
+            .sink { [weak self] paperModel in
                 if let paperModel = paperModel {
                     self?.titleLabel.text = paperModel.title
                 }
@@ -130,7 +128,7 @@ class WrittenPaperViewController: UIViewController {
                 self.viewModel
                     .currentPaperPublisher
                     .receive(on: DispatchQueue.main)
-                    .sink{ [weak self] paperModel in
+                    .sink { [weak self] paperModel in
                         if self?.paperLinkBtnIsPressed == true {
                             self?.presentShareSheet(paperLinkBtn)}
                     }
@@ -163,7 +161,7 @@ class WrittenPaperViewController: UIViewController {
         guard let paper = viewModel.currentPaper else {return}
         getPaperShareLink(with: paper, route: .write)
             .receive(on: DispatchQueue.global(qos: .background))
-            .sink{ (completion) in
+            .sink { (completion) in
                 switch completion {
                     // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
                 case .finished: break
@@ -192,7 +190,7 @@ class WrittenPaperViewController: UIViewController {
     }
     
     func moveToCardRootView() {
-        var isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
+        let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), paperID: self.viewModel.currentPaperPublisher.value?.paperId ?? "paperID Send fail", isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
@@ -339,6 +337,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
+        
         guard let currentPaper = viewModel.currentPaper else { return myCell }
         let card = currentPaper.cards[indexPath.row]
         
@@ -375,49 +374,21 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                 }
                 .store(in: &cancellables)
         }
-        
         return myCell
     }
 }
+
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return  }
         let card = currentPaper.cards[indexPath.row]
         let presentingVC = MagnifiedCardViewController()
-        presentingVC.parentNavigationBarHeight = self.navigationController?.navigationBar.frame.maxY
-        presentingVC.cardContentURLString = card.contentURLString
         
-        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            presentingVC.magnifiedCardImage.image = image
-            presentingVC.modalPresentationStyle = .overCurrentContext
-            present(presentingVC, animated: true)
-        }
-        else {
-            LocalStorageManager.downloadData(urlString: card.contentURLString)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    switch completion {
-                    case .failure(let error): print(error)
-                    case .finished: break
-                    }
-                } receiveValue: { [weak self] data in
-                    if
-                        let data = data,
-                        let image = UIImage(data: data) {
-                        NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                        presentingVC.magnifiedCardImage.image = image
-                        presentingVC.modalPresentationStyle = .overCurrentContext
-                        self?.present(presentingVC, animated: true)
-                    } else {
-                        let image = UIImage(systemName: "person.circle")
-                        presentingVC.magnifiedCardImage.image = image
-                        presentingVC.modalPresentationStyle = .overCurrentContext
-                        self?.present(presentingVC, animated: true)
-                    }
-                }
-                .store(in: &cancellables)
-        }
+        presentingVC.selectedCardIndex = indexPath.row
+        presentingVC.cardContentURLString = card.contentURLString
+        presentingVC.modalPresentationStyle = .overCurrentContext
+        present(presentingVC, animated: true)
+        
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }
-
