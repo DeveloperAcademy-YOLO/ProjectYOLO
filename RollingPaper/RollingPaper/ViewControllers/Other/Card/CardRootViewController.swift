@@ -124,17 +124,17 @@ class CardRootViewController: UIViewController {
     }
     
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
-        let secondStepViewVC = self.children[0] as? CardCreateViewController
+        let cardCreateViewVC = self.children[0] as? CardCreateViewController
         
-        if secondStepViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
+        if cardCreateViewVC?.someImageView.image == UIImage(named: "Rectangle_default") {
             let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 색깔을 넣어주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
                 alert.dismiss(animated: true, completion: nil)
             }))
             present(alert, animated: true)
         } else {
-            if let secondStepViewVC = self.children[0] as? CardCreateViewController {
-                secondStepViewVC.resultImageSend()
+            if let cardCreateViewVC = self.children[0] as? CardCreateViewController {
+                cardCreateViewVC.resultImageSend()
                 print("CardPencilKit here!")
             } else {
                 print("Fail!")
