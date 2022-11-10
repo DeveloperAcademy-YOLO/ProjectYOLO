@@ -86,12 +86,15 @@ final class CardResultViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    lazy var titleBounceView: UIView = {
-        let title = UIView(frame: CGRect(x: view.bounds.midX*0.804, y: 20, width: 234, height: 54))
-        title.backgroundColor = UIColor.white
-        title.layer.masksToBounds = true
-        title.layer.cornerRadius = 12
-        return title
+    lazy var titleBounceView: UILabel = {
+           let titleLabel = UILabel(frame: CGRect(x: view.bounds.midX*0.804, y: 20, width: 234, height: 54))
+           titleLabel.text = "이대로 게시할까요?"
+           titleLabel.textAlignment = .center
+           titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+           titleLabel.backgroundColor = .white
+           titleLabel.layer.cornerRadius = 12
+           titleLabel.layer.masksToBounds = true
+           return titleLabel
     }()
     
     lazy var barrierView: UIView = {
@@ -225,3 +228,4 @@ extension CardResultViewController {
     }
     
 }
+
