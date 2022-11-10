@@ -17,6 +17,11 @@ class PaperStorageViewController: UIViewController {
     private var paperCollectionView: PaperStorageCollectionView?
     private var splitViewIsOpened: Bool = true
     private var viewIsChange: Bool = false
+    private var dataState: DataState = .nothing
+    
+    enum DataState {
+        case nothing, onlyOpened, onlyClosed, both
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,9 +60,22 @@ class PaperStorageViewController: UIViewController {
                 // 페이퍼에 변화가 있으면 UI 업데이트 하기
                 case .initPapers, .papersAreUpdatedInDatabase, .papersAreUpdatedByTimer:
                     self.paperCollectionView?.reloadData()
+                    self.setDataState()
                 }
             })
             .store(in: &cancellables)
+    }
+    
+    private func setDataState() {
+        if viewModel.openedPapers.isEmpty && viewModel.closedPapers.isEmpty {
+            dataState = .nothing
+        } else if viewModel.openedPapers.isEmpty {
+            dataState = .onlyClosed
+        } else if viewModel.closedPapers.isEmpty {
+            dataState = .onlyOpened
+        } else {
+            dataState = .both
+        }
     }
     
     // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
@@ -117,6 +135,7 @@ class PaperStorageViewController: UIViewController {
         guard let collectionView = paperCollectionView else {return}
         collectionView.backgroundColor = .systemBackground
         collectionView.alwaysBounceVertical = true
+
         collectionView.register(PaperStorageOpenedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageOpenedCollectionCell.identifier)
         collectionView.register(PaperStorageClosedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageClosedCollectionCell.identifier)
         collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
