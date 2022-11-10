@@ -347,7 +347,6 @@ class WrittenPaperViewController: UIViewController {
             alert.preferredAction = confirm
             self.present(alert, animated: true, completion: nil)
         }
-        
     }
     
     func setCollectionView() -> UICollectionView {
@@ -375,7 +374,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.viewModel.currentPaper?.cards.count ?? 0
     }
-    
+    //commit collectionView
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
