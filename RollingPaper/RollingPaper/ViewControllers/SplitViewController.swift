@@ -18,12 +18,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
-    
-    var sideBarCategories: [CategoryModel] = [
-        CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
-        CategoryModel(name: "페이퍼 보관함", icon: "folder"),
-        CategoryModel(name: "설정", icon: "gearshape")
-    ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
