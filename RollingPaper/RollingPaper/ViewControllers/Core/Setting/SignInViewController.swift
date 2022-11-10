@@ -66,7 +66,7 @@ final class SignInViewController: UIViewController {
     }()
     private let signInButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .white
+        button.backgroundColor = .systemBackground
         button.layer.cornerRadius = 12
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.borderWidth = 1.0
@@ -102,6 +102,7 @@ final class SignInViewController: UIViewController {
     }()
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
+        spinner.color = .label
         return spinner
     }()
     private let viewModel = SignInViewModel()
