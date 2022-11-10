@@ -32,6 +32,10 @@ private class Length {
     static let titleLengthLabelWidth: CGFloat = 60
     static let titleLengthLabelHeight: CGFloat = 28
     static let warningLabelTopMargin: CGFloat = 10
+    static let timePickerLeftMargin: CGFloat = 18
+    static let timePickerButtonWidth: CGFloat = 86
+    static let timePickerButtonHeight: CGFloat = 36
+    static let timePickerButtonRadius: CGFloat = 6
 }
 
 class PaperSettingViewController: UIViewController {
@@ -113,10 +117,12 @@ class PaperSettingViewController: UIViewController {
         let thumbnail = UIImageView()
         let thumbnailTitle = UILabel()
         let thumbnailDescription = UILabel()
-        let title1 = getTitle(text: "롤링페이퍼 제목")
-        let subtitle1 = getSubTitle(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요")
-        let title2 = getTitle(text: "타이머 설정")
-        let subtitle2 = getSubTitle(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다")
+        let title1 = getLabel(text: "롤링페이퍼 제목", style: .title2, color: .label)
+        let subtitle1 = getLabel(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요", style: .body, color: .secondaryLabel)
+        let title2 = getLabel(text: "타이머 설정", style: .title2, color: .label)
+        let subtitle2 = getLabel(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다", style: .body, color: .secondaryLabel)
+        let limitTimeTitle = getLabel(text: "제한 시간", style: .title3, color: .label)
+        let timePickerButton = getTimePickerButton()
         
         initTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
         initTextLengthView()
@@ -131,6 +137,8 @@ class PaperSettingViewController: UIViewController {
         view.addSubview(warningLabel)
         view.addSubview(title2)
         view.addSubview(subtitle2)
+        view.addSubview(limitTimeTitle)
+        view.addSubview(timePickerButton)
         thumbnail.addSubview(thumbnailTitle)
         thumbnail.addSubview(thumbnailDescription)
         
@@ -204,29 +212,41 @@ class PaperSettingViewController: UIViewController {
             make.leading.equalTo(title1)
             make.trailing.equalTo(title1)
         })
+        limitTimeTitle.snp.makeConstraints({ make in
+            make.top.equalTo(subtitle2.snp.bottom).offset(Length.sectionSubTitleBottomMargin)
+            make.leading.equalTo(title1)
+        })
+        timePickerButton.snp.makeConstraints({ make in
+            make.centerY.equalTo(limitTimeTitle)
+            make.leading.equalTo(limitTimeTitle.snp.trailing).offset(Length.timePickerLeftMargin)
+            make.width.equalTo(Length.timePickerButtonWidth)
+            make.height.equalTo(Length.timePickerButtonHeight)
+        })
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
         view.addGestureRecognizer(gesture)
     }
     
     // 제목 뷰 가져오기
-    private func getTitle(text: String) -> UILabel {
-        let title = UILabel()
-        title.text = text
-        title.textColor = .label
-        title.font = .preferredFont(forTextStyle: .title2)
-        title.numberOfLines = 0
-        return title
+    private func getLabel(text: String, style: UIFont.TextStyle, color: UIColor) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.textColor = color
+        label.font = .preferredFont(forTextStyle: style)
+        label.numberOfLines = 0
+        return label
     }
     
-    // 부제목 뷰 가져오기
-    private func getSubTitle(text: String) -> UILabel {
-        let title = UILabel()
-        title.text = text
-        title.textColor = .secondaryLabel
-        title.font = .preferredFont(forTextStyle: .body)
-        title.numberOfLines = 0
-        return title
+    // 피커 버튼 가져오기
+    private func getTimePickerButton() -> UIButton {
+        let timePickerButton = UIButton()
+        timePickerButton.addTarget(self, action: #selector(onClickedTimePickerButton(_:)), for: .touchUpInside)
+        timePickerButton.setTitle("02:00", for: .normal)
+        timePickerButton.setTitleColor(.black, for: .normal)
+        timePickerButton.backgroundColor = .black
+        timePickerButton.layer.cornerRadius = Length.timePickerButtonRadius
+        timePickerButton.backgroundColor = UIColor(rgb: 0x767680).withAlphaComponent(0.12)
+        return timePickerButton
     }
     
     // 텍스트필드 뷰 가져오기
@@ -309,7 +329,7 @@ class PaperSettingViewController: UIViewController {
         }
     }
     
-    func setCurrentPaperTitle() {
+    private func setCurrentPaperTitle() {
         currentPaperTitle = paperTitleTextField.text ?? "제목을 입력하지 않으셨습니다."
     }
     
@@ -340,5 +360,13 @@ class PaperSettingViewController: UIViewController {
     // 배경 눌렀을 때 동작
     @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
         paperTitleTextField.resignFirstResponder()
+    }
+    
+    // 피커 버튼 눌렀을 때 피커 보여주기
+    @objc private func onClickedTimePickerButton(_ sender: UIButton) {
+        let timePicker = PaperTimePicker()
+        timePicker.modalPresentationStyle = .popover
+        timePicker.popoverPresentationController?.sourceView = sender
+        present(timePicker, animated: true)
     }
 }
