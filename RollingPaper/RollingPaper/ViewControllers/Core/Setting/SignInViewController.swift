@@ -100,6 +100,10 @@ final class SignInViewController: UIViewController {
         label.isHidden = true
         return label
     }()
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .large)
+        return spinner
+    }()
     private let viewModel = SignInViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
@@ -120,10 +124,10 @@ final class SignInViewController: UIViewController {
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
-            .removeDuplicates(by: {$0 == $1})
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
+                self.spinner.stopAnimating()
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
                 case .emailDidMiss:
@@ -150,6 +154,8 @@ final class SignInViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.signInButtonTap)
+                self?.spinner.isHidden = false
+                self?.spinner.startAnimating()
             })
             .store(in: &cancellables)
         appleSignInButton
@@ -163,6 +169,7 @@ final class SignInViewController: UIViewController {
             .controlPublisher(for: .editingChanged)
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.emailFocused)
+                self?.spinner.isHidden = true
             })
             .store(in: &cancellables)
         emailTextField
@@ -348,7 +355,7 @@ extension SignInViewController {
 extension SignInViewController {
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
+        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton, spinner])
         let topOffset = (view.frame.height - 332) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -399,6 +406,9 @@ extension SignInViewController {
             make.width.equalTo(375)
             make.height.equalTo(48)
             make.centerX.equalToSuperview()
+        })
+        spinner.snp.makeConstraints({ make in
+            make.center.equalToSuperview()
         })
         setCloseButton()
     }
