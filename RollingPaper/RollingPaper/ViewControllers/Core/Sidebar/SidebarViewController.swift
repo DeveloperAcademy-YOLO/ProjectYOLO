@@ -78,16 +78,28 @@ class SidebarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeSecondaryView(noitificaiton:)),
+            name: Notification.Name.viewChange,
+            object: nil
+        )
         bind()
         setProfileView()
         setCollectionView()
         configureDataSource()
+        collectionView.selectItem(at: IndexPath(row: 0, section: 0),
+                                  animated: false,
+                                  scrollPosition: UICollectionView.ScrollPosition.centeredVertically)
     }
-    /*
-    func choose() {
-        collectionView.selectItem(at: IndexPath(index: .ini), animated: <#T##Bool#>, scrollPosition: <#T##UICollectionView.ScrollPosition#>)
+    
+    @objc func changeSecondaryView(noitificaiton: Notification) {
+        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+        if object == "페이퍼 보관함" {
+            self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        }
     }
-    */
+    
     private func bind() {
         viewModel
             .currentUserSubject
@@ -154,7 +166,7 @@ class SidebarViewController: UIViewController {
     }
     
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, CategoryModel> { (cell, indexPath, category) in
+        let cellRegistration = UICollectionView.CellRegistration<CategoryCell, CategoryModel> { (cell, indexPath, category) in
             var content = cell.defaultContentConfiguration()
             content.image = UIImage(systemName: category.icon)
             content.text = category.name
@@ -167,15 +179,15 @@ class SidebarViewController: UIViewController {
         }
         
         dataSource = UICollectionViewDiffableDataSource<Section, CategoryModel>(collectionView: collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> UICollectionViewCell? in
+            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> CategoryCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
-
+        
         let sections: [Section] = [.main]
         var snapshot = NSDiffableDataSourceSnapshot<Section, CategoryModel>()
         snapshot.appendSections(sections)
         dataSource.apply(snapshot, animatingDifferences: false)
-
+        
         for section in sections {
             switch section {
             case .main:
@@ -188,22 +200,36 @@ class SidebarViewController: UIViewController {
 }
 
 extension SidebarViewController: UICollectionViewDelegate {
-
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let category = self.sideBarCategories[indexPath.row]
         NotificationCenter.default.post(
             name: Notification.Name.viewChangeFromSidebar,
             object: nil,
             userInfo: [NotificationViewKey.view: category.name])
-        if let cell = collectionView.cellForItem(at: indexPath) {
-            cell.contentView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+    }
+}
+
+class CategoryCell: UICollectionViewListCell {
+    /*
+    override var isSelected: Bool {
+        didSet {
+            
         }
     }
-    
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) {
-                cell.contentView.backgroundColor = nil
-            }
+    */
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        guard var contentConfig = self.contentConfiguration?.updated(for: state) as? UIListContentConfiguration else { return }
+        contentConfig.textProperties.colorTransformer = UIConfigurationColorTransformer { color in
+            state.isSelected || state.isHighlighted ? .black : .black
+        }
+        guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
+        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { color in
+            state.isSelected || state.isHighlighted ? .white : .clear
+        }
+        
+        self.contentConfiguration = contentConfig
+        self.backgroundConfiguration = backgroundConfig
     }
 }
 
