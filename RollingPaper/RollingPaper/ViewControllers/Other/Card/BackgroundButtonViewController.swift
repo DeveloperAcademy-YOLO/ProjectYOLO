@@ -1,5 +1,5 @@
 //
-//  CardBackgroundViewController.swift
+//  BackgroundButtonViewController.swift
 //  RollingPaper
 //
 //  Created by Yosep on 2022/10/05.
@@ -12,6 +12,7 @@ import SnapKit
 import UIKit
 
 final class BackgroundButtonViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+   
     private let backgroundImageName: [String]
     private let viewModel: CardViewModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
@@ -22,11 +23,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         button.setImage(UIImage(named: "\(backgroundImageName[0])"), for: .normal)
         button.layer.cornerRadius = 10
         button.layer.masksToBounds = true
-        let checkBorder = backgroundImageName[0].suffix(5)
-        if checkBorder == "white" {
-            button.layer.borderColor = UIColor.lightGray.cgColor
-            button.layer.borderWidth = 2
-        }
         button.addTarget(self, action: #selector(firstImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
@@ -36,11 +32,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         button.setImage(UIImage(named: "\(backgroundImageName[1])"), for: .normal)
         button.layer.cornerRadius = 10
         button.layer.masksToBounds = true
-        let checkBorder = backgroundImageName[1].suffix(5)
-        if checkBorder == "white" {
-            button.layer.borderColor = UIColor.lightGray.cgColor
-            button.layer.borderWidth = 2
-        }
         button.addTarget(self, action: #selector(secondImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
@@ -50,11 +41,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         button.setImage(UIImage(named: "\(backgroundImageName[2])"), for: .normal)
         button.layer.cornerRadius = 10
         button.layer.masksToBounds = true
-        let checkBorder = backgroundImageName[2].suffix(5)
-        if checkBorder == "white" {
-            button.layer.borderColor = UIColor.lightGray.cgColor
-            button.layer.borderWidth = 2
-        }
         button.addTarget(self, action: #selector(thirdImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
@@ -64,11 +50,6 @@ final class BackgroundButtonViewController: UIViewController, UIImagePickerContr
         button.setImage(UIImage(named: "\(backgroundImageName[3])"), for: .normal)
         button.layer.cornerRadius = 10
         button.layer.masksToBounds = true
-        let checkBorder = backgroundImageName[3].suffix(5)
-        if checkBorder == "white" {
-            button.layer.borderColor = UIColor.lightGray.cgColor
-            button.layer.borderWidth = 2
-        }
         button.addTarget(self, action: #selector(fourthImageViewColor(_:)), for: .touchUpInside)
         return button
     }()
