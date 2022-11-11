@@ -347,6 +347,7 @@
 			children = (
 				BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */,
 				BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */,
+				BC199DB7291CC424009AE08A /* PaperTimePicker.swift */,
 			);
 			path = PaperTemplate;
 			sourceTree = "<group>";
@@ -722,6 +723,7 @@
 				CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
+				BC199DB8291CC424009AE08A /* PaperTimePicker.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
