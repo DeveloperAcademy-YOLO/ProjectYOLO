@@ -86,12 +86,6 @@ final class CardResultViewController: UIViewController {
         return titleLabel
     }()
     
-    lazy var barrierView: UIView = {
-        let barrier = UIView(frame: CGRect(x: 0, y: 140, width: view.bounds.width, height: 0.1))
-        barrier.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
-        return barrier
-    }()
-    
     init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
         self.image = resultImage
         self.viewModel = viewModel
@@ -114,7 +108,6 @@ final class CardResultViewController: UIViewController {
         someImageViewConstraints()
         
         view.addSubview(titleBounceView)
-        view.addSubview(barrierView)
         animationBounce()
         
         view.addSubview(backwardButton)
@@ -126,10 +119,6 @@ final class CardResultViewController: UIViewController {
         self.navigationController?.isNavigationBarHidden = true
         input.send(.viewDidLoad)
         bind()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
     }
     
     private func bind() {
