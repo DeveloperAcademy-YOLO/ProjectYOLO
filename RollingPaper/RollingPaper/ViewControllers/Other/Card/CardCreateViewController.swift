@@ -69,7 +69,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let canvas = PKCanvasView(frame: .zero)
         canvas.delegate = self
         canvas.layer.masksToBounds = true
-        canvas.layer.cornerRadius = 50
+        canvas.layer.cornerRadius = 32
         canvas.contentMode = .scaleAspectFill
         canvas.isOpaque = false
         canvas.alwaysBounceVertical = true
@@ -83,7 +83,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
+        theImageView.layer.cornerRadius = 32
         theImageView.contentMode = .scaleAspectFill
         theImageView.image = backgroundImg
         return theImageView
