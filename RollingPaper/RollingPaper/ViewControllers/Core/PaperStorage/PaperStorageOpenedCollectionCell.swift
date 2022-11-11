@@ -15,6 +15,7 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
     private var cancellables = Set<AnyCancellable>()
     private let cell = UIView()
     private let preview = UIImageView()
+    private let previewOverlay = UIView()
     private let timer = TimerView()
     private let title = UILabel()
     
@@ -32,6 +33,7 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
         cell.addSubview(preview)
         cell.addSubview(timer)
         cell.addSubview(title)
+        preview.addSubview(previewOverlay)
         
         cell.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
@@ -45,6 +47,11 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
             make.leading.equalToSuperview()
             make.width.equalTo(PaperStorageLength.openedPaperThumbnailWidth)
             make.height.equalTo(PaperStorageLength.openedPaperThumbnailHeight)
+        })
+        
+        previewOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        previewOverlay.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
         })
         
         title.font = .preferredFont(for: .title1, weight: .semibold)
