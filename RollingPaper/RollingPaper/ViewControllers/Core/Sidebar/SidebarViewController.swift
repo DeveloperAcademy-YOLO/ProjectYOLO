@@ -35,7 +35,7 @@ final class SidebarViewController: UIViewController {
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
-    var sideBarCategories: [CategoryModel] = [
+    private let sideBarCategories: [CategoryModel] = [
         CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
         CategoryModel(name: "페이퍼 보관함", icon: "folder"),
         CategoryModel(name: "설정", icon: "gearshape")
