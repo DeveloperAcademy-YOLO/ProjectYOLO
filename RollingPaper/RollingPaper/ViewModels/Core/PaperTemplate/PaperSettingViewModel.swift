@@ -12,12 +12,13 @@ class PaperSettingViewModel {
     private var paperTitle: String = ""
     private var paperDurationHour: Int = 2
     private var template: TemplateEnum
+    private var currentUser: UserModel?
+    private var selectedTime: String = defaultTime
+    
     private let databaseManager: DatabaseManager
     private let output: PassthroughSubject<Output, Never> = .init()
-    
     private let authManager: AuthManager = FirebaseAuthManager.shared
-    private var currentUser: UserModel?
-    private var endTime: Date?
+    static let defaultTime = "1시간 00분"
     
     init(databaseManager: DatabaseManager = LocalDatabaseFileManager.shared, template: TemplateEnum) {
         self.databaseManager = databaseManager
@@ -49,7 +50,7 @@ class PaperSettingViewModel {
                 case .endSettingPaper:
                     self.createPaper()
                 case .timePickerChange(let time):
-                    self.setPaperEndTime(duration: time)
+                    self.selectedTime = time
                     self.output.send(.timePickerChange(time: time))
                 }
             })
@@ -57,14 +58,14 @@ class PaperSettingViewModel {
         return output.eraseToAnyPublisher()
     }
     
-    // 종료 시간 설정하기
-    private func setPaperEndTime(duration: String) {
+    // 형식 계산해서 종료 시간 반환해주기
+    private func getPaperEndTime(duration: String) -> Date {
         // 또는 아래와 같이 구할 수도 있다
         let hour = Int(duration.substring(start: 0, end: 1)) ?? 0
         let minute = Int(duration.substring(start: 4, end: 6)) ?? 0
 
         let totalMinute = hour*60+minute
-        endTime = Calendar.current.date(byAdding: .minute, value: totalMinute, to: Date())
+        return Calendar.current.date(byAdding: .minute, value: totalMinute, to: Date()) ?? Date()
     }
     
     // 페이퍼 제목 설정하기
@@ -75,9 +76,8 @@ class PaperSettingViewModel {
     
     // 페이퍼 만들기
     private func createPaper() {
-        let currentTime = Date()
-        guard let endTime = endTime else { return }
-        let paper = PaperModel(creator: currentUser, cards: [], date: currentTime, endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
+        let endTime = getPaperEndTime(duration: selectedTime)
+        let paper = PaperModel(creator: currentUser, cards: [], date: Date(), endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
         databaseManager.addPaper(paper: paper)
         databaseManager.fetchPaper(paperId: paper.paperId)
     }
