@@ -12,35 +12,20 @@ import Combine
 
 class MagnifiedCardViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
-    var cardContentURLString: String?
-    var closeBtn: UIButton = UIButton()
-    lazy var cardsCollectionView: UICollectionView = UICollectionView()
-    var selectedCardIndex: Int = 0
     private var cancellables = Set<AnyCancellable>()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.isOpaque = false
-        view.backgroundColor = .clear
-        setCollectionView()
-        view.addSubview(cardsCollectionView)
-        view.addSubview(closeBtn)
-        setCloseBtn()
-    }
-    
-    @objc func closeAction() {
-        dismiss(animated: true)
-    }
-    
-    func setCollectionView() {
+    //상위 뷰 에서 접근해야하는 변수
+    var selectedCardIndex: Int = 0
+    private var deviceWidth = UIScreen.main.bounds.size.width
+    private var deviceHeight = UIScreen.main.bounds.size.height
+    private lazy var closeBtn: UIButton = UIButton()
+    lazy private var cardsCollectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 80, left: 155, bottom: 80, right: 155 )
-        layout.itemSize = CGSize(width: (self.view.bounds.height - 160)*(4/3), height: self.view.bounds.height - 160)
+        layout.itemSize = CGSize(width: (deviceHeight - 160)*(4/3), height: deviceHeight - 160)
         layout.minimumLineSpacing = 60
         layout.scrollDirection = .horizontal
         
-        cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
-        cardsCollectionView.backgroundColor = UIColor.black.withAlphaComponent(0.32)
+        cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 80, width: deviceWidth, height: deviceHeight-160), collectionViewLayout: layout)
         cardsCollectionView.showsHorizontalScrollIndicator = false
         cardsCollectionView.decelerationRate = .fast
         cardsCollectionView.isPagingEnabled = false
@@ -48,15 +33,22 @@ class MagnifiedCardViewController: UIViewController {
         cardsCollectionView.dataSource = self
         cardsCollectionView.delegate = self
         cardsCollectionView.scrollToItem(at: [0, selectedCardIndex], at: .centeredHorizontally, animated: true)
+        
+        return cardsCollectionView
+    }()
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        view.addSubview(closeBtn)
+        view.addSubview(cardsCollectionView)
+        setCloseBtn()
     }
     
-    func setCloseBtn() {
-        self.closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        closeBtn.snp.makeConstraints { make in
-            make.top.equalTo(self.view).offset(0)
-            make.width.equalTo(self.view)
-            make.height.equalTo(90)
-        }
+    @objc func closeAction() {
+        dismiss(animated: true)
     }
 }
 
@@ -136,5 +128,19 @@ extension MagnifiedCardViewController: UICollectionViewDelegate {
             index = Int(round(estimatedIndex))
         }
         // 위 코드를 통해 페이징 될 좌표 값을 targetContentOffset에 대입
-        targetContentOffset.pointee = CGPoint(x: CGFloat(index) * cellWidthIncludingSpacing, y: 0)    }
+        targetContentOffset.pointee = CGPoint(x: CGFloat(index) * cellWidthIncludingSpacing, y: 0)
+    }
+}
+
+extension MagnifiedCardViewController {
+    func setCloseBtn() {
+        closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
+        closeBtn.snp.makeConstraints { make in
+            make.top.equalTo(self.view)
+            make.width.equalTo(deviceWidth)
+            make.height.equalTo(deviceHeight)
+        }
+    }
+    
+    
 }
