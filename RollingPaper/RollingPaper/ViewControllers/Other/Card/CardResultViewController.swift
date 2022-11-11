@@ -78,7 +78,7 @@ final class CardResultViewController: UIViewController {
     }()
     
     lazy var titleBounceView: UILabel = {
-        let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: 20, width: 234, height: 54))
+        let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: 70, width: 234, height: 54))
            titleLabel.text = "이대로 게시할까요?"
            titleLabel.textAlignment = .center
            titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
@@ -117,8 +117,10 @@ final class CardResultViewController: UIViewController {
         
         view.addSubview(titleBounceView)
         view.addSubview(barrierView)
-        
-        titleBouncing()
+        UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
+            self.titleBounceView.frame = CGRect(x: self.titleBounceView.frame.minX, y: self.titleBounceView.frame.minY+12, width: self.titleBounceView.frame.width, height: self.titleBounceView.frame.height)
+                }
+       // titleBouncing()
         
         view.addSubview(backwardButton)
         backwardButtonConstraints()
