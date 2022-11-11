@@ -349,9 +349,9 @@
 		D24145202919F92300437FE7 /* PaperTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */,
 				BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */,
 				BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */,
-				AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */,
 			);
 			path = PaperTemplate;
 			sourceTree = "<group>";
