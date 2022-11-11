@@ -222,7 +222,7 @@ class CategoryCell: UICollectionViewListCell {
             state.isSelected || state.isHighlighted ? .black : .black
         }
         contentConfig.image = UIImage(systemName: state.isSelected || state.isHighlighted ? categoryData[1] + ".fill" : categoryData[1])
-        
+        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .black : .systemGray3
         guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
         backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
             state.isSelected || state.isHighlighted ? .white : .clear
