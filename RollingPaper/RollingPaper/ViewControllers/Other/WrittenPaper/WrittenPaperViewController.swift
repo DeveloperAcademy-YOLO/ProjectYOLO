@@ -78,14 +78,6 @@ final class WrittenPaperViewController: UIViewController {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
         self.navigationController?.isNavigationBarHidden = false
-        cardsList?.reloadData()
-    }
-    
-    private func titleLabelConstraints() {
-        titleLabel.snp.makeConstraints({ make in
-            make.height.equalTo(36)
-            make.leading.equalTo(timeLabel.view.snp.trailing).offset(10)
-        })
         cardsList.reloadData()
     }
     
@@ -328,24 +320,6 @@ final class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
-    }
-    
-    func deletePaper() {
-        let deleteVerifyText = self.titleEmbedingTextField.text
-        if deleteVerifyText == self.viewModel.currentPaper?.title {
-            if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
-                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
-            } else {
-                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
-            }
-            self.moveToPaperStorageView()
-        } else {
-            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
-            let confirm = UIAlertAction(title: "확인", style: .default)
-            alert.addAction(confirm)
-            alert.preferredAction = confirm
-            self.present(alert, animated: true, completion: nil)
-        }
     }
     
     func setCollectionView() -> UICollectionView {
