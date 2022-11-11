@@ -21,6 +21,13 @@ final class SignInViewController: UIViewController {
         case bothWaring
     }
     
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "logo")
+        return imageView
+    }()
     private let emailTextField: UITextField = {
         let textField = UITextField()
         textField.layer.masksToBounds = true
@@ -30,11 +37,19 @@ final class SignInViewController: UIViewController {
         textField.attributedPlaceholder = NSAttributedString(string: "이메일 주소", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
         textField.textContentType = .emailAddress
         textField.font = .preferredFont(forTextStyle: .body)
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
-        textField.leftView = paddingView
+        let leftPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
+        textField.leftView = leftPaddingView
         textField.leftViewMode = .always
-        textField.clearButtonMode = .always
+        let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 34, height: textField.frame.height))
+        textField.rightView = rightPaddingView
+        textField.rightViewMode = .always
         return textField
+    }()
+    private let emailClearButton: UIButton = {
+        let button = UIButton()
+        button.setImage(systemName: "x.circle.fill")
+        button.tintColor = .systemGray4
+        return button
     }()
     private let passwordTextField: UITextField = {
         let textField = UITextField()
@@ -46,11 +61,19 @@ final class SignInViewController: UIViewController {
         textField.font = .preferredFont(forTextStyle: .body)
         textField.textContentType = .oneTimeCode
         textField.isSecureTextEntry = false
-        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
-        textField.leftView = paddingView
+        let leftPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 17, height: textField.frame.height))
+        textField.leftView = leftPaddingView
         textField.leftViewMode = .always
-        textField.clearButtonMode = .always
+        let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 34, height: textField.frame.height))
+        textField.rightView = rightPaddingView
+        textField.rightViewMode = .always
         return textField
+    }()
+    private let passwordClearButton: UIButton = {
+        let button = UIButton()
+        button.setImage(systemName: "x.circle.fill")
+        button.tintColor = .systemGray4
+        return button
     }()
     private let signUpButton: UIButton = {
         let button = UIButton()
@@ -66,11 +89,15 @@ final class SignInViewController: UIViewController {
     }()
     private let signInButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .white
+        button.backgroundColor = .systemBackground
         button.layer.cornerRadius = 12
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.borderWidth = 1.0
-        button.layer.masksToBounds = true
+        button.layer.masksToBounds = false
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.1
+        button.layer.shadowOffset = CGSize(width: 2, height: 2)
+        button.layer.shadowRadius = 10
         let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.label])
         button.setAttributedTitle(title, for: .normal)
         return button
@@ -101,7 +128,8 @@ final class SignInViewController: UIViewController {
         return label
     }()
     private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .large)
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .label
         return spinner
     }()
     private let viewModel = SignInViewModel()
@@ -127,6 +155,9 @@ final class SignInViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 guard let self = self else { return }
+                let title = NSAttributedString(string: "로그인", attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3), NSAttributedString.Key.foregroundColor: UIColor.label])
+                self.signInButton.isUserInteractionEnabled = true
+                self.signInButton.setAttributedTitle(title, for: .normal)
                 self.spinner.stopAnimating()
                 switch receivedValue {
                 case .signInDidFail(error: let error): self.handleError(error: error)
@@ -154,6 +185,8 @@ final class SignInViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 self?.input.send(.signInButtonTap)
+                self?.signInButton.isUserInteractionEnabled = false
+                self?.signInButton.setAttributedTitle(nil, for: .normal)
                 self?.spinner.isHidden = false
                 self?.spinner.startAnimating()
             })
@@ -161,7 +194,6 @@ final class SignInViewController: UIViewController {
         appleSignInButton
             .controlEventPublisher(for: .touchDown)
             .sink(receiveValue: { [weak self] _ in
-                print("Apple Login Tapped in View")
                 self?.input.send(.appleSignInButtonTap)
             })
             .store(in: &cancellables)
@@ -174,9 +206,15 @@ final class SignInViewController: UIViewController {
             .store(in: &cancellables)
         emailTextField
             .textPublisher
-            .compactMap({ $0 })
             .sink(receiveValue: { [weak self] email in
+                guard
+                    let email = email,
+                    !email.isEmpty else {
+                    self?.emailClearButton.isHidden = true
+                    return
+                }
                 self?.viewModel.email.send(email)
+                self?.emailClearButton.isHidden = false
             })
             .store(in: &cancellables)
         emailTextField
@@ -204,9 +242,15 @@ final class SignInViewController: UIViewController {
             .store(in: &cancellables)
         passwordTextField
             .textPublisher
-            .compactMap({ $0 })
             .sink(receiveValue: { [weak self] password in
+                guard
+                    let password = password,
+                    !password.isEmpty else {
+                    self?.passwordClearButton.isHidden = true
+                    return
+                }
                 self?.viewModel.password.send(password)
+                self?.passwordClearButton.isHidden = false
             })
             .store(in: &cancellables)
         emailTextField
@@ -236,6 +280,20 @@ final class SignInViewController: UIViewController {
                 self?.input.send(.normalBoundTap)
                 self?.passwordTextField.resignFirstResponder()
             })
+            .store(in: &cancellables)
+        emailClearButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                self?.emailTextField.text = ""
+                self?.emailTextField.sendActions(for: .editingChanged)
+            }
+            .store(in: &cancellables)
+        passwordClearButton
+            .tapPublisher
+            .sink { [weak self] _ in
+                self?.passwordTextField.text = ""
+                self?.passwordTextField.sendActions(for: .editingChanged)
+            }
             .store(in: &cancellables)
         signUpButton
             .tapPublisher
@@ -246,7 +304,7 @@ final class SignInViewController: UIViewController {
                     currentNavVC.dismiss(animated: true) {
                         let signUpVC = SignUpViewController()
                         let navVC = UINavigationController(rootViewController: signUpVC)
-                        navVC.modalPresentationStyle = .pageSheet
+                        navVC.modalPresentationStyle = .formSheet
                         splitVC.present(navVC, animated: true)
                     }
                 } else {
@@ -304,7 +362,6 @@ final class SignInViewController: UIViewController {
             if
                 let currentNavVC = navigationController,
                 let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
-                print("Current is SignInView!")
                 NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
             }
         }
@@ -355,19 +412,38 @@ extension SignInViewController {
 extension SignInViewController {
     private func setSignInViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton, spinner])
-        let topOffset = (view.frame.height - 332) / 2
+        view.addSubviews([logoImageView, emailTextField, passwordTextField, waringImage, waringLabel, signUpButton, signUpDivider, signInButton, divider, appleSignInButton])
+        signInButton.addSubview(spinner)
+        emailTextField.addSubview(emailClearButton)
+        passwordTextField.addSubview(passwordClearButton)
+        let topOffset = (view.frame.height - 332 + 85 + 72) / 2
+        logoImageView.snp.makeConstraints({ make in
+            make.width.equalTo(120)
+            make.height.equalTo(85)
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(emailTextField.snp.top).offset(-72)
+        })
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
             make.centerX.equalToSuperview()
             make.height.equalTo(38)
             make.width.equalTo(380)
         })
+        emailClearButton.snp.makeConstraints({ make in
+            make.width.height.equalTo(22)
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-11)
+        })
         passwordTextField.snp.makeConstraints({ make in
             make.top.equalTo(emailTextField.snp.bottom).offset(28)
             make.centerX.equalToSuperview()
             make.height.equalTo(38)
             make.width.equalTo(380)
+        })
+        passwordClearButton.snp.makeConstraints({ make in
+            make.width.height.equalTo(22)
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-11)
         })
         waringImage.snp.makeConstraints({ make in
             make.top.equalTo(passwordTextField.snp.bottom).offset(19)
@@ -409,6 +485,7 @@ extension SignInViewController {
         })
         spinner.snp.makeConstraints({ make in
             make.center.equalToSuperview()
+            make.height.width.equalTo(40)
         })
         setCloseButton()
     }
@@ -462,7 +539,7 @@ extension SignInViewController {
     
     private func layoutIfModalView() {
         if presentingViewController != nil {
-            let topOffset = (view.frame.height - 332) / 2
+            let topOffset = (view.frame.height - 332 + 85 + 72) / 2
             emailTextField.snp.updateConstraints({ make in
                 make.top.equalToSuperview().offset(topOffset)
             })

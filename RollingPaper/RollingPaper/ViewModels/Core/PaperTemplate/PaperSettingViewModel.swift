@@ -13,6 +13,7 @@ class PaperSettingViewModel {
     private var paperDurationHour: Int = 2
     private var template: TemplateEnum
     private let databaseManager: DatabaseManager
+    private let output: PassthroughSubject<Output, Never> = .init()
     
     let authManager: AuthManager = FirebaseAuthManager.shared
     var currentUser: UserModel?
@@ -27,14 +28,18 @@ class PaperSettingViewModel {
     enum Input {
         case setPaperTitle(title: String)
         case endSettingPaper
+        case timePickerChange(time: String)
+    }
+    
+    enum Output {
+        case timePickerChange(time: String)
     }
     
     private var cancellables = Set<AnyCancellable>()
     
     // 어떤 행동이 Input으로 들어오면 그것에 맞는 행동을 Output에 저장한 뒤 반환해주기
-    func transform(input: AnyPublisher<Input, Never>) {
+    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input
-//            .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
@@ -42,9 +47,12 @@ class PaperSettingViewModel {
                     self.setPaperTitle(title: title)
                 case .endSettingPaper:
                     self.createPaper()
+                case .timePickerChange(let time):
+                    self.output.send(.timePickerChange(time: time))
                 }
             })
             .store(in: &cancellables)
+        return output.eraseToAnyPublisher()
     }
     
     // 페이퍼 제목 설정하기

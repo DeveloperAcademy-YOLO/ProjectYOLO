@@ -33,7 +33,8 @@ final class SignUpViewController: UIViewController {
         return button
     }()
     private let spinner: UIActivityIndicatorView = {
-        let spinner = UIActivityIndicatorView(style: .large)
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .systemBackground
         return spinner
     }()
     private let viewModel = SignUpViewModel()
@@ -59,6 +60,9 @@ final class SignUpViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
                 self?.spinner.stopAnimating()
+                let title = NSAttributedString(string: "가입", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .title3)])
+                self?.signUpButton.setAttributedTitle(title, for: .normal)
+                self?.signUpButton.isUserInteractionEnabled = true
                 switch receivedValue {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
@@ -71,6 +75,8 @@ final class SignUpViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else { return }
+                self.signUpButton.setAttributedTitle(nil, for: .normal)
+                self.signUpButton.isUserInteractionEnabled = false
                 self.spinner.startAnimating()
                 self.input.send(.signUpButtonDidTap)
             })
@@ -177,7 +183,7 @@ final class SignUpViewController: UIViewController {
             .sink(receiveValue: { [weak self] passed in
                 let (emailPassed, passwordPassed, namePassed) = passed
                 if emailPassed && passwordPassed && namePassed {
-                    self?.signUpButton.backgroundColor = .systemBlue
+                    self?.signUpButton.backgroundColor = .label
                     self?.signUpButton.isUserInteractionEnabled = true
                 } else {
                     self?.signUpButton.backgroundColor = .systemGray
@@ -294,7 +300,8 @@ extension SignUpViewController {
 extension SignUpViewController {
     private func setSignUpViewUI() {
         view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton, spinner])
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
+        signUpButton.addSubview(spinner)
         let topOffset = (view.frame.height - 320) / 2
         emailTextField.snp.makeConstraints({ make in
             make.top.equalToSuperview().offset(topOffset)
@@ -318,10 +325,11 @@ extension SignUpViewController {
             make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
             make.centerX.equalToSuperview()
             make.width.equalTo(380)
-            make.height.equalTo(38)
+            make.height.equalTo(48)
         })
         spinner.snp.makeConstraints { make in
             make.center.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         setCloseButton()
     }
