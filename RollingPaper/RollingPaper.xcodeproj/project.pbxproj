@@ -17,7 +17,7 @@
 		AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
-		AFEEFDCD291E2F350030534A /* PaperTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */; };
+		BC175412291E180D00A5F57F /* PaperTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC175411291E180D00A5F57F /* PaperTimePicker.swift */; };
 		BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */; };
 		BCE6FEBC291B90AA0093C36E /* PaperStorageLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */; };
 		BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */; };
@@ -102,6 +102,7 @@
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaperTimePicker.swift; path = ../../../../../../../../PaperTimePicker.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
+		BC175411291E180D00A5F57F /* PaperTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaperTimePicker.swift; sourceTree = "<group>"; };
 		BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageOpenedCollectionCell.swift; sourceTree = "<group>"; };
 		BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageLength.swift; sourceTree = "<group>"; };
 		BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageClosedCollectionCell.swift; sourceTree = "<group>"; };
@@ -349,7 +350,7 @@
 		D24145202919F92300437FE7 /* PaperTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */,
+				BC175411291E180D00A5F57F /* PaperTimePicker.swift */,
 				BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */,
 				BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */,
 			);
@@ -673,6 +674,7 @@
 				1573562F28FFA79B00EA565B /* SettingScreenViewController.swift in Sources */,
 				C5F26FE729183F050060109B /* TimerOfPaperViewController.swift in Sources */,
 				BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */,
+				BC175412291E180D00A5F57F /* PaperTimePicker.swift in Sources */,
 				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				AFEEFDCD291E2F350030534A /* PaperTimePicker.swift in Sources */,
