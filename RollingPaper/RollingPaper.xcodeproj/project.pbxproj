@@ -17,6 +17,7 @@
 		AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
+		AFEEFDCD291E2F350030534A /* PaperTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */; };
 		BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */; };
 		BCE6FEBC291B90AA0093C36E /* PaperStorageLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */; };
 		BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEBD291B917C0093C36E /* PaperStorageClosedCollectionCell.swift */; };
@@ -99,6 +100,7 @@
 		AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardCreateViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
+		AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PaperTimePicker.swift; path = ../../../../../../../../PaperTimePicker.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageOpenedCollectionCell.swift; sourceTree = "<group>"; };
 		BCE6FEBB291B90AA0093C36E /* PaperStorageLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageLength.swift; sourceTree = "<group>"; };
@@ -349,7 +351,7 @@
 			children = (
 				BCF2481028ED512A008CD0F9 /* PaperTemplateSelectViewController.swift */,
 				BCF2481628EFC499008CD0F9 /* PaperSettingViewController.swift */,
-				BC199DB7291CC424009AE08A /* PaperTimePicker.swift */,
+				AFEEFDCC291E2F350030534A /* PaperTimePicker.swift */,
 			);
 			path = PaperTemplate;
 			sourceTree = "<group>";
@@ -673,6 +675,7 @@
 				BCE6FEBE291B917C0093C36E /* PaperStorageClosedCollectionCell.swift in Sources */,
 				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
+				AFEEFDCD291E2F350030534A /* PaperTimePicker.swift in Sources */,
 				C5B5853E2900DF1700454C75 /* WrittenPaperViewModel.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */,
@@ -727,7 +730,6 @@
 				CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */,
-				BC199DB8291CC424009AE08A /* PaperTimePicker.swift in Sources */,
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
