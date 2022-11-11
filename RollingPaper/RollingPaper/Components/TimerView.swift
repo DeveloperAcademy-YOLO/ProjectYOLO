@@ -63,12 +63,13 @@ class TimerView: UIStackView {
     func updateTime() {
         guard let endTime = endTime else {return}
         let timeInterval = Int(endTime.timeIntervalSince(Date()))
+        
         // 30분 기준으로 타이머 색상 변경
         backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
         time.text = changeTimeFormat(second: timeInterval)
     }
     
-    // 초를 특정 포맷으로 바꾸기
+    // 초를 특정 포맷으로 바꾸기 (00시간 00분 00초)
     private func changeTimeFormat(second: Int) -> String {
         let hourSuffix = "시간" + " "
         let minSuffix = "분" + " "
@@ -105,7 +106,7 @@ class TimerView: UIStackView {
 
 // 타이머 시간 흐르게 하는 클래스
 class TimerViewModel {
-    private let timerInterval = 1.0 // 1초
+    private let timerInterval = 1.0 // 1초 간격
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var timer: AnyCancellable?
@@ -124,6 +125,7 @@ class TimerViewModel {
             .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else {return}
+                // 타이머 업데이트 됐다고 알려주기
                 self.output.send(.timeIsUpdated)
             })
     }
@@ -137,10 +139,8 @@ class TimerViewModel {
                 switch event {
                 case .viewDidAppear:
                     self.bindTimer()
-                    print("aaa bind!!")
                 case .viewDidDisappear:
                     self.timer?.cancel()
-                    print("aaa cancel!!!")
                 }
             })
             .store(in: &cancellables)
