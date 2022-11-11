@@ -17,8 +17,6 @@ final class CardResultViewController: UIViewController {
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var backgroundImg = UIImage(named: "Rectangle")
     private var cancellables = Set<AnyCancellable>()
-    private var animator: UIDynamicAnimator?
-    private var collision: UICollisionBehavior!
     
     lazy var someImageShadow: UIView = {
         let aView = UIView()
@@ -79,15 +77,15 @@ final class CardResultViewController: UIViewController {
     
     lazy var titleBounceView: UILabel = {
         let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: 70, width: 234, height: 54))
-           titleLabel.text = "이대로 게시할까요?"
-           titleLabel.textAlignment = .center
-           titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-           titleLabel.backgroundColor = .white
-           titleLabel.layer.cornerRadius = 12
-           titleLabel.layer.masksToBounds = true
-           return titleLabel
+        titleLabel.text = "이대로 게시할까요?"
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        titleLabel.backgroundColor = .white
+        titleLabel.layer.cornerRadius = 12
+        titleLabel.layer.masksToBounds = true
+        return titleLabel
     }()
-
+    
     lazy var barrierView: UIView = {
         let barrier = UIView(frame: CGRect(x: 0, y: 140, width: view.bounds.width, height: 0.1))
         barrier.backgroundColor = UIColor(red: 128, green: 128, blue: 128)
@@ -117,10 +115,7 @@ final class CardResultViewController: UIViewController {
         
         view.addSubview(titleBounceView)
         view.addSubview(barrierView)
-        UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
-            self.titleBounceView.frame = CGRect(x: self.titleBounceView.frame.minX, y: self.titleBounceView.frame.minY+12, width: self.titleBounceView.frame.width, height: self.titleBounceView.frame.height)
-                }
-       // titleBouncing()
+        animationBounce()
         
         view.addSubview(backwardButton)
         backwardButtonConstraints()
@@ -141,26 +136,10 @@ final class CardResultViewController: UIViewController {
         _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
     
-    private func titleBouncing() {
-        animator = UIDynamicAnimator(referenceView: self.view)
-      
-        let gravity = UIGravityBehavior(items: [titleBounceView])
-        
-        let vector = CGVector(dx: 0.0, dy: 0.6)
-        gravity.gravityDirection = vector
-        
-        animator?.addBehavior(gravity)
-        gravity.addItem(titleBounceView)
-        
-        collision = UICollisionBehavior(items: [titleBounceView])
-        collision.translatesReferenceBoundsIntoBoundary = true
-       
-        animator?.addBehavior(collision)
-        collision.addBoundary(withIdentifier: "barrier" as NSCopying, for: UIBezierPath(rect: barrierView.frame))
-        let behavior = UIDynamicItemBehavior(items: [titleBounceView])
-        // 탄성 설정 값이 높을수록 높게 튀어오름, 단 1.0 보다 높으면 엄청 빠르게 튀어버려서 튕겨져 나감
-        behavior.elasticity = 0.975
-        animator?.addBehavior(behavior)
+    private func animationBounce() {
+        UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
+            self.titleBounceView.frame = CGRect(x: self.titleBounceView.frame.minX, y: self.titleBounceView.frame.minY+12, width: self.titleBounceView.frame.width, height: self.titleBounceView.frame.height)
+        }
     }
     
     @objc func cancelBtnPressed(_ sender: UISegmentedControl) {
@@ -174,19 +153,6 @@ final class CardResultViewController: UIViewController {
         
         let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
         self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
-    }
-}
-
-extension UIView {
-    func animationBounce() {
-        UIView.animateKeyframes(withDuration: 0.7, delay: 0) { [weak self] in
-            guard let height = self?.bounds.height else {
-                return
-            }
-            self?.alpha = 1
-            self?.center.y = -height/4
-            self?.isHidden = false
-        }
     }
 }
 

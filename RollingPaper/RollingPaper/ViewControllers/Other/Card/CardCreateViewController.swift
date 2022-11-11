@@ -424,23 +424,19 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         return image
     }
     
-    func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
-        guard let image = image else { return nil }
-        let newSize = CGSize(width: width, height: height)
-        UIGraphicsBeginImageContextWithOptions(newSize, false, UIScreen.main.scale)
-        image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return newImage
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let aCell = collectionView.dequeueReusableCell(withReuseIdentifier: "StickerCollectionViewCell", for: indexPath) as? StickerCollectionViewCell else {return UICollectionViewCell()}
-        aCell.myImage.image = resizedImage(image: UIImage(named: self.arrStickers[indexPath.item]), width: 80, height: 80)
+        
+        let image = UIImage(named: self.arrStickers[indexPath.item])
+        let targetSize = CGSize(width: 80, height: 80)
+
+        let scaledImage = image?.scalePreservingAspectRatio(targetSize: targetSize)
+        aCell.myImage.image = scaledImage
+        
         return aCell
     }
     
@@ -559,7 +555,7 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     private func cameraImagePicker() {
-        let pushVC = CameraCustomPicker()
+        let pushVC = CameraCustomPickerController()
         pushVC.delegate = self
         pushVC.sourceType = .camera
         pushVC.cameraFlashMode = .off
@@ -609,6 +605,34 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         actionSheet.addAction(cancelAction)
         
         present(actionSheet, animated: false, completion: nil)
+    }
+}
+
+extension UIImage {
+    func scalePreservingAspectRatio(targetSize: CGSize) -> UIImage {
+        // Determine the scale factor that preserves aspect ratio
+        let widthRatio = targetSize.width / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        let scaleFactor = min(widthRatio, heightRatio)
+        
+        // Compute the new image size that preserves aspect ratio
+        let scaledImageSize = CGSize(
+            width: size.width * scaleFactor,
+            height: size.height * scaleFactor
+        )
+
+        // Draw and return the resized UIImage
+        let renderer = UIGraphicsImageRenderer(
+            size: scaledImageSize
+        )
+        let scaledImage = renderer.image { _ in
+            self.draw(in: CGRect(
+                origin: .zero,
+                size: scaledImageSize
+            ))
+        }
+        return scaledImage
     }
 }
 
@@ -750,43 +774,6 @@ extension CardCreateViewController {
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
             make.top.equalTo(divider.snp.bottom).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-        })
-    }
-}
-
-private class StickerCollectionViewCell: UICollectionViewCell {
-    
-    static let identifier = "StickerCollectionViewCell"
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // 셀에 이미지 뷰 객체를 넣어주기 위해서 생성
-    let myImage: UIImageView = {
-        let img = UIImageView()
-        // 자동으로 위치 정렬 금지
-        img.translatesAutoresizingMaskIntoConstraints = false
-        return img
-    }()
-    
-    func setupView() {
-        // 셀에 위에서 만든 이미지 뷰 객체를 넣어준다.
-        addSubview(myImage)
-        myImageConstraints()
-    }
-    
-    func myImageConstraints() {
-        myImage.snp.makeConstraints({ make in
-            make.top.equalTo(self.myImage)
-            make.left.equalTo(self.myImage)
-            make.right.equalTo(self.myImage)
-            make.bottom.equalTo(self.myImage)
         })
     }
 }
