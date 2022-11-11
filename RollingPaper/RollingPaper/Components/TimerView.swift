@@ -10,6 +10,10 @@ import SnapKit
 import Combine
 
 private class Length {
+    static let timerHeight: CGFloat = 32
+    static let timerWidth1: CGFloat = 172
+    static let timerWidth2: CGFloat = 116
+    static let timerWidth3: CGFloat = 78
     static let timerTopPadding: CGFloat = 6
     static let timerBottomPadding: CGFloat = 6
     static let timerRightPadding: CGFloat = 8
@@ -18,6 +22,9 @@ private class Length {
     static let timerCornerRadius: CGFloat = 16 // 바꿔야함
     static let clockImageWidth: CGFloat = 20
     static let clockImageHeight: CGFloat = 20
+    static let textWidth1: CGFloat = 132
+    static let textWidth2: CGFloat = 76
+    static let textWidth3: CGFloat = 38
 }
 
 // 타이머 UI
@@ -25,6 +32,10 @@ class TimerView: UIStackView {
     private let clock = UIImageView()
     private let time = UILabel()
     private var endTime: Date?
+    private var remainTimeState: RemainTimeState = .hour
+    enum RemainTimeState {
+        case hour, minute, second
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -46,6 +57,11 @@ class TimerView: UIStackView {
         isLayoutMarginsRelativeArrangement = true
         spacing = Length.timerSpace
         
+        snp.makeConstraints ({ make in
+            make.width.equalTo(Length.timerWidth1)
+            make.height.equalTo(Length.timerHeight)
+        })
+        
         clock.image = UIImage(systemName: "timer")
         clock.tintColor = UIColor.white
         clock.contentMode = .scaleAspectFit
@@ -54,9 +70,12 @@ class TimerView: UIStackView {
             make.height.equalTo(Length.clockImageHeight)
         })
         
-        time.font = .preferredFont(for: .subheadline, weight: .semibold)
-        time.textAlignment = .right
+        time.font = .systemFont(ofSize: 16, weight: .semibold)
+        time.textAlignment = .center
         time.textColor = UIColor.white
+        time.snp.makeConstraints({ make in
+            make.width.equalTo(Length.textWidth1)
+        })
     }
     
     // 타이머 남은 시간 업데이트하기
@@ -66,6 +85,34 @@ class TimerView: UIStackView {
         
         // 30분 기준으로 타이머 색상 변경
         backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
+        
+        // 남은 시간에 따라 레이아웃 가로 길이 조절
+        if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
+            remainTimeState = .second
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth3)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth3)
+            })
+        } else if timeInterval >= 60 && timeInterval < 3600 && remainTimeState != .minute {
+            remainTimeState = .minute
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth2)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth2)
+            })
+        } else if timeInterval >= 3600 && remainTimeState != .hour  {
+            remainTimeState = .hour
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth1)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth1)
+            })
+        }
+        
         time.text = changeTimeFormat(second: timeInterval)
     }
     
