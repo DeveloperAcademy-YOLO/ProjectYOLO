@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 private class Length {
     static let timerTopPadding: CGFloat = 6
@@ -19,10 +20,11 @@ private class Length {
     static let clockImageHeight: CGFloat = 20
 }
 
+// 타이머 UI
 class TimerView: UIStackView {
-    private var endTime: Date?
     private let clock = UIImageView()
     private let time = UILabel()
+    private var endTime: Date?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,12 +33,6 @@ class TimerView: UIStackView {
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // 페이퍼 끝나는 시간 설정하도록 하기
-    func setEndTime(time: Date) {
-        endTime = time
-        updateTime(now: Date())
     }
     
     // 레이아웃 세팅하기
@@ -64,9 +60,9 @@ class TimerView: UIStackView {
     }
     
     // 타이머 남은 시간 업데이트하기
-    private func updateTime(now: Date) {
+    func updateTime() {
         guard let endTime = endTime else {return}
-        let timeInterval = Int(endTime.timeIntervalSince(now))
+        let timeInterval = Int(endTime.timeIntervalSince(Date()))
         // 30분 기준으로 타이머 색상 변경
         backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
         time.text = changeTimeFormat(second: timeInterval)
@@ -98,5 +94,56 @@ class TimerView: UIStackView {
         }
         
         return hourString + minString + secString
+    }
+    
+    // 페이퍼 끝나는 시간 설정하도록 하기
+    func setEndTime(time: Date) {
+        endTime = time
+        updateTime()
+    }
+}
+
+// 타이머 시간 흐르게 하는 클래스
+class TimerViewModel {
+    private let timerInterval = 1.0 // 1초
+    private let output: PassthroughSubject<Output, Never> = .init()
+    private var cancellables = Set<AnyCancellable>()
+    private var timer: AnyCancellable?
+    enum Input {
+        case viewDidAppear
+        case viewDidDisappear
+    }
+    enum Output {
+        case timeIsUpdated
+    }
+    
+    // 타이머 연동
+    private func bindTimer() {
+        timer = Timer.publish(every: timerInterval, on: .main, in: .common)
+            .autoconnect()
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] _ in
+                guard let self = self else {return}
+                self.output.send(.timeIsUpdated)
+            })
+    }
+    
+    // 뷰가 나타나면 타이머 연결, 사라지면 타이머 해제
+    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
+        input
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .viewDidAppear:
+                    self.bindTimer()
+                    print("aaa bind!!")
+                case .viewDidDisappear:
+                    self.timer?.cancel()
+                    print("aaa cancel!!!")
+                }
+            })
+            .store(in: &cancellables)
+        return output.eraseToAnyPublisher()
     }
 }
