@@ -5,12 +5,12 @@
 //  Created by Junyeong Park on 2022/10/04.
 //
 
-import UIKit
 import Combine
 import CombineCocoa
+import UIKit
 import SnapKit
 
-class SignUpViewController: UIViewController {
+final class SignUpViewController: UIViewController {
     private let emailTextField: SignUpTextField = {
         let textField = SignUpTextField()
         return textField
@@ -32,7 +32,10 @@ class SignUpViewController: UIViewController {
         button.setAttributedTitle(title, for: .normal)
         return button
     }()
-    
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView(style: .large)
+        return spinner
+    }()
     private let viewModel = SignUpViewModel()
     private let input: PassthroughSubject<SignUpViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
@@ -50,83 +53,16 @@ class SignUpViewController: UIViewController {
         layoutIfModalView()
     }
     
-    private func setKeyboardObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        if
-            let userInfo = notification.userInfo,
-            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
-            let keyboardRect = keyboardInfo.cgRectValue
-            let keyboardY = keyboardRect.origin.y
-            let originalHeight = UIScreen.main.bounds.height
-            let currentViewHeight = view.frame.height
-            let offsetHeight = (originalHeight - currentViewHeight) / 2
-            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
-                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
-            }
-        }
-    }
-
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        if view.frame.origin.y != 0 {
-            view.frame.origin.y = 0
-        }
-    }
-    
-    private func layoutIfModalView() {
-        if presentingViewController != nil {
-            let topOffset = (view.frame.height - 320) / 2
-            emailTextField.snp.updateConstraints({ make in
-                make.top.equalToSuperview().offset(topOffset)
-            })
-            view.layoutIfNeeded()
-        }
-    }
-    
-    private func setSignUpViewUI() {
-        view.backgroundColor = .systemBackground
-        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton])
-        let topOffset = (view.frame.height - 320) / 2
-        emailTextField.snp.makeConstraints({ make in
-            make.top.equalToSuperview().offset(topOffset)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(380)
-        })
-        emailTextField.setTextFieldType(type: .email)
-        passwordTextField.snp.makeConstraints({ make in
-            make.top.equalTo(emailTextField.snp.top).offset(66)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(380)
-        })
-        passwordTextField.setTextFieldType(type: .password)
-        nameTextField.snp.makeConstraints({ make in
-            make.top.equalTo(passwordTextField.snp.top).offset(passwordTextField.frame.height + 28)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(380)
-        })
-        nameTextField.setTextFieldType(type: .name)
-        signUpButton.snp.makeConstraints({ make in
-            make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(380)
-            make.height.equalTo(38)
-        })
-        setCloseButton()
-    }
-    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] receivedValue in
+                self?.spinner.stopAnimating()
                 switch receivedValue {
                 case .signUpDidFail(error: let error):
                     self?.handleError(error: error)
                 case .signUpDidSuccess:
-                    print("SignUpDidSuccess")
                     self?.navigateToSignIn()
                 }
             })
@@ -135,6 +71,7 @@ class SignUpViewController: UIViewController {
             .tapPublisher
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else { return }
+                self.spinner.startAnimating()
                 self.input.send(.signUpButtonDidTap)
             })
             .store(in: &cancellables)
@@ -286,18 +223,6 @@ class SignUpViewController: UIViewController {
         }
     }
     
-    private func setCloseButton() {
-        if presentingViewController != nil {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
-        }
-    }
-    
-    @objc private func close() {
-        dismiss(animated: true)
-    }
-}
-
-extension SignUpViewController {
     private func handleError(error: AuthManagerEnum) {
         switch error {
         case .emailAlreadyInUse:
@@ -316,6 +241,89 @@ extension SignUpViewController {
             nameTextField.setTextFieldState(state: .warning(error: .invalidName))
         default: break
         }
+    }
+    
+    private func setCloseButton() {
+        if presentingViewController != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark")?.withTintColor(.black, renderingMode: .alwaysOriginal), style: .done, target: self, action: #selector(close))
+        }
+    }
+    
+    @objc private func backgroundDidTap() {
+        view.endEditing(true)
+        emailTextField.textField.resignFirstResponder()
+        passwordTextField.textField.resignFirstResponder()
+        nameTextField.textField.resignFirstResponder()
+    }
+    
+    @objc private func close() {
+        dismiss(animated: true)
+    }
+}
+
+// extension for keyboard setting
+extension SignUpViewController {
+    private func setKeyboardObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if
+            let userInfo = notification.userInfo,
+            let keyboardInfo = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRect = keyboardInfo.cgRectValue
+            let keyboardY = keyboardRect.origin.y
+            let originalHeight = UIScreen.main.bounds.height
+            let currentViewHeight = view.frame.height
+            let offsetHeight = (originalHeight - currentViewHeight) / 2
+            if currentFocusedTextfieldY + offsetHeight + 38 > keyboardY {
+                view.frame.origin.y = keyboardY - currentFocusedTextfieldY - 38 - offsetHeight
+            }
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        if view.frame.origin.y != 0 {
+            view.frame.origin.y = 0
+        }
+    }
+}
+
+// extension for SnapKit
+extension SignUpViewController {
+    private func setSignUpViewUI() {
+        view.backgroundColor = .systemBackground
+        view.addSubviews([emailTextField, passwordTextField, nameTextField, signUpButton, spinner])
+        let topOffset = (view.frame.height - 320) / 2
+        emailTextField.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(topOffset)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        emailTextField.setTextFieldType(type: .email)
+        passwordTextField.snp.makeConstraints({ make in
+            make.top.equalTo(emailTextField.snp.top).offset(66)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        passwordTextField.setTextFieldType(type: .password)
+        nameTextField.snp.makeConstraints({ make in
+            make.top.equalTo(passwordTextField.snp.top).offset(passwordTextField.frame.height + 28)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+        })
+        nameTextField.setTextFieldType(type: .name)
+        signUpButton.snp.makeConstraints({ make in
+            make.top.equalTo(nameTextField.snp.top).offset(nameTextField.frame.height + 32)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(380)
+            make.height.equalTo(38)
+        })
+        spinner.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        setCloseButton()
     }
     
     private func setTextfieldLayout(textFieldType: SignUpTextField.SignUpTextFieldEnum, isWaringShown: Bool) {
@@ -337,10 +345,13 @@ extension SignUpViewController {
     }
 
     
-    @objc private func backgroundDidTap() {
-        view.endEditing(true)
-        emailTextField.textField.resignFirstResponder()
-        passwordTextField.textField.resignFirstResponder()
-        nameTextField.textField.resignFirstResponder()
+    private func layoutIfModalView() {
+        if presentingViewController != nil {
+            let topOffset = (view.frame.height - 320) / 2
+            emailTextField.snp.updateConstraints({ make in
+                make.top.equalToSuperview().offset(topOffset)
+            })
+            view.layoutIfNeeded()
+        }
     }
 }

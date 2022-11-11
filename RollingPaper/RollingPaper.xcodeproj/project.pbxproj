@@ -12,8 +12,8 @@
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
 		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
 		AF6FEE3C2902E2E400E44E7D /* CameraCustomPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */; };
-		AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */; };
-		AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */; };
+		AFBF86A4291AB47D00766D9C /* BackgroundButtonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBF86A3291AB47D00766D9C /* BackgroundButtonViewController.swift */; };
+		AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
 		BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE6FEB9291B90430093C36E /* PaperStorageOpenedCollectionCell.swift */; };
@@ -93,8 +93,8 @@
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
 		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
 		AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCustomPicker.swift; sourceTree = "<group>"; };
-		AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardBackgroundViewController.swift; sourceTree = "<group>"; };
-		AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardPencilKitViewController.swift; sourceTree = "<group>"; };
+		AFBF86A3291AB47D00766D9C /* BackgroundButtonViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundButtonViewController.swift; sourceTree = "<group>"; };
+		AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardCreateViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
@@ -397,10 +397,10 @@
 			isa = PBXGroup;
 			children = (
 				AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */,
-				AFE8D6E828F50319005B1F45 /* CardPencilKitViewController.swift */,
+				AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */,
 				AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */,
-				AFE8D6E728F50317005B1F45 /* CardBackgroundViewController.swift */,
 				AF6FEE3B2902E2E400E44E7D /* CameraCustomPicker.swift */,
+				AFBF86A3291AB47D00766D9C /* BackgroundButtonViewController.swift */,
 			);
 			path = Card;
 			sourceTree = "<group>";
@@ -675,7 +675,6 @@
 				BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */,
 				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
-				AFE8D6E928F50319005B1F45 /* CardBackgroundViewController.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
@@ -686,6 +685,7 @@
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
+				AFBF86A4291AB47D00766D9C /* BackgroundButtonViewController.swift in Sources */,
 				D2EF708F29066FA10007E611 /* DynamicLinks+Funcs.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
 				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
@@ -711,7 +711,7 @@
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */,
-				AFE8D6EA28F50319005B1F45 /* CardPencilKitViewController.swift in Sources */,
+				AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
@@ -843,7 +843,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -898,7 +898,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
