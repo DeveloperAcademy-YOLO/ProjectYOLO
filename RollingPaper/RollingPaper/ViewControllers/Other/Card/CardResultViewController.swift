@@ -144,7 +144,7 @@ final class CardResultViewController: UIViewController {
       
         let gravity = UIGravityBehavior(items: [titleBounceView])
         
-        let vector = CGVector(dx: 0.0, dy: 1.0)
+        let vector = CGVector(dx: 0.0, dy: 0.6)
         gravity.gravityDirection = vector
         
         animator?.addBehavior(gravity)
