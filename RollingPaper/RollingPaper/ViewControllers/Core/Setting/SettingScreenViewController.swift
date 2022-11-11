@@ -5,13 +5,13 @@
 //  Created by 임 용관 on 2022/10/12.
 //
 
-import Foundation
-import UIKit
-import SnapKit
+import AVFoundation
 import Combine
 import CombineCocoa
-import AVFoundation
+import Foundation
 import Photos
+import SnapKit
+import UIKit
 
 class SettingScreenViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
 
@@ -21,17 +21,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     private var currentFocusedTextfieldY: CGFloat = .zero
     private var countChange: Bool = false
     private var currentImage: UIImage?
-    // A URLString -> Data A -> B upload -> C upload -> A upload -> 저장 필요 X
-    // Original currentImage UIImage <-> profilePhoto.image
-    // Original currentName <-> profileTextField.textField.text
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupLayout()
-        bind()
-        checkAlbumPermission()
-    }
-
     private let editButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = UIColor.systemBackground
@@ -71,14 +61,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         button.isUserInteractionEnabled = true
         return button
     }()
-
-    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        pickerController.sourceType = type
-        present(pickerController, animated: true)
-    }
-
+    
     private let profileText: SignUpTextField = {
         let textField = SignUpTextField()
         textField.isHidden = true
@@ -132,8 +115,133 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         return visualEffectView
     }()
     
-    @objc func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
-            print("cancelBtnPressed")
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupLayout()
+        bind()
+        checkAlbumPermission()
+    }
+    
+    private func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher()).eraseToAnyPublisher()
+        output
+            .receive(on: DispatchQueue.main)
+            .sink { output in
+                switch output {
+                case .signOutDidSucceed:
+                    if let parentView = self.navigationController?.parent as? SplitViewController {
+                        NotificationCenter.default.post(
+                            name: Notification.Name.viewChange,
+                            object: nil,
+                            userInfo: [NotificationViewKey.view: "설정"]
+                        )
+                    }
+                case .userProfileChangeDidSuccess:
+                    print("Output Received!")
+                    self.countChange = false
+                    self.navigationItem.rightBarButtonItem?.title = "편집"
+                    self.navigationItem.leftBarButtonItem?.title = nil
+                    self.divideView.isHidden = false
+                    self.logoutButton.isHidden = false
+                    self.resignButton.isHidden = false
+                    self.profileText.isHidden = true
+                    self.visualEffectView.isHidden = true
+                    self.editPhotoButton.isHidden = true
+                    self.profileLabel.isHidden = false
+                    self.profileText.textField.text = self.viewModel.currentUserSubject.value?.name
+                    self.profileText.textField.sendActions(for: .editingChanged)
+                    self.profileText.setTextFieldType(type: .name)
+                    self.profileText.setWaringView(waringShown: false, text: nil)
+                    self.profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+                case .userProfileChangeDidFail:
+                    print("Fail")
+                    // TODO: Fail 시 alert
+                case .nameAlreadyInUse:
+                    self.profileText.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
+                }
+            }
+            .store(in: &cancellables)
+
+        editPhotoButton
+            .tapPublisher
+            .sink { _ in
+                self.presentImagePicker(withType: .photoLibrary)
+            }
+            .store(in: &cancellables)
+        
+        resignButton.addTarget(self, action: #selector(resignBtnPressed(_:)), for: .touchUpInside)
+        
+        logoutButton.addTarget(self, action: #selector(logOutBtnPressed(_:)), for: .touchUpInside)
+        
+        // ViewModel -> current Image, current Photo를 가지고 있다! == AuthManaher에서 구독받는 UserProfileUsbject의 데이터! -> ViewModel에서 해당 데이터 퍼블리셔를 구독하고, 뷰 컨에서 해당 흘러오는 데이터를 구독하기!
+        // ViewModel 완료버튼 누르면 -> ViewModel에서 authManager의 setUserProfile 함수 실행해서 현재 데이터와 다른 포토, 이름 넣기 -> AuthManager에서의 데이터 퍼블리셔 값이 변경될 것이기 때문에, 해당 데이터 퍼블리셔 구독하고 있는 ViewModel -> View Controller의 이미지, 이름 등이 자동으로 바뀐다!
+        
+        profileText
+            .textField
+            .didBeginEditingPublisher
+            .sink { [weak self] _ in
+                if let yPosition = self?.profileText.frame.origin.y {
+                    self?.currentFocusedTextfieldY = yPosition
+                }
+            }
+            .store(in: &cancellables)
+        viewModel.currentUserSubject
+            .receive(on: DispatchQueue.main)
+            .sink { userModel in
+                let placeholder =
+                self.profileText.textField.attributedPlaceholder = NSAttributedString(string: userModel?.name ?? "Default", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
+                self.profileText.textField.text = self.viewModel.currentUserSubject.value?.name
+                self.profileText.textField.sendActions(for: .editingChanged)
+                self.profileText.textField.sendActions(for: .editingDidEnd)
+                self.profileLabel.text = userModel?.name ?? "Guest"
+            }
+            .store(in: &cancellables)
+        viewModel.currentPhotoSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] image in
+                if let image = image {
+                    self?.profileImage.image = image
+                } else {
+                    self?.profileImage.image = UIImage(systemName: "person")
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        self.dismiss(animated: true) {
+            if let image = info[.editedImage] as? UIImage {
+                self.profileImage.image = image
+            } else if let image = info[.originalImage] as? UIImage {
+                self.countChange = true
+                self.profileImage.image = image
+            }
+        }
+    }
+
+    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        pickerController.sourceType = type
+        present(pickerController, animated: true)
+    }
+    
+    private func checkAlbumPermission() {
+        PHPhotoLibrary.requestAuthorization({ status in
+            switch status {
+            case .authorized:
+                print("Album: 권한 허용")
+            case .denied:
+                print("Album: 권한 거부")
+            case .restricted, .notDetermined:
+                print("Album: 선택하지 않음")
+            default:
+                break
+            }
+        })
+    }
+    
+    @objc private func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
             let alert = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
         
             alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction!) in
@@ -146,8 +254,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             present(alert, animated: true)
         }
     
-    @objc func resignBtnPressed(_ gesture: UITapGestureRecognizer) {
-            print("cancelBtnPressed")
+    @objc private func resignBtnPressed(_ gesture: UITapGestureRecognizer) {
             let alert = UIAlertController(title: " 회원 탈퇴를 하면 모든 기록이 사라집니다.", message: "회원 탈퇴를 하시겠습니까?", preferredStyle: .alert)
         
             alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction!) in
@@ -160,9 +267,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             present(alert, animated: true)
         }
 
-
-
-    @objc func didCancelButton() {
+    @objc private func didCancelButton() {
         profileText.textField.resignFirstResponder()
         navigationItem.rightBarButtonItem?.title = "편집"
         navigationItem.leftBarButtonItem?.title = nil
@@ -231,7 +336,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     }
 
     @objc private func didBackgroundTap() {
-        print("AAA")
         view.endEditing(true)
         profileText.textField.resignFirstResponder()
     }
@@ -325,119 +429,5 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             make.top.equalTo(logoutButton.snp.bottom).offset(16.5)
             make.centerX.equalToSuperview()
         })
-    }
-
-    private func bind() {
-        let output = viewModel.transform(input: input.eraseToAnyPublisher()).eraseToAnyPublisher()
-        output
-            .receive(on: DispatchQueue.main)
-            .sink { output in
-                switch output {
-                case .signOutDidSucceed:
-                    if let parentView = self.navigationController?.parent as? SplitViewController {
-                        NotificationCenter.default.post(
-                            name: Notification.Name.viewChange,
-                            object: nil,
-                            userInfo: [NotificationViewKey.view: "설정"]
-                        )
-                    }
-                case .userProfileChangeDidSuccess:
-                    print("Output Received!")
-                    self.countChange = false
-                    self.navigationItem.rightBarButtonItem?.title = "편집"
-                    self.navigationItem.leftBarButtonItem?.title = nil
-                    self.divideView.isHidden = false
-                    self.logoutButton.isHidden = false
-                    self.resignButton.isHidden = false
-                    self.profileText.isHidden = true
-                    self.visualEffectView.isHidden = true
-                    self.editPhotoButton.isHidden = true
-                    self.profileLabel.isHidden = false
-                    self.profileText.textField.text = self.viewModel.currentUserSubject.value?.name
-                    self.profileText.textField.sendActions(for: .editingChanged)
-                    self.profileText.setTextFieldType(type: .name)
-                    self.profileText.setWaringView(waringShown: false, text: nil)
-                    self.profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
-                case .userProfileChangeDidFail:
-                    print("Fail")
-                    // TODO: Fail 시 alert
-                case .nameAlreadyInUse:
-                    self.profileText.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
-                }
-            }
-            .store(in: &cancellables)
-
-        editPhotoButton
-            .tapPublisher
-            .sink { _ in
-                self.presentImagePicker(withType: .photoLibrary)
-            }
-            .store(in: &cancellables)
-        
-        resignButton.addTarget(self, action: #selector(resignBtnPressed(_:)), for: .touchUpInside)
-        
-        logoutButton.addTarget(self, action: #selector(logOutBtnPressed(_:)), for: .touchUpInside)
-        
-        // ViewModel -> current Image, current Photo를 가지고 있다! == AuthManaher에서 구독받는 UserProfileUsbject의 데이터! -> ViewModel에서 해당 데이터 퍼블리셔를 구독하고, 뷰 컨에서 해당 흘러오는 데이터를 구독하기!
-        // ViewModel 완료버튼 누르면 -> ViewModel에서 authManager의 setUserProfile 함수 실행해서 현재 데이터와 다른 포토, 이름 넣기 -> AuthManager에서의 데이터 퍼블리셔 값이 변경될 것이기 때문에, 해당 데이터 퍼블리셔 구독하고 있는 ViewModel -> View Controller의 이미지, 이름 등이 자동으로 바뀐다!
-        
-        profileText
-            .textField
-            .didBeginEditingPublisher
-            .sink { [weak self] _ in
-                if let yPosition = self?.profileText.frame.origin.y {
-                    self?.currentFocusedTextfieldY = yPosition
-                }
-            }
-            .store(in: &cancellables)
-        viewModel.currentUserSubject
-            .receive(on: DispatchQueue.main)
-            .sink { userModel in
-                let placeholder =
-                self.profileText.textField.attributedPlaceholder = NSAttributedString(string: userModel?.name ?? "Default", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
-                self.profileText.textField.text = self.viewModel.currentUserSubject.value?.name
-                self.profileText.textField.sendActions(for: .editingChanged)
-                self.profileText.textField.sendActions(for: .editingDidEnd)
-                self.profileLabel.text = userModel?.name ?? "Guest"
-            }
-            .store(in: &cancellables)
-        viewModel.currentPhotoSubject
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] image in
-                if let image = image {
-                    self?.profileImage.image = image
-                } else {
-                    self?.profileImage.image = UIImage(systemName: "person")
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
-    private func checkAlbumPermission() {
-        PHPhotoLibrary.requestAuthorization({ status in
-            switch status {
-            case .authorized:
-                print("Album: 권한 허용")
-            case .denied:
-                print("Album: 권한 거부")
-            case .restricted, .notDetermined:
-                print("Album: 선택하지 않음")
-            default:
-                break
-            }
-        })
-    }
-
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        self.dismiss(animated: true) {
-            if let image = info[.editedImage] as? UIImage {
-                print("hello")
-                self.profileImage.image = image
-            } else if let image = info[.originalImage] as? UIImage {
-                self.countChange = true
-                print("original")
-                self.profileImage.image = image
-            }
-        }
     }
 }
