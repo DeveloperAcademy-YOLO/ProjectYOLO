@@ -47,6 +47,7 @@ public enum StickerViewPosition:Int {
     @objc func stickerViewDidEndRotating(_ stickerView: StickerView)
     @objc func stickerViewDidClose(_ stickerView: StickerView)
     @objc func stickerViewDidTap(_ stickerView: StickerView)
+    @objc func stickerViewDidPinch(_ stickerView: StickerView)
 }
 
 public class StickerView: UIView {
@@ -131,6 +132,7 @@ public class StickerView: UIView {
         self.backgroundColor = UIColor.clear
         self.addGestureRecognizer(self.moveGesture)
         self.addGestureRecognizer(self.tapGesture)
+        self.addGestureRecognizer(self.pinchGesture)
         
         // Setup content view
         self.contentView = contentView
@@ -319,6 +321,10 @@ public class StickerView: UIView {
     private lazy var tapGesture = {
         return UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:)))
     }()
+    
+    private lazy var pinchGesture = {
+        return UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
+    }()
     // MARK: - Gesture Handlers
     @objc
     func handleMoveGesture(_ recognizer: UIPanGestureRecognizer) {
@@ -402,6 +408,17 @@ public class StickerView: UIView {
         if let delegate = self.delegate {
             delegate.stickerViewDidTap(self)
         }
+    }
+    
+    @objc
+    func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
+        if let delegate = self.delegate {
+            delegate.stickerViewDidPinch(self)
+        }
+        
+        guard let view = recognizer.view else { return }
+        view.transform = view.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
+        recognizer.scale = 1
     }
     
     // MARK: - Private Methods
