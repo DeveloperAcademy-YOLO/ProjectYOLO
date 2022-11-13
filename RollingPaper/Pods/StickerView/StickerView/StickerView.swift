@@ -414,10 +414,15 @@ public class StickerView: UIView {
         if let delegate = self.delegate {
             delegate.stickerViewDidPinch(self)
         }
+    
+        let firstPoint = recognizer.location(ofTouch: 0, in: self.contentView)
+        let secondPoint = recognizer.location(ofTouch: 1, in: self.contentView)
         
-        guard let view = recognizer.view else { return }
-        view.transform = view.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
-        recognizer.scale = 1
+        var scale = CGPointGetDistance(point1: firstPoint, point2: secondPoint) / self.initialDistance
+        let minimumScale = CGFloat(self.minimumSize) / min(self.initialBounds.size.width, self.initialBounds.size.height)
+        scale = max(scale, minimumScale)
+        let scaledBounds = CGRectScale(self.initialBounds, wScale: scale, hScale: scale)
+        self.bounds = scaledBounds
     }
     
     // MARK: - Private Methods
