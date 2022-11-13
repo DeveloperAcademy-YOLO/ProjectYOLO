@@ -31,7 +31,7 @@ final private class Layout {
 }
 
 final class SidebarViewController: UIViewController {
-    private var dataSource: UICollectionViewDiffableDataSource<Section, CategoryModel>! = nil
+    private var dataSource: UICollectionViewDiffableDataSource<SidebarSection, CategoryModel>! = nil
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
@@ -149,13 +149,13 @@ final class SidebarViewController: UIViewController {
             cell.contentConfiguration = content
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Section, CategoryModel>(collectionView: collectionView) {
+        dataSource = UICollectionViewDiffableDataSource<SidebarSection, CategoryModel>(collectionView: collectionView) {
             (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> CategoryCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
         
-        let sections: [Section] = [.main]
-        var snapshot = NSDiffableDataSourceSnapshot<Section, CategoryModel>()
+        let sections: [SidebarSection] = [.main]
+        var snapshot = NSDiffableDataSourceSnapshot<SidebarSection, CategoryModel>()
         snapshot.appendSections(sections)
         dataSource.apply(snapshot, animatingDifferences: false)
         
@@ -233,6 +233,6 @@ class CategoryCell: UICollectionViewListCell {
     }
 }
 
-enum Section: String {
+enum SidebarSection: String {
     case main
 }
