@@ -321,7 +321,6 @@ public class StickerView: UIView {
     private lazy var tapGesture = {
         return UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:)))
     }()
-    
     private lazy var pinchGesture = {
         return UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
     }()
