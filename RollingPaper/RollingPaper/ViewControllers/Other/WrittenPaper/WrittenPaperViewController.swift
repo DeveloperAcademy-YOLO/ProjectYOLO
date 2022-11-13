@@ -360,12 +360,12 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     func shareCard( _ indexPath: Int) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath]
-
+        
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-//            imageShare(_ :)
+            //            imageShare(_ :)
         }
     }
-
+    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
@@ -417,9 +417,15 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         guard let currentPaper = viewModel.currentPaper else { return  }
         let card = currentPaper.cards[indexPath.row]
         let presentingVC = MagnifiedCardViewController()
+        let blurredVC = BlurredViewController()
+        
+        blurredVC.modalTransitionStyle = .crossDissolve
+        blurredVC.modalPresentationStyle = .currentContext
+        self.present(blurredVC, animated: true)
+        
         
         presentingVC.selectedCardIndex = indexPath.row
-        presentingVC.modalPresentationStyle = .overCurrentContext
+        presentingVC.modalPresentationStyle = .overFullScreen
         present(presentingVC, animated: true)
         
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
@@ -500,7 +506,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         shareSheetVC.popoverPresentationController?.sourceRect = sender.accessibilityFrame
         present(shareSheetVC, animated: true)
     }
-
+    
 }
 
 extension WrittenPaperViewController {

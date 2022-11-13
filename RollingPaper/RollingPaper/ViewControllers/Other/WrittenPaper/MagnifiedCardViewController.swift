@@ -27,6 +27,7 @@ class MagnifiedCardViewController: UIViewController {
         
         cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 80, width: deviceWidth, height: deviceHeight-160), collectionViewLayout: layout)
         cardsCollectionView.showsHorizontalScrollIndicator = false
+        cardsCollectionView.backgroundColor = .clear
         cardsCollectionView.decelerationRate = .fast
         cardsCollectionView.isPagingEnabled = false
         cardsCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
