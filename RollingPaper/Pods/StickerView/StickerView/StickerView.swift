@@ -48,6 +48,7 @@ public enum StickerViewPosition:Int {
     @objc func stickerViewDidClose(_ stickerView: StickerView)
     @objc func stickerViewDidTap(_ stickerView: StickerView)
     @objc func stickerViewDidPinch(_ stickerView: StickerView)
+    @objc func stickerViewDidRotation(_ stickerView: StickerView)
 }
 
 public class StickerView: UIView {
@@ -133,6 +134,7 @@ public class StickerView: UIView {
         self.addGestureRecognizer(self.moveGesture)
         self.addGestureRecognizer(self.tapGesture)
         self.addGestureRecognizer(self.pinchGesture)
+        self.addGestureRecognizer(self.rotationGesture)
         
         // Setup content view
         self.contentView = contentView
@@ -324,6 +326,10 @@ public class StickerView: UIView {
     private lazy var pinchGesture = {
         return UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
     }()
+    
+    private lazy var rotationGesture = {
+        return UIRotationGestureRecognizer(target: self, action: #selector(handleRotationGesture(_:)))
+    }()
     // MARK: - Gesture Handlers
     @objc
     func handleMoveGesture(_ recognizer: UIPanGestureRecognizer) {
@@ -414,7 +420,6 @@ public class StickerView: UIView {
         if let delegate = self.delegate {
             delegate.stickerViewDidPinch(self)
         }
-    
         let firstPoint = recognizer.location(ofTouch: 0, in: self.contentView)
         let secondPoint = recognizer.location(ofTouch: 1, in: self.contentView)
         
@@ -423,6 +428,39 @@ public class StickerView: UIView {
         scale = max(scale, minimumScale)
         let scaledBounds = CGRectScale(self.initialBounds, wScale: scale, hScale: scale)
         self.bounds = scaledBounds
+    }
+    
+    @objc func handleRotationGesture(_ recognizer: UIRotationGestureRecognizer) {
+        if let delegate = self.delegate {
+            delegate.stickerViewDidRotation(self)
+        }
+   
+        let firstPoint = recognizer.location(ofTouch: 0, in: self.contentView)
+        let secondPoint = recognizer.location(ofTouch: 1, in: self.contentView)
+        
+        switch recognizer.state {
+        case .began:
+            self.deltaAngle = CGFloat(atan2f(Float(secondPoint.y - firstPoint.y), Float(secondPoint.x - firstPoint.x))) - CGAffineTransformGetAngle(self.transform)
+            self.initialBounds = self.bounds
+            self.initialDistance = CGPointGetDistance(point1: firstPoint, point2: secondPoint)
+            if let delegate = self.delegate {
+                delegate.stickerViewDidRotation(self)
+            }
+        case .changed:
+            let angle = atan2f(Float(secondPoint.y - firstPoint.y), Float(secondPoint.x - firstPoint.x))
+            let angleDiff = Float(self.deltaAngle) - angle
+            self.transform = CGAffineTransform(rotationAngle: CGFloat(-angleDiff))
+            
+            if let delegate = self.delegate {
+                delegate.stickerViewDidRotation(self)
+            }
+        case .ended:
+            if let delegate = self.delegate {
+                delegate.stickerViewDidRotation(self)
+            }
+        default:
+            break
+        }
     }
     
     // MARK: - Private Methods

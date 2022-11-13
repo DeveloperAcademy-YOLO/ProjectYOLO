@@ -500,6 +500,10 @@ extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidPinch(_ stickerView: StickerView) {
         
     }
+    
+    func stickerViewDidRotation(_ stickerView: StickerView) {
+        
+    }
 }
 
 extension UIButton {
