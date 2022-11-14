@@ -5,11 +5,9 @@
 //  Created by Kelly Chui on 2022/11/12.
 //
 
-import AVFoundation
 import Combine
 import CombineCocoa
 import Foundation
-import Photos
 import SnapKit
 import UIKit
 
