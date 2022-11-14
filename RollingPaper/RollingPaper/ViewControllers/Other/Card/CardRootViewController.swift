@@ -138,7 +138,9 @@ class CardRootViewController: UIViewController {
             present(alert, animated: true)
         } else {
             if let cardCreateViewVC = self.children[0] as? CardCreateViewController {
+                if completeClickCount == 0 {
                     cardCreateViewVC.resultImageSend()
+                }
                 print("CardPencilKit here!")
             } else {
                 print("Fail!")
