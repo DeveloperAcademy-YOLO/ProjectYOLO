@@ -6,19 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
-struct AppSettingUserProfileModel: Hashable {
-    var name: String
-    var photo: String
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
-    }
-}
-
-struct AppSettingCollectionCellModel: Hashable {
+struct AppSettingSectionModel: Hashable {
     let title: String
-    let expand_view: UIView?
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
-    }
+    let detailView: UIView
 }

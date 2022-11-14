@@ -13,9 +13,9 @@ import Photos
 import SnapKit
 import UIKit
 
-class AppSettingViewController: UIViewController {
-    var dataSource: UICollectionViewDiffableDataSource<Section, ListItem>!
+final class AppSettingViewController: UIViewController {
     private var viewModel = AppSettingViewModel()
+    private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>! = nil
     
     let colorSelectButton: UISegmentedControl = {
         let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
@@ -26,15 +26,9 @@ class AppSettingViewController: UIViewController {
     
     lazy var collectionView: UICollectionView = {
         var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
+        collectionView.isScrollEnabled = false
         return collectionView
     }()
-    
-    let modelObjects = [
-        AppSettingCollectionCellModel(title: "색상 테마", symbols: UIView()),
-        AppSettingCollectionCellModel(title: "알림", symbols: UIView()),
-        AppSettingCollectionCellModel(title: "고객 지원", symbols: UIView()),
-        AppSettingCollectionCellModel(title: "정보", symbols: UIView())
-    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,50 +47,69 @@ class AppSettingViewController: UIViewController {
     }
     
     private func setLayout() -> UICollectionViewLayout {
-        let layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-        return UICollectionViewCompositionalLayout.list(using: layoutConfig)
+        let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
+            var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            config.headerMode = .none
+            return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
+        }
+        return layout
     }
     
     private func configureDataSource() {
-        let headerCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingCollectionCellModel> {
-            (cell, indexPath, headerItem) in
-            var content = cell.defaultContentConfiguration()
-            content.text = headerItem.title
-            cell.contentConfiguration = content
-            let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
-            cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
-        }
         
-        dataSource = UICollectionViewDiffableDataSource<Section, ListItem>(collectionView: collectionView) {
-            (collectionView, indexPath, listItem) -> UICollectionViewCell? in
-            switch listItem {
-            case .header(let headerItem):
-                let cell = collectionView.dequeueConfiguredReusableCell(using: headerCellRegistration, for: indexPath, item: headerItem)
-                return cell
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionModel> { (cell, indexPath, item) in
+            var content = cell.defaultContentConfiguration()
+            content.text = item.title
+            cell.contentConfiguration = content
+            cell.accessories = []
+        }
+
+        dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: AppSettingSectionModel) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+        }
+
+        let sections: [AppSettingViewModel.Section] = [.section1, .section2]
+        var snapshot = NSDiffableDataSourceSnapshot<AppSettingViewModel.Section, AppSettingSectionModel>()
+        snapshot.appendSections(sections)
+        dataSource.apply(snapshot, animatingDifferences: false)
+
+        for section in sections {
+            switch section {
+            case .section1:
+                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<AppSettingSectionModel>()
+                sectionSnapshot.append(viewModel.sectionData1)
+                dataSource.apply(sectionSnapshot, to: section)
+            case .section2:
+                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<AppSettingSectionModel>()
+                sectionSnapshot.append(viewModel.sectionData2)
+                dataSource.apply(sectionSnapshot, to: section)
             }
         }
-        var dataSourceSnapshot = NSDiffableDataSourceSnapshot<Section, ListItem>()
-
-        dataSourceSnapshot.appendSections([.main])
-        dataSource.apply(dataSourceSnapshot)
-        
-        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
-
-        for headerItem in modelObjects {
-            let headerListItem = ListItem.header(headerItem)
-            sectionSnapshot.append([headerListItem])
-            sectionSnapshot.expand([headerListItem])
-        }
-
-        dataSource.apply(sectionSnapshot, to: .main, animatingDifferences: false)
     }
     
     private func setView() {
         view.addSubview(collectionView)
-        view.addSubview(colorSelectButton)
+        // view.addSubview(colorSelectButton)
         
         collectionView.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
         }
     }
 }
+
+class LocalPushCell: UICollectionViewListCell {
+    // LocalPushCell (토글)
+}
+
+class LocalPushContentView: UIView, UIContentView {
+    // localPush 내부 뷰
+}
+
+class SelectedColorContentView: UIView, UIContentView {
+    // SelectedColor 내부 뷰
+}
+
+class InformationContentView: UIView, UIContentView {
+    // InformationContent 내부 뷰
+}
+

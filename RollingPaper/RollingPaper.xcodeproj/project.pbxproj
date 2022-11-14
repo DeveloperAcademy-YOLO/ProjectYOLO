@@ -45,6 +45,7 @@
 		CF265263291FB91D00C8171D /* AppSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF265262291FB91D00C8171D /* AppSettingViewModel.swift */; };
 		CF6D80CD291A763B004CAAD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */; };
 		CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */; };
+		CFD4422329224B3D00FC0C20 /* AppSettingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -133,6 +134,7 @@
 		CF265262291FB91D00C8171D /* AppSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingViewModel.swift; sourceTree = "<group>"; };
 		CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
+		CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingModels.swift; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */,
 				CFDA52C028F48D08006774E2 /* CategoryModel.swift */,
 				D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */,
+				CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -728,6 +731,7 @@
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */,
+				CFD4422329224B3D00FC0C20 /* AppSettingModels.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
