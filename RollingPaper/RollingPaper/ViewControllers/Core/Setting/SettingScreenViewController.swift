@@ -137,7 +137,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                         )
                     }
                 case .userProfileChangeDidSuccess:
-                    print("Output Received!")
                     self.countChange = false
                     self.navigationItem.rightBarButtonItem?.title = "편집"
                     self.navigationItem.leftBarButtonItem?.title = nil
@@ -154,8 +153,9 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                     self.profileText.setWaringView(waringShown: false, text: nil)
                     self.profileText.textField.attributedPlaceholder = NSAttributedString(string: self.profileText.textField.text ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
                 case .userProfileChangeDidFail:
-                    print("Fail")
-                    // TODO: Fail 시 alert
+                    let alert = UIAlertController(title: "유저 프로필 Fail", message: "유저 프로필을 불려오지 못했습니다.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
                 case .nameAlreadyInUse:
                     self.profileText.setTextFieldState(state: .warning(error: .nameAlreadyInUse))
                 }
