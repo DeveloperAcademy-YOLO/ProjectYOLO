@@ -358,7 +358,7 @@ class PaperSettingViewController: UIViewController {
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
                   object: nil,
-                  userInfo: [NotificationViewKey.view: "페이퍼 보관함"]
+                  userInfo: [NotificationViewKey.view: "보관함"]
               )
           }
       }

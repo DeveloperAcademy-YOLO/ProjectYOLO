@@ -98,7 +98,7 @@ final class SidebarViewController: UIViewController {
     
     @objc private func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
-        if object == "페이퍼 보관함" {
+        if object == "보관함" {
             self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
         }
     }
