@@ -26,8 +26,8 @@ class PaperStorageViewModel {
     var closedPaperIds = Set<String>()
     var thumbnails = [String: UIImage?]()
     
-    private let timerViewModel = TimerViewModel()
-    private let timerInput: PassthroughSubject<TimerViewModel.Input, Never> = .init()
+    private let timeFlowManager = TimeFlowManager()
+    private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private let localDatabaseManager: DatabaseManager
@@ -77,7 +77,7 @@ class PaperStorageViewModel {
     
     // 타이머 연동시키기
     private func bindTimer() {
-        let timerOutput = timerViewModel.transform(input: timerInput.eraseToAnyPublisher())
+        let timerOutput = timeFlowManager.transform(input: timerInput.eraseToAnyPublisher())
         timerOutput
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] event in

@@ -18,6 +18,7 @@
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
 		BC175412291E180D00A5F57F /* PaperTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC175411291E180D00A5F57F /* PaperTimePicker.swift */; };
+		BC95A92D292212CF00124665 /* TimeFlowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC95A92C292212CF00124665 /* TimeFlowManager.swift */; };
 		BCC74A79291E1B2300582248 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A78291E1B2300582248 /* TimerView.swift */; };
 		BCC74A7B291E778800582248 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A7A291E778800582248 /* String+Extensions.swift */; };
 		BCC74A7D2922050B00582248 /* PaperSettingLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A7C2922050B00582248 /* PaperSettingLength.swift */; };
@@ -108,6 +109,7 @@
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		BBFE36CDAB55431C5E2625EF /* Pods-RollingPaper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.debug.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.debug.xcconfig"; sourceTree = "<group>"; };
 		BC175411291E180D00A5F57F /* PaperTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaperTimePicker.swift; sourceTree = "<group>"; };
+		BC95A92C292212CF00124665 /* TimeFlowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFlowManager.swift; sourceTree = "<group>"; };
 		BCC74A78291E1B2300582248 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		BCC74A7A291E778800582248 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		BCC74A7C2922050B00582248 /* PaperSettingLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSettingLength.swift; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				D2B6308928F158E7008365CB /* LocalDatabaseMockManager.swift */,
 				D2CB508C28FD2CB50065C2A9 /* NSCacheManager.swift */,
 				BCF2482429012589008CD0F9 /* SplitViewManager.swift */,
+				BC95A92C292212CF00124665 /* TimeFlowManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -733,6 +736,7 @@
 				D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */,
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
+				BC95A92D292212CF00124665 /* TimeFlowManager.swift in Sources */,
 				BCC74A7B291E778800582248 /* String+Extensions.swift in Sources */,
 				D251BDCB28ED32890094ECD9 /* UIColor+Extensions.swift in Sources */,
 				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,

@@ -28,54 +28,83 @@ private class Length {
 }
 
 // 타이머 UI
-class TimerView: UIStackView {
-    private let clock = UIImageView()
-    private let time = UILabel()
+final class TimerView: UIStackView {
     private var endTime: Date?
     private var remainTimeState: RemainTimeState = .hour
+    
     enum RemainTimeState {
         case hour, minute, second, end
     }
     
+    // 시계 이미지
+    private lazy var clock: UIImageView = {
+        let clock = UIImageView()
+        clock.image = UIImage(systemName: "timer")
+        clock.tintColor = UIColor.white
+        clock.contentMode = .scaleAspectFit
+        return clock
+    }()
+    // 시간 라벨
+    private lazy var time: UILabel = {
+        let time = UILabel()
+        time.font = .systemFont(ofSize: 16, weight: .semibold)
+        time.textAlignment = .left
+        time.textColor = UIColor.white
+        return time
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setLayout()
+        setMainView()
+        configure()
+        setConstraints()
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // 레이아웃 세팅하기
-    private func setLayout() {
-        addArrangedSubview(clock)
-        addArrangedSubview(time)
-        
+    // 메인뷰 설정하기
+    private func setMainView() {
         layer.cornerRadius = Length.timerCornerRadius
         distribution = .equalSpacing
         layoutMargins = UIEdgeInsets(top: Length.timerTopPadding, left: Length.timerLeftPadding, bottom: Length.timerBottomPadding, right: Length.timerRightPadding)
         isLayoutMarginsRelativeArrangement = true
         spacing = Length.timerSpace
+    }
+    
+    
+    // 초를 특정 포맷으로 바꾸기 (00시간 00분 00초)
+    private func changeTimeFormat(second: Int) -> String {
+        let hourSuffix = "시간" + " "
+        let minSuffix = "분" + " "
+        let secSuffix = "초"
         
-        snp.makeConstraints ({ make in
-            make.width.equalTo(Length.timerWidth1)
-            make.height.equalTo(Length.timerHeight)
-        })
+        let hour = Int(second/3600)
+        let min = Int((second - (hour*3600))/60)
+        let sec = second - (hour*3600+min*60)
+
+        var hourString = String(hour)+hourSuffix
+        var minString = String(min)+minSuffix
+        var secString = String(sec)+secSuffix
         
-        clock.image = UIImage(systemName: "timer")
-        clock.tintColor = UIColor.white
-        clock.contentMode = .scaleAspectFit
-        clock.snp.makeConstraints({ make in
-            make.width.equalTo(Length.clockImageWidth)
-            make.height.equalTo(Length.clockImageHeight)
-        })
+        if hourString.count == 1+hourSuffix.count { hourString = "0" + hourString }
+        if minString.count == 1+minSuffix.count { minString = "0" + minString }
+        if secString.count == 1+secSuffix.count { secString = "0" + secString }
         
-        time.font = .systemFont(ofSize: 16, weight: .semibold)
-        time.textAlignment = .left
-        time.textColor = UIColor.white
-        time.snp.makeConstraints({ make in
-            make.width.equalTo(Length.textWidth1)
-        })
+        if hour == 0 {
+            hourString = ""
+            if min == 0 {
+                minString = ""
+            }
+        }
+        return hourString + minString + secString
+    }
+    
+    // 페이퍼 끝나는 시간 설정하도록 하기
+    func setEndTime(time: Date) {
+        endTime = time
+        updateTime()
     }
     
     // 타이머 남은 시간 업데이트하기
@@ -123,82 +152,26 @@ class TimerView: UIStackView {
         }
         
     }
-    
-    // 초를 특정 포맷으로 바꾸기 (00시간 00분 00초)
-    private func changeTimeFormat(second: Int) -> String {
-        let hourSuffix = "시간" + " "
-        let minSuffix = "분" + " "
-        let secSuffix = "초"
-        
-        let hour = Int(second/3600)
-        let min = Int((second - (hour*3600))/60)
-        let sec = second - (hour*3600+min*60)
-
-        var hourString = String(hour)+hourSuffix
-        var minString = String(min)+minSuffix
-        var secString = String(sec)+secSuffix
-        
-        if hourString.count == 1+hourSuffix.count { hourString = "0" + hourString }
-        if minString.count == 1+minSuffix.count { minString = "0" + minString }
-        if secString.count == 1+secSuffix.count { secString = "0" + secString }
-        
-        if hour == 0 {
-            hourString = ""
-            if min == 0 {
-                minString = ""
-            }
-        }
-        
-        return hourString + minString + secString
-    }
-    
-    // 페이퍼 끝나는 시간 설정하도록 하기
-    func setEndTime(time: Date) {
-        endTime = time
-        updateTime()
-    }
 }
 
-// 타이머 시간 흐르게 하는 클래스
-class TimerViewModel {
-    private let timerInterval = 1.0 // 1초 간격
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    private var timer: AnyCancellable?
-    enum Input {
-        case viewDidAppear
-        case viewDidDisappear
-    }
-    enum Output {
-        case timeIsUpdated
+// 스냅킷 설정
+extension TimerView {
+    private func configure() {
+        addArrangedSubview(clock)
+        addArrangedSubview(time)
     }
     
-    // 타이머 연동
-    private func bindTimer() {
-        timer = Timer.publish(every: timerInterval, on: .main, in: .common)
-            .autoconnect()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] _ in
-                guard let self = self else {return}
-                // 타이머 업데이트 됐다고 알려주기
-                self.output.send(.timeIsUpdated)
-            })
-    }
-    
-    // 뷰가 나타나면 타이머 연결, 사라지면 타이머 해제
-    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
-        input
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .viewDidAppear:
-                    self.bindTimer()
-                case .viewDidDisappear:
-                    self.timer?.cancel()
-                }
-            })
-            .store(in: &cancellables)
-        return output.eraseToAnyPublisher()
+    private func setConstraints() {
+        snp.makeConstraints ({ make in
+            make.width.equalTo(Length.timerWidth1)
+            make.height.equalTo(Length.timerHeight)
+        })
+        clock.snp.makeConstraints({ make in
+            make.width.equalTo(Length.clockImageWidth)
+            make.height.equalTo(Length.clockImageHeight)
+        })
+        time.snp.makeConstraints({ make in
+            make.width.equalTo(Length.textWidth1)
+        })
     }
 }
