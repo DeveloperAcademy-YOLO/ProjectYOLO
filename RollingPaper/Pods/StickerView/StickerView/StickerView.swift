@@ -47,8 +47,6 @@ public enum StickerViewPosition:Int {
     @objc func stickerViewDidEndRotating(_ stickerView: StickerView)
     @objc func stickerViewDidClose(_ stickerView: StickerView)
     @objc func stickerViewDidTap(_ stickerView: StickerView)
-    @objc func stickerViewDidPinch(_ stickerView: StickerView)
-    @objc func stickerViewDidRotation(_ stickerView: StickerView)
 }
 
 public class StickerView: UIView {
@@ -416,65 +414,13 @@ public class StickerView: UIView {
     
     @objc
     func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        let firstPoint = recognizer.location(ofTouch: 0, in: self.contentView)
-        let secondPoint = recognizer.location(ofTouch: 1, in: self.contentView)
-        
-        switch recognizer.state {
-        case .began:
-            self.initialBounds = self.bounds
-            self.initialDistance = CGPointGetDistance(point1: firstPoint, point2: secondPoint)
-            if let delegate = self.delegate {
-                delegate.stickerViewDidPinch(self)
-            }
-        case .changed:
-            var scale = CGPointGetDistance(point1: firstPoint, point2: secondPoint) / self.initialDistance
-            let minimumScale = CGFloat(self.minimumSize) / min(self.initialBounds.size.width, self.initialBounds.size.height)
-            scale = max(scale, minimumScale)
-            let scaledBounds = CGRectScale(self.initialBounds, wScale: scale, hScale: scale)
-            self.bounds = scaledBounds
-            self.setNeedsDisplay()
-            
-            if let delegate = self.delegate {
-                delegate.stickerViewDidPinch(self)
-            }
-        case .ended:
-            if let delegate = self.delegate {
-                delegate.stickerViewDidPinch(self)
-            }
-        default:
-            break
-        }
+        self.transform = self.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
+        recognizer.scale = 1
     }
     
     @objc func handleRotationGesture(_ recognizer: UIRotationGestureRecognizer) {
-        if let delegate = self.delegate {
-            delegate.stickerViewDidRotation(self)
-        }
-
-        let firstPoint = recognizer.location(ofTouch: 0, in: self.contentView)
-        let secondPoint = recognizer.location(ofTouch: 1, in: self.contentView)
-
-        switch recognizer.state {
-        case .began:
-            self.deltaAngle = CGFloat(atan2f(Float(secondPoint.y - firstPoint.y), Float(secondPoint.x - firstPoint.x))) - CGAffineTransformGetAngle(self.transform)
-            if let delegate = self.delegate {
-                delegate.stickerViewDidRotation(self)
-            }
-        case .changed:
-            let angle = atan2f(Float(secondPoint.y - firstPoint.y), Float(secondPoint.x - firstPoint.x))
-            let angleDiff = Float(self.deltaAngle) - angle
-            self.transform = CGAffineTransform(rotationAngle: CGFloat(-angleDiff))
-
-            if let delegate = self.delegate {
-                delegate.stickerViewDidRotation(self)
-            }
-        case .ended:
-            if let delegate = self.delegate {
-                delegate.stickerViewDidRotation(self)
-            }
-        default:
-            break
-        }
+        self.transform = self.transform.rotated(by: recognizer.rotation)
+        recognizer.rotation = 0
     }
     
     // MARK: - Private Methods

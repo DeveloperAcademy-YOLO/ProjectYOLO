@@ -496,14 +496,6 @@ extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidClose(_ stickerView: StickerView) {
         
     }
-    
-    func stickerViewDidPinch(_ stickerView: StickerView) {
-        
-    }
-    
-    func stickerViewDidRotation(_ stickerView: StickerView) {
-        
-    }
 }
 
 extension UIButton {
