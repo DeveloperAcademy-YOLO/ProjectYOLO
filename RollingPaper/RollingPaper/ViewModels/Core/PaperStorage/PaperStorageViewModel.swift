@@ -26,12 +26,12 @@ class PaperStorageViewModel {
     var closedPaperIds = Set<String>()
     var thumbnails = [String: UIImage?]()
     
-    private let timerInterval: Double = 60
-    private let localDatabaseManager: DatabaseManager
-    private let serverDatabaseManager: DatabaseManager
+    private let timerViewModel = TimerViewModel()
+    private let timerInput: PassthroughSubject<TimerViewModel.Input, Never> = .init()
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var timer: AnyCancellable?
+    private let localDatabaseManager: DatabaseManager
+    private let serverDatabaseManager: DatabaseManager
     private var papersFromLocal = [PaperPreviewModel]()
     private var papersFromServer = [PaperPreviewModel]()
     private var papers = [PaperPreviewModel]()
@@ -41,6 +41,7 @@ class PaperStorageViewModel {
     init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
+        bindTimer()
         bindDatabaseManager()
     }
     
@@ -53,14 +54,14 @@ class PaperStorageViewModel {
                 switch event {
                 // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
                 case .viewDidAppear:
-                    self.bindTimer()
+                    self.timerInput.send(.viewDidAppear)
                     self.updateCurrentTime()
                     self.classifyPapers()
                     self.downloadLocalThumbnails(outputValue: .initPapers)
                     self.downloadServerThumbnails(outputValue: .initPapers)
-                // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
+                // 뷰가 사라졌다는 시그널이 오면 타이머한테 알려줘서 타이머 해제시키기
                 case .viewDidDisappear:
-                    self.timer?.cancel()
+                    self.timerInput.send(.viewDidDisappear)
                 // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
                 case .paperSelected(let paperId):
                     if self.serverPaperIds.contains(paperId) {
@@ -72,6 +73,24 @@ class PaperStorageViewModel {
             })
             .store(in: &cancellables)
         return output.eraseToAnyPublisher()
+    }
+    
+    // 타이머 연동시키기
+    private func bindTimer() {
+        let timerOutput = timerViewModel.transform(input: timerInput.eraseToAnyPublisher())
+        timerOutput
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
+                case .timeIsUpdated:
+                    self.updateCurrentTime()
+                    self.classifyPapers()
+                    self.output.send(.papersAreUpdatedByTimer)
+                }
+            })
+            .store(in: &cancellables)
     }
     
     // 데이터베이스 메니저 연동
@@ -103,22 +122,9 @@ class PaperStorageViewModel {
             .store(in: &cancellables)
     }
     
-    // 타이머 연동
-    private func bindTimer() {
-        timer = Timer.publish(every: timerInterval, on: .main, in: .common)
-            .autoconnect()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] date in
-                guard let self = self else {return}
-                self.updateCurrentTime(date: date)
-                self.classifyPapers()
-                self.output.send(.papersAreUpdatedByTimer)
-            })
-    }
-    
     // 현재 시간 업데이트하기
-    private func updateCurrentTime(date: Date = Date()) {
-        self.currentTime = date
+    private func updateCurrentTime() {
+        self.currentTime = Date()
     }
     
     // 서버와 로컬에 있는 페이퍼들 합쳐서, 열린 페이퍼와 닫힌 페이퍼로 구분하기
@@ -214,8 +220,6 @@ class PaperStorageViewModel {
             }
         }
     }
-    
-    
     
     // url을 통해 서버에 저장되어있는 썸네일 다운받아오기
     private func downloadServerThumbnails(outputValue: Output) {

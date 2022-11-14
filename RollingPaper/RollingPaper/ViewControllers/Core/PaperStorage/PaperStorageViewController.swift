@@ -36,14 +36,14 @@ class PaperStorageViewController: UIViewController {
         self.splitViewController?.show(.primary)
     }
     
-    // view가 나타나면 알려주기
+    // 뷰모델한테 뷰 나타났다고 알려주기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         input.send(.viewDidAppear)
         viewIsChange = false
     }
     
-    // view가 사라지면 알려주기
+    // 뷰모델한테 뷰 사라졌다고 알려주기
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         input.send(.viewDidDisappear)
@@ -66,6 +66,7 @@ class PaperStorageViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    // 진행중인거, 종료된거에 따라 상태 변경하기
     private func setDataState() {
         if viewModel.openedPapers.isEmpty && viewModel.closedPapers.isEmpty {
             dataState = .nothing
