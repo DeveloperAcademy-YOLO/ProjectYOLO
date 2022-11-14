@@ -287,7 +287,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         profileImage.image = viewModel.currentPhotoSubject.value ?? UIImage(systemName: "person")
     }
 
-    @objc func didEditButton() {
+    @objc private func didEditButton() {
         if let currentTitle = navigationItem.rightBarButtonItem?.title {
             if currentTitle == "편집" {
                 navigationItem.rightBarButtonItem?.title = "저장"
@@ -357,20 +357,18 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             view.frame.origin.y = 0
         }
     }
+}
 
+// extension for SnapKit
+extension SettingScreenViewController {
     private func setupLayout() {
-        view.addSubview(profileImage)
+        view.backgroundColor = .systemBackground
 
         profileImage.addSubview(visualEffectView)
         profileImage.addSubview(editPhotoButton)
 
-        view.addSubview(profileText)
-        view.addSubview(profileLabel)
-        view.addSubview(divideView)
-        view.addSubview(logoutButton)
-        view.addSubview(resignButton)
-        view.addSubview(editButton)
-        view.backgroundColor = .systemBackground
+        view.addSubviews([profileImage,profileText,profileLabel,divideView,logoutButton,resignButton,editButton])
+        
         let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(didBackgroundTap))
         view.addGestureRecognizer(backgroundTap)
 
