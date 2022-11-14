@@ -12,3 +12,26 @@ import Combine
 class AppSettingViewModel {
     
 }
+
+enum Section {
+    case main
+}
+
+enum ListItem: Hashable {
+    case header(AppSettingCollectionCellModel)
+}
+
+struct AppSettingCollectionCellModel: Hashable {
+    let title: String
+    let symbols: UIView
+}
+
+struct SFSymbolItem: Hashable {
+    let name: String
+    let image: UIImage
+    
+    init(name: String) {
+        self.name = name
+        self.image = UIImage(systemName: name)!
+    }
+}
