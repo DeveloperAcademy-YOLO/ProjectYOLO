@@ -17,15 +17,24 @@ class MagnifiedCardViewController: UIViewController {
     var selectedCardIndex: Int = 0
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
-    private lazy var closeBtn1: UIButton = UIButton()
-    private lazy var closeBtn2: UIButton = UIButton()
+    private lazy var closeBtn1: UIButton = {
+        let closeBtn = UIButton()
+        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+        
+        return closeBtn
+    }()
+    private lazy var closeBtn2: UIButton = {
+        let closeBtn = UIButton()
+        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+        
+        return closeBtn
+    }()
     lazy private var cardsCollectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 80, left: 155, bottom: 80, right: 155 )
         layout.itemSize = CGSize(width: (deviceHeight - 160)*(4/3), height: deviceHeight - 160)
         layout.minimumLineSpacing = 60
         layout.scrollDirection = .horizontal
-        
         
         cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: deviceHeight), collectionViewLayout: layout)
         cardsCollectionView.showsHorizontalScrollIndicator = false
@@ -40,6 +49,8 @@ class MagnifiedCardViewController: UIViewController {
         return cardsCollectionView
     }()
     
+    var backgroundViewController: BlurredViewController!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +62,9 @@ class MagnifiedCardViewController: UIViewController {
         setCloseBtn()
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handleDismiss)))
     }
-    var viewTranslation = CGPoint(x: 0, y: 0)
+    
+    private var viewTranslation = CGPoint(x: 0, y: 0)
+    
     @objc func handleDismiss(sender: UIPanGestureRecognizer) {
         switch sender.state {
         case .changed:
@@ -65,7 +78,7 @@ class MagnifiedCardViewController: UIViewController {
                     self.view.transform = .identity
                 })
             } else {
-                dismiss(animated: true, completion: nil)
+                closeAction()
             }
         default:
             break
@@ -73,7 +86,9 @@ class MagnifiedCardViewController: UIViewController {
     }
     
     @objc func closeAction() {
-        dismiss(animated: true)
+        dismiss(animated: true) {
+            self.backgroundViewController.dismiss(animated: true)
+        }
     }
 }
 
@@ -169,14 +184,12 @@ extension MagnifiedCardViewController: UICollectionViewDelegate {
 
 extension MagnifiedCardViewController {
     func setCloseBtn() {
-        closeBtn1.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
         closeBtn1.snp.makeConstraints { make in
             make.top.equalTo(0)
             make.width.equalTo(deviceWidth)
             make.height.equalTo(80)
         }
         
-        closeBtn2.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
         closeBtn2.snp.makeConstraints { make in
             make.top.equalTo(deviceHeight-80)
             make.width.equalTo(deviceWidth)

@@ -424,6 +424,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         self.present(blurredVC, animated: true)
         
         
+        presentingVC.backgroundViewController = blurredVC
         presentingVC.selectedCardIndex = indexPath.row
         presentingVC.modalPresentationStyle = .overFullScreen
         present(presentingVC, animated: true)
