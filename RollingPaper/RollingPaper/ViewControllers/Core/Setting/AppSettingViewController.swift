@@ -97,6 +97,7 @@ final class AppSettingViewController: UIViewController {
     }
 }
 
+/*
 class LocalPushCell: UICollectionViewListCell {
     // LocalPushCell (토글)
 }
@@ -112,4 +113,4 @@ class SelectedColorContentView: UIView, UIContentView {
 class InformationContentView: UIView, UIContentView {
     // InformationContent 내부 뷰
 }
-
+*/

@@ -51,7 +51,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-            self.settingScreenViewController = UINavigationController(rootViewController: AppSettingViewController())
+            self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
             self.settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
         }
@@ -99,7 +99,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             }
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-                self.settingScreenViewController.setViewControllers([AppSettingViewController()], animated: false)
+                self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
             } else {
                 self.settingScreenViewController.setViewControllers([SignInViewController()], animated: false)
             }
