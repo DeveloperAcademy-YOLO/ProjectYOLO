@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Combine
 
-private class Length {
+private final class Length {
     static let timerHeight: CGFloat = 32
     static let timerWidth1: CGFloat = 172
     static let timerWidth2: CGFloat = 116
