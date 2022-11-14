@@ -189,8 +189,8 @@ final class SidebarViewController: UIViewController {
         userInfoStack.isLayoutMarginsRelativeArrangement = true
         userInfoStack.layoutMargins = Layout.userInfoStackInset
         userInfoStack.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.userInfoStackLeadingSuperView)
-            make.trailing.equalToSuperview().offset(Layout.userInfoStackTrailingSuperView)
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
