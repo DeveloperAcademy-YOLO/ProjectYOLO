@@ -99,7 +99,14 @@ class WrittenPaperViewModel {
     
     func getRemainingTime(_ paperID: String) {}
     
-    func deleteCard() {}
+    func deleteCard(_ card: CardModel, from paperFrom: DataSource) {
+        switch paperFrom {
+        case .fromLocal:
+            localDatabaseManager.removeCard(paperId: paperID, card: card)
+        case .fromServer:
+            serverDatabaseManager.removeCard(paperId: paperID, card: card)
+        }
+    }
     
     func showCardDetail() {}
     

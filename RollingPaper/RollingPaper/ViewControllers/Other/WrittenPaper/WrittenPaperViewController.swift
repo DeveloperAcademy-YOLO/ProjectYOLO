@@ -35,7 +35,7 @@ final class WrittenPaperViewController: UIViewController {
         cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsList.dataSource = self
         cardsList.delegate = self
-        cardsList.reloadData()
+//        cardsList.reloadData()
         
         return cardsList
     }()
@@ -99,6 +99,15 @@ final class WrittenPaperViewController: UIViewController {
                         // creator 있던 페이퍼에 만든 사람이 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
                     }
                     self?.setCustomNavBarButtons()
+                }
+            }
+            .store(in: &cancellables)
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] paper in
+                if let paper = paper {
+                    self?.cardsList.reloadData()
                 }
             }
             .store(in: &cancellables)
@@ -364,30 +373,36 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     
-    func saveCard( _ indexPath : Int) {
+    func saveCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath]
+        let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
         }
     }
     
-    func shareCard( _ indexPath: Int, _ sender: CGPoint) {
+    func shareCard( _ indexPath: IndexPath, _ sender: CGPoint) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath]
+        let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             imageShare(sender,image)
         }
     }
     
-    func deleteCard( _ indexPath : Int) {
+    func deleteCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath]
+        let card = currentPaper.cards[indexPath.row]
         
+//        cardsList.deleteItems(at: [IndexPath.init(row: sender.tag, section: 0)])
+        
+        if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
+            viewModel.deleteCard(card, from: .fromServer)
+        } else {
+            viewModel.deleteCard(card, from: .fromLocal)
+        }
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
@@ -448,7 +463,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first?.row else { return nil }
+        guard let indexPath = indexPaths.first else { return nil }
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let save = UIAction(
@@ -478,7 +493,8 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 discoverabilityTitle: nil,
                 attributes: .destructive,
                 state: .off
-            ) { _ in
+            ) { [weak self] _ in
+                self?.deleteCard(indexPath)
             }
             
             return UIMenu(
