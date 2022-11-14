@@ -62,11 +62,13 @@ class PaperStorageViewController: UIViewController {
                 guard let self = self else {return}
                 switch event {
                 // 페이퍼에 변화가 있으면 UI 업데이트 하기
-                case .initPapers, .papersAreUpdatedInDatabase, .papersAreUpdatedByTimer:
-                    self.paperCollectionView?.reloadData()
-                    self.setDataState()
+                case .initPapers:
                     self.updateLoadingView(isLoading: false)
+                case .papersAreUpdatedByTimer, .papersAreUpdatedInDatabase:
+                    break
                 }
+                self.setDataState()
+                self.paperCollectionView?.reloadData()
             })
             .store(in: &cancellables)
     }
