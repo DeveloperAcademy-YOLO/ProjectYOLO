@@ -329,24 +329,6 @@ final class WrittenPaperViewController: UIViewController {
         present(allertController, animated: true)
     }
     
-    //    func deletePaper() {
-    //        let deleteVerifyText = self.titleEmbedingTextField.text
-    //        if deleteVerifyText == self.viewModel.currentPaper?.title {
-    //            if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
-    //                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
-    //            } else {
-    //                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
-    //            }
-    //            self.moveToPaperStorageView()
-    //        } else {
-    //            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
-    //            let confirm = UIAlertAction(title: "확인", style: .default)
-    //            alert.addAction(confirm)
-    //            alert.preferredAction = confirm
-    //            self.present(alert, animated: true, completion: nil)
-    //        }
-    //    }
-    
     func setCollectionView() -> UICollectionView {
         var cardsCollection: UICollectionView?
         
@@ -394,9 +376,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     func deleteCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row]
-        
-//        cardsList.deleteItems(at: [IndexPath.init(row: sender.tag, section: 0)])
-        
+                
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
         } else {
