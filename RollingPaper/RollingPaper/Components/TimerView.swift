@@ -34,7 +34,7 @@ class TimerView: UIStackView {
     private var endTime: Date?
     private var remainTimeState: RemainTimeState = .hour
     enum RemainTimeState {
-        case hour, minute, second
+        case hour, minute, second, end
     }
     
     override init(frame: CGRect) {
@@ -71,7 +71,7 @@ class TimerView: UIStackView {
         })
         
         time.font = .systemFont(ofSize: 16, weight: .semibold)
-        time.textAlignment = .center
+        time.textAlignment = .left
         time.textColor = UIColor.white
         time.snp.makeConstraints({ make in
             make.width.equalTo(Length.textWidth1)
@@ -87,7 +87,10 @@ class TimerView: UIStackView {
         backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
         
         // 남은 시간에 따라 레이아웃 가로 길이 조절
-        if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
+        if timeInterval < 0 && remainTimeState != .end {
+            remainTimeState = .end
+            // 나중에 UI 업데이트하기
+        } else if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
             remainTimeState = .second
             snp.updateConstraints({ make in
                 make.width.equalTo(Length.timerWidth3)
@@ -103,7 +106,7 @@ class TimerView: UIStackView {
             time.snp.updateConstraints({ make in
                 make.width.equalTo(Length.textWidth2)
             })
-        } else if timeInterval >= 3600 && remainTimeState != .hour  {
+        } else if timeInterval >= 3600 && remainTimeState != .hour {
             remainTimeState = .hour
             snp.updateConstraints({ make in
                 make.width.equalTo(Length.timerWidth1)
@@ -113,7 +116,12 @@ class TimerView: UIStackView {
             })
         }
         
-        time.text = changeTimeFormat(second: timeInterval)
+        if timeInterval < 0 {
+            time.text = changeTimeFormat(second: 0)
+        } else {
+            time.text = changeTimeFormat(second: timeInterval)
+        }
+        
     }
     
     // 초를 특정 포맷으로 바꾸기 (00시간 00분 00초)
