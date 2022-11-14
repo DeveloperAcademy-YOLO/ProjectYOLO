@@ -131,6 +131,8 @@ public class StickerView: UIView {
         self.backgroundColor = UIColor.clear
         self.addGestureRecognizer(self.moveGesture)
         self.addGestureRecognizer(self.tapGesture)
+        self.addGestureRecognizer(self.pinchGesture)
+        self.addGestureRecognizer(self.rotationGesture)
         
         // Setup content view
         self.contentView = contentView
@@ -319,6 +321,12 @@ public class StickerView: UIView {
     private lazy var tapGesture = {
         return UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:)))
     }()
+    private lazy var pinchGesture = {
+        return UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
+    }()
+    private lazy var rotationGesture = {
+        return UIRotationGestureRecognizer(target: self, action: #selector(handleRotationGesture(_:)))
+    }()
     // MARK: - Gesture Handlers
     @objc
     func handleMoveGesture(_ recognizer: UIPanGestureRecognizer) {
@@ -402,6 +410,17 @@ public class StickerView: UIView {
         if let delegate = self.delegate {
             delegate.stickerViewDidTap(self)
         }
+    }
+    
+    @objc
+    func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
+        self.transform = self.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
+        recognizer.scale = 1
+    }
+    
+    @objc func handleRotationGesture(_ recognizer: UIRotationGestureRecognizer) {
+        self.transform = self.transform.rotated(by: recognizer.rotation)
+        recognizer.rotation = 0
     }
     
     // MARK: - Private Methods
