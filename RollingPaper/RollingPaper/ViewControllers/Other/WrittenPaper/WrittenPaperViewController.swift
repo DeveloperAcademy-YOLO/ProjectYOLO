@@ -7,6 +7,7 @@
 import AVFoundation
 import Combine
 import Foundation
+import LinkPresentation
 import SnapKit
 import PencilKit
 import Photos
@@ -220,8 +221,6 @@ final class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    
-    
     private func moveToCardRootView() {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         
@@ -321,23 +320,23 @@ final class WrittenPaperViewController: UIViewController {
         present(allertController, animated: true)
     }
     
-//    func deletePaper() {
-//        let deleteVerifyText = self.titleEmbedingTextField.text
-//        if deleteVerifyText == self.viewModel.currentPaper?.title {
-//            if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
-//                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
-//            } else {
-//                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
-//            }
-//            self.moveToPaperStorageView()
-//        } else {
-//            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
-//            let confirm = UIAlertAction(title: "확인", style: .default)
-//            alert.addAction(confirm)
-//            alert.preferredAction = confirm
-//            self.present(alert, animated: true, completion: nil)
-//        }
-//    }
+    //    func deletePaper() {
+    //        let deleteVerifyText = self.titleEmbedingTextField.text
+    //        if deleteVerifyText == self.viewModel.currentPaper?.title {
+    //            if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
+    //                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromServer)
+    //            } else {
+    //                viewModel.deletePaper(viewModel.currentPaper!.paperId, from: .fromLocal)
+    //            }
+    //            self.moveToPaperStorageView()
+    //        } else {
+    //            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
+    //            let confirm = UIAlertAction(title: "확인", style: .default)
+    //            alert.addAction(confirm)
+    //            alert.preferredAction = confirm
+    //            self.present(alert, animated: true, completion: nil)
+    //        }
+    //    }
     
     func setCollectionView() -> UICollectionView {
         var cardsCollection: UICollectionView?
@@ -365,7 +364,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     
-    func saveCard(_ indexPath : Int) {
+    func saveCard( _ indexPath : Int) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath]
         
@@ -374,15 +373,21 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         }
     }
     
-    func shareCard( _ indexPath: Int) {
+    func shareCard( _ indexPath: Int, _ sender: CGPoint) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath]
-
+        
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-//            imageShare(_ :)
+            imageShare(sender,image)
         }
     }
-
+    
+    func deleteCard( _ indexPath : Int) {
+        guard let currentPaper = viewModel.currentPaper else { return }
+        let card = currentPaper.cards[indexPath]
+        
+    }
+    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
@@ -447,8 +452,8 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let save = UIAction(
-                title: "내 갤러리 저장하기",
-                image: UIImage(systemName: "arrow.down.square"),
+                title: "사진 앱에 저장하기",
+                image: UIImage(systemName: "photo.on.rectangle"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
@@ -458,17 +463,17 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             
             let share = UIAction(
                 title: "공유하기",
-                image: UIImage(systemName: "link"),
+                image: UIImage(systemName: "square.and.arrow.up"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
             ){ [weak self] _ in
-                self?.imageShare(save)
+                self?.shareCard(indexPath, point)
             }
             
             let delete = UIAction(
                 title: "삭제하기",
-                image: UIImage(systemName: "trash.fill"),
+                image: UIImage(systemName: "trash"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 attributes: .destructive,
@@ -479,7 +484,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             return UIMenu(
                 image: nil,
                 identifier: nil,
-                options: UIMenu.Options.displayInline,
+                options: .singleSelection,
                 children: [save, share, delete]
             )
         }
@@ -491,33 +496,39 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
-            
         } else {
-            
-            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Saved!", message: "이미지가 사진첩에 저장이 되었습니다", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
-            
         }
     }
     
-    private func imageShare(_ sender: UIAction) {
-        guard let image = UIImage(systemName: "bell"), let url = URL(string: "https://www.google.com") else {
-            return
-        }
+    private func imageShare(_ sender: CGPoint, _ image: UIImage) {
         
         let shareSheetVC = UIActivityViewController(
-            activityItems: [
-                image,
-                url
-            ], applicationActivities: nil
-        )
+            activityItems:
+                [
+                    image
+                ], applicationActivities: nil)
+        
+        // exclude some activity types from the list (optional)
+        shareSheetVC.excludedActivityTypes = [
+            UIActivity.ActivityType.message,
+            UIActivity.ActivityType.saveToCameraRoll,
+            UIActivity.ActivityType.assignToContact,
+            UIActivity.ActivityType.copyToPasteboard,
+            UIActivity.ActivityType.print,
+            UIActivity.ActivityType.addToReadingList
+        ]
+        
+        // present the view controller
+        self.present(shareSheetVC, animated: true, completion: nil)
+        
+        let rect: CGRect = .init(origin: sender, size: CGSize(width: 200, height: 200))
         
         shareSheetVC.popoverPresentationController?.sourceView = self.view
-        shareSheetVC.popoverPresentationController?.sourceRect = sender.accessibilityFrame
-        present(shareSheetVC, animated: true)
+        shareSheetVC.popoverPresentationController?.sourceRect = rect
     }
-
 }
 
 extension WrittenPaperViewController {
