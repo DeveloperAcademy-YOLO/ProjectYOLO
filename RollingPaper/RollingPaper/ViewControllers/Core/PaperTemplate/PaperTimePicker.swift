@@ -9,16 +9,27 @@ import UIKit
 import Combine
 
 // 제한시간 설정할 때 쓰는 피커
-class PaperTimePicker: UIViewController {
+final class PaperTimePicker: UIViewController {
     private let hourList = ["1", "2", "3", "4", "5", "6"]
     private let minuteList = ["00", "10", "20", "30", "40", "50"]
     private let hourLabel = "시간"
     private let minuteLabel = "분"
-    private var selectedHour = "1"
-    private var selectedMinute = "00"
-    private let picker = UIPickerView()
     private let viewModel: PaperSettingViewModel
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
+    private var selectedHour = "1"
+    private var selectedMinute = "00"
+    
+    // (시간, 분) 선택할 수 있는 피커
+    private lazy var picker: UIPickerView = {
+        let picker = UIPickerView()
+        picker.delegate = self
+        picker.dataSource = self
+        return picker
+    }()
+    // 피커에 나오는 리스트 오른쪽에 추가하는 라벨
+    private lazy var labels: [UILabel] = {
+        return setPickerLabels(labels: [hourLabel, minuteLabel], lengths: [hourList[0].count, minuteList[0].count])
+    }()
     
     init(viewModel: PaperSettingViewModel) {
         self.viewModel = viewModel
@@ -30,40 +41,23 @@ class PaperTimePicker: UIViewController {
     }
     
     override func viewDidLoad() {
-        setView()
-        setPicker()
-        compressView()
         bind()
+        configure()
+        setConstraints()
+        setMainView()
     }
     
     // 뷰모델과 연결하기
     private func bind() {
         _ = viewModel.transform(input: input.eraseToAnyPublisher())
     }
-    
-    // 피커 설정하기
-    private func setPicker() {
-        picker.delegate = self
-        picker.dataSource = self
-        setPickerLabelsWith(labels: [hourLabel, minuteLabel], lengths: [hourList[0].count, minuteList[0].count])
-        
-        picker.snp.makeConstraints({ make in
-            make.edges.equalToSuperview()
-        })
-    }
-    // 메인 뷰 설정하기
-    private func setView() {
-        view.addSubview(picker)
-        view.snp.makeConstraints { make in
-            make.width.equalTo(250)
-        }
-    }
-    // 뷰 크기 압축하기
-    private func compressView() {
+    // 메인 뷰 초기화
+    private func setMainView() {
+        // 뷰 크기 압축하기
         preferredContentSize = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
     }
-    // 라벨 달기
-    func setPickerLabelsWith(labels: [String], lengths: [Int]) {
+    // 피커에 라벨 달기
+    func setPickerLabels(labels: [String], lengths: [Int]) -> [UILabel] {
         let columCount = labels.count
         let fontSize: CGFloat = 20
 
@@ -80,14 +74,16 @@ class PaperTimePicker: UIViewController {
         let pickerWidth: CGFloat = picker.frame.width
         let labelY: CGFloat = (picker.frame.size.height / 2) - 3
 
+        var locatedLabelList: [UILabel] = []
         for (index, label) in labelList.enumerated() {
             let labelX: CGFloat = (pickerWidth / (CGFloat(columCount)*2))
                                     * CGFloat(index + 1)
                                     + fontSize*CGFloat(lengths[index])
                                     - fontSize*0.5*CGFloat(lengths[index]-1)
             label.frame = CGRect(x: labelX, y: labelY, width: fontSize*CGFloat(labels[index].count), height: fontSize)
-            picker.addSubview(label)
+            locatedLabelList.append(label)
         }
+        return locatedLabelList
     }
 }
 
@@ -115,5 +111,24 @@ extension PaperTimePicker: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         return CGFloat(80.0)
+    }
+}
+
+// 스냅킷 설정
+extension PaperTimePicker {
+    private func configure() {
+        view.addSubview(picker)
+        for label in labels {
+            picker.addSubview(label)
+        }
+    }
+    
+    private func setConstraints() {
+        view.snp.makeConstraints { make in
+            make.width.equalTo(250)
+        }
+        picker.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
     }
 }
