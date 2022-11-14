@@ -16,6 +16,7 @@ class CardRootViewController: UIViewController {
     private let currentPaper: PaperModel
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var backgroundImg: UIImage?
+    private var completeClickCount: Int = 0
     private var cancellables = Set<AnyCancellable>()
     
     lazy var leftButton: UIBarButtonItem = {
@@ -69,11 +70,16 @@ class CardRootViewController: UIViewController {
         bind()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        completeClickCount = 0
+    }
+    
     private func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         output
             .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
+                guard let self = self else { return }
                 switch event {
                 case .getRecentCardBackgroundImgSuccess(_):
                     DispatchQueue.main.async(execute: {
@@ -132,15 +138,19 @@ class CardRootViewController: UIViewController {
             present(alert, animated: true)
         } else {
             if let cardCreateViewVC = self.children[0] as? CardCreateViewController {
-                cardCreateViewVC.resultImageSend()
+                    cardCreateViewVC.resultImageSend()
                 print("CardPencilKit here!")
             } else {
                 print("Fail!")
             }
-            DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
-                let pushVC = CardResultViewController(resultImage: self.backgroundImg ?? UIImage(named: "thumbnail_halloween")!, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
-                self.navigationController?.pushViewController(pushVC, animated: false)
-            })
+            if completeClickCount == 0 {
+                DispatchQueue.main.asyncAfter(deadline: .now(), execute: {
+                    guard let image = self.backgroundImg else { return }
+                    let pushVC = CardResultViewController(resultImage: image, viewModel: self.viewModel, isLocalDB: self.isLocalDB)
+                    self.navigationController?.pushViewController(pushVC, animated: false)
+                })
+                completeClickCount += 1
+            }
         }
     }
     
