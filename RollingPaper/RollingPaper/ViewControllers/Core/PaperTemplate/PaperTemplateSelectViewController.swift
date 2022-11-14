@@ -31,6 +31,7 @@ private class Length {
 class PaperTemplateSelectViewController: UIViewController {
     private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperTemplateSelectViewModel()
+    private let spinner = UIActivityIndicatorView()
     private let input: PassthroughSubject<PaperTemplateSelectViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var recentTemplate: TemplateEnum?
@@ -46,16 +47,23 @@ class PaperTemplateSelectViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setMainView()
-        setCollectionView()
         bind()
         splitViewBind()
+        setMainView()
+        setSpinnerView()
+        setCollectionView()
     }
     
     // view가 나타날때마다 최근 템플릿 확인하기 위해 input에 값 설정하기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        updateLoadingView(isLoading: true)
         input.send(.viewDidAppear)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        templateCollectionView?.isHidden = true
     }
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
@@ -72,6 +80,7 @@ class PaperTemplateSelectViewController: UIViewController {
                     self.recentTemplate = nil
                 }
                 self.templateCollectionView?.reloadData()
+                self.updateLoadingView(isLoading: false)
             })
             .store(in: &cancellables)
     }
@@ -103,9 +112,35 @@ class PaperTemplateSelectViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    // 로딩뷰 띄워주거나 없애기
+    private func updateLoadingView(isLoading: Bool) {
+        if isLoading {
+            templateCollectionView?.isHidden = true
+            spinner.isHidden = false
+            spinner.startAnimating()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.3) { [weak self] in
+                guard let self = self else {return}
+                self.templateCollectionView?.isHidden = false
+                self.spinner.isHidden = true
+                self.spinner.stopAnimating()
+            }
+        }
+    }
+    
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .systemBackground
+    }
+    
+    // 스피너 뷰 초기화
+    private func setSpinnerView() {
+        spinner.color = .label
+        
+        view.addSubview(spinner)
+        spinner.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
     }
     
     // 컬렉션 뷰 레이아웃 초기화
@@ -130,6 +165,7 @@ class PaperTemplateSelectViewController: UIViewController {
         collectionView.register(PaperTemplateCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperTemplateCollectionHeader.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.isHidden = true
         
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
