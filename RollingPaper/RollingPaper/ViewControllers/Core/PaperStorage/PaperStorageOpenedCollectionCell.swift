@@ -7,15 +7,16 @@
 
 import UIKit
 import SnapKit
+import Combine
 
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰 (진행중인거)
 class PaperStorageOpenedCollectionCell: UICollectionViewCell {
     static let identifier = "OpenedCollectionCell"
+    private var cancellables = Set<AnyCancellable>()
     private let cell = UIView()
     private let preview = UIImageView()
-    private let timer = UIStackView()
-    private let clock = UIImageView()
-    private let time = UILabel()
+    private let previewOverlay = UIView()
+    private let timer = TimerView()
     private let title = UILabel()
     
     override init(frame: CGRect) {
@@ -32,8 +33,7 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
         cell.addSubview(preview)
         cell.addSubview(timer)
         cell.addSubview(title)
-        timer.addArrangedSubview(clock)
-        timer.addArrangedSubview(time)
+        preview.addSubview(previewOverlay)
         
         cell.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
@@ -49,6 +49,11 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
             make.height.equalTo(PaperStorageLength.openedPaperThumbnailHeight)
         })
         
+        previewOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        previewOverlay.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
+        
         title.font = .preferredFont(for: .title1, weight: .semibold)
         title.textColor = UIColor.white
         title.textAlignment = .right
@@ -58,62 +63,14 @@ class PaperStorageOpenedCollectionCell: UICollectionViewCell {
             make.leading.equalTo(preview.snp.leading).offset(PaperStorageLength.openedPaperTitleLeftMargin)
         })
         
-        timer.layer.cornerRadius = PaperStorageLength.timerCornerRadius
-        timer.distribution = .equalSpacing
-        timer.layoutMargins = UIEdgeInsets(top: PaperStorageLength.timerTopPadding, left: PaperStorageLength.timerLeftPadding, bottom: PaperStorageLength.timerBottomPadding, right: PaperStorageLength.timerRightPadding)
-        timer.isLayoutMarginsRelativeArrangement = true
-        timer.layer.cornerRadius = PaperStorageLength.timerCornerRadius
-        timer.spacing = PaperStorageLength.timerSpace
         timer.snp.makeConstraints({ make in
             make.top.equalTo(preview.snp.top).offset(PaperStorageLength.timerTopMargin)
             make.leading.equalTo(preview.snp.leading).offset(PaperStorageLength.timerLeftMargin)
         })
-        
-        clock.image = UIImage(systemName: "timer")
-        clock.tintColor = UIColor.white
-        clock.contentMode = .scaleAspectFit
-        clock.snp.makeConstraints({ make in
-            make.width.equalTo(PaperStorageLength.clockImageWidth)
-            make.height.equalTo(PaperStorageLength.clockImageHeight)
-        })
-        
-        time.font = .preferredFont(for: .subheadline, weight: .semibold)
-        time.textAlignment = .right
-        time.textColor = UIColor.white
-    }
-    
-    // 초를 05:17(시간:분) 형식으로 바꾸기
-    private func changeTimeFormat(second: Int) -> String {
-        let hour = Int(second/3600)
-        let minute = Int((second - (hour*3600))/60)
-        var hourString = String(hour)
-        var minuteString = String(minute)
-        if hourString.count == 1 {
-            hourString = "0" + hourString
-        }
-        if minuteString.count == 1 {
-            minuteString = "0" + minuteString
-        }
-        
-        return hourString + ":" + minuteString
-    }
-    
-    // 날짜를 2022.10.13 같은 형식으로 바꾸기
-    private func changeDateFormat(date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "y.M.d"
-        return dateFormatter.string(from: date)
     }
     
     func setCell(paper: PaperPreviewModel, thumbnail: UIImage?, now: Date) {
-        let timeInterval = Int(paper.endTime.timeIntervalSince(now))
-        // 10분 이상 남은 페이퍼라면
-        if timeInterval > 600 {
-            timer.backgroundColor = UIColor.black.withAlphaComponent(0.32)
-        } else {
-            timer.backgroundColor = UIColor.red
-        }
-        time.text = changeTimeFormat(second: timeInterval)
+        timer.setEndTime(time: paper.endTime)
         title.text = paper.title
         preview.image = thumbnail
         preview.snp.updateConstraints({ make in
