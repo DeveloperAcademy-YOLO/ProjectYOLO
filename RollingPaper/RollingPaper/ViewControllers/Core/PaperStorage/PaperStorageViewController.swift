@@ -12,6 +12,7 @@ import Combine
 class PaperStorageViewController: UIViewController {
     private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperStorageViewModel()
+    private let spinner = UIActivityIndicatorView()
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var paperCollectionView: PaperStorageCollectionView?
@@ -28,6 +29,7 @@ class PaperStorageViewController: UIViewController {
         bind()
         splitViewBind()
         setMainView()
+        setSpinnerView()
         setCollectionView()
     }
     
@@ -39,6 +41,7 @@ class PaperStorageViewController: UIViewController {
     // 뷰모델한테 뷰 나타났다고 알려주기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        updateLoadingView(isLoading: true)
         input.send(.viewDidAppear)
         viewIsChange = false
     }
@@ -46,6 +49,7 @@ class PaperStorageViewController: UIViewController {
     // 뷰모델한테 뷰 사라졌다고 알려주기
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        paperCollectionView?.isHidden = true
         input.send(.viewDidDisappear)
     }
     
@@ -61,6 +65,7 @@ class PaperStorageViewController: UIViewController {
                 case .initPapers, .papersAreUpdatedInDatabase, .papersAreUpdatedByTimer:
                     self.paperCollectionView?.reloadData()
                     self.setDataState()
+                    self.updateLoadingView(isLoading: false)
                 }
             })
             .store(in: &cancellables)
@@ -111,12 +116,37 @@ class PaperStorageViewController: UIViewController {
             self.paperCollectionView?.reloadItems(at: openedIndexPath)
             self.paperCollectionView?.reloadSections(IndexSet(integer: 1))
         })
-        
+    }
+    
+    // 로딩뷰 띄워주거나 없애기
+    private func updateLoadingView(isLoading: Bool) {
+        if isLoading {
+            paperCollectionView?.isHidden = true
+            spinner.isHidden = false
+            spinner.startAnimating()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { [weak self] in
+                guard let self = self else {return}
+                self.paperCollectionView?.isHidden = false
+                self.spinner.isHidden = true
+                self.spinner.stopAnimating()
+            }
+        }
     }
     
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .systemBackground
+    }
+    
+    // 스피너 뷰 초기화
+    private func setSpinnerView() {
+        spinner.color = .label
+        
+        view.addSubview(spinner)
+        spinner.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
     }
     
     // 컬렉션 뷰 레이아웃 초기화
@@ -142,6 +172,7 @@ class PaperStorageViewController: UIViewController {
         collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.isHidden = true
 
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints({ make in
