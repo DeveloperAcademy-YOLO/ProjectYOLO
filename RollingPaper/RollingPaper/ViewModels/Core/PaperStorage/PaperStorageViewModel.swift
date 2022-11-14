@@ -190,6 +190,10 @@ class PaperStorageViewModel {
                 }
             }
         }
+        
+        if papersFromLocal.isEmpty {
+            output.send(outputValue)
+        }
     }
     
     // url을 통해 서버에 저장되어있는 썸네일 다운받아오기
@@ -244,6 +248,10 @@ class PaperStorageViewModel {
                     self.output.send(outputValue)
                 }
             }
+        }
+        
+        if papersFromServer.isEmpty {
+            output.send(outputValue)
         }
     }
     
