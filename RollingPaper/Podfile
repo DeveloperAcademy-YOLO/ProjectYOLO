@@ -15,6 +15,7 @@ target 'RollingPaper' do
   pod 'SwiftLint', '0.39.1'
   pod 'StickerView'
   pod 'FirebaseDynamicLinks'
+  pod 'lottie-ios'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
