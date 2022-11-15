@@ -11,7 +11,7 @@ import Combine
 
 enum PaperShareRoute: String {
     case write
-    case present
+    case gift
 }
 
 func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String, paperThumbnailURLString: String?, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
@@ -37,7 +37,13 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
     if let thumnailURLString = paperThumbnailURLString {
         socialMetaTagPaprams.imageURL = URL(string: thumnailURLString)
     }
-    socialMetaTagPaprams.descriptionText = "\(creator?.name ?? "YOLO")님과 함께 페이퍼를 만들어주세요!"
+    let descriptionText: String
+    if route == .write {
+        descriptionText = "\(creator?.name ?? "YOLO")님과 함께 페이퍼를 만들어주세요!"
+    } else {
+        descriptionText = "\(creator?.name ?? "YOLO")님이 보낸 선물이 도착했습니다!"
+    }
+    socialMetaTagPaprams.descriptionText = descriptionText
     linkBuilder.socialMetaTagParameters = socialMetaTagPaprams
     guard
         let longDynamicLinkString = linkBuilder.url?.absoluteString,
@@ -60,4 +66,10 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
 
 func getPaperShareLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
     return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: route)
+}
+
+func getPaperGiftLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
+    var paper = paper
+    paper.isGift = true
+    return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: .gift)
 }

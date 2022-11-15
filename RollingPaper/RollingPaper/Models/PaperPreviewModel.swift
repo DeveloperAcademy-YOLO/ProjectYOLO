@@ -18,4 +18,5 @@ struct PaperPreviewModel: Codable {
         return TemplateEnum(rawValue: templateString)?.template ?? TemplateEnum.beige.template
     }
     var thumbnailURLString: String?
+    var isGift: Bool = false
 }
