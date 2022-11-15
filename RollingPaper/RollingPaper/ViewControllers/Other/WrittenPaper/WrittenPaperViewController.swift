@@ -445,9 +445,15 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             guard let currentPaper = viewModel.currentPaper else { return  }
             let card = currentPaper.cards[indexPath.row-1]
             let presentingVC = MagnifiedCardViewController()
-            print("indexPath.row : \(indexPath.row)")
+            let blurredVC = BlurredViewController()
+            
+            blurredVC.modalTransitionStyle = .crossDissolve
+            blurredVC.modalPresentationStyle = .currentContext
+            self.present(blurredVC, animated: true)
+            
+            presentingVC.backgroundViewController = blurredVC
             presentingVC.selectedCardIndex = indexPath.row - 1
-            presentingVC.modalPresentationStyle = .overCurrentContext
+            presentingVC.modalPresentationStyle = .overFullScreen
             present(presentingVC, animated: true)
             
             collectionView.scrollToItem(at: [0, indexPath.row - 1], at: .centeredHorizontally, animated: true)

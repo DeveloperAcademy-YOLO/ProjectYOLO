@@ -17,7 +17,18 @@ class MagnifiedCardViewController: UIViewController {
     var selectedCardIndex: Int = 0
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
-    private lazy var closeBtn: UIButton = UIButton()
+    private lazy var closeBtn1: UIButton = {
+        let closeBtn = UIButton()
+        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+        
+        return closeBtn
+    }()
+    private lazy var closeBtn2: UIButton = {
+        let closeBtn = UIButton()
+        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
+        
+        return closeBtn
+    }()
     lazy private var cardsCollectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 80, left: 155, bottom: 80, right: 155 )
@@ -25,8 +36,9 @@ class MagnifiedCardViewController: UIViewController {
         layout.minimumLineSpacing = 60
         layout.scrollDirection = .horizontal
         
-        cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 80, width: deviceWidth, height: deviceHeight-160), collectionViewLayout: layout)
+        cardsCollectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: deviceHeight), collectionViewLayout: layout)
         cardsCollectionView.showsHorizontalScrollIndicator = false
+        cardsCollectionView.backgroundColor = .clear
         cardsCollectionView.decelerationRate = .fast
         cardsCollectionView.isPagingEnabled = false
         cardsCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
@@ -37,18 +49,46 @@ class MagnifiedCardViewController: UIViewController {
         return cardsCollectionView
     }()
     
+    var backgroundViewController: BlurredViewController!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.isOpaque = false
         view.backgroundColor = .clear
-        view.addSubview(closeBtn)
         view.addSubview(cardsCollectionView)
+        view.addSubview(closeBtn1)
+        view.addSubview(closeBtn2)
         setCloseBtn()
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handleDismiss)))
+    }
+    
+    private var viewTranslation = CGPoint(x: 0, y: 0)
+    
+    @objc func handleDismiss(sender: UIPanGestureRecognizer) {
+        switch sender.state {
+        case .changed:
+            viewTranslation = sender.translation(in: view)
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                self.view.transform = CGAffineTransform(translationX: 0, y: self.viewTranslation.y)
+            })
+        case .ended:
+            if viewTranslation.y < 200 {
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+                    self.view.transform = .identity
+                })
+            } else {
+                closeAction()
+            }
+        default:
+            break
+        }
     }
     
     @objc func closeAction() {
-        dismiss(animated: true)
+        dismiss(animated: true) {
+            self.backgroundViewController.dismiss(animated: true)
+        }
     }
 }
 
@@ -59,14 +99,24 @@ extension MagnifiedCardViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
-        myCell.layer.cornerRadius = 60
-        myCell.layer.masksToBounds = true
+        
+        myCell.contentView.layer.cornerRadius = 60
+        myCell.contentView.layer.borderColor = UIColor.clear.cgColor
+        myCell.contentView.layer.masksToBounds = true;
+        
+        myCell.layer.shadowColor = UIColor.black.cgColor
+        myCell.layer.shadowOffset = CGSize(width: 0,height: 2.0)
+        myCell.layer.shadowRadius = 60.0
+        myCell.layer.shadowOpacity = 0.5
+        myCell.layer.masksToBounds = false;
+        myCell.layer.shadowPath = UIBezierPath(roundedRect:myCell.bounds, cornerRadius:myCell.contentView.layer.cornerRadius).cgPath
         
         guard let currentPaper = viewModel.currentPaper else { return myCell }
         let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             let imageView = UIImageView(image: image)
+            imageView.layer.cornerRadius = 60
             imageView.layer.masksToBounds = true
             myCell.addSubview(imageView)
             imageView.snp.makeConstraints { make in
@@ -134,11 +184,16 @@ extension MagnifiedCardViewController: UICollectionViewDelegate {
 
 extension MagnifiedCardViewController {
     func setCloseBtn() {
-        closeBtn.addTarget(self, action: #selector(closeAction), for: UIControl.Event.touchUpInside)
-        closeBtn.snp.makeConstraints { make in
-            make.top.equalTo(self.view)
+        closeBtn1.snp.makeConstraints { make in
+            make.top.equalTo(0)
             make.width.equalTo(deviceWidth)
-            make.height.equalTo(deviceHeight)
+            make.height.equalTo(80)
+        }
+        
+        closeBtn2.snp.makeConstraints { make in
+            make.top.equalTo(deviceHeight-80)
+            make.width.equalTo(deviceWidth)
+            make.height.equalTo(80)
         }
     }
     
