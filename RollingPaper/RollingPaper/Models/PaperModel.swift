@@ -13,7 +13,7 @@ struct PaperModel: Codable {
     var creator: UserModel?
     var cards: [CardModel]
     let date: Date
-    let endTime: Date
+    var endTime: Date
     var title: String
     var linkUrl: URL?
     var templateString: String
