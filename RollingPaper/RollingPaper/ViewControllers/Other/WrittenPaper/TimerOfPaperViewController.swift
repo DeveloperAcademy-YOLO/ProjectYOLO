@@ -12,12 +12,15 @@ class TimerOfPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private let now: Date = Date()
     private let timeLabel: UIStackView = UIStackView()
+    private let discriptionPopOverBtn: UIButton = UIButton()
     private let timerImage = UIImageView(image: UIImage(systemName: "timer"))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setTime()
+        setDiscriptionPopOverBtn()
         view.addSubview(timeLabel)
+        view.addSubview(discriptionPopOverBtn)
         setLocation()
     }
     
@@ -52,6 +55,30 @@ class TimerOfPaperViewController: UIViewController {
         self.view.layer.cornerRadius = 18
         self.view.layer.backgroundColor = timeInterval > 0 ? UIColor(rgb: 0xADADAD).cgColor : UIColor(rgb: 0xFF3B30).cgColor
     }
+    
+    private func setDiscriptionPopOverBtn() {
+        discriptionPopOverBtn.addAction(UIAction(handler: { [self] _ in setDiscriptionPopOver(discriptionPopOverBtn)}), for: .touchUpInside)
+    }
+    
+    private func setDiscriptionPopOver(_ sender: UIButton) {
+        
+        let addedAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
+            NSAttributedString.Key.strokeWidth: -2
+        ]
+        let attributedTitleString = NSAttributedString(string: "타이머가 종료되면 더 이상", attributes: addedAttributes)
+        let attributedMessageString = NSAttributedString(string: "메시지를 남길 수 없어요", attributes: addedAttributes)
+        let allertController = UIAlertController(title: "", message: "", preferredStyle: .actionSheet)
+        
+        allertController.setValue(attributedTitleString, forKey: "attributedTitle")
+        allertController.setValue(attributedMessageString, forKey: "attributedMessage")
+        
+        let popover = allertController.popoverPresentationController
+        popover?.sourceView = sender
+        popover?.backgroundColor = .lightText
+        present(allertController, animated: true)
+    }
+    
 }
 
 extension TimerOfPaperViewController {
@@ -69,6 +96,10 @@ extension TimerOfPaperViewController {
             make.width.equalTo(27)
             make.height.equalTo(18)
 
+        })
+        discriptionPopOverBtn.snp.makeConstraints({ make in
+            make.width.equalTo(120)
+            make.height.equalTo(36)
         })
     }
 }
