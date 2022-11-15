@@ -75,6 +75,8 @@ final class FirebaseAuthManager: NSObject, AuthManager {
                     let userModel = userModel,
                     let userProfileURLString = userModel.profileUrl {
                     self?.handleProfileImage(with: userProfileURLString)
+                } else {
+                    self?.userProfileImageSubject.send(nil)
                 }
             }
             .store(in: &cancellables)
