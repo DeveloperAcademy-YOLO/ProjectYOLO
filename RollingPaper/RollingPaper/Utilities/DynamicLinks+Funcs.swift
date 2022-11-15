@@ -67,9 +67,3 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
 func getPaperShareLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
     return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: route)
 }
-
-func getPaperGiftLink(with paper: PaperModel, route: PaperShareRoute) -> AnyPublisher<URL, Error> {
-    var paper = paper
-    paper.isGift = true
-    return getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: .gift)
-}
