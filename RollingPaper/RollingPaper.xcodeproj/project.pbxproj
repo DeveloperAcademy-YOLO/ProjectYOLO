@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -58,6 +58,8 @@
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
+		D2225E2829232B6900CAC434 /* GiftBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2225E2729232B6900CAC434 /* GiftBoxViewController.swift */; };
+		D2225E2A29232C5A00CAC434 /* GiftPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2225E2929232C5A00CAC434 /* GiftPaperViewController.swift */; };
 		D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA128EBDC72001091DA /* AppDelegate.swift */; };
 		D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AA328EBDC72001091DA /* SceneDelegate.swift */; };
 		D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D22E4AAA28EBDC73001091DA /* Assets.xcassets */; };
@@ -156,6 +158,8 @@
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
+		D2225E2729232B6900CAC434 /* GiftBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftBoxViewController.swift; sourceTree = "<group>"; };
+		D2225E2929232C5A00CAC434 /* GiftPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftPaperViewController.swift; sourceTree = "<group>"; };
 		D22E4A9E28EBDC72001091DA /* RollingPaper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RollingPaper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D22E4AA128EBDC72001091DA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D22E4AA328EBDC72001091DA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -234,6 +238,22 @@
 				9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D2225E2629232B4C00CAC434 /* GiftBox */ = {
+			isa = PBXGroup;
+			children = (
+				D2225E2729232B6900CAC434 /* GiftBoxViewController.swift */,
+			);
+			path = GiftBox;
+			sourceTree = "<group>";
+		};
+		D2225E2B29232C5F00CAC434 /* GiftPaper */ = {
+			isa = PBXGroup;
+			children = (
+				D2225E2929232C5A00CAC434 /* GiftPaperViewController.swift */,
+			);
+			path = GiftPaper;
 			sourceTree = "<group>";
 		};
 		D22E4A9528EBDC72001091DA = {
@@ -358,6 +378,7 @@
 		D241451E2919F90D00437FE7 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				D2225E2629232B4C00CAC434 /* GiftBox */,
 				D24145222919F94600437FE7 /* Setting */,
 				D24145212919F94000437FE7 /* PaperStorage */,
 				D24145202919F92300437FE7 /* PaperTemplate */,
@@ -417,6 +438,7 @@
 			children = (
 				D24145262919FA0200437FE7 /* Card */,
 				D24145252919F9C400437FE7 /* WrittenPaper */,
+				D2225E2B29232C5F00CAC434 /* GiftPaper */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -731,6 +753,7 @@
 				BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				D22E4AC028EBF805001091DA /* FirebaseAuthManager.swift in Sources */,
+				D2225E2A29232C5A00CAC434 /* GiftPaperViewController.swift in Sources */,
 				CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */,
 				D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */,
 				AFBF86A4291AB47D00766D9C /* BackgroundButtonViewController.swift in Sources */,
@@ -769,6 +792,7 @@
 				CFD4422329224B3D00FC0C20 /* AppSettingModels.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
+				D2225E2829232B6900CAC434 /* GiftBoxViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				BCE6FEBC291B90AA0093C36E /* PaperStorageLength.swift in Sources */,
 				D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */,
