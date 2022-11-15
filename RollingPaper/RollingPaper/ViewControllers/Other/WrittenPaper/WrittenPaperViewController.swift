@@ -358,7 +358,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     
     func saveCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row]
+        let card = currentPaper.cards[indexPath.row - 1]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
@@ -367,7 +367,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     
     func shareCard( _ indexPath: IndexPath, _ sender: CGPoint) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row]
+        let card = currentPaper.cards[indexPath.row - 1]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             imageShare(sender,image)
@@ -376,7 +376,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     
     func deleteCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row]
+        let card = currentPaper.cards[indexPath.row - 1]
                 
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
@@ -462,6 +462,9 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
+        if indexPath.row == 0 {
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil)
+        }
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let save = UIAction(
