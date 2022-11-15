@@ -158,7 +158,7 @@ final class PaperStorageViewController: UIViewController {
             spinner.isHidden = false
             spinner.startAnimating()
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { [weak self] in
                 guard let self = self else {return}
                 self.paperCollectionView.isHidden = false
                 self.spinner.isHidden = true
