@@ -61,7 +61,7 @@ class SettingScreenViewModel {
                 if let image = image {
                     self?.currentPhotoSubject.send(image)
                 } else {
-                    self?.currentPhotoSubject.send(UIImage(systemName: "person.circle"))
+                    self?.currentPhotoSubject.send(nil)
                 }
             }
             .store(in: &cancellables)
