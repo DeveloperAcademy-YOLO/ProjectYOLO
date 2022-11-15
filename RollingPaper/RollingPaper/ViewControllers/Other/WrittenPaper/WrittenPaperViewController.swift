@@ -463,7 +463,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
         if indexPath.row == 0 {
-            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil)
+            return nil
         }
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
