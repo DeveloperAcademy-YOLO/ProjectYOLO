@@ -99,7 +99,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
         guard
             let fileDir = getFilePath(paper: paper),
             let previewFileDir = getPreviewFilePath(paperId: paper.paperId) else { return }
-        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
         do {
             let paperData = try JSONEncoder().encode(paper)
             let paperPreviewData = try JSONEncoder().encode(paperPreview)
@@ -155,6 +155,7 @@ final class LocalDatabaseFileManager: DatabaseManager {
             try paperData.write(to: fileDir, options: .atomic)
             if let index = currentPapers.firstIndex(where: {$0.paperId == paper.paperId }) {
                 var currentPaper = currentPapers[index]
+                currentPaper.isGift = paper.isGift
                 if currentPaper.title != paper.title {
                     currentPaper.title = paper.title
                     currentPapers[index] = currentPaper

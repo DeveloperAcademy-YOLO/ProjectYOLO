@@ -64,7 +64,7 @@ final class FirestoreManager: DatabaseManager {
     /// (1). 파이어베이스 내 페이퍼 데이터 추가 (2). 현재 유저가 작성한 페이퍼 아이디 목록에 추가 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 추가
     func addPaper(paper: PaperModel) {
         paperSubject.send(paper)
-        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
         guard
             currentUserEmail != nil,
             let paperDict = getPaperDict(with: paper) else { return }
@@ -140,7 +140,7 @@ final class FirestoreManager: DatabaseManager {
     /// (1). 파이어베이스 내 데이터 업데이트 (2). 프리뷰가 변경되었을 때를 대비, 프리뷰 데이터 업데이트, (3) 제목 업데이트
     func updatePaper(paper: PaperModel) {
         guard let paperDict = getPaperDict(with: paper) else { return }
-        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString)
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
         database
             .collection(FireStoreConstants.papersPath.rawValue)
             .document(paper.paperId)
