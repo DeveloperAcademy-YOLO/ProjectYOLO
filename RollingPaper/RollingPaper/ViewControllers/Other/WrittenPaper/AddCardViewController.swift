@@ -10,9 +10,9 @@ import SnapKit
 import UIKit
 
 class AddCardViewController: UIViewController {
-    private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
-    private var deviceWidth = UIScreen.main.bounds.size.width
-    private var deviceHeight = UIScreen.main.bounds.size.height
+    private let viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
+    private let deviceWidth = UIScreen.main.bounds.size.width
+    private let deviceHeight = UIScreen.main.bounds.size.height
     private let plusImg: UIImageView = {
         let imageView = UIImageView()
         let image = UIImage(systemName: "plus")
