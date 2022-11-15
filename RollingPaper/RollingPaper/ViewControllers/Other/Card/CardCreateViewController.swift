@@ -24,8 +24,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
     
-    private var isCameraToggle: Bool = false
-    private var isBackgroundToggle: Bool = false
     private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = false
    
@@ -382,7 +380,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
-        self.isBackgroundToggle = true
         self.backgroundOnButtonAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
@@ -423,8 +420,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        isBackgroundToggle = false
-        backgroundOffButtonAppear()
+        self.backgroundOffButtonAppear()
+     
         print("Modal Dismissed!")
     }
 }
@@ -551,7 +548,6 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         pickerController.delegate = self
         pickerController.sourceType = type
         present(pickerController, animated: true)
-        isCameraToggle = false
         cameraOffButtonAppear()
     }
     
@@ -573,7 +569,6 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     private func cameraImagePicker() {
-        isCameraToggle = false
         cameraOffButtonAppear()
         
         let pushVC = CameraCustomPickerController()
@@ -601,8 +596,7 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
-        isCameraToggle = true
-        cameraOnButtonAppear()
+        self.cameraOnButtonAppear()
         
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -624,7 +618,6 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             DispatchQueue.main.async(execute: {
-                self.isCameraToggle = false
                 self.cameraOffButtonAppear()
             })
         }
