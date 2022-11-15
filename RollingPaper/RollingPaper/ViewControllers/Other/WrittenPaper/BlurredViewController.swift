@@ -12,12 +12,12 @@ import UIKit
 class BlurredViewController: UIViewController {
     lazy var blurView = UIVisualEffectView()
     
-    var deviceWidth = UIScreen.main.bounds.size.width
-    var deviceHeight = UIScreen.main.bounds.size.height
-    var cardIsDismissed: Bool = false
+    private let deviceWidth = UIScreen.main.bounds.size.width
+    private let deviceHeight = UIScreen.main.bounds.size.height
+    private let cardIsDismissed: Bool = false
     
     private lazy var closeBtn: UIButton = UIButton()
-    let presentingVC = MagnifiedCardViewController()
+    private let presentingVC = MagnifiedCardViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,32 +25,27 @@ class BlurredViewController: UIViewController {
         view.addSubview(closeBtn)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
-        animationIN()
+        animationIn()
         setCloseBtn()
         setBlurView()
         
         
     }
     
-    func presentBlurredView() {
-        if cardIsDismissed == false
-        {
-            print("cardIsDismissed : \(cardIsDismissed)")
-            UIView.animate(withDuration: 0.4) {
-                self.blurView.effect = UIBlurEffect(style: .systemThinMaterial)
-            }
+    private func presentBlurredView() {
+        cardIsDismissed == false
+        ? UIView.animate(withDuration: 0.4) {
+            self.blurView.effect = UIBlurEffect(style: .systemThinMaterial)
         }
-        else{
-            print("cardIsDismissed : \(cardIsDismissed)")
-            UIView.animate(withDuration: 0.4) {
-                self.blurView.effect = nil
-            }
-            dismiss(animated: true)
+        
+        : UIView.animate(withDuration: 0.4) {
+            self.blurView.effect = nil
         }
+        dismiss(animated: true)
+        
     }
     
-    func animationIN() {
-        print("cardIsDismissed : \(cardIsDismissed)")
+    func animationIn() {
         if cardIsDismissed == false
         {
             UIView.animate(withDuration: 0.4) {
@@ -60,7 +55,6 @@ class BlurredViewController: UIViewController {
     }
     
     func animationOut() {
-        print("cardIsDismissed : \(cardIsDismissed)")
         if cardIsDismissed == true
         {
             UIView.animate(withDuration: 0.4) {
