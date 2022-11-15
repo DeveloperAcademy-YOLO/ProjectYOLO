@@ -17,11 +17,15 @@ import UIKit
 final class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private let authManager: AuthManager = FirebaseAuthManager.shared
+    private let timeManager: TimeFlowManager = TimeFlowManager()
+    private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var paperLinkBtnIsPressed: Bool = false
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
+    private let now: Date = Date()
+    
     lazy private var cardsList: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
@@ -35,7 +39,6 @@ final class WrittenPaperViewController: UIViewController {
         cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsList.dataSource = self
         cardsList.delegate = self
-//        cardsList.reloadData()
         
         return cardsList
     }()
@@ -43,6 +46,20 @@ final class WrittenPaperViewController: UIViewController {
     //페이퍼의 제목 수정과 페이퍼 삭제, 두 곳에 쓰이는 UITextField 이므로 직접 쓰이는 곳에서 initialize를 해줘야 합니다.
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     
+    lazy private var timeLabel: TimerView = {
+        let timeLabel = TimerView()
+        timeLabel.setEndTime(time: viewModel.currentPaper?.endTime ?? Date())
+        timeLabel.addSubview(showBalloonButton)
+        return timeLabel
+    }()
+    
+    lazy private var showBalloonButton: UIButton = {
+        let balloonBtn = UIButton()
+        balloonBtn.addTarget(self, action: #selector(showBalloon), for: .touchUpInside)
+        
+        return balloonBtn
+    }()
+    private let timerDiscriptionBalloon = TimerDiscriptionBalloon()
     
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
@@ -51,27 +68,32 @@ final class WrittenPaperViewController: UIViewController {
         titleLabel.text = viewModel.currentPaper?.title
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
+        
         return titleLabel
     }()
-    //도피가 만든 타이머로 바뀌는 부분
-    lazy private var timeLabel = TimerOfPaperViewController()
+    
+    
     lazy private var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = NSLayoutConstraint.Axis.horizontal
         stackView.distribution = UIStackView.Distribution.equalSpacing
-        stackView.addArrangedSubview(self.timeLabel.view)
+        stackView.addArrangedSubview(self.timeLabel)
         stackView.addArrangedSubview(self.titleLabel)
-        titleLabelConstraints()
+        setBtnLocation()
+        
         return stackView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        bindTimer()
         bind()
         self.splitViewController?.hide(.primary)
+        stackViewConstraints()
         navigationItem.titleView = stackView
         setCustomNavBarButtons()
+        titleLabelConstraints()
         view.addSubview(cardsList)
     }
     
@@ -80,6 +102,21 @@ final class WrittenPaperViewController: UIViewController {
         self.splitViewController?.hide(.primary)
         self.navigationController?.isNavigationBarHidden = false
         cardsList.reloadData()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        timerInput.send(.viewDidAppear)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        timerInput.send(.viewDidDisappear)
+    }
+    
+    override func viewWillDisappear  (_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timerDiscriptionBalloon.view.removeFromSuperview()
     }
     
     private func bind() {
@@ -111,6 +148,21 @@ final class WrittenPaperViewController: UIViewController {
                     self?.cardsList.reloadData()
                 }
             }
+            .store(in: &cancellables)
+    }
+    
+    private func bindTimer() {
+        let timerOutput = timeManager.transform(input: timerInput.eraseToAnyPublisher())
+        timerOutput
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                    // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
+                case .timeIsUpdated:
+                    self.timeLabel.updateTime()
+                }
+            })
             .store(in: &cancellables)
     }
     
@@ -239,6 +291,7 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func presentSignUpModal(_ sender: UIButton) {
+        timerDiscriptionBalloon.view.removeFromSuperview()
         let signInVC = SignInViewController()
         let navVC = UINavigationController(rootViewController: signInVC)
         navVC.modalPresentationStyle = .formSheet //로그인 모달에 x버튼 넣기 위함
@@ -246,8 +299,6 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func presentShareSheet(_ sender: UIButton) {
-        let text = "dummy text. 여기에 소개 멘트가 들어갈 자리입니다. 페이퍼를 공유해보세요~~ 등등"
-        //TODO : 카톡으로 공유하기
         guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
         let applicationActivities: [UIActivity]? = nil
         let activityViewController = UIActivityViewController(
@@ -348,6 +399,11 @@ final class WrittenPaperViewController: UIViewController {
         cardsCollection?.reloadData()
         return cardsCollection ?? UICollectionView()
     }
+    
+    @objc private func showBalloon() {
+        cardsList.addSubview(timerDiscriptionBalloon.view)
+        setBalloonLocation()
+    }
 }
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
@@ -356,7 +412,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     
-    func saveCard( _ indexPath : IndexPath) {
+    func saveCard(_ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row]
         
@@ -370,14 +426,14 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            imageShare(sender,image)
+            imageShare(sender, image)
         }
     }
     
-    func deleteCard( _ indexPath : IndexPath) {
+    func deleteCard(_ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row]
-                
+        
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
         } else {
@@ -392,11 +448,10 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         
         
         
-        if(indexPath.row == 0) {
+        if indexPath.row == 0 {
             let addCardBtn = AddCardViewController()
             myCell.addSubview(addCardBtn.view)
-        }
-        else {
+        } else {
             guard let currentPaper = viewModel.currentPaper else { return myCell }
             let card = currentPaper.cards[indexPath.row-1]
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -439,11 +494,9 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if (indexPath.row == 0) {
+        if indexPath.row == 0 {
             moveToCardRootView()
         } else {
-            guard let currentPaper = viewModel.currentPaper else { return  }
-            let card = currentPaper.cards[indexPath.row-1]
             let presentingVC = MagnifiedCardViewController()
             let blurredVC = BlurredViewController()
             
@@ -470,7 +523,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
-            ){ [weak self] _ in
+            ) { [weak self] _ in
                 self?.saveCard(indexPath)
             }
             
@@ -480,7 +533,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
-            ){ [weak self] _ in
+            ) { [weak self] _ in
                 self?.shareCard(indexPath, point)
             }
             
@@ -546,10 +599,30 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
 }
 
 extension WrittenPaperViewController {
+    private func stackViewConstraints() {
+        stackView.snp.makeConstraints { make in
+            make.height.equalTo(36)
+        }
+    }
+    
     private func titleLabelConstraints() {
         titleLabel.snp.makeConstraints({ make in
             make.height.equalTo(36)
-            make.leading.equalTo(timeLabel.view.snp.trailing).offset(10)
+            make.leading.equalTo(timeLabel.snp.trailing).offset(10)
         })
+    }
+    private func setBtnLocation() {
+        showBalloonButton.snp.makeConstraints({ make in
+            make.width.equalTo(timeLabel.snp.width)
+            make.height.equalTo(timeLabel.snp.height)
+        })
+    }
+    
+    private func setBalloonLocation() {
+        timerDiscriptionBalloon.view.snp.makeConstraints { make in
+            make.centerX.equalTo(timeLabel.snp.centerX)
+            make.width.equalTo(224)
+            make.height.equalTo(81)
+        }
     }
 }
