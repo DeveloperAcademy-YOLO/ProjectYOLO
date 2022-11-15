@@ -76,7 +76,9 @@ final class CardResultViewController: UIViewController {
     }()
     
     lazy var titleBounceView: UILabel = {
-        let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: 70, width: 234, height: 54))
+        let titleLabel = UILabel()
+      //  let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: someImageView.bounds.height*0.5, width: 234, height: 54))
+        titleLabel.text = "이대로 게시할까요?"
         titleLabel.text = "이대로 게시할까요?"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
@@ -108,6 +110,7 @@ final class CardResultViewController: UIViewController {
         someImageViewConstraints()
         
         view.addSubview(titleBounceView)
+        titleBounceViewConstraints()
         animationBounce()
         
         view.addSubview(backwardButton)
@@ -146,12 +149,22 @@ final class CardResultViewController: UIViewController {
 }
 
 extension CardResultViewController {
+    
+    private func titleBounceViewConstraints() {
+        titleBounceView.snp.makeConstraints({ make in
+            make.width.equalTo(234)
+            make.height.equalTo(54)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(someImageView.snp.top).offset(-30)
+        })
+    }
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.60)
             make.height.equalTo(self.view.bounds.height * 0.60)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.top).offset(150)
+            make.centerY.equalTo(self.view)
         })
     }
     
@@ -160,7 +173,7 @@ extension CardResultViewController {
             make.width.equalTo(self.view.bounds.width * 0.60)
             make.height.equalTo(self.view.bounds.height * 0.60)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.top).offset(150)
+            make.centerY.equalTo(self.view)
         })
     }
     
