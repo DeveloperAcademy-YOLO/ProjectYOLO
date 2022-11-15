@@ -20,12 +20,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private let viewModel: CardViewModel
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+   
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
-    private var isCanvasToolToggle: Bool = true
+    
     private var isCameraToggle: Bool = false
-    private var isStickerToggle: Bool = false
     private var isBackgroundToggle: Bool = false
+    private var isCanvasToolToggle: Bool = true
+    private var isStickerToggle: Bool = false
+   
     private var imageSticker: UIImage!
     private var _selectedStickerView: StickerView?
     private var selectedStickerView: StickerView? {
@@ -379,8 +382,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
-        isBackgroundToggle = true
-        backgroundOnButtonAppear()
+        self.isBackgroundToggle = true
+        self.backgroundOnButtonAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -395,6 +398,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     @objc func togglebutton(_ gesture: UITapGestureRecognizer) {
         self.isCanvasToolToggle.toggle()
         self.isStickerToggle.toggle()
+        
         if isCanvasToolToggle == true && isStickerToggle == false {
             print("sticker button off")
             stickerButtonOff()
@@ -426,7 +430,6 @@ extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
 }
 
 extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    
     func mergeImages(imageView: UIImageView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -543,7 +546,6 @@ extension UIView {
 }
 
 extension CardCreateViewController: UIImagePickerControllerDelegate {
-    
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
