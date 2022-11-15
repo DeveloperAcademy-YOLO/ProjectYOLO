@@ -152,8 +152,10 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
         case "signOut":
-            paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
-            paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+            // paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
+            // paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+            paperTemplateSelectViewController.popToRootViewController(animated: false)
+            paperStorageViewController.popToRootViewController(animated: false)
             // TODO: GiftboxViewController() 생성
             // settingScreenViewController = UINavigationController(rootViewController: )
         // case "signIn":
