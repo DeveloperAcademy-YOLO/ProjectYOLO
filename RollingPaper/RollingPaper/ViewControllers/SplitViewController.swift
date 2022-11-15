@@ -17,7 +17,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private var currentSecondaryView = "새 페이퍼"
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
-    private var giftboxViewController: UINavigationController!
+    private var giftStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
 
     override func viewDidLoad() {
@@ -59,8 +59,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         sidebarViewController = SidebarViewController()
         paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        // TODO: GiftboxViewController() 생성
-        // settingScreenViewController = UINavigationController(rootViewController: )
+        giftStorageViewController = UINavigationController(rootViewController: GiftStorageViewController())
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
             settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
@@ -108,9 +107,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
@@ -133,9 +131,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             setViewController(paperTemplateSelectViewController, for: .secondary)
         case "보관함":
             setViewController(paperStorageViewController, for: .secondary)
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             setViewController(settingScreenViewController, for: .secondary)
         default :
