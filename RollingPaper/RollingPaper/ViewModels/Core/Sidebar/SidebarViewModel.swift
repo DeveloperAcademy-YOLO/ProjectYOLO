@@ -10,7 +10,9 @@ import Combine
 import UIKit
 
 final class SidebarViewModel {
-
+    enum SidebarSection: String {
+        case main
+    }
     private let authManager: AuthManager
     var cancellables = Set<AnyCancellable>()
     let currentUserSubject = PassthroughSubject<UserModel?, Never>()
@@ -42,3 +44,4 @@ final class SidebarViewModel {
             .store(in: &cancellables)
     }
 }
+

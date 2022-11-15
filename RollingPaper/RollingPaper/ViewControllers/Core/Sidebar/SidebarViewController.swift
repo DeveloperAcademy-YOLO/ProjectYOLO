@@ -10,20 +10,18 @@ import SnapKit
 import Combine
 import CombineCocoa
 
-private class Layout {
+final private class Layout {
     static let userPhotoFrameWidthHeight = 44
     static let userNameFontSize: CGFloat = 20
     static let userPhotoToNamePadding: CGFloat = 16
-    // static let userChevronFrameWidth = Int(Double(userInfoStackWidthSuperView) * 0.3 * 0.24)
-    // static let userChevronWidthHeight = 15
-    static let tableCellBackgroundInsets = NSDirectionalEdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0)
-    static let tableCellimageToTextPadding: CGFloat = 16
-    static let tableCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-    static let tableCellHeight: CGFloat = 56
-    static let tableCellImageSize = CGSize(width: 25, height: 25)
-    static let tableViewLeadingOffset = 128
-    static let tableViewTrailingOffset = -28
-    static let tableViewToUserInfoStackPadding = 24
+    static let collectionViewCellBackgroundInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 6, trailing: 0)
+    static let collectionViewCellimageToTextPadding: CGFloat = 16
+    static let collectionViewCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+    static let collectionViewHeight: CGFloat = 56
+    static let collectionViewCellImageSize = CGSize(width: 25, height: 25)
+    static let collectionViewLeadingOffset = 128
+    static let collectionViewTrailingOffset = -28
+    static let collectionViewToUserInfoStackPadding = 40
     static let userInfoStackRadius: CGFloat = 12
     static let userInfoStackInset = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
     static let userInfoStackWidthSuperView = -156
@@ -32,27 +30,23 @@ private class Layout {
     static let userInfoStackTopSafeArea = 40
 }
 
-class SidebarViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
+final class SidebarViewController: UIViewController {
+    private var dataSource: UICollectionViewDiffableDataSource<SidebarViewModel.SidebarSection, CategoryModel>! = nil
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
+    private let sideBarCategories: [CategoryModel] = [
+        CategoryModel(name: "새 페이퍼", icon: "doc.on.doc"),
+        CategoryModel(name: "보관함", icon: "folder"),
+        CategoryModel(name: "선물 상자", icon: "giftcard"),
+        CategoryModel(name: "설정", icon: "gearshape")
+    ]
+    
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
-        photo.layer.cornerRadius = photo.frame.width / 2
-        photo.layer.masksToBounds = true
-        photo.contentMode = UIView.ContentMode.scaleAspectFit
+        photo.contentMode = UIView.ContentMode.scaleAspectFill
         return photo
     }()
-    
-    /*
-    private let chevron: UIImageView = {
-        let chevron = UIImageView()
-        chevron.image = UIImage(systemName: "chevron.forward")
-        chevron.contentMode = UIView.ContentMode.scaleAspectFit
-        return chevron
-    }()
-    */
     
     private let userName: UILabel = {
         let name = UILabel()
@@ -62,7 +56,7 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         return name
     }()
     
-    lazy var userInfoStack: UIStackView = {
+    private lazy var userInfoStack: UIStackView = {
         let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
         userInfo.axis = .horizontal
         userInfo.alignment = .center
@@ -72,28 +66,43 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
         return userInfo
     }()
     
-    private let tableView: UITableView = {
-        let tableview = UITableView()
-        tableview.register(UITableViewCell.self, forCellReuseIdentifier: "DefaultCell")
-        return tableview
+    private lazy var collectionView: UICollectionView = {
+        var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
+        collectionView.isScrollEnabled = false
+        return collectionView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemGray6
         bind()
-        // let tapUserInfo = UITapGestureRecognizer(target: self, action: #selector(didTapUserInfo(_: )))
-        // userInfoStack.addGestureRecognizer(tapUserInfo)
-        tableView.separatorStyle = .none
+        configureDataSource()
+        setInitialConfig()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeSecondaryView(noitificaiton:)),
+            name: Notification.Name.viewChange,
+            object: nil
+        )
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        setupSubviews()
+        setProfileView()
+        setCollectionView()
     }
     
-    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
-        print("UserInfoTapped!", sender)
+    private func setInitialConfig() {
+        view.backgroundColor = .systemGray6
+        collectionView.selectItem(at: IndexPath(row: 0, section: 0),
+                                  animated: false,
+                                  scrollPosition: UICollectionView.ScrollPosition.centeredVertically)
+    }
+    
+    @objc private func changeSecondaryView(noitificaiton: Notification) {
+        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+        if object == "보관함" {
+            self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        }
     }
     
     private func bind() {
@@ -120,78 +129,70 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             }
             .store(in: &cancellables)
     }
-
-
-    func show(categories: [CategoryModel]) {
-        self.categories = categories
-        tableView.reloadData()
-    }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        let category = self.categories[indexPath.row]
-        var backgroundConfig = UIBackgroundConfiguration.listSidebarCell()
-        backgroundConfig.backgroundInsets = Layout.tableCellBackgroundInsets
-        cell.backgroundConfiguration = backgroundConfig
-        cell.selectionStyle = .gray
-        var content = cell.defaultContentConfiguration()
-        content.image = UIImage(systemName: category.icon)
-        content.text = category.name
-        content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
-        content.imageToTextPadding = Layout.tableCellimageToTextPadding
-        content.imageProperties.tintColor = .systemGray3
-        content.imageProperties.maximumSize = Layout.tableCellImageSize
-        content.directionalLayoutMargins = Layout.tableCellInsets
-        cell.contentConfiguration = content
-        
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.categories.count
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let category = self.categories[indexPath.row]
-        NotificationCenter.default.post(
-            name: Notification.Name.viewChangeFromSidebar,
-            object: nil,
-            userInfo: [NotificationViewKey.view: category.name])
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return Layout.tableCellHeight
-    }
-    
-    private func setupSubviews() {
-        setupProfileView()
-        setupTableView()
-    }
-    
-    private func setupTableView() {
-        view.addSubview(tableView)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.backgroundColor = .clear
-        
-        tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.tableViewLeadingOffset)
-            make.trailing.equalToSuperview().offset(Layout.tableViewTrailingOffset)
-            make.bottom.equalToSuperview()
-            make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.tableViewToUserInfoStackPadding)
+    private func setLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout { section, layoutEnvironment in
+            var config = UICollectionLayoutListConfiguration(appearance: .sidebar)
+            config.headerMode = .none
+            return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
         }
     }
     
-    private func setupProfileView() {
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<CategoryCell, CategoryModel> { (cell, indexPath, category) in
+            cell.categoryData = [category.name, category.icon]
+            var content = cell.defaultContentConfiguration()
+            content.image = UIImage(systemName: category.icon)
+            content.text = category.name
+            content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
+            content.imageToTextPadding = Layout.collectionViewCellimageToTextPadding
+            content.imageProperties.tintColor = .systemGray3
+            content.imageProperties.maximumSize = Layout.collectionViewCellImageSize
+            content.directionalLayoutMargins = Layout.collectionViewCellInsets
+            cell.contentConfiguration = content
+        }
+        
+        dataSource = UICollectionViewDiffableDataSource<SidebarViewModel.SidebarSection, CategoryModel>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: CategoryModel) -> CategoryCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+        }
+        
+        let sections: [SidebarViewModel.SidebarSection] = [.main]
+        var snapshot = NSDiffableDataSourceSnapshot<SidebarViewModel.SidebarSection, CategoryModel>()
+        snapshot.appendSections(sections)
+        dataSource.apply(snapshot, animatingDifferences: false)
+        
+        for section in sections {
+            switch section {
+            case .main:
+                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<CategoryModel>()
+                sectionSnapshot.append(sideBarCategories)
+                dataSource.apply(sectionSnapshot, to: section)
+            }
+        }
+    }
+    
+    private func setCollectionView() {
+        view.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.backgroundColor = .clear
+        collectionView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom).offset(Layout.collectionViewToUserInfoStackPadding)
+        }
+    }
+    
+    private func setProfileView() {
         view.addSubview(userInfoStack)
         userInfoStack.backgroundColor = .systemBackground
         userInfoStack.layer.cornerRadius = Layout.userInfoStackRadius
         userInfoStack.isLayoutMarginsRelativeArrangement = true
         userInfoStack.layoutMargins = Layout.userInfoStackInset
         userInfoStack.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.userInfoStackLeadingSuperView)
-            make.trailing.equalToSuperview().offset(Layout.userInfoStackTrailingSuperView)
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
@@ -200,6 +201,39 @@ class SidebarViewController: UIViewController, UITableViewDataSource, UITableVie
             make.width.equalTo(userPhoto.snp.height)
         }
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
-        userPhoto.contentMode = .scaleAspectFill
+        userPhoto.layer.masksToBounds = true
     }
+}
+
+extension SidebarViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let category = self.sideBarCategories[indexPath.row]
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChangeFromSidebar,
+            object: nil,
+            userInfo: [NotificationViewKey.view: category.name])
+    }
+}
+
+class CategoryCell: UICollectionViewListCell {
+    var categoryData = ["", ""]
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        guard var contentConfig = self.contentConfiguration?.updated(for: state) as? UIListContentConfiguration else { return }
+        contentConfig.textProperties.colorTransformer = UIConfigurationColorTransformer { color in
+            state.isSelected || state.isHighlighted ? .black : .black
+        }
+        contentConfig.image = UIImage(systemName: state.isSelected || state.isHighlighted ? categoryData[1] + ".fill" : categoryData[1])
+        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .black : .systemGray3
+        guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
+        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
+            state.isSelected || state.isHighlighted ? .white : .clear
+        }
+        
+        self.contentConfiguration = contentConfig
+        self.backgroundConfiguration = backgroundConfig
+        
+    }
+    
 }

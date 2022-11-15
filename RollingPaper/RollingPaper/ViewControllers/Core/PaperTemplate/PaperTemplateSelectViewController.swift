@@ -9,36 +9,42 @@ import UIKit
 import SnapKit
 import Combine
 
-private class Length {
-    static let templateThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(24*5))/4
-    static let templateThumbnailHeight: CGFloat = templateThumbnailWidth*0.75
-    static let templateThumbnailCornerRadius: CGFloat = 12
-    static let templateTitleHeight: CGFloat = 19
-    static let templateTitleTopMargin: CGFloat = 16
-    static let cellWidth: CGFloat = templateThumbnailWidth
-    static let cellHeight: CGFloat = templateThumbnailHeight + templateTitleTopMargin + templateTitleHeight
-    static let cellHorizontalSpace: CGFloat = 20
-    static let cellVerticalSpace: CGFloat = 28
-    static let sectionTopMargin: CGFloat = 28
-    static let sectionBottomMargin: CGFloat = 48
-    static let sectionRightMargin: CGFloat = 28
-    static let sectionLeftMargin: CGFloat = 28
-    static let headerWidth: CGFloat = 116
-    static let headerHeight: CGFloat = 29
-    static let headerLeftMargin: CGFloat = 34
-}
-
 class PaperTemplateSelectViewController: UIViewController {
     private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperTemplateSelectViewModel()
     private let input: PassthroughSubject<PaperTemplateSelectViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     private var recentTemplate: TemplateEnum?
-    private var templateCollectionView: PaperTemplateCollectionView?
+    private var isLoading: Bool = true
     private var isRecentExist: Bool {
         return recentTemplate == nil ? false : true
     }
     
+    // 데이터 로딩시 보여줄 스피너
+    private lazy var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .label
+        return spinner
+    }()
+    // 템플릿 목록 보여주는 컬렉션뷰
+    private lazy var templateCollectionView: PaperTemplateCollectionView = {
+        let templateCollectionView = PaperTemplateCollectionView(frame: .zero, collectionViewLayout: .init())
+        templateCollectionView.setCollectionViewLayout(getCollectionViewLayout(), animated: false)
+        
+        templateCollectionView.backgroundColor = .systemBackground
+        templateCollectionView.alwaysBounceVertical = true
+        
+        templateCollectionView.register(PaperTemplateCollectionCell.self, forCellWithReuseIdentifier: PaperTemplateCollectionCell.identifier)
+        templateCollectionView.register(PaperTemplateCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperTemplateCollectionHeader.identifier)
+        
+        templateCollectionView.dataSource = self
+        templateCollectionView.delegate = self
+        templateCollectionView.isHidden = true
+        
+        return templateCollectionView
+    }()
+    
+    // splitview 나오게 하기
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.show(.primary)
@@ -46,10 +52,12 @@ class PaperTemplateSelectViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setMainView()
-        setCollectionView()
+        updateLoadingView()
         bind()
         splitViewBind()
+        setMainView()
+        configure()
+        setConstraints()
     }
     
     // view가 나타날때마다 최근 템플릿 확인하기 위해 input에 값 설정하기
@@ -66,12 +74,17 @@ class PaperTemplateSelectViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
+                // 최근 템플릿 설정하기
                 case .getRecentTemplateSuccess(let template):
                     self.recentTemplate = template
                 case .getRecentTemplateFail:
                     self.recentTemplate = nil
                 }
-                self.templateCollectionView?.reloadData()
+                self.templateCollectionView.reloadData()
+                if !self.isLoading {
+                    self.updateLoadingView()
+                }
+                
             })
             .store(in: &cancellables)
     }
@@ -81,7 +94,8 @@ class PaperTemplateSelectViewController: UIViewController {
         let output = splitViewManager.getOutput()
         output
             .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { event in
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
                 var extraLeftMargin: Int
                 var extraRightMargin: Int
                 switch event {
@@ -92,15 +106,33 @@ class PaperTemplateSelectViewController: UIViewController {
                     extraLeftMargin = 54
                     extraRightMargin = 24
                 }
-                self.templateCollectionView?.snp.updateConstraints({ make in
+                self.templateCollectionView.snp.updateConstraints({ make in
                     make.leading.equalToSuperview().offset(extraLeftMargin)
                     make.trailing.equalToSuperview().offset(extraRightMargin)
                 })
-                UIView.animate(withDuration: 0.5, delay: 0, animations: {
+                UIView.animate(withDuration: 0.5, delay: 0, animations: { [weak self] in
+                    guard let self = self else {return}
                     self.view.layoutIfNeeded()
                 })
             })
             .store(in: &cancellables)
+    }
+    
+    // 로딩뷰 띄워주거나 없애기
+    private func updateLoadingView() {
+        if isLoading {
+            templateCollectionView.isHidden = true
+            spinner.isHidden = false
+            spinner.startAnimating()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.3) { [weak self] in
+                guard let self = self else {return}
+                self.templateCollectionView.isHidden = false
+                self.spinner.isHidden = true
+                self.spinner.stopAnimating()
+            }
+        }
+        isLoading.toggle()
     }
     
     // 메인 뷰 초기화
@@ -109,33 +141,13 @@ class PaperTemplateSelectViewController: UIViewController {
     }
     
     // 컬렉션 뷰 레이아웃 초기화
-    private func setCollectionViewLayout() {
+    private func getCollectionViewLayout() -> UICollectionViewFlowLayout {
         let collectionViewLayer = UICollectionViewFlowLayout()
-        collectionViewLayer.sectionInset = UIEdgeInsets(top: Length.sectionTopMargin, left: Length.sectionLeftMargin, bottom: Length.sectionBottomMargin, right: Length.sectionRightMargin)
-        collectionViewLayer.minimumInteritemSpacing = Length.cellHorizontalSpace
-        collectionViewLayer.minimumLineSpacing = Length.cellVerticalSpace
-        collectionViewLayer.headerReferenceSize = .init(width: Length.headerWidth, height: Length.headerHeight)
-        self.templateCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: false)
-    }
-    
-    // 컬렉션 뷰 초기화
-    private func setCollectionView() {
-        templateCollectionView = PaperTemplateCollectionView(frame: .zero, collectionViewLayout: .init())
-        setCollectionViewLayout()
-        
-        guard let collectionView = templateCollectionView else {return}
-        collectionView.backgroundColor = .systemBackground
-        collectionView.alwaysBounceVertical = true
-        collectionView.register(PaperTemplateCollectionCell.self, forCellWithReuseIdentifier: PaperTemplateCollectionCell.identifier)
-        collectionView.register(PaperTemplateCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperTemplateCollectionHeader.identifier)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        view.addSubview(collectionView)
-        collectionView.snp.makeConstraints({ make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide)
-        })
+        collectionViewLayer.sectionInset = UIEdgeInsets(top: PaperTemplateSelectLength.sectionTopMargin, left: PaperTemplateSelectLength.sectionLeftMargin, bottom: PaperTemplateSelectLength.sectionBottomMargin, right: PaperTemplateSelectLength.sectionRightMargin)
+        collectionViewLayer.minimumInteritemSpacing = PaperTemplateSelectLength.cellHorizontalSpace
+        collectionViewLayer.minimumLineSpacing = PaperTemplateSelectLength.cellVerticalSpace
+        collectionViewLayer.headerReferenceSize = .init(width: PaperTemplateSelectLength.headerWidth, height: PaperTemplateSelectLength.headerHeight)
+        return collectionViewLayer
     }
 }
 
@@ -143,19 +155,16 @@ class PaperTemplateSelectViewController: UIViewController {
 extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀 크기
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: Length.cellWidth, height: Length.cellHeight)
+        return CGSize(width: PaperTemplateSelectLength.cellWidth, height: PaperTemplateSelectLength.cellHeight)
     }
-    
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return isRecentExist && section == 0 ? 1 : viewModel.getTemplates().count
     }
-    
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return isRecentExist ? 2 : 1
     }
-    
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperTemplateCollectionCell.identifier, for: indexPath) as? PaperTemplateCollectionCell else {return UICollectionViewCell()}
@@ -168,7 +177,6 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
         
         return cell
     }
-    
     // 특정 위치의 헤더
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
@@ -183,7 +191,6 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
             return UICollectionReusableView()
         }
     }
-    
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         // 템플릿을 터치하는 순간 최근 템플릿으로 설정하기 위해 input에 값 설정하기
@@ -202,86 +209,23 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
     }
 }
 
-// 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
-private class PaperTemplateCollectionView: UICollectionView {}
-
-// 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
-private class PaperTemplateCollectionHeader: UICollectionReusableView {
-    static let identifier = "CollectionHeader"
-    private let title = UILabel()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        configure()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+// 스냅킷 설정
+extension PaperTemplateSelectViewController {
     private func configure() {
-        addSubview(title)
-        
-        title.font = .preferredFont(forTextStyle: .title2)
-        title.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalToSuperview().offset(Length.headerLeftMargin)
+        view.addSubview(templateCollectionView)
+        view.addSubview(spinner)
+    }
+    
+    private func setConstraints() {
+        templateCollectionView.snp.makeConstraints({ make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
         })
-    }
-    
-    func setHeader(text: String) {
-        title.text = text
-    }
-}
-
-// 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰
-private class PaperTemplateCollectionCell: UICollectionViewCell {
-    static let identifier = "CollectionCell"
-    private let cell = UIStackView()
-    private let title = UILabel()
-    private let imageView = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        configure()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func configure() {
-        addSubview(cell)
-        cell.addArrangedSubview(imageView)
-        cell.addArrangedSubview(title)
-        
-        cell.spacing = Length.templateTitleTopMargin
-        cell.axis = .vertical
-        cell.snp.makeConstraints({ make in
+        spinner.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
         })
-        
-        imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = Length.templateThumbnailCornerRadius
-        imageView.contentMode = .scaleAspectFill
-        imageView.snp.makeConstraints({ make in
-            make.top.equalToSuperview()
-            make.leading.equalToSuperview()
-            make.width.equalTo(Length.templateThumbnailWidth)
-            make.height.equalTo(Length.templateThumbnailHeight)
-        })
-        
-        title.font = .preferredFont(forTextStyle: .body)
-        title.textColor = UIColor(rgb: 0x808080)
-        title.textAlignment = .center
-        title.snp.makeConstraints({ make in
-            make.centerX.equalTo(imageView)
-            make.width.equalToSuperview()
-        })
-    }
-    
-    func setCell(template: TemplateModel) {
-        imageView.image = template.thumbnail
-        title.text = template.templateString
     }
 }
+
+// 최근 사용한 템플릿과 원래 템플릿들을 모두 보여주는 컬렉션 뷰
+private class PaperTemplateCollectionView: UICollectionView {}

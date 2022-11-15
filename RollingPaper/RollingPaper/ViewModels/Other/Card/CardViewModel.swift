@@ -24,8 +24,8 @@ class CardViewModel {
     enum Input {
         case viewDidLoad
         case resultShown
-        case setCardBackgroundImg(background: String) //CardBackgroundViewController 으로부터 backgroundImg Set
-        case setCardResultImg(result: UIImage) //CardPencilKitViewController 으로부터 mergedImage Set
+        case setCardBackgroundImg(background: String) //CardBackgroundViewController 으로부터 backgroundString Set
+        case setCardResultImg(result: UIImage) //CardCreateViewController 으로부터 mergedImage Set
         case resultSend(isLocalDB: Bool)
     }
     

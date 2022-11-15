@@ -5,48 +5,116 @@
 //  Created by 김동락 on 2022/10/07.
 //
 
-import UIKit
-import SnapKit
 import Combine
+import SnapKit
+import UIKit
 
-private class Length {
-    static let topMargin: CGFloat = 48
-    static let thumbnailLeftMargin: CGFloat = 48
-    static let thumbnailRadius: CGFloat = 24
-    static let thumbnailWidth: CGFloat = 262
-    static let thumbnailHeight: CGFloat = 388
-    static let thumbnailLeftPadding: CGFloat = 24
-    static let thumbnailRightPadding: CGFloat = 24
-    static let thumbnailBottomPadding: CGFloat = 28
-    static let thumbnailLabelSpacing: CGFloat = 8
-    static let sectionLeftMargin: CGFloat = 36
-    static let sectionRightMargin: CGFloat = 88
-    static let sectionTitleBottomMargin: CGFloat = 14
-    static let sectionSubTitleBottomMargin: CGFloat = 32
-    static let sectionSpacing: CGFloat = 48
-    static let textfieldHeight: CGFloat = 15
-    static let textfieldWithBorderSpacing: CGFloat = 9
-    static let textfieldBorderWidth: CGFloat = 2
-    static let textfieldWithBorderHeight: CGFloat = textfieldHeight + textfieldWithBorderSpacing + textfieldBorderWidth
-    static let textfieldTitleLengthSpacing: CGFloat = 10
-    static let titleLengthLabelWidth: CGFloat = 60
-    static let titleLengthLabelHeight: CGFloat = 28
-    static let warningLabelTopMargin: CGFloat = 10
-}
-
-class PaperSettingViewController: UIViewController {
+final class PaperSettingViewController: UIViewController {
     private let textLimit = 30
     private let template: TemplateEnum
-    private let paperTitleTextField = UITextField()
-    private let titleLengthLabel = UILabel()
-    private let warningLabel = UILabel()
-    private let warningImage = UIImageView()
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
-    
     private var cancellables = Set<AnyCancellable>()
     private var textState: TextState = .noText
     private var viewModel: PaperSettingViewModel
-    private var currentPaperTitle: String = ""
+    
+    // 페이퍼 제목 입력하는 텍스트필드
+    private lazy var paperTitleTextField: UITextField = {
+        let paperTitleTextField = UITextField()
+        let placeHolder = "재현이의 중학교 졸업을 축하하며"
+        paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
+        return paperTitleTextField
+    }()
+    // 텍스트필드 밑에 있는 선
+    private lazy var textFieldBorder: UIView = {
+        let textFieldBorder = UIView()
+        textFieldBorder.backgroundColor = .opaqueSeparator
+        return textFieldBorder
+    }()
+    // 텍스트필드에 입력된 글자가 몇개인지 알려주는 라벨
+    private lazy var titleLengthLabel: UILabel = {
+        let titleLengthLabel = UILabel()
+        titleLengthLabel.text = "0/\(textLimit)"
+        titleLengthLabel.font = UIFont.preferredFont(for: .body, weight: .semibold)
+        titleLengthLabel.textAlignment = .center
+        titleLengthLabel.textColor = .white
+        titleLengthLabel.backgroundColor = .systemGray
+        titleLengthLabel.layer.cornerRadius = 9
+        titleLengthLabel.layer.masksToBounds = true
+        return titleLengthLabel
+    }()
+    // 조건에 따라 보여주는 경고 라벨
+    private lazy var warningLabel: UILabel = {
+        let warningLabel = UILabel()
+        warningLabel.textColor = .systemGray
+        warningLabel.font = .preferredFont(forTextStyle: .body)
+        return warningLabel
+    }()
+    // 경고 라벨 옆에 있는 이미지
+    private lazy var warningImage: UIImageView = {
+        let warningImage = UIImageView()
+        warningImage.contentMode = .center
+        warningImage.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
+        warningImage.isHidden = true
+        return warningImage
+    }()
+    // 누르면 피커가 보이는 버튼
+    private lazy var timePickerButton: UIButton = {
+        let timePickerButton = UIButton()
+        timePickerButton.addTarget(self, action: #selector(onClickedTimePickerButton(_:)), for: .touchUpInside)
+        timePickerButton.setTitle(PaperSettingViewModel.defaultTime, for: .normal)
+        timePickerButton.setTitleColor(.black, for: .normal)
+        timePickerButton.backgroundColor = .black
+        timePickerButton.layer.cornerRadius = PaperSettingLength.timePickerButtonRadius
+        timePickerButton.backgroundColor = UIColor(rgb: 0x767680).withAlphaComponent(0.12)
+        return timePickerButton
+    }()
+    // 제한 시간 정할 수 있는 피커
+    private lazy var timePicker: PaperTimePicker = {
+        let timePicker = PaperTimePicker(viewModel: viewModel)
+        return timePicker
+    }()
+    // 템플릿 썸네일 이미지
+    private lazy var thumbnail: UIImageView = {
+        let thumbnail = UIImageView()
+        thumbnail.layer.masksToBounds = true
+        thumbnail.layer.cornerRadius = PaperSettingLength.thumbnailRadius
+        thumbnail.image = template.template.thumbnailDetail
+        return thumbnail
+    }()
+    // 템플릿 제목
+    private lazy var thumbnailTitle: UILabel = {
+        let thumbnailTitle = UILabel()
+        thumbnailTitle.text = template.template.templateTitle
+        thumbnailTitle.textColor = .white
+        thumbnailTitle.numberOfLines = 0
+        thumbnailTitle.font = .preferredFont(for: .title2, weight: .bold)
+        return thumbnailTitle
+    }()
+    // 템플릿 설명
+    private lazy var thumbnailDescription: UILabel = {
+        let thumbnailDescription = UILabel()
+        thumbnailDescription.text =  template.template.templateDescription
+        thumbnailDescription.textColor = .white
+        thumbnailDescription.numberOfLines = 0
+        thumbnailDescription.font = .preferredFont(forTextStyle: .body)
+        return thumbnailDescription
+    }()
+    private lazy var title1: UILabel = {
+        return getLabel(text: "롤링페이퍼 제목", style: .title2, color: .label)
+    }()
+    private lazy var subtitle1: UILabel = {
+        return getLabel(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요", style: .body, color: .secondaryLabel)
+    }()
+    private lazy var title2: UILabel = {
+        return getLabel(text: "타이머 설정", style: .title2, color: .label)
+    }()
+    private lazy var subtitle2: UILabel = {
+        return getLabel(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다", style: .body, color: .secondaryLabel)
+    }()
+    private lazy var limitTimeTitle: UILabel = {
+        return getLabel(text: "제한 시간", style: .title3, color: .label)
+    }()
+    
     enum TextState {
         case normal, noText, tooLong
         var sentence: String {
@@ -74,19 +142,31 @@ class PaperSettingViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setMainView()
-        setNavigationBar()
         bind()
+        setNavigationBar()
+        setMainView()
+        setTextFieldControl()
+        configure()
+        setConstraints()
     }
     
     // Input이 설정될때마다 자동으로 transform 함수가 실행되고 그 결과값으로 Output이 오면 어떤 행동을 할지 정하기
     private func bind() {
-        viewModel.transform(input: input.eraseToAnyPublisher())
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                case .timePickerChange(let time):
+                    self.timePickerButton.setTitle(time, for: .normal)
+                }
+            })
+            .store(in: &cancellables)
     }
     
     // 네비게이션 바 초기화
     private func setNavigationBar() {
-        // 요셉이 만들어주신 거 그대로 쓰긴 했는데, 나중에 크기와 색깔을 전부 통일해야할듯함 (티모가 따로 디자인해주신 버튼이 아니라면)
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let leftCustomBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         leftCustomBackBtn.setTitle("템플릿", for: .normal)
@@ -109,132 +189,23 @@ class PaperSettingViewController: UIViewController {
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .systemBackground
-        
-        let thumbnail = UIImageView()
-        let thumbnailTitle = UILabel()
-        let thumbnailDescription = UILabel()
-        let title1 = getTitle(text: "롤링페이퍼 제목")
-        let subtitle1 = getSubTitle(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요")
-        let title2 = getTitle(text: "타이머 설정")
-        let subtitle2 = getSubTitle(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다")
-        
-        initTextField(placeHolder: "재현이의 중학교 졸업을 축하하며")
-        initTextLengthView()
-        initWarningLabel()
-        
-        view.addSubview(thumbnail)
-        view.addSubview(title1)
-        view.addSubview(subtitle1)
-        view.addSubview(paperTitleTextField)
-        view.addSubview(titleLengthLabel)
-        view.addSubview(warningImage)
-        view.addSubview(warningLabel)
-        view.addSubview(title2)
-        view.addSubview(subtitle2)
-        thumbnail.addSubview(thumbnailTitle)
-        thumbnail.addSubview(thumbnailDescription)
-        
-        thumbnail.layer.masksToBounds = true
-        thumbnail.layer.cornerRadius = Length.thumbnailRadius
-        thumbnail.image = template.template.thumbnailDetail
-        thumbnail.snp.makeConstraints({ make in
-            make.leading.equalToSuperview().offset(Length.thumbnailLeftMargin)
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(Length.topMargin)
-            make.width.equalTo(Length.thumbnailWidth)
-            make.height.equalTo(Length.thumbnailHeight)
-        })
-        
-        thumbnailDescription.text =  template.template.templateDescription
-        thumbnailDescription.textColor = .white
-        thumbnailDescription.numberOfLines = 0
-        thumbnailDescription.font = .preferredFont(forTextStyle: .body)
-        thumbnailDescription.snp.makeConstraints({ make in
-            make.bottom.equalToSuperview().offset(-Length.thumbnailBottomPadding)
-            make.leading.equalToSuperview().offset(Length.thumbnailLeftPadding)
-            make.trailing.equalToSuperview().offset(-Length.thumbnailRightPadding)
-        })
-        
-        thumbnailTitle.text = template.template.templateTitle
-        thumbnailTitle.textColor = .white
-        thumbnailTitle.numberOfLines = 0
-        thumbnailTitle.font = .preferredFont(for: .title2, weight: .bold)
-        thumbnailTitle.snp.makeConstraints({ make in
-            make.bottom.equalTo(thumbnailDescription.snp.top).offset(-Length.thumbnailLabelSpacing)
-            make.leading.equalToSuperview().offset(Length.thumbnailLeftPadding)
-            make.trailing.equalToSuperview().offset(-Length.thumbnailRightPadding)
-        })
-        
-        title1.snp.makeConstraints({ make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(Length.topMargin)
-            make.leading.equalTo(thumbnail.snp.trailing).offset(Length.sectionLeftMargin)
-            make.trailing.equalToSuperview().offset(-Length.sectionRightMargin)
-        })
-        subtitle1.snp.makeConstraints({ make in
-            make.top.equalTo(title1.snp.bottom).offset(Length.sectionTitleBottomMargin)
-            make.leading.equalTo(title1)
-            make.trailing.equalTo(title1)
-        })
-        paperTitleTextField.snp.makeConstraints({ make in
-            make.top.equalTo(subtitle1.snp.bottom).offset(Length.sectionSubTitleBottomMargin)
-            make.leading.equalTo(title1)
-            make.trailing.equalTo(titleLengthLabel.snp.leading).offset(-Length.textfieldTitleLengthSpacing)
-            make.height.equalTo(Length.textfieldWithBorderHeight)
-        })
-        titleLengthLabel.snp.makeConstraints({ make in
-            make.bottom.equalTo(paperTitleTextField.snp.bottom)
-            make.trailing.equalTo(title1)
-            make.width.equalTo(Length.titleLengthLabelWidth)
-            make.height.equalTo(Length.titleLengthLabelHeight)
-        })
-        warningImage.snp.makeConstraints({ make in
-            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.warningLabelTopMargin)
-            make.leading.equalTo(title1)
-        })
-        warningLabel.snp.makeConstraints({ make in
-            make.top.equalTo(paperTitleTextField.snp.bottom).offset(Length.warningLabelTopMargin)
-            make.leading.equalTo(warningImage.snp.trailing).offset(10)
-        })
-        title2.snp.makeConstraints({ make in
-            make.top.equalTo(warningLabel.snp.bottom).offset(Length.sectionSpacing)
-            make.leading.equalTo(title1)
-            make.trailing.equalTo(title1)
-        })
-        subtitle2.snp.makeConstraints({ make in
-            make.top.equalTo(title2.snp.bottom).offset(Length.sectionTitleBottomMargin)
-            make.leading.equalTo(title1)
-            make.trailing.equalTo(title1)
-        })
-        
+
         let gesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
         view.addGestureRecognizer(gesture)
     }
     
-    // 제목 뷰 가져오기
-    private func getTitle(text: String) -> UILabel {
-        let title = UILabel()
-        title.text = text
-        title.textColor = .label
-        title.font = .preferredFont(forTextStyle: .title2)
-        title.numberOfLines = 0
-        return title
+    // 제목 뷰에서 공통된 컴포넌트들 설정해서 가져오기
+    private func getLabel(text: String, style: UIFont.TextStyle, color: UIColor) -> UILabel {
+        let label = UILabel()
+        label.text = text
+        label.textColor = color
+        label.font = .preferredFont(forTextStyle: style)
+        label.numberOfLines = 0
+        return label
     }
     
-    // 부제목 뷰 가져오기
-    private func getSubTitle(text: String) -> UILabel {
-        let title = UILabel()
-        title.text = text
-        title.textColor = .secondaryLabel
-        title.font = .preferredFont(forTextStyle: .body)
-        title.numberOfLines = 0
-        return title
-    }
-    
-    // 텍스트필드 뷰 가져오기
-    private func initTextField(placeHolder: String) {
-        let border = UIView()
-        paperTitleTextField.addSubview(border)
-        paperTitleTextField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [.foregroundColor: UIColor.placeholderText])
-        
+    // 텍스트필드 컨트롤에 관한 설정들 해주기
+    private func setTextFieldControl() {
         // 제목 입력할때마다 입력한 글자 저장
         paperTitleTextField
             .controlPublisher(for: .editingChanged)
@@ -267,34 +238,6 @@ class PaperSettingViewController: UIViewController {
                 self.setWarningLabel(state: .normal)
             })
             .store(in: &cancellables)
-    
-        border.backgroundColor = .opaqueSeparator
-        border.snp.makeConstraints({ make in
-            make.top.equalTo(paperTitleTextField.snp.bottom)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(Length.textfieldBorderWidth)
-        })
-    }
-    
-    // 텍스트 글자 수 보여주는 뷰 세팅하기
-    private func initTextLengthView() {
-        titleLengthLabel.text = "0/\(textLimit)"
-        titleLengthLabel.font = UIFont.preferredFont(for: .body, weight: .semibold)
-        titleLengthLabel.textAlignment = .center
-        titleLengthLabel.textColor = .white
-        titleLengthLabel.backgroundColor = .systemGray
-        titleLengthLabel.layer.cornerRadius = 9
-        titleLengthLabel.layer.masksToBounds = true
-    }
-    
-    // 경고 라벨 세팅하기
-    private func initWarningLabel() {
-        warningLabel.textColor = .systemGray
-        warningLabel.font = .preferredFont(forTextStyle: .body)
-        
-        warningImage.contentMode = .center
-        warningImage.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
-        warningImage.isHidden = true
     }
     
     // 경고 라벨 종류 설정하기
@@ -309,11 +252,7 @@ class PaperSettingViewController: UIViewController {
         }
     }
     
-    func setCurrentPaperTitle() {
-        currentPaperTitle = paperTitleTextField.text ?? "제목을 입력하지 않으셨습니다."
-    }
-    
-    // 생성하기 버튼 눌렀을 때 동작
+    // 생성하기 버튼 눌렀을 때 경고 메시지 띄워주거나 페이퍼 뷰로 이동하기
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
         let textCount = paperTitleTextField.text?.count ?? 0
         if textCount == 0 {
@@ -327,18 +266,119 @@ class PaperSettingViewController: UIViewController {
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
                   object: nil,
-                  userInfo: [NotificationViewKey.view: "페이퍼 보관함"]
+                  userInfo: [NotificationViewKey.view: "보관함"]
               )
           }
       }
     
-    // 뒤로가기 버튼 눌렀을 때 동작
+    // 뒤로가기 버튼 눌렀을 때 뒤로가기
     @objc private func backBtnPressed() {
         navigationController?.popViewController(animated: true)
     }
 
-    // 배경 눌렀을 때 동작
-    @objc func backgroundTapped(_ sender: UITapGestureRecognizer) {
+    // 배경 눌렀을 때 텍스트필드 포커스 해제하기
+    @objc private func backgroundTapped(_ sender: UITapGestureRecognizer) {
         paperTitleTextField.resignFirstResponder()
+    }
+    
+    // 피커 버튼 눌렀을 때 피커 보여주기
+    @objc private func onClickedTimePickerButton(_ sender: UIButton) {
+        timePicker.modalPresentationStyle = .popover
+        timePicker.popoverPresentationController?.sourceView = sender
+        present(timePicker, animated: true)
+    }
+}
+
+// 스냅킷 설정
+extension PaperSettingViewController {
+    private func configure() {
+        view.addSubview(thumbnail)
+        view.addSubview(title1)
+        view.addSubview(subtitle1)
+        view.addSubview(paperTitleTextField)
+        view.addSubview(titleLengthLabel)
+        view.addSubview(warningImage)
+        view.addSubview(warningLabel)
+        view.addSubview(title2)
+        view.addSubview(subtitle2)
+        view.addSubview(limitTimeTitle)
+        view.addSubview(timePickerButton)
+        thumbnail.addSubview(thumbnailTitle)
+        thumbnail.addSubview(thumbnailDescription)
+        paperTitleTextField.addSubview(textFieldBorder)
+    }
+    
+    private func setConstraints() {
+        thumbnail.snp.makeConstraints({ make in
+            make.leading.equalToSuperview().offset(PaperSettingLength.thumbnailLeftMargin)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(PaperSettingLength.topMargin)
+            make.width.equalTo(PaperSettingLength.thumbnailWidth)
+            make.height.equalTo(PaperSettingLength.thumbnailHeight)
+        })
+        thumbnailDescription.snp.makeConstraints({ make in
+            make.bottom.equalToSuperview().offset(-PaperSettingLength.thumbnailBottomPadding)
+            make.leading.equalToSuperview().offset(PaperSettingLength.thumbnailLeftPadding)
+            make.trailing.equalToSuperview().offset(-PaperSettingLength.thumbnailRightPadding)
+        })
+        thumbnailTitle.snp.makeConstraints({ make in
+            make.bottom.equalTo(thumbnailDescription.snp.top).offset(-PaperSettingLength.thumbnailLabelSpacing)
+            make.leading.equalToSuperview().offset(PaperSettingLength.thumbnailLeftPadding)
+            make.trailing.equalToSuperview().offset(-PaperSettingLength.thumbnailRightPadding)
+        })
+        title1.snp.makeConstraints({ make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(PaperSettingLength.topMargin)
+            make.leading.equalTo(thumbnail.snp.trailing).offset(PaperSettingLength.sectionLeftMargin)
+            make.trailing.equalToSuperview().offset(-PaperSettingLength.sectionRightMargin)
+        })
+        subtitle1.snp.makeConstraints({ make in
+            make.top.equalTo(title1.snp.bottom).offset(PaperSettingLength.sectionTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
+        })
+        paperTitleTextField.snp.makeConstraints({ make in
+            make.top.equalTo(subtitle1.snp.bottom).offset(PaperSettingLength.sectionSubTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(titleLengthLabel.snp.leading).offset(-PaperSettingLength.textfieldTitleLengthSpacing)
+            make.height.equalTo(PaperSettingLength.textfieldWithBorderHeight)
+        })
+        titleLengthLabel.snp.makeConstraints({ make in
+            make.bottom.equalTo(paperTitleTextField.snp.bottom)
+            make.trailing.equalTo(title1)
+            make.width.equalTo(PaperSettingLength.titleLengthLabelWidth)
+            make.height.equalTo(PaperSettingLength.titleLengthLabelHeight)
+        })
+        warningImage.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom).offset(PaperSettingLength.warningLabelTopMargin)
+            make.leading.equalTo(title1)
+        })
+        warningLabel.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom).offset(PaperSettingLength.warningLabelTopMargin)
+            make.leading.equalTo(warningImage.snp.trailing).offset(10)
+        })
+        title2.snp.makeConstraints({ make in
+            make.top.equalTo(warningLabel.snp.bottom).offset(PaperSettingLength.sectionSpacing)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
+        })
+        subtitle2.snp.makeConstraints({ make in
+            make.top.equalTo(title2.snp.bottom).offset(PaperSettingLength.sectionTitleBottomMargin)
+            make.leading.equalTo(title1)
+            make.trailing.equalTo(title1)
+        })
+        limitTimeTitle.snp.makeConstraints({ make in
+            make.top.equalTo(subtitle2.snp.bottom).offset(PaperSettingLength.sectionSubTitleBottomMargin)
+            make.leading.equalTo(title1)
+        })
+        timePickerButton.snp.makeConstraints({ make in
+            make.centerY.equalTo(limitTimeTitle)
+            make.leading.equalTo(limitTimeTitle.snp.trailing).offset(PaperSettingLength.timePickerLeftMargin)
+            make.width.equalTo(PaperSettingLength.timePickerButtonWidth)
+            make.height.equalTo(PaperSettingLength.timePickerButtonHeight)
+        })
+        textFieldBorder.snp.makeConstraints({ make in
+            make.top.equalTo(paperTitleTextField.snp.bottom)
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(PaperSettingLength.textfieldBorderWidth)
+        })
     }
 }

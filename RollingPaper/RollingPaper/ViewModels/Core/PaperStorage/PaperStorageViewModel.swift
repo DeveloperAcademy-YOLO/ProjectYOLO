@@ -5,10 +5,29 @@
 //  Created by 김동락 on 2022/10/12.
 //
 
-import UIKit
 import Combine
+import UIKit
 
 class PaperStorageViewModel {
+    private let timeFlowManager = TimeFlowManager()
+    private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
+    private let output: PassthroughSubject<Output, Never> = .init()
+    private let localDatabaseManager: DatabaseManager
+    private let serverDatabaseManager: DatabaseManager
+    private var cancellables = Set<AnyCancellable>()
+    private var papersFromLocal = [PaperPreviewModel]()
+    private var papersFromServer = [PaperPreviewModel]()
+    private var papers = [PaperPreviewModel]()
+    
+    var currentTime: Date = Date()
+    var serverPaperIds = Set<String>()
+    var localPaperIds = Set<String>()
+    var openedPaperIds = Set<String>()
+    var closedPaperIds = Set<String>()
+    var thumbnails = [String: UIImage?]()
+    var openedPapers = [PaperPreviewModel]()
+    var closedPapers = [PaperPreviewModel]()
+    
     enum Input {
         case viewDidAppear
         case viewDidDisappear
@@ -19,59 +38,30 @@ class PaperStorageViewModel {
         case papersAreUpdatedInDatabase
         case papersAreUpdatedByTimer
     }
-    var currentTime: Date = Date()
-    var serverPaperIds = Set<String>()
-    var localPaperIds = Set<String>()
-    var openedPaperIds = Set<String>()
-    var closedPaperIds = Set<String>()
-    var thumbnails = [String: UIImage?]()
-    
-    private let timerInterval: Double = 60
-    private let localDatabaseManager: DatabaseManager
-    private let serverDatabaseManager: DatabaseManager
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    private var timer: AnyCancellable?
-    private var papersFromLocal = [PaperPreviewModel]()
-    private var papersFromServer = [PaperPreviewModel]()
-    private var papers = [PaperPreviewModel]()
-    var openedPapers = [PaperPreviewModel]()
-    var closedPapers = [PaperPreviewModel]()
     
     init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
+        bindTimer()
         bindDatabaseManager()
     }
     
-    // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
-    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
-        input
-            .receive(on: DispatchQueue.global(qos: .background))
+    // 타이머 연동시키기
+    private func bindTimer() {
+        let timerOutput = timeFlowManager.transform(input: timerInput.eraseToAnyPublisher())
+        timerOutput
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
-                case .viewDidAppear:
-                    self.bindTimer()
+                // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
+                case .timeIsUpdated:
                     self.updateCurrentTime()
                     self.classifyPapers()
-                    self.downloadLocalThumbnails(outputValue: .initPapers)
-                    self.downloadServerThumbnails(outputValue: .initPapers)
-                // 뷰가 없어졌다는 시그널이 오면 타이머 bind 끊어버림
-                case .viewDidDisappear:
-                    self.timer?.cancel()
-                // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
-                case .paperSelected(let paperId):
-                    if self.serverPaperIds.contains(paperId) {
-                        self.serverDatabaseManager.fetchPaper(paperId: paperId)
-                    } else {
-                        self.localDatabaseManager.fetchPaper(paperId: paperId)
-                    }
+                    self.output.send(.papersAreUpdatedByTimer)
                 }
             })
             .store(in: &cancellables)
-        return output.eraseToAnyPublisher()
     }
     
     // 데이터베이스 메니저 연동
@@ -103,22 +93,9 @@ class PaperStorageViewModel {
             .store(in: &cancellables)
     }
     
-    // 타이머 연동
-    private func bindTimer() {
-        timer = Timer.publish(every: timerInterval, on: .main, in: .common)
-            .autoconnect()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] date in
-                guard let self = self else {return}
-                self.updateCurrentTime(date: date)
-                self.classifyPapers()
-                self.output.send(.papersAreUpdatedByTimer)
-            })
-    }
-    
     // 현재 시간 업데이트하기
-    private func updateCurrentTime(date: Date = Date()) {
-        self.currentTime = date
+    private func updateCurrentTime() {
+        self.currentTime = Date()
     }
     
     // 서버와 로컬에 있는 페이퍼들 합쳐서, 열린 페이퍼와 닫힌 페이퍼로 구분하기
@@ -213,9 +190,11 @@ class PaperStorageViewModel {
                 }
             }
         }
+        
+        if papersFromLocal.isEmpty {
+            output.send(outputValue)
+        }
     }
-    
-    
     
     // url을 통해 서버에 저장되어있는 썸네일 다운받아오기
     private func downloadServerThumbnails(outputValue: Output) {
@@ -270,5 +249,39 @@ class PaperStorageViewModel {
                 }
             }
         }
+        
+        if papersFromServer.isEmpty {
+            output.send(outputValue)
+        }
+    }
+    
+    // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
+    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
+        input
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
+                case .viewDidAppear:
+                    self.timerInput.send(.viewDidAppear)
+                    self.updateCurrentTime()
+                    self.classifyPapers()
+                    self.downloadLocalThumbnails(outputValue: .initPapers)
+                    self.downloadServerThumbnails(outputValue: .initPapers)
+                // 뷰가 사라졌다는 시그널이 오면 타이머한테 알려줘서 타이머 해제시키기
+                case .viewDidDisappear:
+                    self.timerInput.send(.viewDidDisappear)
+                // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
+                case .paperSelected(let paperId):
+                    if self.serverPaperIds.contains(paperId) {
+                        self.serverDatabaseManager.fetchPaper(paperId: paperId)
+                    } else {
+                        self.localDatabaseManager.fetchPaper(paperId: paperId)
+                    }
+                }
+            })
+            .store(in: &cancellables)
+        return output.eraseToAnyPublisher()
     }
 }

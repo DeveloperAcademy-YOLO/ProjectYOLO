@@ -1,5 +1,5 @@
 //
-//  CardPencilKitViewController.swift
+//  CardCreateViewController.swift
 //  RollingPaper
 //
 //  Created by Yosep on 2022/10/05.
@@ -21,9 +21,10 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var backgroundImg = UIImage(named: "Rectangle")
+    private var backgroundImg: UIImage?
     private var isCanvasToolToggle: Bool = true
     private var isStickerToggle: Bool = false
+    private var isBackgroundToggle: Bool = false
     private var imageSticker: UIImage!
     private var _selectedStickerView: StickerView?
     private var selectedStickerView: StickerView? {
@@ -68,7 +69,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let canvas = PKCanvasView(frame: .zero)
         canvas.delegate = self
         canvas.layer.masksToBounds = true
-        canvas.layer.cornerRadius = 50
+        canvas.layer.cornerRadius = 32
         canvas.contentMode = .scaleAspectFill
         canvas.isOpaque = false
         canvas.alwaysBounceVertical = true
@@ -82,11 +83,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
+        theImageView.layer.cornerRadius = 32
         theImageView.contentMode = .scaleAspectFill
-        theImageView.layer.borderWidth = 0.5
-        theImageView.layer.borderColor = UIColor.systemGray.cgColor
-        theImageView.image = UIImage(named: "Rectangle_default")
+        theImageView.image = backgroundImg
         return theImageView
     }()
     
@@ -118,6 +117,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return label
     }()
     
+    lazy var introWordingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "사진 또는 배경을 넣어 주세요."
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 30)
+        label.textColor = .lightGray
+        return label
+    }()
+    
     lazy var cameraButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
@@ -126,7 +134,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return button
     }()
     
-    lazy var backgroundButton: UIButton = {
+    lazy var backgroundOnButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "paintpalette.fill")
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(setPopOverView(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var backgroundOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
         button.tintColor = UIColor(red: 217, green: 217, blue: 217)
@@ -186,6 +202,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
+        view.addSubview(introWordingLabel)
+        introWordingLabelConstraints()
         
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
@@ -200,7 +218,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         buttonLabelConstraints()
         
         cameraButtonAppear()
-        backgroundButtonAppear()
+        backgroundOffButtonAppear()
         
         dividerAppear()
         
@@ -216,6 +234,10 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         
         input.send(.viewDidLoad)
         bind()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false
     }
     
     private func bind() {
@@ -287,9 +309,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         cameraButtonConstraints()
     }
     
-    private func backgroundButtonAppear() {
-        view.addSubview(backgroundButton)
-        backgroundButtonConstraints()
+    private func backgroundOnButtonAppear() {
+        view.addSubview(backgroundOnButton)
+        backgroundOnButtonConstraints()
+    }
+    
+    private func backgroundOffButtonAppear() {
+        view.addSubview(backgroundOffButton)
+        backgroundOffButtonConstraints()
     }
     
     private func dividerAppear() {
@@ -338,6 +365,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
+        isBackgroundToggle = true
+        backgroundOnButtonAppear()
+        
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
         controller.preferredContentSize = CGSize(width: 128, height: 400)
@@ -375,6 +405,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        isBackgroundToggle = false
+        backgroundOffButtonAppear()
         print("Modal Dismissed!")
     }
 }
@@ -392,23 +424,19 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         return image
     }
     
-    func resizedImage(image: UIImage?, width: CGFloat, height: CGFloat) -> UIImage? {
-        guard let image = image else { return nil }
-        let newSize = CGSize(width: width, height: height)
-        UIGraphicsBeginImageContextWithOptions(newSize, false, UIScreen.main.scale)
-        image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return newImage
-    }
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.arrStickers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let aCell = collectionView.dequeueReusableCell(withReuseIdentifier: "StickerCollectionViewCell", for: indexPath) as? StickerCollectionViewCell else {return UICollectionViewCell()}
-        aCell.myImage.image = resizedImage(image: UIImage(named: self.arrStickers[indexPath.item]), width: 80, height: 80)
+        
+        let image = UIImage(named: self.arrStickers[indexPath.item])
+        let targetSize = CGSize(width: 80, height: 80)
+
+        let scaledImage = image?.scalePreservingAspectRatio(targetSize: targetSize)
+        aCell.myImage.image = scaledImage
+        
         return aCell
     }
     
@@ -435,7 +463,6 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         }
     }
 }
-
 
 extension CardCreateViewController: StickerViewDelegate {
     func stickerViewDidTap(_ stickerView: StickerView) {
@@ -528,7 +555,7 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     private func cameraImagePicker() {
-        let pushVC = CameraCustomPicker()
+        let pushVC = CameraCustomPickerController()
         pushVC.delegate = self
         pushVC.sourceType = .camera
         pushVC.cameraFlashMode = .off
@@ -581,15 +608,40 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
 }
 
+extension UIImage {
+    func scalePreservingAspectRatio(targetSize: CGSize) -> UIImage {
+        // Determine the scale factor that preserves aspect ratio
+        let widthRatio = targetSize.width / size.width
+        let heightRatio = targetSize.height / size.height
+        
+        let scaleFactor = min(widthRatio, heightRatio)
+        
+        // Compute the new image size that preserves aspect ratio
+        let scaledImageSize = CGSize(
+            width: size.width * scaleFactor,
+            height: size.height * scaleFactor
+        )
+
+        // Draw and return the resized UIImage
+        let renderer = UIGraphicsImageRenderer(
+            size: scaledImageSize
+        )
+        let scaledImage = renderer.image { _ in
+            self.draw(in: CGRect(
+                origin: .zero,
+                size: scaledImageSize
+            ))
+        }
+        return scaledImage
+    }
+}
+
 extension CardCreateViewController {
     private func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -597,12 +649,9 @@ extension CardCreateViewController {
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -610,12 +659,18 @@ extension CardCreateViewController {
     
     private func canvasViewConstraints() {
         canvasView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.75)
+            make.width.equalTo(self.view.bounds.width * 0.80)
             make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
-            make.leading.equalTo(self.view.snp.leading).offset(self.view.bounds.width * 0.125)
-            make.trailing.equalTo(self.view.snp.trailing).offset(-(self.view.bounds.width * 0.125))
-            make.top.equalTo(self.view.snp.top).offset(90)
-            make.bottom.equalTo(self.view.snp.bottom).offset(-90)
+            make.top.equalTo(self.view.snp.top).offset(60)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    private func introWordingLabelConstraints() {
+        introWordingLabel.snp.makeConstraints({ make in
+            make.width.equalTo(500)
+            make.height.equalTo(50)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -657,8 +712,17 @@ extension CardCreateViewController {
         })
     }
     
-    private func backgroundButtonConstraints() {
-        backgroundButton.snp.makeConstraints({ make in
+    private func backgroundOnButtonConstraints() {
+        backgroundOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+        })
+    }
+    
+    private func backgroundOffButtonConstraints() {
+        backgroundOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
@@ -670,8 +734,8 @@ extension CardCreateViewController {
         divider.snp.makeConstraints({ make in
             make.width.equalTo(65)
             make.height.equalTo(1)
-            make.centerX.equalTo(backgroundButton.snp.centerX)
-            make.top.equalTo(backgroundButton.snp.bottom).offset(20)
+            make.centerX.equalTo(cameraButton.snp.centerX)
+            make.top.equalTo(buttonLabel.snp.top).offset(150)
         })
     }
     
@@ -710,43 +774,6 @@ extension CardCreateViewController {
             make.leading.equalTo(buttonLabel.snp.leading).offset(10)
             make.top.equalTo(divider.snp.bottom).offset(90)
             make.bottom.equalTo(buttonLabel.snp.bottom).offset(-20)
-        })
-    }
-}
-
-private class StickerCollectionViewCell: UICollectionViewCell {
-    
-    static let identifier = "StickerCollectionViewCell"
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupView()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // 셀에 이미지 뷰 객체를 넣어주기 위해서 생성
-    let myImage: UIImageView = {
-        let img = UIImageView()
-        // 자동으로 위치 정렬 금지
-        img.translatesAutoresizingMaskIntoConstraints = false
-        return img
-    }()
-    
-    func setupView() {
-        // 셀에 위에서 만든 이미지 뷰 객체를 넣어준다.
-        addSubview(myImage)
-        myImageConstraints()
-    }
-    
-    func myImageConstraints() {
-        myImage.snp.makeConstraints({ make in
-            make.top.equalTo(self.myImage)
-            make.left.equalTo(self.myImage)
-            make.right.equalTo(self.myImage)
-            make.bottom.equalTo(self.myImage)
         })
     }
 }
