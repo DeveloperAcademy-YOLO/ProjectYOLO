@@ -476,16 +476,16 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
 }
 
 extension CardCreateViewController: IRStickerViewDelegate {
-    func ir_StickerView(stickerView: IRStickerView, imageForRightTopControl recommendedSize: CGSize) -> UIImage? {
+    private func ir_StickerView(stickerView: IRStickerView, imageForRightTopControl recommendedSize: CGSize) -> UIImage? {
         if stickerView.tag == 1 {
-            return UIImage.init(named: "btn_smile.png")
+            return UIImage.init(named: "Sticker_Close")
         }
         return nil
     }
     
     func ir_StickerView(stickerView: IRStickerView, imageForLeftBottomControl recommendedSize: CGSize) -> UIImage? {
         if stickerView.tag == 1 || stickerView.tag == 2 {
-            return UIImage.init(named: "btn_flip.png")
+            return UIImage.init(named: "Sticker_Flip")
         }
         return nil
     }
