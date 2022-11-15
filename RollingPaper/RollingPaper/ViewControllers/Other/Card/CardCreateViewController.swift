@@ -454,12 +454,11 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
             if let imageSticker = cell.myImage.image {
-                let testImage = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100))
-                testImage.image = imageSticker
-                testImage.contentMode = .scaleAspectFit
-              
-                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100), contentImage: imageSticker)
-                stickerView.center = view.center
+
+                print("cell indexPath: \(indexPath), image size: \(imageSticker.size)")
+                
+                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
+                stickerView.center = someImageView.center
                 stickerView.stickerMinScale = 0.5
                 stickerView.stickerMaxScale = 3.0
                 stickerView.enabledControl = false

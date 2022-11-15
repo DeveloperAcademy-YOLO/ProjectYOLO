@@ -30,16 +30,13 @@ class StickerCollectionViewCell: UICollectionViewCell {
     
     func setupView() {
         // 셀에 위에서 만든 이미지 뷰 객체를 넣어준다.
-        addSubview(myImage)
+        contentView.addSubview(myImage)
         myImageConstraints()
     }
     
     func myImageConstraints() {
-        myImage.snp.makeConstraints({ make in
-            make.top.equalTo(self.myImage)
-            make.left.equalTo(self.myImage)
-            make.right.equalTo(self.myImage)
-            make.bottom.equalTo(self.myImage)
-        })
+        myImage.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
 }
