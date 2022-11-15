@@ -356,7 +356,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     
-    func saveCard( _ indexPath : IndexPath) {
+    func saveCard( _ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row - 1]
         
@@ -370,11 +370,11 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         let card = currentPaper.cards[indexPath.row - 1]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            imageShare(sender,image)
+            imageShare(sender, image)
         }
     }
     
-    func deleteCard( _ indexPath : IndexPath) {
+    func deleteCard( _ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row - 1]
                 
@@ -439,7 +439,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if (indexPath.row == 0) {
+        if indexPath.row == 0 {
             moveToCardRootView()
         } else {
             guard let currentPaper = viewModel.currentPaper else { return  }
@@ -473,7 +473,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
-            ){ [weak self] _ in
+            ) { [weak self] _ in
                 self?.saveCard(indexPath)
             }
             
@@ -483,7 +483,7 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
-            ){ [weak self] _ in
+            ) { [weak self] _ in
                 self?.shareCard(indexPath, point)
             }
             
