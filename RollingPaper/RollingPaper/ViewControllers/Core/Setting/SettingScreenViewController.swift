@@ -115,6 +115,14 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         return visualEffectView
     }()
     
+    private let spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.transform = CGAffineTransform(scaleX: 3, y: 3)
+        spinner.color = .label
+        spinner.isHidden = true
+        return spinner
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -187,22 +195,32 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             .store(in: &cancellables)
         viewModel.currentUserSubject
             .receive(on: DispatchQueue.main)
-            .sink { userModel in
+            .sink { [weak self] userModel in
+                guard let self = self else { return }
                 let placeholder =
                 self.profileText.textField.attributedPlaceholder = NSAttributedString(string: userModel?.name ?? "Default", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray, NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .body)])
                 self.profileText.textField.text = self.viewModel.currentUserSubject.value?.name
                 self.profileText.textField.sendActions(for: .editingChanged)
                 self.profileText.textField.sendActions(for: .editingDidEnd)
                 self.profileLabel.text = userModel?.name ?? "Guest"
+                if
+                    let userModel = userModel,
+                    let url = userModel.profileUrl {
+                    self.spinner.startAnimating()
+                    self.spinner.isHidden = false
+                }
             }
             .store(in: &cancellables)
         viewModel.currentPhotoSubject
             .receive(on: DispatchQueue.main)
             .sink { [weak self] image in
                 if let image = image {
+                    print("Stop animation")
+                    self?.spinner.stopAnimating()
                     self?.profileImage.image = image
                 } else {
-                    self?.profileImage.image = UIImage(systemName: "person")
+                    print("Start animation")
+                    self?.profileImage.image = UIImage(systemName: "person.circle")
                 }
             }
             .store(in: &cancellables)
@@ -363,6 +381,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
 
         profileImage.addSubview(visualEffectView)
         profileImage.addSubview(editPhotoButton)
+        profileImage.addSubview(spinner)
 
         view.addSubview(profileText)
         view.addSubview(profileLabel)
@@ -388,6 +407,10 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             make.height.equalTo(180)
             make.width.equalTo(180)
         })
+        
+        spinner.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
 
         editPhotoButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()

@@ -7,9 +7,10 @@
 
 import UIKit
 
-class PaperStorageFlowLayout: UICollectionViewFlowLayout {
-    let cellHorizontalSpacing: CGFloat
-    let inset: UIEdgeInsets
+// 컬렉션뷰에 쓰이는 레이아웃
+final class PaperStorageFlowLayout: UICollectionViewFlowLayout {
+    private let cellHorizontalSpacing: CGFloat
+    private let inset: UIEdgeInsets
 
     init(cellSpacing: CGFloat, inset: UIEdgeInsets) {
         self.cellHorizontalSpacing = cellSpacing
@@ -21,6 +22,7 @@ class PaperStorageFlowLayout: UICollectionViewFlowLayout {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // 컬렉션 뷰의 셀들 일정한 간격으로 나열되도록 하기
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         sectionInset = inset
         

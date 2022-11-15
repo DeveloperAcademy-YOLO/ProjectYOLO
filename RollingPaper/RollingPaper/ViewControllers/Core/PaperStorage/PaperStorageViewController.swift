@@ -5,16 +5,16 @@
 //  Created by 김동락 on 2022/10/12.
 //
 
-import UIKit
-import SnapKit
 import Combine
+import SnapKit
+import UIKit
 
-class PaperStorageViewController: UIViewController {
+final class PaperStorageViewController: UIViewController {
     private let splitViewManager = SplitViewManager.shared
     private let viewModel = PaperStorageViewModel()
     private let input: PassthroughSubject<PaperStorageViewModel.Input, Never> = .init()
+    
     private var cancellables = Set<AnyCancellable>()
-    private var paperCollectionView: PaperStorageCollectionView?
     private var splitViewIsOpened: Bool = true
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
@@ -23,29 +23,58 @@ class PaperStorageViewController: UIViewController {
         case nothing, onlyOpened, onlyClosed, both
     }
     
+    // 데이터 로딩시 보여줄 스피너
+    private lazy var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .label
+        return spinner
+    }()
+    // 페이퍼 목록 보여주는 컬렉션뷰
+    private lazy var paperCollectionView: PaperStorageCollectionView = {
+        let paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: .init())
+        paperCollectionView.setCollectionViewLayout(getCollectionViewLayout(), animated: false)
+ 
+        paperCollectionView.backgroundColor = .systemBackground
+        paperCollectionView.alwaysBounceVertical = true
+
+        paperCollectionView.register(PaperStorageOpenedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageOpenedCollectionCell.identifier)
+        paperCollectionView.register(PaperStorageClosedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageClosedCollectionCell.identifier)
+        paperCollectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
+        
+        paperCollectionView.dataSource = self
+        paperCollectionView.delegate = self
+        paperCollectionView.isHidden = true
+        
+        return paperCollectionView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
         splitViewBind()
         setMainView()
-        setCollectionView()
+        configure()
+        setConstraints()
     }
     
+    // splitview 나오게 하기
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.show(.primary)
     }
     
-    // view가 나타나면 알려주기
+    // 뷰모델한테 뷰 나타났다고 알려주기
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        updateLoadingView(isLoading: true)
         input.send(.viewDidAppear)
         viewIsChange = false
     }
     
-    // view가 사라지면 알려주기
+    // 뷰모델한테 뷰 사라졌다고 알려주기
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        paperCollectionView.isHidden = true
         input.send(.viewDidDisappear)
     }
     
@@ -57,28 +86,19 @@ class PaperStorageViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                // 페이퍼에 변화가 있으면 UI 업데이트 하기
-                case .initPapers, .papersAreUpdatedInDatabase, .papersAreUpdatedByTimer:
-                    self.paperCollectionView?.reloadData()
-                    self.setDataState()
+                // 변화가 있으면 UI 업데이트 하기
+                case .initPapers:
+                    self.updateLoadingView(isLoading: false)
+                case .papersAreUpdatedByTimer, .papersAreUpdatedInDatabase:
+                    break
                 }
+                self.setDataState()
+                self.paperCollectionView.reloadData()
             })
             .store(in: &cancellables)
     }
     
-    private func setDataState() {
-        if viewModel.openedPapers.isEmpty && viewModel.closedPapers.isEmpty {
-            dataState = .nothing
-        } else if viewModel.openedPapers.isEmpty {
-            dataState = .onlyClosed
-        } else if viewModel.closedPapers.isEmpty {
-            dataState = .onlyOpened
-        } else {
-            dataState = .both
-        }
-    }
-    
-    // splitView에 대한 어떤 행동을 받고 그에 따라 어떤 행동을 할지 정하기
+    // splitView가 열리고 닫힘에 따라 어떤 행동을 할지 정하기
     private func splitViewBind() {
         viewIsChange = false
         let output = splitViewManager.getOutput()
@@ -99,54 +119,61 @@ class PaperStorageViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    // 스플릿뷰 열고닫음에 따라 뷰 업데이트하기
-    private func updateLayout() {
-        let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
-        PaperStorageLength.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin+PaperStorageLength.openedCellHorizontalSpace+2))/2
-        PaperStorageLength.closedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin))
-        
-        UIView.performWithoutAnimation({
-            let openedIndexPath = Array(0..<viewModel.openedPapers.count).map({ IndexPath(item: $0, section: 0) })
-            self.paperCollectionView?.reloadItems(at: openedIndexPath)
-            self.paperCollectionView?.reloadSections(IndexSet(integer: 1))
-        })
-        
-    }
-    
     // 메인 뷰 초기화
     private func setMainView() {
         view.backgroundColor = .systemBackground
     }
     
-    // 컬렉션 뷰 레이아웃 초기화
-    private func setCollectionViewLayout() {
-        let sectionInset = UIEdgeInsets(top: PaperStorageLength.sectionTopMargin, left: PaperStorageLength.sectionLeftMargin, bottom: PaperStorageLength.sectionBottomMargin, right: PaperStorageLength.sectionRightMargin)
-        let collectionViewLayer = PaperStorageFlowLayout(cellSpacing: PaperStorageLength.openedCellHorizontalSpace, inset: sectionInset)
-        collectionViewLayer.headerReferenceSize = .init(width: PaperStorageLength.headerWidth, height: PaperStorageLength.headerHeight)
-        collectionViewLayer.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        self.paperCollectionView?.setCollectionViewLayout(collectionViewLayer, animated: false)
+    // 진행중인거, 종료된거에 따라 데이터 상태 변경하기
+    private func setDataState() {
+        if viewModel.openedPapers.isEmpty && viewModel.closedPapers.isEmpty {
+            dataState = .nothing
+        } else if viewModel.openedPapers.isEmpty {
+            dataState = .onlyClosed
+        } else if viewModel.closedPapers.isEmpty {
+            dataState = .onlyOpened
+        } else {
+            dataState = .both
+        }
     }
     
-    // 컬렉션 뷰 초기화
-    private func setCollectionView() {
-        paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: .init())
-        setCollectionViewLayout()
+    // 컬렉션 뷰 셀의 가로 길이 업데이트하기
+    private func updateLayout() {
+        let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
+        PaperStorageLength.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin+PaperStorageLength.openedCellHorizontalSpace+2))/2
+        PaperStorageLength.closedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin))
         
-        guard let collectionView = paperCollectionView else {return}
-        collectionView.backgroundColor = .systemBackground
-        collectionView.alwaysBounceVertical = true
-
-        collectionView.register(PaperStorageOpenedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageOpenedCollectionCell.identifier)
-        collectionView.register(PaperStorageClosedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageClosedCollectionCell.identifier)
-        collectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-
-        view.addSubview(collectionView)
-        collectionView.snp.makeConstraints({ make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide)
+        UIView.performWithoutAnimation({ [weak self] in
+            guard let self = self else {return}
+            let openedIndexPath = Array(0..<self.viewModel.openedPapers.count).map({ IndexPath(item: $0, section: 0) })
+            self.paperCollectionView.reloadItems(at: openedIndexPath)
+            self.paperCollectionView.reloadSections(IndexSet(integer: 1))
         })
+    }
+    
+    // 로딩뷰 띄워주거나 없애기
+    private func updateLoadingView(isLoading: Bool) {
+        if isLoading {
+            paperCollectionView.isHidden = true
+            spinner.isHidden = false
+            spinner.startAnimating()
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { [weak self] in
+                guard let self = self else {return}
+                self.paperCollectionView.isHidden = false
+                self.spinner.isHidden = true
+                self.spinner.stopAnimating()
+            }
+        }
+    }
+    
+    // 컬렉션 뷰 레이아웃 가져오기
+    private func getCollectionViewLayout() -> PaperStorageFlowLayout {
+        let sectionInset = UIEdgeInsets(top: PaperStorageLength.sectionTopMargin, left: PaperStorageLength.sectionLeftMargin, bottom: PaperStorageLength.sectionBottomMargin, right: PaperStorageLength.sectionRightMargin)
+        let collectionViewLayout = PaperStorageFlowLayout(cellSpacing: PaperStorageLength.openedCellHorizontalSpace, inset: sectionInset)
+        collectionViewLayout.headerReferenceSize = .init(width: PaperStorageLength.headerWidth, height: PaperStorageLength.headerHeight)
+        collectionViewLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        return collectionViewLayout
     }
     
     // 특정 페이퍼를 선택하면 알려주기
@@ -229,5 +256,23 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
 }
 
+// 스냅킷 설정
+extension PaperStorageViewController {
+    private func configure() {
+        view.addSubview(spinner)
+        view.addSubview(paperCollectionView)
+    }
+    
+    private func setConstraints() {
+        spinner.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
+        paperCollectionView.snp.makeConstraints({ make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+        })
+    }
+}
+
 // 진행중인 페이퍼와 종료된 페이퍼들을 모두 보여주는 컬렉션 뷰
-private class PaperStorageCollectionView: UICollectionView {}
+final private class PaperStorageCollectionView: UICollectionView {}
