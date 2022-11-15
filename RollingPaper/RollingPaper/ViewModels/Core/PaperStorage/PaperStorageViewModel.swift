@@ -64,10 +64,16 @@ class PaperStorageViewModel {
             .store(in: &cancellables)
     }
     
+    private func filterPaperPreviewModels(paperPreviews: [PaperPreviewModel]) -> [PaperPreviewModel] {
+        let filtered = paperPreviews.filter({!$0.isGift})
+        return filtered
+    }
+    
     // 데이터베이스 메니저 연동
     private func bindDatabaseManager() {
         localDatabaseManager.papersSubject
             .receive(on: DispatchQueue.global(qos: .background))
+            .map(filterPaperPreviewModels)
             .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
                 self.papersFromLocal = paperPreviews
@@ -81,6 +87,7 @@ class PaperStorageViewModel {
         
         serverDatabaseManager.papersSubject
             .receive(on: DispatchQueue.global(qos: .background))
+            .map(filterPaperPreviewModels)
             .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
                 self.papersFromServer = paperPreviews
