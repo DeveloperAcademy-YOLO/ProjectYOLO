@@ -51,6 +51,16 @@ final class GiftStorageCollectionCell: UICollectionViewCell {
         date.textAlignment = .center
         return date
     }()
+    // 보낸 사람
+    private let sender: BasePaddingLabel = {
+        let sender = BasePaddingLabel(padding: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
+        sender.layer.cornerRadius = 8
+        sender.layer.masksToBounds = true
+        sender.backgroundColor = .black.withAlphaComponent(0.64)
+        sender.textColor = .white
+        
+        return sender
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -74,6 +84,7 @@ final class GiftStorageCollectionCell: UICollectionViewCell {
         if let paper = paper {
             date.text = changeDateFormat(date: paper.endTime)
             title.text = paper.title
+            sender.text = (paper.creator?.name ?? "?") + "님이 보낸 선물"
             preview.image = thumbnail
             preview.snp.updateConstraints({ make in
                 make.width.equalTo(GiftStorageLength.paperThumbnailWidth)
@@ -92,6 +103,7 @@ extension GiftStorageCollectionCell {
         addSubview(cell)
         cell.addSubview(preview)
         cell.addSubview(label)
+        cell.addSubview(sender)
         preview.addSubview(previewOverlay)
         label.addArrangedSubview(title)
         label.addArrangedSubview(date)
@@ -113,6 +125,10 @@ extension GiftStorageCollectionCell {
         label.snp.makeConstraints({ make in
             make.centerX.equalTo(preview)
             make.centerY.equalTo(preview)
+        })
+        sender.snp.makeConstraints({ make in
+            make.top.equalToSuperview().offset(9)
+            make.leading.equalToSuperview().offset(11)
         })
     }
 }
