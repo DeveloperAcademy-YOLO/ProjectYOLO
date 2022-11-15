@@ -23,6 +23,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
     private var isCanvasToolToggle: Bool = true
+    private var isCameraToggle: Bool = false
     private var isStickerToggle: Bool = false
     private var isBackgroundToggle: Bool = false
     private var imageSticker: UIImage!
@@ -126,7 +127,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return label
     }()
     
-    lazy var cameraButton: UIButton = {
+    lazy var cameraOnButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "camera.fill")
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var cameraOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
         button.tintColor = UIColor(red: 217, green: 217, blue: 217)
@@ -217,7 +226,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        cameraButtonAppear()
+        cameraOffButtonAppear()
         backgroundOffButtonAppear()
         
         dividerAppear()
@@ -304,9 +313,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         toolPicker.setVisible(false, forFirstResponder: canvasView)
     }
     
-    private func cameraButtonAppear() {
-        view.addSubview(cameraButton)
-        cameraButtonConstraints()
+    private func cameraOnButtonAppear() {
+        view.addSubview(cameraOnButton)
+        cameraOnButtonConstraints()
+    }
+    
+    private func cameraOffButtonAppear() {
+        view.addSubview(cameraOffButton)
+        cameraOffButtonConstraints()
     }
     
     private func backgroundOnButtonAppear() {
@@ -535,6 +549,8 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         pickerController.delegate = self
         pickerController.sourceType = type
         present(pickerController, animated: true)
+        isCameraToggle = false
+        cameraOffButtonAppear()
     }
     
     private func checkCameraPermission() {
@@ -555,6 +571,9 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     private func cameraImagePicker() {
+        isCameraToggle = false
+        cameraOffButtonAppear()
+        
         let pushVC = CameraCustomPickerController()
         pushVC.delegate = self
         pushVC.sourceType = .camera
@@ -580,6 +599,9 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        isCameraToggle = true
+        cameraOnButtonAppear()
+        
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
             alertStyle = UIAlertController.Style.alert
@@ -598,7 +620,12 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
             })
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            DispatchQueue.main.async(execute: {
+                self.isCameraToggle = false
+                self.cameraOffButtonAppear()
+            })
+        }
         
         actionSheet.addAction(cameraAction)
         actionSheet.addAction(libraryAction)
@@ -703,8 +730,17 @@ extension CardCreateViewController {
         })
     }
     
-    private func cameraButtonConstraints() {
-        cameraButton.snp.makeConstraints({ make in
+    private func cameraOnButtonConstraints() {
+        cameraOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    private func cameraOffButtonConstraints() {
+        cameraOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
@@ -717,7 +753,7 @@ extension CardCreateViewController {
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+            make.top.equalTo(buttonLabel.snp.top).offset(85)
         })
     }
     
@@ -726,7 +762,7 @@ extension CardCreateViewController {
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+            make.top.equalTo(buttonLabel.snp.top).offset(85)
         })
     }
     
@@ -734,7 +770,7 @@ extension CardCreateViewController {
         divider.snp.makeConstraints({ make in
             make.width.equalTo(65)
             make.height.equalTo(1)
-            make.centerX.equalTo(cameraButton.snp.centerX)
+            make.centerX.equalTo(buttonLabel.snp.centerX)
             make.top.equalTo(buttonLabel.snp.top).offset(150)
         })
     }
