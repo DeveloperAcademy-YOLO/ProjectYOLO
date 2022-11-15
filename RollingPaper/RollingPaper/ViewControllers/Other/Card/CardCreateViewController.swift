@@ -19,14 +19,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private let viewModel: CardViewModel
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
-   
+    
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
-   
+    
     private var animator: UIDynamicAnimator?
     private var selectedSticker: IRStickerView?
     private var isCanvasToolToggle: Bool = true
-  
+    
     private var isStickerToggle: Bool = false
     private var imageSticker: UIImage!
     
@@ -387,10 +387,10 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             stickerButtonOff()
             disableEditSticker()
             stickerCollectionViewDisappear()
-    
+            
             pencilButtonOn()
             toolPickerAppear()
-      
+            
             canvasViewInteractionEnabled()
         } else {
             print("sticker button On")
@@ -398,7 +398,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             stickerCollectionViewAppear()
             pencilButtonOff()
             toolPickerDisappear()
-    
+            
             canvasViewInteractionDisabled()
         }
     }
@@ -443,7 +443,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         
         let image = UIImage(named: self.arrStickers[indexPath.item])
         let targetSize = CGSize(width: 80, height: 80)
-
+        
         let scaledImage = image?.scalePreservingAspectRatio(targetSize: targetSize)
         aCell.myImage.image = scaledImage
         
@@ -454,8 +454,6 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
             if let imageSticker = cell.myImage.image {
-
-                print("cell indexPath: \(indexPath), image size: \(imageSticker.size)")
                 
                 let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
                 stickerView.center = someImageView.center
@@ -465,9 +463,8 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                 stickerView.enabledBorder = false
                 stickerView.tag = 1
                 stickerView.delegate = self
-              
+                
                 self.someImageView.addSubview(stickerView)
-               // self.selectedStickerView = stickerView
             } else {
                 print("Sticker not loaded")
             }
@@ -660,7 +657,7 @@ extension UIImage {
             width: size.width * scaleFactor,
             height: size.height * scaleFactor
         )
-
+        
         // Draw and return the resized UIImage
         let renderer = UIGraphicsImageRenderer(
             size: scaledImageSize
