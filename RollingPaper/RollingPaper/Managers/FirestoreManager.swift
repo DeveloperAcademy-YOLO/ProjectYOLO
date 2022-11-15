@@ -58,6 +58,7 @@ final class FirestoreManager: DatabaseManager {
     }
     
     func resetPaper() {
+        
         paperSubject.send(nil)
     }
     
@@ -86,7 +87,8 @@ final class FirestoreManager: DatabaseManager {
     /// (1). 파이어베이스 내 페이퍼 데이터 추가 (2). 현재 유저가 작성한 페이퍼 아이디 목록에 추가 (3). 파이어베이스 내 페이퍼 프리뷰 데이터 추가
     func addPaper(paper: PaperModel) {
         paperSubject.send(paper)
-        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, creator: paper.creator, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
+        print("addPaper's paperPreview - creator: \(paperPreview.creator?.name ?? "")")
         guard
             currentUserEmail != nil,
             let paperDict = getPaperDict(with: paper) else { return }
@@ -162,7 +164,7 @@ final class FirestoreManager: DatabaseManager {
     /// (1). 파이어베이스 내 데이터 업데이트 (2). 프리뷰가 변경되었을 때를 대비, 프리뷰 데이터 업데이트, (3) 제목 업데이트
     func updatePaper(paper: PaperModel) {
         guard let paperDict = getPaperDict(with: paper) else { return }
-        let paperPreview = PaperPreviewModel(paperId: paper.paperId, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
+        let paperPreview = PaperPreviewModel(paperId: paper.paperId, creator: paper.creator, date: paper.date, endTime: paper.endTime, title: paper.title, templateString: paper.templateString, thumbnailURLString: paper.thumbnailURLString, isGift: paper.isGift)
         database
             .collection(FireStoreConstants.papersPath.rawValue)
             .document(paper.paperId)
@@ -228,6 +230,7 @@ extension FirestoreManager {
     /// 파이어베이스 내 프리뷰를 세팅 (설정 및 추가 동일 로직 사용)
     private func setPaperPreview(paperPreview: PaperPreviewModel) {
         guard let paperPreviewDict = getPaperPreviewDict(with: paperPreview) else { return }
+        print("setPaperPreview's dict: \(paperPreviewDict)")
         database
             .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperPreview.paperId)
@@ -310,15 +313,15 @@ extension FirestoreManager {
         database
             .collection(FireStoreConstants.usersCollectionPath.rawValue)
             .document(currentUserEmail)
-            .getDocument(completion: { [weak self] snapshot, error in
+            .addSnapshotListener { [weak self] document, error in
                 guard
-                    error == nil,
-                    let dictionary = snapshot?.data() as? [String: [String]],
-                    let paperIds = dictionary["paperIds"] else { return }
-                paperIds.forEach({ paperId in
+                    let data = document?.data() as? [String: [String]],
+                    let paperIds = data["paperIds"],
+                    error == nil else { return }
+                paperIds.forEach { paperId in
                     self?.fetchPaperPreview(paperId: paperId)
-                })
-            })
+                }
+            }
     }
     
     /// 페이퍼 모델 데이터를 파이어베이스가 사용하는 딕셔너리 타입으로 인코딩
