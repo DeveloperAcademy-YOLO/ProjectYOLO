@@ -38,6 +38,7 @@
 		BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */; };
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
+		C539EFE02921041E00ED4F9E /* AddCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
 		C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = C5AB305528EC119300C2E016 /* .swiftlint.yml */; };
@@ -49,8 +50,11 @@
 		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
 		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
+		CF265261291FB66A00C8171D /* AppSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF265260291FB66A00C8171D /* AppSettingViewController.swift */; };
+		CF265263291FB91D00C8171D /* AppSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF265262291FB91D00C8171D /* AppSettingViewModel.swift */; };
 		CF6D80CD291A763B004CAAD7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */; };
 		CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */; };
+		CFD4422329224B3D00FC0C20 /* AppSettingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */; };
 		CFDA52C128F48D08006774E2 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C028F48D08006774E2 /* CategoryModel.swift */; };
 		CFDA52C328F48D41006774E2 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C228F48D41006774E2 /* SplitViewController.swift */; };
 		CFDA52C528F48E96006774E2 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFDA52C428F48E96006774E2 /* SidebarViewController.swift */; };
@@ -130,6 +134,7 @@
 		BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
+		C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCardViewController.swift; sourceTree = "<group>"; };
 		C5951E14291951FE00D55BC7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
 		C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagnifiedCardViewController.swift; sourceTree = "<group>"; };
@@ -143,8 +148,11 @@
 		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
+		CF265260291FB66A00C8171D /* AppSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingViewController.swift; sourceTree = "<group>"; };
+		CF265262291FB91D00C8171D /* AppSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingViewModel.swift; sourceTree = "<group>"; };
 		CF6D80CC291A763B004CAAD7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CFA10C96290585C7002B8653 /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
+		CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingModels.swift; sourceTree = "<group>"; };
 		CFDA52C028F48D08006774E2 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		CFDA52C228F48D41006774E2 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		CFDA52C428F48E96006774E2 /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
@@ -298,6 +306,7 @@
 				D251BDC828ED2A310094ECD9 /* TemplateEnum.swift */,
 				CFDA52C028F48D08006774E2 /* CategoryModel.swift */,
 				D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */,
+				CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -398,6 +407,7 @@
 				1573562E28FFA79B00EA565B /* SettingScreenViewController.swift */,
 				D22E4AC328EBFD91001091DA /* SignInViewController.swift */,
 				D22E4AC528EBFD9C001091DA /* SignUpViewController.swift */,
+				CF265260291FB66A00C8171D /* AppSettingViewController.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -418,6 +428,7 @@
 				C5E79FA02920EC170064B96B /* BlurredViewController.swift */,
 				C5F26FE629183F050060109B /* TimerOfPaperViewController.swift */,
 				C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */,
+				C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */,
 			);
 			path = WrittenPaper;
 			sourceTree = "<group>";
@@ -477,6 +488,7 @@
 				D22E4AC828EBFDDF001091DA /* SignInViewModel.swift */,
 				D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */,
 				1573563028FFA7FF00EA565B /* SettingScreenViewModel.swift */,
+				CF265262291FB91D00C8171D /* AppSettingViewModel.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -707,9 +719,11 @@
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */,
 				BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */,
+				CF265261291FB66A00C8171D /* AppSettingViewController.swift in Sources */,
 				D2B6309828F6F3E4008365CB /* FirebaseStorageManager.swift in Sources */,
 				D2B6308A28F158E7008365CB /* LocalDatabaseMockManager.swift in Sources */,
 				D22E4AC628EBFD9C001091DA /* SignUpViewController.swift in Sources */,
+				CF265263291FB91D00C8171D /* AppSettingViewModel.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
@@ -751,6 +765,8 @@
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */,
+				C539EFE02921041E00ED4F9E /* AddCardViewController.swift in Sources */,
+				CFD4422329224B3D00FC0C20 /* AppSettingModels.swift in Sources */,
 				BCF2481728EFC499008CD0F9 /* PaperSettingViewController.swift in Sources */,
 				C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
