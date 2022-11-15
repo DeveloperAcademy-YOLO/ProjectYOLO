@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PaperStorageLength {
+final class PaperStorageLength {
     static let paperThumbnailCornerRadius: CGFloat = 12
     static let headerWidth: CGFloat = 200 // 임시
     static let headerHeight: CGFloat = 29
