@@ -200,7 +200,10 @@ extension FirestoreManager {
                     self?.removeUsersPaperId(paperId: paperId)
                     return
                 }
-                self?.papersSubject.send(self?.papersSubject.value ?? [] + [paperPreview])
+                if var currentPapers = self?.papersSubject.value {
+                    currentPapers.append(paperPreview)
+                    self?.papersSubject.send(currentPapers)
+                }
             })
     }
     
@@ -247,7 +250,19 @@ extension FirestoreManager {
                 guard
                     error == nil,
                     var dictionary = snapshot?.data() as? [String: [String]],
-                    var paperIds = dictionary["paperIds"] else { return }
+                    var paperIds = dictionary["paperIds"] else {
+                    self?.database
+                        .collection(FireStoreConstants.usersCollectionPath.rawValue)
+                        .document(currentUserEmail)
+                        .setData(["paperIds": [paperId]], completion: { error in
+                            if let error = error {
+                                print("addUsersPaperId" + error.localizedDescription)
+                            } else {
+                                print("User's PaperId Added Successfully at first.")
+                            }
+                        })
+                    return
+                }
                 paperIds.append(paperId)
                 dictionary["paperIds"] = paperIds
                 self?.database
