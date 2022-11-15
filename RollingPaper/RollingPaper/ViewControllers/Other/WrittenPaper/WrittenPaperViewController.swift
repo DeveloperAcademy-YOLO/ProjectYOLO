@@ -7,6 +7,7 @@
 import AVFoundation
 import Combine
 import Foundation
+import LinkPresentation
 import SnapKit
 import PencilKit
 import Photos
@@ -34,7 +35,7 @@ final class WrittenPaperViewController: UIViewController {
         cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsList.dataSource = self
         cardsList.delegate = self
-        cardsList.reloadData()
+//        cardsList.reloadData()
         
         return cardsList
     }()
@@ -99,6 +100,15 @@ final class WrittenPaperViewController: UIViewController {
                         // creator 있던 페이퍼에 만든 사람이 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
                     }
                     self?.setCustomNavBarButtons()
+                }
+            }
+            .store(in: &cancellables)
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] paper in
+                if let paper = paper {
+                    self?.cardsList.reloadData()
                 }
             }
             .store(in: &cancellables)
@@ -220,8 +230,6 @@ final class WrittenPaperViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
-    
     
     private func moveToCardRootView() {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
@@ -348,24 +356,34 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     
-    func saveCard(_ indexPath : Int) {
+    func saveCard( _ indexPath : IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath]
+        let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
         }
     }
     
-    func shareCard( _ indexPath: Int) {
+    func shareCard( _ indexPath: IndexPath, _ sender: CGPoint) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath]
+        let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            //            imageShare(_ :)
+            imageShare(sender,image)
         }
     }
     
+    func deleteCard( _ indexPath : IndexPath) {
+        guard let currentPaper = viewModel.currentPaper else { return }
+        let card = currentPaper.cards[indexPath.row]
+                
+        if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
+            viewModel.deleteCard(card, from: .fromServer)
+        } else {
+            viewModel.deleteCard(card, from: .fromLocal)
+        }
+    }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
@@ -433,12 +451,12 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first?.row else { return nil }
+        guard let indexPath = indexPaths.first else { return nil }
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let save = UIAction(
-                title: "내 갤러리 저장하기",
-                image: UIImage(systemName: "arrow.down.square"),
+                title: "사진 앱에 저장하기",
+                image: UIImage(systemName: "photo.on.rectangle"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
@@ -448,28 +466,29 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             
             let share = UIAction(
                 title: "공유하기",
-                image: UIImage(systemName: "link"),
+                image: UIImage(systemName: "square.and.arrow.up"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 state: .off
             ){ [weak self] _ in
-                self?.imageShare(save)
+                self?.shareCard(indexPath, point)
             }
             
             let delete = UIAction(
                 title: "삭제하기",
-                image: UIImage(systemName: "trash.fill"),
+                image: UIImage(systemName: "trash"),
                 identifier: nil,
                 discoverabilityTitle: nil,
                 attributes: .destructive,
                 state: .off
-            ) { _ in
+            ) { [weak self] _ in
+                self?.deleteCard(indexPath)
             }
             
             return UIMenu(
                 image: nil,
                 identifier: nil,
-                options: UIMenu.Options.displayInline,
+                options: .singleSelection,
                 children: [save, share, delete]
             )
         }
@@ -481,33 +500,39 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
-            
         } else {
-            
-            let alert = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Saved!", message: "이미지가 사진첩에 저장이 되었습니다", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
-            
         }
     }
     
-    private func imageShare(_ sender: UIAction) {
-        guard let image = UIImage(systemName: "bell"), let url = URL(string: "https://www.google.com") else {
-            return
-        }
+    private func imageShare(_ sender: CGPoint, _ image: UIImage) {
         
         let shareSheetVC = UIActivityViewController(
-            activityItems: [
-                image,
-                url
-            ], applicationActivities: nil
-        )
+            activityItems:
+                [
+                    image
+                ], applicationActivities: nil)
+        
+        // exclude some activity types from the list (optional)
+        shareSheetVC.excludedActivityTypes = [
+            UIActivity.ActivityType.message,
+            UIActivity.ActivityType.saveToCameraRoll,
+            UIActivity.ActivityType.assignToContact,
+            UIActivity.ActivityType.copyToPasteboard,
+            UIActivity.ActivityType.print,
+            UIActivity.ActivityType.addToReadingList
+        ]
+        
+        // present the view controller
+        self.present(shareSheetVC, animated: true, completion: nil)
+        
+        let rect: CGRect = .init(origin: sender, size: CGSize(width: 200, height: 200))
         
         shareSheetVC.popoverPresentationController?.sourceView = self.view
-        shareSheetVC.popoverPresentationController?.sourceRect = sender.accessibilityFrame
-        present(shareSheetVC, animated: true)
+        shareSheetVC.popoverPresentationController?.sourceRect = rect
     }
-    
 }
 
 extension WrittenPaperViewController {

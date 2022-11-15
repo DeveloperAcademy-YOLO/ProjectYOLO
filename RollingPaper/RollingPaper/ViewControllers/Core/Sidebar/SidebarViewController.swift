@@ -43,9 +43,7 @@ final class SidebarViewController: UIViewController {
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
-        photo.layer.cornerRadius = photo.frame.width / 2
-        photo.layer.masksToBounds = true
-        photo.contentMode = UIView.ContentMode.scaleAspectFit
+        photo.contentMode = UIView.ContentMode.scaleAspectFill
         return photo
     }()
     
@@ -76,8 +74,6 @@ final class SidebarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        setProfileView()
-        setCollectionView()
         configureDataSource()
         setInitialConfig()
         NotificationCenter.default.addObserver(
@@ -86,6 +82,12 @@ final class SidebarViewController: UIViewController {
             name: Notification.Name.viewChange,
             object: nil
         )
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        setProfileView()
+        setCollectionView()
     }
     
     private func setInitialConfig() {
@@ -198,7 +200,7 @@ final class SidebarViewController: UIViewController {
             make.width.equalTo(userPhoto.snp.height)
         }
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
-        userPhoto.contentMode = .scaleAspectFill
+        userPhoto.layer.masksToBounds = true
     }
 }
 
