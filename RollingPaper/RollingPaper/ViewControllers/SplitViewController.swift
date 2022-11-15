@@ -14,13 +14,20 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
     private var sidebarViewController: SidebarViewController!
-    private var currentSecondaryView = "페이퍼 템플릿"
+    private var currentSecondaryView = "새 페이퍼"
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
+    private var giftboxViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        registerChangeViewNC()
+        setupSplitView()
+        splitViewManager.transform(input: input.eraseToAnyPublisher())
+    }
+    
+    private func registerChangeViewNC() {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(changeSecondaryView(noitificaiton:)),
@@ -38,22 +45,26 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             selector: #selector(changeFromDeeplink),
             name: .deeplink,
             object: nil)
+    }
+    
+    private func setupSplitView() {
+        delegate = self
         self.preferredDisplayMode = UISplitViewController.DisplayMode.oneBesideSecondary
         self.presentsWithGesture = true
         self.loadViewControllers()
         self.preferredPrimaryColumnWidthFraction = 0.25
-        delegate = self
-        splitViewManager.transform(input: input.eraseToAnyPublisher())
     }
     
     private func loadViewControllers() {
-        self.sidebarViewController = SidebarViewController()
-        self.paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
-        self.paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        sidebarViewController = SidebarViewController()
+        paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
+        paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+        // TODO: GiftboxViewController() 생성
+        // settingScreenViewController = UINavigationController(rootViewController: )
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-            self.settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
+            settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
-            self.settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
+            settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
         }
         let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
         self.viewControllers = [sidebar, paperTemplateSelectViewController]
@@ -87,16 +98,19 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     @objc func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
-        case "페이퍼 템플릿":
-            self.viewControllers[1] = paperTemplateSelectViewController
-        case "페이퍼 보관함":
-            if currentSecondaryView == "페이퍼 템플릿" {
+        case "새 페이퍼":
+            setViewController(paperTemplateSelectViewController, for: .secondary)
+        case "보관함":
+            if currentSecondaryView == "새 페이퍼" {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
                 self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
                 setViewController(paperStorageViewController, for: .secondary)
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
+        // TODO: GiftboxViewController() 생성
+        case "선물 상자":
+            setViewController(giftboxViewController, for: .secondary)
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
@@ -115,10 +129,13 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             return
         }
         switch object {
-        case "페이퍼 템플릿":
+        case "새 페이퍼":
             setViewController(paperTemplateSelectViewController, for: .secondary)
-        case "페이퍼 보관함":
+        case "보관함":
             setViewController(paperStorageViewController, for: .secondary)
+        // TODO: GiftboxViewController() 생성
+        case "선물 상자":
+            setViewController(giftboxViewController, for: .secondary)
         case "설정":
             setViewController(settingScreenViewController, for: .secondary)
         default :

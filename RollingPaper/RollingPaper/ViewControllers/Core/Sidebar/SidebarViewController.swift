@@ -36,8 +36,9 @@ final class SidebarViewController: UIViewController {
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let sideBarCategories: [CategoryModel] = [
-        CategoryModel(name: "페이퍼 템플릿", icon: "doc.on.doc"),
-        CategoryModel(name: "페이퍼 보관함", icon: "folder"),
+        CategoryModel(name: "새 페이퍼", icon: "doc.on.doc"),
+        CategoryModel(name: "보관함", icon: "folder"),
+        CategoryModel(name: "선물 상자", icon: "giftcard"),
         CategoryModel(name: "설정", icon: "gearshape")
     ]
     
@@ -99,7 +100,7 @@ final class SidebarViewController: UIViewController {
     
     @objc private func changeSecondaryView(noitificaiton: Notification) {
         guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
-        if object == "페이퍼 보관함" {
+        if object == "보관함" {
             self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
         }
     }
@@ -190,8 +191,8 @@ final class SidebarViewController: UIViewController {
         userInfoStack.isLayoutMarginsRelativeArrangement = true
         userInfoStack.layoutMargins = Layout.userInfoStackInset
         userInfoStack.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Layout.userInfoStackLeadingSuperView)
-            make.trailing.equalToSuperview().offset(Layout.userInfoStackTrailingSuperView)
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
