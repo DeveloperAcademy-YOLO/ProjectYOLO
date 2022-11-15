@@ -411,11 +411,28 @@ public class StickerView: UIView {
             delegate.stickerViewDidTap(self)
         }
     }
-    
+    public var stickerMinScale: CGFloat = 0.5
+    public var stickerMaxScale: CGFloat = 2.0
     @objc
     func handlePinchGesture(_ recognizer: UIPinchGestureRecognizer) {
-        self.transform = self.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
-        recognizer.scale = 1
+        var scale = recognizer.scale;
+        // Scale limit
+        let currentScale: CGFloat = self.contentView.layer.value(forKeyPath: "transform.scale") as! CGFloat
+        if (!(stickerMinScale == 0 && stickerMaxScale == 0)) {
+            if (scale * currentScale <= stickerMinScale) {
+                scale = stickerMinScale / currentScale;
+            } else if (scale * currentScale >= stickerMaxScale) {
+                scale = stickerMaxScale / currentScale;
+            }
+        }
+        
+        self.contentView.transform = self.contentView.transform.scaledBy(x: scale, y: scale)
+        recognizer.scale = 1;
+        
+        
+        
+//        self.transform = self.transform.scaledBy(x: recognizer.scale, y: recognizer.scale)
+//        recognizer.scale = 1
     }
     
     @objc func handleRotationGesture(_ recognizer: UIRotationGestureRecognizer) {

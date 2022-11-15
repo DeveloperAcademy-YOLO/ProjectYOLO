@@ -709,6 +709,7 @@ PODS:
     - Libuv-gRPC (= 0.0.10)
   - gRPC-Core/Interface (1.44.0)
   - GTMSessionFetcher/Core (2.3.0)
+  - IRSticker-swift (1.0.1)
   - leveldb-library (1.22.1)
   - Libuv-gRPC (0.0.10):
     - Libuv-gRPC/Implementation (= 0.0.10)
@@ -734,6 +735,7 @@ DEPENDENCIES:
   - FirebaseDynamicLinks
   - FirebaseFirestore
   - FirebaseStorage
+  - IRSticker-swift
   - lottie-ios
   - SnapKit
   - StickerView
@@ -758,6 +760,7 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
+    - IRSticker-swift
     - leveldb-library
     - Libuv-gRPC
     - lottie-ios
@@ -785,6 +788,7 @@ SPEC CHECKSUMS:
   "gRPC-C++": 9675f953ace2b3de7c506039d77be1f2e77a8db2
   gRPC-Core: 943e491cb0d45598b0b0eb9e910c88080369290b
   GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
+  IRSticker-swift: 35ab14c73ce4625ed0ea638b070e35c379ea409b
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   Libuv-gRPC: 55e51798e14ef436ad9bc45d12d43b77b49df378
   lottie-ios: c55158d67d0629a260625cc2ded2052b829e3c3e
@@ -794,6 +798,6 @@ SPEC CHECKSUMS:
   StickerView: c486fbc722bddaff4f521afd9028ea4dc3e25a62
   SwiftLint: 55e96a4a4d537d4a3156859fc1c54bd24851a046
 
-PODFILE CHECKSUM: 9963430a73749c259a759bd9a764beebe71dddd3
+PODFILE CHECKSUM: 79441bd3be0b80ade6a532790b6c620468679692
 
 COCOAPODS: 1.11.3

@@ -9,12 +9,11 @@ import AVFoundation
 import Combine
 import PencilKit
 import Photos
-import StickerView
+import IRSticker_swift
 import SnapKit
 import UIKit
 
 class CardCreateViewController: UIViewController, UINavigationControllerDelegate, PKCanvasViewDelegate, PKToolPickerObserver {
-    
     private let arrStickers: [String]
     private let backgroundImageName: [String]
     private let viewModel: CardViewModel
@@ -23,31 +22,13 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
    
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
-    
-    private var isCanvasToolToggle: Bool = true
-    private var isStickerToggle: Bool = false
    
+    private var animator: UIDynamicAnimator?
+    private var selectedSticker: IRStickerView?
+    private var isCanvasToolToggle: Bool = true
+  
+    private var isStickerToggle: Bool = false
     private var imageSticker: UIImage!
-    private var _selectedStickerView: StickerView?
-    private var selectedStickerView: StickerView? {
-        get {
-            return _selectedStickerView
-        }
-        set {
-            // if other sticker choosed then resign the handler
-            if _selectedStickerView != newValue {
-                if let selectedStickerView = _selectedStickerView {
-                    selectedStickerView.showEditingHandlers = false
-                }
-                _selectedStickerView = newValue
-            }
-            // assign handler to new sticker added
-            if let selectedStickerView = _selectedStickerView {
-                selectedStickerView.showEditingHandlers = true
-                selectedStickerView.superview?.bringSubviewToFront(selectedStickerView)
-            }
-        }
-    }
     
     private let imageShadowView: UIView = {
         let aView = UIView()
@@ -215,6 +196,11 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         view.addSubview(introWordingLabel)
         introWordingLabelConstraints()
         
+        let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
+        tapRecognizer.numberOfTapsRequired = 1
+        someImageView.addGestureRecognizer(tapRecognizer)
+        
+        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
@@ -280,7 +266,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     func resultImageSend() {
-        self.selectedStickerView?.showEditingHandlers = false
+        disableEditSticker()
         guard let image = self.mergeImages(imageView: self.rootUIImageView) else { return }
         self.input.send(.setCardResultImg(result: image))
     }
@@ -399,7 +385,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         if isCanvasToolToggle == true && isStickerToggle == false {
             print("sticker button off")
             stickerButtonOff()
-            selectedStickerView?.showEditingHandlers = false
+            disableEditSticker()
             stickerCollectionViewDisappear()
     
             pencilButtonOn()
@@ -416,13 +402,23 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             canvasViewInteractionDisabled()
         }
     }
+    
+    @objc func tapBackground(recognizer: UITapGestureRecognizer) {
+        disableEditSticker()
+    }
+    
+    private func disableEditSticker() {
+        if selectedSticker != nil {
+            selectedSticker!.enabledControl = false
+            selectedSticker!.enabledBorder = false
+            selectedSticker = nil
+        }
+    }
 }
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         self.backgroundOffButtonAppear()
-     
-        print("Modal Dismissed!")
     }
 }
 
@@ -461,16 +457,18 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                 let testImage = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100))
                 testImage.image = imageSticker
                 testImage.contentMode = .scaleAspectFit
-                let stickerView = StickerView.init(contentView: testImage)
-                stickerView.center = CGPoint.init(x: 400, y: 250)
+              
+                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100), contentImage: imageSticker)
+                stickerView.center = view.center
+                stickerView.stickerMinScale = 0.5
+                stickerView.stickerMaxScale = 3.0
+                stickerView.enabledControl = false
+                stickerView.enabledBorder = false
+                stickerView.tag = 1
                 stickerView.delegate = self
-                stickerView.setImage(UIImage.init(named: "Close")!, forHandler: StickerViewHandler.close)
-                stickerView.setImage(UIImage.init(named: "Rotate")!, forHandler: StickerViewHandler.rotate)
-                stickerView.setImage(UIImage.init(named: "Flip")!, forHandler: StickerViewHandler.flip)
-                stickerView.showEditingHandlers = false
-                stickerView.tag = 999
+              
                 self.someImageView.addSubview(stickerView)
-                self.selectedStickerView = stickerView
+               // self.selectedStickerView = stickerView
             } else {
                 print("Sticker not loaded")
             }
@@ -478,37 +476,57 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
     }
 }
 
-extension CardCreateViewController: StickerViewDelegate {
-    func stickerViewDidTap(_ stickerView: StickerView) {
-        self.selectedStickerView = stickerView
+extension CardCreateViewController: IRStickerViewDelegate {
+    func ir_StickerView(stickerView: IRStickerView, imageForRightTopControl recommendedSize: CGSize) -> UIImage? {
+        if stickerView.tag == 1 {
+            return UIImage.init(named: "btn_smile.png")
+        }
+        return nil
     }
     
-    func stickerViewDidBeginMoving(_ stickerView: StickerView) {
-        self.selectedStickerView = stickerView
+    func ir_StickerView(stickerView: IRStickerView, imageForLeftBottomControl recommendedSize: CGSize) -> UIImage? {
+        if stickerView.tag == 1 || stickerView.tag == 2 {
+            return UIImage.init(named: "btn_flip.png")
+        }
+        return nil
     }
     
-    func stickerViewDidChangeMoving(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapContentView(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] ContentView", stickerView.tag)
+        if let selectedSticker = selectedSticker {
+            selectedSticker.enabledBorder = false
+            selectedSticker.enabledControl = false
+        }
+        selectedSticker = stickerView
+        selectedSticker!.enabledBorder = true
+        selectedSticker!.enabledControl = true
     }
     
-    func stickerViewDidEndMoving(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapLeftTopControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] DeleteControl", stickerView.tag)
+        stickerView.removeFromSuperview()
+        for subView in view.subviews {
+            if subView.isKind(of: IRStickerView.self) {
+                guard let sticker = subView as? IRStickerView else { fatalError("error") }
+                sticker.performTapOperation()
+                break
+            }
+        }
     }
     
-    func stickerViewDidBeginRotating(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapLeftBottomControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] LeftBottomControl", stickerView.tag)
+        let targetOrientation = (stickerView.contentImage?.imageOrientation == UIImage.Orientation.up ? UIImage.Orientation.upMirrored : UIImage.Orientation.up)
+        let invertImage = UIImage.init(cgImage: (stickerView.contentImage?.cgImage)!, scale: 1.0, orientation: targetOrientation)
+        stickerView.contentImage = invertImage
     }
     
-    func stickerViewDidChangeRotating(_ stickerView: StickerView) {
-        
-    }
-    
-    func stickerViewDidEndRotating(_ stickerView: StickerView) {
-        
-    }
-    
-    func stickerViewDidClose(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapRightTopControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] RightTopControl", stickerView.tag)
+        animator?.removeAllBehaviors()
+        let snapbehavior = UISnapBehavior.init(item: stickerView, snapTo: view.center)
+        snapbehavior.damping = 0.65
+        animator?.addBehavior(snapbehavior)
     }
 }
 
