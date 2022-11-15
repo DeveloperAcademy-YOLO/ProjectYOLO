@@ -1,17 +1,17 @@
 //
-//  PaperStorageCollectionHeader.swift
+//  PaperTemplateCollectionHeader.swift
 //  RollingPaper
 //
-//  Created by 김동락 on 2022/11/09.
+//  Created by 김동락 on 2022/11/14.
 //
 
-import SnapKit
 import UIKit
 
 // 컬렉션 뷰에서 섹션의 제목을 보여주는 뷰
-final class PaperStorageCollectionHeader: UICollectionReusableView {
+final class PaperTemplateCollectionHeader: UICollectionReusableView {
     static let identifier = "CollectionHeader"
     
+    // 헤더 제목
     private lazy var title: UILabel = {
         let title = UILabel()
         title.font = .preferredFont(forTextStyle: .title2)
@@ -35,7 +35,7 @@ final class PaperStorageCollectionHeader: UICollectionReusableView {
 }
 
 // 스냅킷 설정
-extension PaperStorageCollectionHeader {
+extension PaperTemplateCollectionHeader {
     private func configure() {
         addSubview(title)
     }
@@ -43,7 +43,7 @@ extension PaperStorageCollectionHeader {
     private func setConstraints() {
         title.snp.makeConstraints({ make in
             make.top.equalToSuperview()
-            make.leading.equalToSuperview().offset(PaperStorageLength.headerLeftMargin)
+            make.leading.equalToSuperview().offset(PaperTemplateSelectLength.headerLeftMargin)
         })
     }
 }

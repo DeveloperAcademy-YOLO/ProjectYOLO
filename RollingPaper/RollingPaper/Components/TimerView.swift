@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Combine
 
-private class Length {
+private final class Length {
     static let timerHeight: CGFloat = 32
     static let timerWidth1: CGFloat = 172
     static let timerWidth2: CGFloat = 116
@@ -28,93 +28,51 @@ private class Length {
 }
 
 // 타이머 UI
-class TimerView: UIStackView {
-    private let clock = UIImageView()
-    private let time = UILabel()
+final class TimerView: UIStackView {
     private var endTime: Date?
     private var remainTimeState: RemainTimeState = .hour
+    
     enum RemainTimeState {
-        case hour, minute, second
+        case hour, minute, second, end
     }
+    
+    // 시계 이미지
+    private lazy var clock: UIImageView = {
+        let clock = UIImageView()
+        clock.image = UIImage(systemName: "timer")
+        clock.tintColor = UIColor.white
+        clock.contentMode = .scaleAspectFit
+        return clock
+    }()
+    // 시간 라벨
+    private lazy var time: UILabel = {
+        let time = UILabel()
+        time.font = .systemFont(ofSize: 16, weight: .semibold)
+        time.textAlignment = .left
+        time.textColor = UIColor.white
+        return time
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setLayout()
+        setMainView()
+        configure()
+        setConstraints()
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // 레이아웃 세팅하기
-    private func setLayout() {
-        addArrangedSubview(clock)
-        addArrangedSubview(time)
-        
+    // 메인뷰 설정하기
+    private func setMainView() {
         layer.cornerRadius = Length.timerCornerRadius
         distribution = .equalSpacing
         layoutMargins = UIEdgeInsets(top: Length.timerTopPadding, left: Length.timerLeftPadding, bottom: Length.timerBottomPadding, right: Length.timerRightPadding)
         isLayoutMarginsRelativeArrangement = true
         spacing = Length.timerSpace
-        
-        snp.makeConstraints ({ make in
-            make.width.equalTo(Length.timerWidth1)
-            make.height.equalTo(Length.timerHeight)
-        })
-        
-        clock.image = UIImage(systemName: "timer")
-        clock.tintColor = UIColor.white
-        clock.contentMode = .scaleAspectFit
-        clock.snp.makeConstraints({ make in
-            make.width.equalTo(Length.clockImageWidth)
-            make.height.equalTo(Length.clockImageHeight)
-        })
-        
-        time.font = .systemFont(ofSize: 16, weight: .semibold)
-        time.textAlignment = .center
-        time.textColor = UIColor.white
-        time.snp.makeConstraints({ make in
-            make.width.equalTo(Length.textWidth1)
-        })
     }
     
-    // 타이머 남은 시간 업데이트하기
-    func updateTime() {
-        guard let endTime = endTime else {return}
-        let timeInterval = Int(endTime.timeIntervalSince(Date()))
-        
-        // 30분 기준으로 타이머 색상 변경
-        backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
-        
-        // 남은 시간에 따라 레이아웃 가로 길이 조절
-        if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
-            remainTimeState = .second
-            snp.updateConstraints({ make in
-                make.width.equalTo(Length.timerWidth3)
-            })
-            time.snp.updateConstraints({ make in
-                make.width.equalTo(Length.textWidth3)
-            })
-        } else if timeInterval >= 60 && timeInterval < 3600 && remainTimeState != .minute {
-            remainTimeState = .minute
-            snp.updateConstraints({ make in
-                make.width.equalTo(Length.timerWidth2)
-            })
-            time.snp.updateConstraints({ make in
-                make.width.equalTo(Length.textWidth2)
-            })
-        } else if timeInterval >= 3600 && remainTimeState != .hour  {
-            remainTimeState = .hour
-            snp.updateConstraints({ make in
-                make.width.equalTo(Length.timerWidth1)
-            })
-            time.snp.updateConstraints({ make in
-                make.width.equalTo(Length.textWidth1)
-            })
-        }
-        
-        time.text = changeTimeFormat(second: timeInterval)
-    }
     
     // 초를 특정 포맷으로 바꾸기 (00시간 00분 00초)
     private func changeTimeFormat(second: Int) -> String {
@@ -140,7 +98,6 @@ class TimerView: UIStackView {
                 minString = ""
             }
         }
-        
         return hourString + minString + secString
     }
     
@@ -149,48 +106,72 @@ class TimerView: UIStackView {
         endTime = time
         updateTime()
     }
+    
+    // 타이머 남은 시간 업데이트하기
+    func updateTime() {
+        guard let endTime = endTime else {return}
+        let timeInterval = Int(endTime.timeIntervalSince(Date()))
+        
+        // 30분 기준으로 타이머 색상 변경
+        backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
+        
+        // 남은 시간에 따라 레이아웃 가로 길이 조절
+        if timeInterval < 0 && remainTimeState != .end {
+            remainTimeState = .end
+            // 나중에 UI 업데이트하기
+        } else if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
+            remainTimeState = .second
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth3)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth3)
+            })
+        } else if timeInterval >= 60 && timeInterval < 3600 && remainTimeState != .minute {
+            remainTimeState = .minute
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth2)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth2)
+            })
+        } else if timeInterval >= 3600 && remainTimeState != .hour {
+            remainTimeState = .hour
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth1)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth1)
+            })
+        }
+        
+        if timeInterval < 0 {
+            time.text = changeTimeFormat(second: 0)
+        } else {
+            time.text = changeTimeFormat(second: timeInterval)
+        }
+        
+    }
 }
 
-// 타이머 시간 흐르게 하는 클래스
-class TimerViewModel {
-    private let timerInterval = 1.0 // 1초 간격
-    private let output: PassthroughSubject<Output, Never> = .init()
-    private var cancellables = Set<AnyCancellable>()
-    private var timer: AnyCancellable?
-    enum Input {
-        case viewDidAppear
-        case viewDidDisappear
-    }
-    enum Output {
-        case timeIsUpdated
+// 스냅킷 설정
+extension TimerView {
+    private func configure() {
+        addArrangedSubview(clock)
+        addArrangedSubview(time)
     }
     
-    // 타이머 연동
-    private func bindTimer() {
-        timer = Timer.publish(every: timerInterval, on: .main, in: .common)
-            .autoconnect()
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] _ in
-                guard let self = self else {return}
-                // 타이머 업데이트 됐다고 알려주기
-                self.output.send(.timeIsUpdated)
-            })
-    }
-    
-    // 뷰가 나타나면 타이머 연결, 사라지면 타이머 해제
-    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
-        input
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink(receiveValue: { [weak self] event in
-                guard let self = self else {return}
-                switch event {
-                case .viewDidAppear:
-                    self.bindTimer()
-                case .viewDidDisappear:
-                    self.timer?.cancel()
-                }
-            })
-            .store(in: &cancellables)
-        return output.eraseToAnyPublisher()
+    private func setConstraints() {
+        snp.makeConstraints ({ make in
+            make.width.equalTo(Length.timerWidth1)
+            make.height.equalTo(Length.timerHeight)
+        })
+        clock.snp.makeConstraints({ make in
+            make.width.equalTo(Length.clockImageWidth)
+            make.height.equalTo(Length.clockImageHeight)
+        })
+        time.snp.makeConstraints({ make in
+            make.width.equalTo(Length.textWidth1)
+        })
     }
 }
