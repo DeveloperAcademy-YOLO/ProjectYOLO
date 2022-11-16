@@ -17,7 +17,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private var sidebarViewController: UINavigationController!
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
-    private var giftboxViewController: UINavigationController!
+    private var giftStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
 
     override func viewDidLoad() {
@@ -64,8 +64,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         sidebarViewController = UINavigationController(rootViewController: SidebarViewController())
         paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        // TODO: GiftboxViewController() 생성
-        // settingScreenViewController = UINavigationController(rootViewController: )
+        giftStorageViewController = UINavigationController(rootViewController: GiftStorageViewController())
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
             settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
@@ -97,12 +96,13 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
                 }
             }
         } else {
+            // Gift Storage -> Gift Paper
             if let currentNavVC = viewControllers[1] as? UINavigationController {
                 currentNavVC.popToRootViewController(true) {
-                    self.setViewController(self.giftboxViewController, for: .secondary)
-                    if let giftBoxVC = self.giftboxViewController.viewControllers.first as? GiftBoxViewController {
-                        let giftVC = GiftPaperViewController()
-                        self.giftboxViewController.pushViewController(giftVC, animated: true) {
+                    self.setViewController(self.giftStorageViewController, for: .secondary)
+                    if let giftStorageVC = self.giftStorageViewController.viewControllers.first as? GiftStorageViewController {
+                        let giftVC = WrittenPaperViewController()
+                        self.giftStorageViewController.pushViewController(giftVC, animated: true) {
                             LocalDatabaseFileManager.shared.fetchPaper(paperId: paperId)
                             FirestoreManager.shared.fetchPaper(paperId: paperId)
                         }
@@ -125,9 +125,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
@@ -150,9 +149,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             setViewController(paperTemplateSelectViewController, for: .secondary)
         case "보관함":
             setViewController(paperStorageViewController, for: .secondary)
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             setViewController(settingScreenViewController, for: .secondary)
         default:

@@ -35,7 +35,7 @@ final class PaperStorageLength {
     static let clockImageWidth: CGFloat = 14
     static let clockImageHeight: CGFloat = 14
     
-    static var closedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin)) // 반응형
+    static var closedPaperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+2)) // 반응형
     static let closedPaperThumbnailHeight: CGFloat = closedPaperThumbnailWidth*0.16
     static let closedCellHorizontalSpace: CGFloat = 0
     static let closedCellVerticalSpace: CGFloat = 10
