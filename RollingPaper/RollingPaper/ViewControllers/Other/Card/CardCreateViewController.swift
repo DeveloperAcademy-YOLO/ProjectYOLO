@@ -9,43 +9,26 @@ import AVFoundation
 import Combine
 import PencilKit
 import Photos
-import StickerView
+import IRSticker_swift
 import SnapKit
 import UIKit
 
 class CardCreateViewController: UIViewController, UINavigationControllerDelegate, PKCanvasViewDelegate, PKToolPickerObserver {
-    
     private let arrStickers: [String]
     private let backgroundImageName: [String]
     private let viewModel: CardViewModel
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
+    
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
+    
+    private var animator: UIDynamicAnimator?
+    private var selectedSticker: IRStickerView?
     private var isCanvasToolToggle: Bool = true
+    
     private var isStickerToggle: Bool = false
-    private var isBackgroundToggle: Bool = false
     private var imageSticker: UIImage!
-    private var _selectedStickerView: StickerView?
-    private var selectedStickerView: StickerView? {
-        get {
-            return _selectedStickerView
-        }
-        set {
-            // if other sticker choosed then resign the handler
-            if _selectedStickerView != newValue {
-                if let selectedStickerView = _selectedStickerView {
-                    selectedStickerView.showEditingHandlers = false
-                }
-                _selectedStickerView = newValue
-            }
-            // assign handler to new sticker added
-            if let selectedStickerView = _selectedStickerView {
-                selectedStickerView.showEditingHandlers = true
-                selectedStickerView.superview?.bringSubviewToFront(selectedStickerView)
-            }
-        }
-    }
     
     private let imageShadowView: UIView = {
         let aView = UIView()
@@ -126,7 +109,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return label
     }()
     
-    lazy var cameraButton: UIButton = {
+    lazy var cameraOnButton: UIButton = {
+        let button = UIButton()
+        button.setUIImage(systemName: "camera.fill")
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    lazy var cameraOffButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
         button.tintColor = UIColor(red: 217, green: 217, blue: 217)
@@ -205,6 +196,11 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         view.addSubview(introWordingLabel)
         introWordingLabelConstraints()
         
+        let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
+        tapRecognizer.numberOfTapsRequired = 1
+        someImageView.addGestureRecognizer(tapRecognizer)
+        
+        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
@@ -217,7 +213,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
-        cameraButtonAppear()
+        cameraOffButtonAppear()
         backgroundOffButtonAppear()
         
         dividerAppear()
@@ -270,7 +266,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     func resultImageSend() {
-        self.selectedStickerView?.showEditingHandlers = false
+        disableEditSticker()
         guard let image = self.mergeImages(imageView: self.rootUIImageView) else { return }
         self.input.send(.setCardResultImg(result: image))
     }
@@ -304,9 +300,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         toolPicker.setVisible(false, forFirstResponder: canvasView)
     }
     
-    private func cameraButtonAppear() {
-        view.addSubview(cameraButton)
-        cameraButtonConstraints()
+    private func cameraOnButtonAppear() {
+        view.addSubview(cameraOnButton)
+        cameraOnButtonConstraints()
+    }
+    
+    private func cameraOffButtonAppear() {
+        view.addSubview(cameraOffButton)
+        cameraOffButtonConstraints()
     }
     
     private func backgroundOnButtonAppear() {
@@ -365,8 +366,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
-        isBackgroundToggle = true
-        backgroundOnButtonAppear()
+        self.backgroundOnButtonAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -381,15 +381,16 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     @objc func togglebutton(_ gesture: UITapGestureRecognizer) {
         self.isCanvasToolToggle.toggle()
         self.isStickerToggle.toggle()
+        
         if isCanvasToolToggle == true && isStickerToggle == false {
             print("sticker button off")
             stickerButtonOff()
-            selectedStickerView?.showEditingHandlers = false
+            disableEditSticker()
             stickerCollectionViewDisappear()
-    
+            
             pencilButtonOn()
             toolPickerAppear()
-      
+            
             canvasViewInteractionEnabled()
         } else {
             print("sticker button On")
@@ -397,22 +398,31 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             stickerCollectionViewAppear()
             pencilButtonOff()
             toolPickerDisappear()
-    
+            
             canvasViewInteractionDisabled()
+        }
+    }
+    
+    @objc func tapBackground(recognizer: UITapGestureRecognizer) {
+        disableEditSticker()
+    }
+    
+    private func disableEditSticker() {
+        if selectedSticker != nil {
+            selectedSticker!.enabledControl = false
+            selectedSticker!.enabledBorder = false
+            selectedSticker = nil
         }
     }
 }
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        isBackgroundToggle = false
-        backgroundOffButtonAppear()
-        print("Modal Dismissed!")
+        self.backgroundOffButtonAppear()
     }
 }
 
 extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    
     func mergeImages(imageView: UIImageView) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(imageView.frame.size, false, 0.0)
         imageView.superview!.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -433,7 +443,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         
         let image = UIImage(named: self.arrStickers[indexPath.item])
         let targetSize = CGSize(width: 80, height: 80)
-
+        
         let scaledImage = image?.scalePreservingAspectRatio(targetSize: targetSize)
         aCell.myImage.image = scaledImage
         
@@ -444,19 +454,17 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
             if let imageSticker = cell.myImage.image {
-                let testImage = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: 100, height: 100))
-                testImage.image = imageSticker
-                testImage.contentMode = .scaleAspectFit
-                let stickerView = StickerView.init(contentView: testImage)
-                stickerView.center = CGPoint.init(x: 400, y: 250)
+                
+                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
+                stickerView.center = someImageView.center
+                stickerView.stickerMinScale = 0.5
+                stickerView.stickerMaxScale = 3.0
+                stickerView.enabledControl = false
+                stickerView.enabledBorder = false
+                stickerView.tag = 1
                 stickerView.delegate = self
-                stickerView.setImage(UIImage.init(named: "Close")!, forHandler: StickerViewHandler.close)
-                stickerView.setImage(UIImage.init(named: "Rotate")!, forHandler: StickerViewHandler.rotate)
-                stickerView.setImage(UIImage.init(named: "Flip")!, forHandler: StickerViewHandler.flip)
-                stickerView.showEditingHandlers = false
-                stickerView.tag = 999
+                
                 self.someImageView.addSubview(stickerView)
-                self.selectedStickerView = stickerView
             } else {
                 print("Sticker not loaded")
             }
@@ -464,37 +472,57 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
     }
 }
 
-extension CardCreateViewController: StickerViewDelegate {
-    func stickerViewDidTap(_ stickerView: StickerView) {
-        self.selectedStickerView = stickerView
+extension CardCreateViewController: IRStickerViewDelegate {
+    private func ir_StickerView(stickerView: IRStickerView, imageForRightTopControl recommendedSize: CGSize) -> UIImage? {
+        if stickerView.tag == 1 {
+            return UIImage.init(named: "Sticker_Close")
+        }
+        return nil
     }
     
-    func stickerViewDidBeginMoving(_ stickerView: StickerView) {
-        self.selectedStickerView = stickerView
+    func ir_StickerView(stickerView: IRStickerView, imageForLeftBottomControl recommendedSize: CGSize) -> UIImage? {
+        if stickerView.tag == 1 || stickerView.tag == 2 {
+            return UIImage.init(named: "Sticker_Flip")
+        }
+        return nil
     }
     
-    func stickerViewDidChangeMoving(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapContentView(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] ContentView", stickerView.tag)
+        if let selectedSticker = selectedSticker {
+            selectedSticker.enabledBorder = false
+            selectedSticker.enabledControl = false
+        }
+        selectedSticker = stickerView
+        selectedSticker!.enabledBorder = true
+        selectedSticker!.enabledControl = true
     }
     
-    func stickerViewDidEndMoving(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapLeftTopControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] DeleteControl", stickerView.tag)
+        stickerView.removeFromSuperview()
+        for subView in view.subviews {
+            if subView.isKind(of: IRStickerView.self) {
+                guard let sticker = subView as? IRStickerView else { fatalError("error") }
+                sticker.performTapOperation()
+                break
+            }
+        }
     }
     
-    func stickerViewDidBeginRotating(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapLeftBottomControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] LeftBottomControl", stickerView.tag)
+        let targetOrientation = (stickerView.contentImage?.imageOrientation == UIImage.Orientation.up ? UIImage.Orientation.upMirrored : UIImage.Orientation.up)
+        let invertImage = UIImage.init(cgImage: (stickerView.contentImage?.cgImage)!, scale: 1.0, orientation: targetOrientation)
+        stickerView.contentImage = invertImage
     }
     
-    func stickerViewDidChangeRotating(_ stickerView: StickerView) {
-        
-    }
-    
-    func stickerViewDidEndRotating(_ stickerView: StickerView) {
-        
-    }
-    
-    func stickerViewDidClose(_ stickerView: StickerView) {
-        
+    func ir_StickerViewDidTapRightTopControl(stickerView: IRStickerView) {
+        NSLog("Tap[%zd] RightTopControl", stickerView.tag)
+        animator?.removeAllBehaviors()
+        let snapbehavior = UISnapBehavior.init(item: stickerView, snapTo: view.center)
+        snapbehavior.damping = 0.65
+        animator?.addBehavior(snapbehavior)
     }
 }
 
@@ -529,12 +557,12 @@ extension UIView {
 }
 
 extension CardCreateViewController: UIImagePickerControllerDelegate {
-    
     private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = type
         present(pickerController, animated: true)
+        cameraOffButtonAppear()
     }
     
     private func checkCameraPermission() {
@@ -555,6 +583,8 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     private func cameraImagePicker() {
+        cameraOffButtonAppear()
+        
         let pushVC = CameraCustomPickerController()
         pushVC.delegate = self
         pushVC.sourceType = .camera
@@ -580,6 +610,8 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        self.cameraOnButtonAppear()
+        
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
             alertStyle = UIAlertController.Style.alert
@@ -598,7 +630,11 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
             })
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            DispatchQueue.main.async(execute: {
+                self.cameraOffButtonAppear()
+            })
+        }
         
         actionSheet.addAction(cameraAction)
         actionSheet.addAction(libraryAction)
@@ -621,7 +657,7 @@ extension UIImage {
             width: size.width * scaleFactor,
             height: size.height * scaleFactor
         )
-
+        
         // Draw and return the resized UIImage
         let renderer = UIGraphicsImageRenderer(
             size: scaledImageSize
@@ -703,8 +739,17 @@ extension CardCreateViewController {
         })
     }
     
-    private func cameraButtonConstraints() {
-        cameraButton.snp.makeConstraints({ make in
+    private func cameraOnButtonConstraints() {
+        cameraOnButton.snp.makeConstraints({ make in
+            make.width.equalTo(50)
+            make.height.equalTo(50)
+            make.leading.equalTo(buttonLabel.snp.leading).offset(25)
+            make.top.equalTo(buttonLabel.snp.top).offset(20)
+        })
+    }
+    
+    private func cameraOffButtonConstraints() {
+        cameraOffButton.snp.makeConstraints({ make in
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
@@ -717,7 +762,7 @@ extension CardCreateViewController {
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+            make.top.equalTo(buttonLabel.snp.top).offset(85)
         })
     }
     
@@ -726,7 +771,7 @@ extension CardCreateViewController {
             make.width.equalTo(50)
             make.height.equalTo(50)
             make.leading.equalTo(buttonLabel.snp.leading).offset(25)
-            make.top.equalTo(cameraButton.snp.bottom).offset(20)
+            make.top.equalTo(buttonLabel.snp.top).offset(85)
         })
     }
     
@@ -734,7 +779,7 @@ extension CardCreateViewController {
         divider.snp.makeConstraints({ make in
             make.width.equalTo(65)
             make.height.equalTo(1)
-            make.centerX.equalTo(cameraButton.snp.centerX)
+            make.centerX.equalTo(buttonLabel.snp.centerX)
             make.top.equalTo(buttonLabel.snp.top).offset(150)
         })
     }
