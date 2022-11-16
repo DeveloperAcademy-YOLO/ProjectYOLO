@@ -25,6 +25,8 @@ final class FirestoreManager: DatabaseManager {
     private let database = Firestore.firestore()
     private var cancellables = Set<AnyCancellable>()
     private var currentUserEmail: String?
+    private var paperObserver: ListenerRegistration?
+    private var paperPreviewObserver = [String: ListenerRegistration?]()
     
     private init() {
         bind()
@@ -40,10 +42,10 @@ final class FirestoreManager: DatabaseManager {
     
     /// (1). 페이퍼 아이디를 통해 파이어베이스 내 저장된 페이퍼 탐색 및 페이퍼 퍼블리셔에 로드 (2). 페이퍼 아이디에 대한 페이퍼 데이터가 존재하지 않을 때 유저의 페이퍼 프리뷰 배열 업데이트
     func fetchPaper(paperId: String) {
-        database
+        paperObserver = database
             .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)
-            .getDocument(completion: { [weak self] document, error in
+            .addSnapshotListener({ [weak self] document, error in
                 guard
                     let data = document?.data(),
                     let paper = self?.getPaper(from: data),
@@ -58,8 +60,8 @@ final class FirestoreManager: DatabaseManager {
     }
     
     func resetPaper() {
-        
         paperSubject.send(nil)
+        paperObserver = nil
     }
     
     func convertPaperToGift(paper: PaperModel) -> AnyPublisher<PaperModel, Error> {
@@ -191,10 +193,10 @@ final class FirestoreManager: DatabaseManager {
 extension FirestoreManager {
     /// 파이어베이스 내 페이퍼 프리뷰 로드, 페이퍼 프리뷰가 존재하지 않을 경우 현재 유저의 페이퍼 목록 중 페이퍼 아이디를 삭제
     private func fetchPaperPreview(paperId: String) {
-        database
+        paperPreviewObserver[paperId] = database
             .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperId)
-            .getDocument(completion: { [weak self] document, error in
+            .addSnapshotListener({ [weak self] document, error in
                 guard
                     let data = document?.data(),
                     let paperPreview = self?.getPaperPreview(from: data),
@@ -203,7 +205,11 @@ extension FirestoreManager {
                     return
                 }
                 if var currentPapers = self?.papersSubject.value {
-                    currentPapers.append(paperPreview)
+                    if let index = currentPapers.firstIndex(where: {$0.paperId == paperId}) {
+                        currentPapers[index] = paperPreview
+                    } else {
+                        currentPapers.append(paperPreview)
+                    }
                     self?.papersSubject.send(currentPapers)
                 }
             })
@@ -225,12 +231,12 @@ extension FirestoreManager {
                     print("PaperPreview Successfully Removed")
                 }
             })
+        paperPreviewObserver[paperId] = nil
     }
     
     /// 파이어베이스 내 프리뷰를 세팅 (설정 및 추가 동일 로직 사용)
     private func setPaperPreview(paperPreview: PaperPreviewModel) {
         guard let paperPreviewDict = getPaperPreviewDict(with: paperPreview) else { return }
-        print("setPaperPreview's dict: \(paperPreviewDict)")
         database
             .collection(FireStoreConstants.paperPreviewsPath.rawValue)
             .document(paperPreview.paperId)
@@ -241,6 +247,7 @@ extension FirestoreManager {
                     print("PaperPreview Successfully Set")
                 }
             }
+        fetchPaperPreview(paperId: paperPreview.paperId)
     }
     
     /// 현재 유저의 페이퍼 아이디 딕셔너리에 해당 페이퍼 아이디를 추가
