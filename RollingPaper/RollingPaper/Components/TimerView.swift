@@ -139,7 +139,7 @@ final class TimerView: UIStackView {
         }
         
         // 남은 시간에 따라 레이아웃 가로 길이 조절
-        if timeInterval < 0 && remainTimeState != .end {
+        if timeInterval <= 0 && remainTimeState != .end {
             remainTimeState = .end
             clock.isHidden = true
             time.isHidden = true
@@ -150,7 +150,7 @@ final class TimerView: UIStackView {
             time.snp.updateConstraints({ make in
                 make.width.equalTo(Length.dateTextWidth)
             })
-        } else if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
+        } else if timeInterval > 0 && timeInterval < 60 && remainTimeState != .second {
             remainTimeState = .second
             snp.updateConstraints({ make in
                 make.width.equalTo(Length.timerWidth3)
@@ -176,7 +176,7 @@ final class TimerView: UIStackView {
             })
         }
         
-        if timeInterval < 0 {
+        if timeInterval <= 0 {
             dateLabel.text = changeTimeFormat2(date: endTime)
         } else {
             time.text = changeTimeFormat(second: timeInterval)
