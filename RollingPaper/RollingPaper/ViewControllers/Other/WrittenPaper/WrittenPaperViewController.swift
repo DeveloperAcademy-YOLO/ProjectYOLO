@@ -25,6 +25,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var paperLinkBtnIsPressed: Bool = false
     private lazy var stopPaperBtnIsPressed: Bool = false
     private lazy var timerBalloonBtnPressed: Bool = false
+    private lazy var signInWithModal: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
@@ -121,7 +122,7 @@ final class WrittenPaperViewController: UIViewController {
         stackView.distribution = UIStackView.Distribution.equalSpacing
         stackView.addArrangedSubview(self.timeLabel)
         stackView.addArrangedSubview(self.titleLabel)
-        setBtnLocation()
+        setBalloonBtnLocation()
         
         return stackView
     }()
@@ -171,8 +172,9 @@ final class WrittenPaperViewController: UIViewController {
                     let userModel = userModel,
                     var currentPaper = self?.viewModel.currentPaper {
                     self?.viewModel.setCurrentUser()
-                    if currentPaper.creator == nil {
+                    if currentPaper.creator == nil && self?.signInWithModal == true {
                         currentPaper.creator = userModel
+                        self?.setCustomNavBarButtons()
                         self?.viewModel.localDatabaseManager.updatePaper(paper: currentPaper)
                         self?.viewModel.localDatabaseManager.fetchPaper(paperId: currentPaper.paperId)
                         // 게스트가 생성 후 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
@@ -207,6 +209,7 @@ final class WrittenPaperViewController: UIViewController {
             .tapPublisher
             .sink { [weak self] in
                 self?.moveToPaperStorageView()
+                self?.signInWithModal = false
             }
             .store(in: &cancellables)
         
@@ -241,8 +244,6 @@ final class WrittenPaperViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
-    
     
     private func bindTimer() {
         let timerOutput = timeManager.transform(input: timerInput.eraseToAnyPublisher())
@@ -385,6 +386,7 @@ final class WrittenPaperViewController: UIViewController {
         if timerBalloonBtnPressed == true {
             timerDiscriptionBalloon.view.removeFromSuperview()
         }
+        signInWithModal = true
         let signInVC = SignInViewController()
         let navVC = UINavigationController(rootViewController: signInVC)
         navVC.modalPresentationStyle = .formSheet //로그인 모달에 x버튼 넣기 위함
@@ -687,7 +689,8 @@ extension WrittenPaperViewController {
             make.leading.equalTo(timeLabel.snp.trailing).offset(10)
         })
     }
-    private func setBtnLocation() {
+    
+    private func setBalloonBtnLocation() {
         showBalloonButton.snp.makeConstraints({ make in
             make.width.equalTo(timeLabel.snp.width)
             make.height.equalTo(timeLabel.snp.height)

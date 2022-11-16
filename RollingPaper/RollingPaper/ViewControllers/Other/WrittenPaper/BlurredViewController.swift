@@ -49,16 +49,6 @@ class BlurredViewController: UIViewController {
             }
         }
     }
-    
-    func animationOut() {
-        if cardIsDismissed == true
-        {
-            UIView.animate(withDuration: 0.4) {
-                self.blurView.effect = nil
-                self.dismiss(animated: true)
-            }
-        }
-    }
 }
 
 extension BlurredViewController {
