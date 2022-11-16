@@ -19,10 +19,7 @@ final class PaperStorageViewController: UIViewController {
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
     
-    
-    private var viewModel2: WrittenPaperViewModel = WrittenPaperViewModel()
     lazy private var titleEmbedingTextField: UITextField = UITextField()
-    
     
     enum DataState {
         case nothing, onlyOpened, onlyClosed, both
@@ -38,10 +35,10 @@ final class PaperStorageViewController: UIViewController {
     private lazy var paperCollectionView: PaperStorageCollectionView = {
         let paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: .init())
         paperCollectionView.setCollectionViewLayout(getCollectionViewLayout(), animated: false)
- 
+        
         paperCollectionView.backgroundColor = .systemBackground
         paperCollectionView.alwaysBounceVertical = true
-
+        
         paperCollectionView.register(PaperStorageOpenedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageOpenedCollectionCell.identifier)
         paperCollectionView.register(PaperStorageClosedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageClosedCollectionCell.identifier)
         paperCollectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
@@ -91,7 +88,7 @@ final class PaperStorageViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                // 변화가 있으면 UI 업데이트 하기
+                    // 변화가 있으면 UI 업데이트 하기
                 case .initPapers:
                     self.updateLoadingView(isLoading: false)
                 case .papersAreUpdatedByTimer, .papersAreUpdatedInDatabase:
@@ -260,14 +257,10 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         return true
     }
     
-    private func deletePaper() {
+    private func deletePaper(_ paper: PaperPreviewModel) {
         let deleteVerifyText = self.titleEmbedingTextField.text
-        if deleteVerifyText == self.viewModel2.currentPaper?.title {
-            if viewModel2.isPaperLinkMade {
-                viewModel2.deletePaper(viewModel2.currentPaper!.paperId, from: .fromServer)
-            } else {
-                viewModel2.deletePaper(viewModel2.currentPaper!.paperId, from: .fromLocal)
-            }
+        if deleteVerifyText == paper.title {
+            input.send(.paperDeleted(paperId: paper.paperId))
         } else {
             let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
             let confirm = UIAlertAction(title: "확인", style: .default)
@@ -277,20 +270,19 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         }
     }
     
-    func deleteAlert(_ sender: CGRect) {
-
+    func deleteAlert(_ sender: CGRect, _ paper: PaperPreviewModel) {
         let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
-            let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
-                self.deletePaper()
-            }
-            let cancel = UIAlertAction(title: "취소", style: .cancel)
-            allertController.addAction(delete)
-            allertController.addAction(cancel)
-            allertController.preferredAction = delete
-            allertController.addTextField { (deleteTitleTextField) in
-                deleteTitleTextField.placeholder = self.viewModel2.currentPaper?.title
-                self.titleEmbedingTextField = deleteTitleTextField
-            }
+        let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
+            self.deletePaper(paper)
+        }
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        allertController.addAction(delete)
+        allertController.addAction(cancel)
+        allertController.preferredAction = delete
+        allertController.addTextField { (deleteTitleTextField) in
+            deleteTitleTextField.placeholder = paper.title
+            self.titleEmbedingTextField = deleteTitleTextField
+        }
         let popover = allertController.popoverPresentationController
         popover?.sourceView = self.view
         popover?.backgroundColor = .systemBackground
@@ -301,6 +293,8 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         let senderPoint = CGRect(x: 0, y: 0, width: point.x, height: point.y)
         guard let indexPath = indexPaths.first else { return nil }
+        let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
+        let selectedPaper = papers[indexPath.item]
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let delete = UIAction(
@@ -311,7 +305,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 attributes: .destructive,
                 state: .off
             ) { [weak self] _ in
-                self?.deleteAlert(senderPoint)
+                self?.deleteAlert(senderPoint, selectedPaper)
             }
             
             return UIMenu(

@@ -32,6 +32,7 @@ class PaperStorageViewModel {
         case viewDidAppear
         case viewDidDisappear
         case paperSelected(paperId: String)
+        case paperDeleted(paperId: String)
     }
     enum Output {
         case initPapers
@@ -278,6 +279,12 @@ class PaperStorageViewModel {
                         self.serverDatabaseManager.fetchPaper(paperId: paperId)
                     } else {
                         self.localDatabaseManager.fetchPaper(paperId: paperId)
+                    }
+                case .paperDeleted(paperId: let paperId):
+                    if self.serverPaperIds.contains(paperId) {
+                        self.serverDatabaseManager.removePaper(paperId: paperId)
+                    } else {
+                        self.localDatabaseManager.removePaper(paperId: paperId)
                     }
                 }
             })
