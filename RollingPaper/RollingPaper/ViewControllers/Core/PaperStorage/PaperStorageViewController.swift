@@ -254,6 +254,32 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
         return true
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            
+            let delete = UIAction(
+                title: "페이퍼 삭제하기",
+                image: UIImage(systemName: "trash"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                attributes: .destructive,
+                state: .off
+            ) { [weak self] _ in
+                
+            }
+            
+            return UIMenu(
+                image: nil,
+                identifier: nil,
+                options: .singleSelection,
+                children: [delete]
+            )
+        }
+        return config
+    }
+
 }
 
 // 스냅킷 설정
