@@ -19,6 +19,11 @@ final class PaperStorageViewController: UIViewController {
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
     
+    
+    private var viewModel2: WrittenPaperViewModel = WrittenPaperViewModel()
+    lazy private var titleEmbedingTextField: UITextField = UITextField()
+    
+    
     enum DataState {
         case nothing, onlyOpened, onlyClosed, both
     }
@@ -255,7 +260,46 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         return true
     }
     
+    private func deletePaper() {
+        let deleteVerifyText = self.titleEmbedingTextField.text
+        if deleteVerifyText == self.viewModel2.currentPaper?.title {
+            if viewModel2.isPaperLinkMade {
+                viewModel2.deletePaper(viewModel2.currentPaper!.paperId, from: .fromServer)
+            } else {
+                viewModel2.deletePaper(viewModel2.currentPaper!.paperId, from: .fromLocal)
+            }
+        } else {
+            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
+            let confirm = UIAlertAction(title: "확인", style: .default)
+            alert.addAction(confirm)
+            alert.preferredAction = confirm
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func deleteAlert(_ sender: CGRect) {
+
+        let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+            let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
+                self.deletePaper()
+            }
+            let cancel = UIAlertAction(title: "취소", style: .cancel)
+            allertController.addAction(delete)
+            allertController.addAction(cancel)
+            allertController.preferredAction = delete
+            allertController.addTextField { (deleteTitleTextField) in
+                deleteTitleTextField.placeholder = self.viewModel2.currentPaper?.title
+                self.titleEmbedingTextField = deleteTitleTextField
+            }
+        let popover = allertController.popoverPresentationController
+        popover?.sourceView = self.view
+        popover?.backgroundColor = .systemBackground
+        present(allertController, animated: true)
+    }
+    
+    //셀 눌렀을 때 ContextMenu 추가
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        let senderPoint = CGRect(x: 0, y: 0, width: point.x, height: point.y)
         guard let indexPath = indexPaths.first else { return nil }
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
@@ -267,7 +311,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 attributes: .destructive,
                 state: .off
             ) { [weak self] _ in
-                
+                self?.deleteAlert(senderPoint)
             }
             
             return UIMenu(
@@ -279,7 +323,6 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         }
         return config
     }
-
 }
 
 // 스냅킷 설정
