@@ -11,6 +11,7 @@ extension Notification.Name {
     static let viewChange = Notification.Name("viewChange")
     static let viewChangeFromSidebar = Notification.Name("ViewChangeFromSidebar")
     static let deeplink = Notification.Name("deeplink")
+    static let viewInit = Notification.Name("viewInit")
 }
 
 enum NotificationViewKey {
