@@ -257,6 +257,37 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         return true
     }
     
+    private func sharePaperLink(_ sender: CGPoint, _ url: URL) {
+        let shareSheetVC = UIActivityViewController(
+            activityItems:
+                [
+                 url
+                ], applicationActivities: nil)
+        
+        self.present(shareSheetVC, animated: true, completion: nil)
+        
+        let rect: CGRect = .init(origin: sender, size: CGSize(width: 200, height: 200))
+        
+        shareSheetVC.popoverPresentationController?.sourceView = self.view
+        shareSheetVC.popoverPresentationController?.sourceRect = rect
+    }
+    
+    private func sharePaper(_ paper: PaperPreviewModel, _ sender: CGPoint) {
+        var linkSubscription: AnyCancellable?
+        linkSubscription = getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: .write)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    linkSubscription?.cancel()
+                case .finished: break
+                }
+            }, receiveValue: { [weak self] url in
+                self?.sharePaperLink(sender, url)
+                linkSubscription?.cancel()
+            })
+    }
+    
     private func deletePaper(_ paper: PaperPreviewModel) {
         let deleteVerifyText = self.titleEmbedingTextField.text
         if deleteVerifyText == paper.title {
@@ -270,7 +301,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         }
     }
     
-    func deleteAlert(_ sender: CGRect, _ paper: PaperPreviewModel) {
+    private func deleteAlert(_ sender: CGRect, _ paper: PaperPreviewModel) {
         let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
         let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
             self.deletePaper(paper)
@@ -304,6 +335,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 discoverabilityTitle: nil,
                 state: .off
             ) { [weak self] _ in
+                self?.sharePaper(selectedPaper, point)
             }
             
             let delete = UIAction(
