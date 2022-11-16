@@ -16,7 +16,8 @@ class GiftStorageViewModel {
     private var papersFromLocal = [PaperPreviewModel]()
     private var papersFromServer = [PaperPreviewModel]()
     
-    var papers = [PaperPreviewModel]()
+    var papersByYear = [String: [PaperPreviewModel]]()
+    var years = [String]()
     var serverPaperIds = Set<String>()
     var localPaperIds = Set<String>()
     var thumbnails = [String: UIImage?]()
@@ -53,6 +54,7 @@ class GiftStorageViewModel {
                 for paper in self.papersFromLocal {
                     self.localPaperIds.insert(paper.paperId)
                 }
+                self.sortPapers()
                 self.downloadLocalThumbnails(outputValue: .papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)
@@ -67,6 +69,7 @@ class GiftStorageViewModel {
                 for paper in self.papersFromServer {
                     self.serverPaperIds.insert(paper.paperId)
                 }
+                self.sortPapers()
                 self.downloadServerThumbnails(outputValue: .papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)
@@ -204,9 +207,33 @@ class GiftStorageViewModel {
                 papersLocalOnly.append(paperFromLocal)
             }
         }
-        // 만든 시간 순서대로 정렬
-        papers = papersLocalOnly + papersFromServer
-        papers.sort(by: {return $0.date < $1.date})
+        
+        let papers = papersLocalOnly + papersFromServer
+        var papersByYearTemp = [String: [PaperPreviewModel]]()
+        var yearsTemp = [String]()
+        
+        for paper in papers {
+            let year = getYear(date: paper.date)
+            if papersByYearTemp[year] == nil {
+                papersByYearTemp[year] = [paper]
+                yearsTemp.append(year)
+            } else {
+                papersByYearTemp[year]?.append(paper)
+            }
+        }
+        yearsTemp.append("2020")
+        yearsTemp.append("2021")
+        yearsTemp = yearsTemp.sorted().reversed()
+        
+        papersByYear = papersByYearTemp
+        years = yearsTemp
+    }
+    
+    // Date 타입에서 연도 얻기
+    private func getYear(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        return dateFormatter.string(from: date)
     }
     
     // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
