@@ -68,7 +68,7 @@ const DocumentMap QueryEngine::GetDocumentsMatchingQuery(
   return ExecuteFullCollectionScan(query);
 }
 
-absl::optional<DocumentMap> QueryEngine::PerformQueryUsingIndex(
+const absl::optional<DocumentMap> QueryEngine::PerformQueryUsingIndex(
     const Query& query) const {
   if (query.MatchesAllDocuments()) {
     // Don't use indexes for queries that can be executed by scanning the
@@ -128,7 +128,7 @@ absl::optional<DocumentMap> QueryEngine::PerformQueryUsingIndex(
   return AppendRemainingResults(previous_results, query, offset);
 }
 
-absl::optional<DocumentMap> QueryEngine::PerformQueryUsingRemoteKeys(
+const absl::optional<DocumentMap> QueryEngine::PerformQueryUsingRemoteKeys(
     const Query& query,
     const DocumentKeySet& remote_keys,
     const SnapshotVersion& last_limbo_free_snapshot_version) const {

@@ -83,14 +83,14 @@ class QueryEngine {
    * Performs an indexed query that evaluates the query based on a collection's
    * persisted index values. Returns nullopt if an index is not available.
    */
-  absl::optional<model::DocumentMap> PerformQueryUsingIndex(
+  const absl::optional<model::DocumentMap> PerformQueryUsingIndex(
       const core::Query& query) const;
 
   /**
    * Performs a query based on the target's persisted query mapping. Returns
    * nullopt if the mapping is not available or cannot be used.
    */
-  absl::optional<model::DocumentMap> PerformQueryUsingRemoteKeys(
+  const absl::optional<model::DocumentMap> PerformQueryUsingRemoteKeys(
       const core::Query& query,
       const model::DocumentKeySet& remote_keys,
       const model::SnapshotVersion& last_limbo_free_snapshot_version) const;

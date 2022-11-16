@@ -172,14 +172,8 @@ Query Query::AddingFilter(Filter filter) const {
                   explicit_order_bys_[0].field() == *new_inequality_field,
               "First orderBy must match inequality field");
 
-  return {path_,
-          collection_group_,
-          filters_.push_back(std::move(filter)),
-          explicit_order_bys_,
-          limit_,
-          limit_type_,
-          start_at_,
-          end_at_};
+  return Query(path_, collection_group_, filters_.push_back(std::move(filter)),
+               explicit_order_bys_, limit_, limit_type_, start_at_, end_at_);
 }
 
 Query Query::AddingOrderBy(OrderBy order_by) const {
@@ -191,37 +185,34 @@ Query Query::AddingOrderBy(OrderBy order_by) const {
                 "First OrderBy must match inequality field.");
   }
 
-  return {path_,     collection_group_,
-          filters_,  explicit_order_bys_.push_back(std::move(order_by)),
-          limit_,    limit_type_,
-          start_at_, end_at_};
+  return Query(path_, collection_group_, filters_,
+               explicit_order_bys_.push_back(std::move(order_by)), limit_,
+               limit_type_, start_at_, end_at_);
 }
 
 Query Query::WithLimitToFirst(int32_t limit) const {
-  return {path_, collection_group_, filters_,  explicit_order_bys_,
-          limit, LimitType::First,  start_at_, end_at_};
+  return Query(path_, collection_group_, filters_, explicit_order_bys_, limit,
+               LimitType::First, start_at_, end_at_);
 }
 
 Query Query::WithLimitToLast(int32_t limit) const {
-  return {path_, collection_group_, filters_,  explicit_order_bys_,
-          limit, LimitType::Last,   start_at_, end_at_};
+  return Query(path_, collection_group_, filters_, explicit_order_bys_, limit,
+               LimitType::Last, start_at_, end_at_);
 }
 
 Query Query::StartingAt(Bound bound) const {
-  return {path_,  collection_group_, filters_,         explicit_order_bys_,
-          limit_, limit_type_,       std::move(bound), end_at_};
+  return Query(path_, collection_group_, filters_, explicit_order_bys_, limit_,
+               limit_type_, std::move(bound), end_at_);
 }
 
 Query Query::EndingAt(Bound bound) const {
-  return {path_,  collection_group_, filters_,  explicit_order_bys_,
-          limit_, limit_type_,       start_at_, std::move(bound)};
+  return Query(path_, collection_group_, filters_, explicit_order_bys_, limit_,
+               limit_type_, start_at_, std::move(bound));
 }
 
 Query Query::AsCollectionQueryAtPath(ResourcePath path) const {
-  return {std::move(path), /*collection_group=*/nullptr,
-          filters_,        explicit_order_bys_,
-          limit_,          limit_type_,
-          start_at_,       end_at_};
+  return Query(path, /*collection_group=*/nullptr, filters_,
+               explicit_order_bys_, limit_, limit_type_, start_at_, end_at_);
 }
 
 // MARK: - Matching
@@ -255,14 +246,7 @@ bool Query::MatchesFilters(const Document& doc) const {
 }
 
 bool Query::MatchesOrderBy(const Document& doc) const {
-  // We must use `order_bys()` to get the list of all orderBys
-  // (both implicit and explicit). Note that for OR queries, orderBy applies to
-  // all disjunction terms and implicit orderBys must be taken into account.
-  // For example, the query "a > 1 || b == 1" has an implicit "orderBy a" due
-  // to the inequality, and is evaluated as "a > 1 orderBy a || b == 1 orderBy
-  // a". A document with content of {b:1} matches the filters, but does not
-  // match the orderBy because it's missing the field 'a'.
-  for (const OrderBy& order_by : order_bys()) {
+  for (const OrderBy& order_by : explicit_order_bys_) {
     const FieldPath& field_path = order_by.field();
     // order by key always matches
     if (field_path != FieldPath::KeyFieldPath() &&
@@ -309,7 +293,7 @@ model::DocumentComparator Query::Comparator() const {
       });
 }
 
-std::string Query::CanonicalId() const {
+const std::string Query::CanonicalId() const {
   if (limit_type_ != LimitType::None) {
     return absl::StrCat(ToTarget().CanonicalId(),
                         "|lt:", (limit_type_ == LimitType::Last) ? "l" : "f");
