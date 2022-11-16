@@ -306,6 +306,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func cameraOffButtonAppear() {
+        cameraOnButton.removeFromSuperview()
         view.addSubview(cameraOffButton)
         cameraOffButtonConstraints()
     }
@@ -316,6 +317,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func backgroundOffButtonAppear() {
+        backgroundOnButton.removeFromSuperview()
         view.addSubview(backgroundOffButton)
         backgroundOffButtonConstraints()
     }
@@ -331,6 +333,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func pencilButtonOff() {
+        pencilOnButton.removeFromSuperview()
         view.addSubview(pencilOffButton)
         pencilOffButtonConstraints()
     }
@@ -341,6 +344,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func stickerButtonOff() {
+        stickerOnButton.removeFromSuperview()
         view.addSubview(stickerOffButton)
         stickerOffButtonConstraints()
     }
