@@ -17,17 +17,65 @@ final class WrittenPaperViewController: UIViewController {
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let timeManager: TimeFlowManager = TimeFlowManager()
+    
     private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
-    private var cancellables = Set<AnyCancellable>()
-    private var paperLinkBtnIsPressed: Bool = false
-    private var stopPaperBtnIsPressed: Bool = false
-    private var timerBalloonBtnPressed: Bool = false
-    private var deviceWidth = UIScreen.main.bounds.size.width
-    private var deviceHeight = UIScreen.main.bounds.size.height
+    private lazy var cancellables = Set<AnyCancellable>()
+    
+    private lazy var paperLinkBtnIsPressed: Bool = false
+    private lazy var stopPaperBtnIsPressed: Bool = false
+    private lazy var timerBalloonBtnPressed: Bool = false
+    private let deviceWidth = UIScreen.main.bounds.size.width
+    private let deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
     
-    lazy private var cardsList: UICollectionView = {
+    private lazy var showBalloonButton: UIButton = UIButton()
+    private lazy var customBackBtn: UIButton = {
+        let btnImg = UIImage(systemName: "chevron.backward")?
+            .withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 27, green: 27, blue: 27), renderingMode: .alwaysOriginal)
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
+        btn.setTitle("보관함", for: .normal)
+        btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        btn.setTitleColor(UIColor(named: "customBlack"), for: .normal)
+        btn.setImage(btnImg, for: .normal)
+        btn.addLeftPadding(5)
+        
+        return btn
+    }()
+    private lazy var managePaperBtn: UIButton = {
+        let btnImg = UIImage(systemName: "ellipsis.circle")!
+                        .resized(to: CGSize(width: 30, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var paperLinkBtn: UIButton = {
+        let btnImg = UIImage(systemName: "square.and.arrow.up")!
+                        .resized(to: CGSize(width: 30, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var createCardBtn: UIButton = {
+        let btnImg = UIImage(systemName: "plus.rectangle.fill")!
+                        .resized(to: CGSize(width: 40, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var giftLinkBtn: UIButton = {
+        let btnImg = UIImage(systemName: "giftcard.fill")!
+                        .resized(to: CGSize(width: 51, height: 36))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    
+    private lazy var cardsList: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
         layout.itemSize = CGSize(width: (deviceWidth-80)/3, height: ((deviceWidth-120)/3)*0.75)
@@ -54,12 +102,6 @@ final class WrittenPaperViewController: UIViewController {
         return timeLabel
     }()
     
-    lazy private var showBalloonButton: UIButton = {
-        let balloonBtn = UIButton()
-        balloonBtn.addTarget(self, action: #selector(showBalloon), for: .touchUpInside)
-        
-        return balloonBtn
-    }()
     private let timerDiscriptionBalloon = TimerDiscriptionBalloon()
     
     lazy private var titleLabel: BasePaddingLabel = {
@@ -72,7 +114,6 @@ final class WrittenPaperViewController: UIViewController {
         
         return titleLabel
     }()
-    
     
     lazy private var stackView: UIStackView = {
         let stackView = UIStackView()
@@ -152,7 +193,56 @@ final class WrittenPaperViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
+        
+        showBalloonButton
+            .tapPublisher
+            .sink { [weak self] in
+                self?.timerBalloonBtnPressed = true
+                self?.cardsList.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                self?.setBalloonLocation()
+            }
+            .store(in: &cancellables)
+        
+        customBackBtn
+            .tapPublisher
+            .sink { [weak self] in
+                self?.moveToPaperStorageView()
+            }
+            .store(in: &cancellables)
+        
+        managePaperBtn
+            .tapPublisher
+            .sink { [weak self] in
+                self?.setPopOverView(self?.managePaperBtn ?? UIButton())
+                if self?.timerBalloonBtnPressed == true {
+                    self?.timerDiscriptionBalloon.view.removeFromSuperview()
+                }
+            }
+            .store(in: &cancellables)
+        
+        paperLinkBtn
+            .tapPublisher
+            .sink { [weak self] in
+                self?.makeShareLink()
+            }
+            .store(in: &cancellables)
+        
+        createCardBtn
+            .tapPublisher
+            .sink{ [weak self] in
+                self?.moveToCardRootView()
+            }
+            .store(in: &cancellables)
+        
+        giftLinkBtn
+            .tapPublisher
+            .sink{ [weak self] in
+                print("선물하기 링크 생성 완료")
+            }
+            .store(in: &cancellables)
     }
+    
+    
     
     private func bindTimer() {
         let timerOutput = timeManager.transform(input: timerInput.eraseToAnyPublisher())
@@ -194,62 +284,6 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func setCustomNavBarButtons() {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
-        let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        customBackBtn.setTitle("보관함", for: .normal)
-        customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        customBackBtn.setTitleColor(.black, for: .normal)
-        customBackBtn.setImage(customBackBtnImage, for: .normal)
-        customBackBtn.addAction(UIAction(handler: { [self] _ in moveToPaperStorageView()}), for: .touchUpInside)
-        customBackBtn.addLeftPadding(5)
-        
-        let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
-        let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        managePaperBtn.setImage(managePaperBtnImage, for: .normal)
-        managePaperBtn.addAction(UIAction(handler: {_ in
-            self.setPopOverView(managePaperBtn)
-            if self.timerBalloonBtnPressed == true {
-                self.timerDiscriptionBalloon.view.removeFromSuperview()
-            }
-        }), for: .touchUpInside)
-        
-        let paperLinkBtnImage = UIImage(systemName: "square.and.arrow.up")!.resized(to: CGSize(width: 30, height: 30))
-        paperLinkBtnImage.withTintColor(.systemBlue)
-        let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
-        paperLinkBtn.addAction(UIAction(handler: { [self] _ in
-            if self.timerBalloonBtnPressed == true {
-                self.timerDiscriptionBalloon.view.removeFromSuperview()
-            }
-            if viewModel.isSameCurrentUserAndCreator {
-                makeCurrentPaperLink()
-                paperLinkBtnIsPressed = true
-                viewModel
-                    .currentPaperPublisher
-                    .receive(on: DispatchQueue.main)
-                    .sink { [weak self] paperModel in
-                        if self?.paperLinkBtnIsPressed == true {
-                            self?.presentShareSheet(paperLinkBtn)}
-                    }
-                    .store(in: &self.cancellables)
-                
-            } else {
-                presentSignUpModal(paperLinkBtn)
-            }
-        }), for: .touchUpInside)
-        
-        let createCardBtnImage = UIImage(systemName: "plus.rectangle.fill")!.resized(to: CGSize(width: 40, height: 30))
-        let createCardBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        createCardBtn.setImage(createCardBtnImage, for: .normal)
-        createCardBtn.addAction(UIAction(handler: { [self] _ in moveToCardRootView()}), for: .touchUpInside)
-        
-        let giftLinkBtnImage = UIImage(systemName: "giftcard.fill")!.resized(to: CGSize(width: 51, height: 36))
-        let giftLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
-        giftLinkBtn.setImage(giftLinkBtnImage, for: .normal)
-        giftLinkBtn.addAction(UIAction(handler: { _ in
-            print("선물하기 링크 생성 완료")
-        }), for: .touchUpInside)
-        
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
         let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
@@ -262,7 +296,6 @@ final class WrittenPaperViewController: UIViewController {
         
         navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
         if self.stopPaperBtnIsPressed == true {
-            print("self.stopPaperBtnIsPressed: \(self.stopPaperBtnIsPressed)")
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
         viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
@@ -317,6 +350,28 @@ final class WrittenPaperViewController: UIViewController {
                 self?.viewModel.makePaperLinkToShare(input: url)
             }
             .store(in: &cancellables)
+    }
+    
+    private func makeShareLink() {
+        if self.timerBalloonBtnPressed == true {
+            self.timerDiscriptionBalloon.view.removeFromSuperview()
+        }
+        
+        if self.viewModel.isSameCurrentUserAndCreator {
+            self.makeCurrentPaperLink()
+            self.paperLinkBtnIsPressed = true
+            self.viewModel
+                .currentPaperPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] paperModel in
+                    if self?.paperLinkBtnIsPressed == true {
+                        self?.presentShareSheet(self?.paperLinkBtn ?? UIButton())
+                    }
+                }
+                .store(in: &cancellables)
+        } else {
+            presentSignUpModal(paperLinkBtn)
+        }
     }
     
     private func moveToCardRootView() {
@@ -422,31 +477,6 @@ final class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
-    }
-    
-    func setCollectionView() -> UICollectionView {
-        var cardsCollection: UICollectionView?
-        
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
-        layout.itemSize = CGSize(width: (self.view.frame.width-80)/3, height: ((self.view.frame.width-120)/3)*0.75)
-        layout.minimumInteritemSpacing = 20
-        layout.minimumLineSpacing = 20
-        
-        cardsCollection = UICollectionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height), collectionViewLayout: layout)
-        cardsCollection?.center.x = view.center.x
-        cardsCollection?.showsVerticalScrollIndicator = false
-        cardsCollection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        cardsCollection?.dataSource = self
-        cardsCollection?.delegate = self
-        cardsCollection?.reloadData()
-        return cardsCollection ?? UICollectionView()
-    }
-    
-    @objc private func showBalloon() {
-        self.timerBalloonBtnPressed = true
-        cardsList.addSubview(timerDiscriptionBalloon.view)
-        setBalloonLocation()
     }
 }
 

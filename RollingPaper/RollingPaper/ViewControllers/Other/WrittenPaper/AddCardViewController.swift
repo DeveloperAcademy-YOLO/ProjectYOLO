@@ -16,9 +16,9 @@ class AddCardViewController: UIViewController {
     private let plusImg: UIImageView = {
         let imageView = UIImageView()
         let image = UIImage(systemName: "plus")
-        
         imageView.image = image
         imageView.tintColor = UIColor(red: 173, green: 173, blue: 173)
+        
         return imageView
     }()
     

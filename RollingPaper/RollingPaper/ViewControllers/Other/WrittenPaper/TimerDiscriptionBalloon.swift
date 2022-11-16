@@ -4,12 +4,13 @@
 //
 //  Created by SeungHwanKim on 2022/11/15.
 //
-
+import Combine
 import Foundation
 import SnapKit
 import UIKit
 
 class TimerDiscriptionBalloon: UIViewController {
+    private lazy var cancellables = Set<AnyCancellable>()
     private lazy var balloonImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
@@ -45,16 +46,11 @@ class TimerDiscriptionBalloon: UIViewController {
         return stackView
     }()
     
-    private lazy var closeBtn: UIButton = {
-        let button = UIButton()
-        button.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
-        button.backgroundColor = .clear
-        
-        return button
-    }()
+    private lazy var closeBtn: UIButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        bind()
         view.addSubview(balloonImageView)
         view.addSubview(discriptionTextStack)
         view.addSubview(closeBtn)
@@ -63,16 +59,21 @@ class TimerDiscriptionBalloon: UIViewController {
         closeBtnSizeConstraints()
     }
     
+    private func bind() {
+        closeBtn
+            .tapPublisher
+            .sink{ [weak self] in
+                self?.view.removeFromSuperview()
+            }
+            .store(in: &cancellables)
+    }
+    
     private func textLabelInit(_ label:BasePaddingLabel){
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = true
         label.sizeToFit()
-    }
-    
-    @objc private func closeAction() {
-        view.removeFromSuperview()
     }
 }
 
