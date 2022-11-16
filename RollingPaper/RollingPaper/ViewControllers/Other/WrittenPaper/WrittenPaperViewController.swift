@@ -11,7 +11,6 @@ import LinkPresentation
 import SnapKit
 import PencilKit
 import Photos
-import StickerView
 import UIKit
 
 final class WrittenPaperViewController: UIViewController {

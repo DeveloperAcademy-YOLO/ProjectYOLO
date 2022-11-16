@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double StickerViewVersionNumber;
-FOUNDATION_EXPORT const unsigned char StickerViewVersionString[];
+FOUNDATION_EXPORT double IRSticker_swiftVersionNumber;
+FOUNDATION_EXPORT const unsigned char IRSticker_swiftVersionString[];
 
