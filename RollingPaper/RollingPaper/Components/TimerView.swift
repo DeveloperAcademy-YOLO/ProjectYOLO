@@ -118,6 +118,12 @@ final class TimerView: UIStackView {
         // 남은 시간에 따라 레이아웃 가로 길이 조절
         if timeInterval < 0 && remainTimeState != .end {
             remainTimeState = .end
+            snp.updateConstraints({ make in
+                make.width.equalTo(Length.timerWidth3)
+            })
+            time.snp.updateConstraints({ make in
+                make.width.equalTo(Length.textWidth3)
+            })
             // 나중에 UI 업데이트하기
         } else if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
             remainTimeState = .second
