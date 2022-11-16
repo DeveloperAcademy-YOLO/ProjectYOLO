@@ -221,8 +221,6 @@ class GiftStorageViewModel {
                 papersByYearTemp[year]?.append(paper)
             }
         }
-        yearsTemp.append("2020")
-        yearsTemp.append("2021")
         yearsTemp = yearsTemp.sorted().reversed()
         
         papersByYear = papersByYearTemp
