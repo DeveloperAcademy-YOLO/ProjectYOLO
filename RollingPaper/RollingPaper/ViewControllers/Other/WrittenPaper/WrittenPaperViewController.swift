@@ -22,6 +22,7 @@ final class WrittenPaperViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var paperLinkBtnIsPressed: Bool = false
     private var stopPaperBtnIsPressed: Bool = false
+    private var timerBalloonBtnPressed: Bool = false
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
@@ -116,7 +117,9 @@ final class WrittenPaperViewController: UIViewController {
     
     override func viewWillDisappear  (_ animated: Bool) {
         super.viewWillDisappear(animated)
-        timerDiscriptionBalloon.view.removeFromSuperview()
+        if timerBalloonBtnPressed == true {
+            timerDiscriptionBalloon.view.removeFromSuperview()
+        }
     }
     
     private func bind() {
@@ -203,13 +206,21 @@ final class WrittenPaperViewController: UIViewController {
         let managePaperBtnImage = UIImage(systemName: "ellipsis.circle")!.resized(to: CGSize(width: 30, height: 30))
         let managePaperBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         managePaperBtn.setImage(managePaperBtnImage, for: .normal)
-        managePaperBtn.addAction(UIAction(handler: {_ in self.setPopOverView(managePaperBtn)}), for: .touchUpInside)
+        managePaperBtn.addAction(UIAction(handler: {_ in
+            self.setPopOverView(managePaperBtn)
+            if self.timerBalloonBtnPressed == true {
+                self.timerDiscriptionBalloon.view.removeFromSuperview()
+            }
+        }), for: .touchUpInside)
         
         let paperLinkBtnImage = UIImage(systemName: "square.and.arrow.up")!.resized(to: CGSize(width: 30, height: 30))
         paperLinkBtnImage.withTintColor(.systemBlue)
         let paperLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         paperLinkBtn.setImage(paperLinkBtnImage, for: .normal)
         paperLinkBtn.addAction(UIAction(handler: { [self] _ in
+            if self.timerBalloonBtnPressed == true {
+                self.timerDiscriptionBalloon.view.removeFromSuperview()
+            }
             if viewModel.isSameCurrentUserAndCreator {
                 makeCurrentPaperLink()
                 paperLinkBtnIsPressed = true
@@ -316,7 +327,9 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func presentSignUpModal(_ sender: UIButton) {
-        timerDiscriptionBalloon.view.removeFromSuperview()
+        if timerBalloonBtnPressed == true {
+            timerDiscriptionBalloon.view.removeFromSuperview()
+        }
         let signInVC = SignInViewController()
         let navVC = UINavigationController(rootViewController: signInVC)
         navVC.modalPresentationStyle = .formSheet //로그인 모달에 x버튼 넣기 위함
@@ -431,6 +444,7 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     @objc private func showBalloon() {
+        self.timerBalloonBtnPressed = true
         cardsList.addSubview(timerDiscriptionBalloon.view)
         setBalloonLocation()
     }
