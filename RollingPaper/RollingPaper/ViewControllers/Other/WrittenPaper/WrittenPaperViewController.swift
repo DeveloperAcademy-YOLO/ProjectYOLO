@@ -20,6 +20,7 @@ final class WrittenPaperViewController: UIViewController {
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var paperLinkBtnIsPressed: Bool = false
+    private var stopPaperBtnIsPressed: Bool = false
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
     lazy private var cardsList: UICollectionView = {
@@ -126,6 +127,18 @@ final class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    private func resetPaperEndTime() {
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] paperModel in
+                if let paperModel = paperModel {
+                    self?.viewModel.currentPaper?.endTime = paperModel.date
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     private func setCustomNavBarButtons() {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
@@ -168,15 +181,28 @@ final class WrittenPaperViewController: UIViewController {
         createCardBtn.setImage(createCardBtnImage, for: .normal)
         createCardBtn.addAction(UIAction(handler: { [self] _ in moveToCardRootView()}), for: .touchUpInside)
         
+        let giftLinkBtnImage = UIImage(systemName: "giftcard.fill")!.resized(to: CGSize(width: 51, height: 36))
+        let giftLinkBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
+        giftLinkBtn.setImage(giftLinkBtnImage, for: .normal)
+        giftLinkBtn.addAction(UIAction(handler: { _ in
+            print("선물하기 링크 생성 완료")
+        }), for: .touchUpInside)
+        
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
         let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
         let fourthBarButton = UIBarButtonItem(customView: createCardBtn)
+        let fifthBarButton = UIBarButtonItem(customView: giftLinkBtn)
         
         let signInSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton, secondBarButton]
         let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
+        let stoppedPaperSetting: [UIBarButtonItem] = [fifthBarButton]
         
         navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        if self.stopPaperBtnIsPressed == true {
+            print("self.stopPaperBtnIsPressed: \(self.stopPaperBtnIsPressed)")
+            navigationItem.rightBarButtonItems = stoppedPaperSetting
+        }
         viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
         navigationItem.leftBarButtonItem = firstBarButton
     }
@@ -296,7 +322,12 @@ final class WrittenPaperViewController: UIViewController {
         allertController.addAction(UIAlertAction(title: "마감", style: .default,
                                                  handler: {_ in
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
-            let stop = UIAlertAction(title: "확인", style: .default) { (stop) in  }
+            let stop = UIAlertAction(title: "확인", style: .default) { _ in
+                self.stopPaperBtnIsPressed = true
+                self.resetPaperEndTime()
+                self.setCustomNavBarButtons()
+                print("마감되었음")
+            }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
             alert.addAction(stop)
