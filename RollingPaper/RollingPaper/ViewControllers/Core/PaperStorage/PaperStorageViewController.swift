@@ -297,6 +297,15 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         let selectedPaper = papers[indexPath.item]
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
+            let share = UIAction(
+                title: "페이퍼 공유하기",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ) { [weak self] _ in
+            }
+            
             let delete = UIAction(
                 title: "페이퍼 삭제하기",
                 image: UIImage(systemName: "trash"),
@@ -312,7 +321,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 image: nil,
                 identifier: nil,
                 options: .singleSelection,
-                children: [delete]
+                children: [share,delete]
             )
         }
         return config
