@@ -136,7 +136,7 @@ class WrittenPaperViewModel {
         isPaperLinkMade = true
         guard let paper = currentPaper else { return }
         localDatabaseManager.updatePaper(paper: paper)
-        serverDatabaseManager.updatePaper(paper: paper)
+        serverDatabaseManager.addPaper(paper: paper)
         //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
         currentPaperPublisher.send(paper)
     }

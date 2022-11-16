@@ -13,11 +13,11 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
-    private var sidebarViewController: SidebarViewController!
     private var currentSecondaryView = "새 페이퍼"
+    private var sidebarViewController: UINavigationController!
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
-    private var giftboxViewController: UINavigationController!
+    private var giftStorageViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
 
     override func viewDidLoad() {
@@ -30,20 +30,25 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private func registerChangeViewNC() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(changeSecondaryView(noitificaiton:)),
-            name: Notification.Name.viewChange,
+            selector: #selector(changeSecondaryView(notification:)),
+            name: .viewChange,
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(changeSecondaryViewFromSidebar(noitificaiton:)),
-            name: Notification.Name.viewChangeFromSidebar,
+            selector: #selector(changeSecondaryViewFromSidebar(notification:)),
+            name: .viewChangeFromSidebar,
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(changeFromDeeplink),
             name: .deeplink,
+            object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(initializeNavigationStack(notification:)),
+            name: .viewInit,
             object: nil)
     }
     
@@ -56,21 +61,19 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     private func loadViewControllers() {
-        sidebarViewController = SidebarViewController()
+        sidebarViewController = UINavigationController(rootViewController: SidebarViewController())
         paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
-        // TODO: GiftboxViewController() 생성
-        // settingScreenViewController = UINavigationController(rootViewController: )
+        giftStorageViewController = UINavigationController(rootViewController: GiftStorageViewController())
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
             settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
             settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
         }
-        let sidebar = UINavigationController(rootViewController: self.sidebarViewController)
-        self.viewControllers = [sidebar, paperTemplateSelectViewController]
+        self.viewControllers = [sidebarViewController, paperTemplateSelectViewController]
     }
     
-    @objc func changeFromDeeplink(notification: Notification) {
+    @objc private func changeFromDeeplink(notification: Notification) {
         guard
             let paperId = notification.userInfo?["paperId"] as? String,
             let routeString = notification.userInfo?["route"] as? String,
@@ -92,11 +95,25 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
                     }
                 }
             }
+        } else {
+            // Gift Storage -> Gift Paper
+            if let currentNavVC = viewControllers[1] as? UINavigationController {
+                currentNavVC.popToRootViewController(true) {
+                    self.setViewController(self.giftStorageViewController, for: .secondary)
+                    if let giftStorageVC = self.giftStorageViewController.viewControllers.first as? GiftStorageViewController {
+                        let giftVC = WrittenPaperViewController()
+                        self.giftStorageViewController.pushViewController(giftVC, animated: true) {
+                            LocalDatabaseFileManager.shared.fetchPaper(paperId: paperId)
+                            FirestoreManager.shared.fetchPaper(paperId: paperId)
+                        }
+                    }
+                }
+            }
         }
     }
     
-    @objc func changeSecondaryView(noitificaiton: Notification) {
-        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+    @objc private func changeSecondaryView(notification: Notification) {
+        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
         case "새 페이퍼":
             setViewController(paperTemplateSelectViewController, for: .secondary)
@@ -108,23 +125,22 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
             } else {
                 self.settingScreenViewController.setViewControllers([SignInViewController()], animated: false)
             }
-        default :
+        default:
             break
         }
         self.currentSecondaryView = object
     }
     
-    @objc func changeSecondaryViewFromSidebar(noitificaiton: Notification) {
-        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+    @objc private func changeSecondaryViewFromSidebar(notification: Notification) {
+        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         if self.currentSecondaryView == object {
             return
         }
@@ -133,15 +149,30 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             setViewController(paperTemplateSelectViewController, for: .secondary)
         case "보관함":
             setViewController(paperStorageViewController, for: .secondary)
-        // TODO: GiftboxViewController() 생성
         case "선물 상자":
-            setViewController(giftboxViewController, for: .secondary)
+            setViewController(giftStorageViewController, for: .secondary)
         case "설정":
             setViewController(settingScreenViewController, for: .secondary)
-        default :
+        default:
             break
         }
         self.currentSecondaryView = object
+    }
+    
+    @objc private func initializeNavigationStack(notification: Notification) {
+        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
+        switch object {
+        case "signOut":
+            // paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
+            // paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
+            paperTemplateSelectViewController.popToRootViewController(animated: false)
+            paperStorageViewController.popToRootViewController(animated: false)
+            // TODO: GiftboxViewController() 생성
+            // settingScreenViewController = UINavigationController(rootViewController: )
+        // case "signIn":
+        default:
+            break
+        }
     }
     
     func splitViewController(_ svc: UISplitViewController, willChangeTo displayMode: UISplitViewController.DisplayMode) {

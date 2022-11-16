@@ -143,6 +143,11 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                             object: nil,
                             userInfo: [NotificationViewKey.view: "설정"]
                         )
+                        NotificationCenter.default.post(
+                            name: Notification.Name.viewInit,
+                            object: nil,
+                            userInfo: [NotificationViewKey.view: "signOut"]
+                        )
                     }
                 case .userProfileChangeDidSuccess:
                     self.countChange = false

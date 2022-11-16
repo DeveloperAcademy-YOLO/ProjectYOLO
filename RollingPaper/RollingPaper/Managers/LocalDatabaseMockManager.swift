@@ -135,4 +135,7 @@ final class LocalDatabaseMockManager: DatabaseManager {
         paperSubject.send(nil)
     }
     
+    func convertPaperToGift(paper: PaperModel) -> AnyPublisher<PaperModel, Error> {
+        return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+    }
 }
