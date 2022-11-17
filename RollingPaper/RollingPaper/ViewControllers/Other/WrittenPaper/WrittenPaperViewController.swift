@@ -89,7 +89,7 @@ final class WrittenPaperViewController: UIViewController {
         view.backgroundColor = .systemBackground
         bindTimer()
         bind()
-        self.splitViewController?.hide(.primary)
+//        self.splitViewController?.hide(.primary)
         stackViewConstraints()
         navigationItem.titleView = stackView
         setCustomNavBarButtons()
@@ -145,6 +145,8 @@ final class WrittenPaperViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] paper in
                 if let paper = paper {
+                    self?.titleLabel.text = paper.title
+                    self?.timeLabel.setEndTime(time: paper.endTime)
                     self?.cardsList.reloadData()
                 }
             }
@@ -217,11 +219,12 @@ final class WrittenPaperViewController: UIViewController {
                     .currentPaperPublisher
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] paperModel in
-                        if self?.paperLinkBtnIsPressed == true {
-                            self?.presentShareSheet(paperLinkBtn)}
+                        if self?.paperLinkBtnIsPressed == true && paperModel?.linkUrl != nil {
+                            self?.presentShareSheet(paperLinkBtn)
+                            self?.paperLinkBtnIsPressed = false
+                        }
                     }
                     .store(in: &self.cancellables)
-                
             } else {
                 presentSignUpModal(paperLinkBtn)
             }
@@ -475,8 +478,6 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
         
-        
-        
         if indexPath.row == 0 {
             let addCardBtn = AddCardViewController()
             myCell.addSubview(addCardBtn.view)
@@ -492,29 +493,60 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                 }
                 return myCell
             } else {
-                LocalStorageManager.downloadData(urlString: card.contentURLString)
-                    .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        switch completion {
-                        case .failure(let error): print(error)
-                        case .finished: break
-                        }
-                    } receiveValue: { [weak self] data in
-                        if
-                            let data = data,
-                            let image = UIImage(data: data) {
-                            NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                            let imageView = UIImageView(image: image)
-                            imageView.layer.masksToBounds = true
-                            myCell.addSubview(imageView)
-                            imageView.snp.makeConstraints { make in
-                                make.top.bottom.leading.trailing.equalTo(myCell)
+                switch viewModel.paperFrom {
+                case .fromLocal:
+                    LocalStorageManager.downloadData(urlString: card.contentURLString)
+                        .receive(on: DispatchQueue.main)
+                        .sink { completion in
+                            switch completion {
+                            case .failure(let error):
+                                print(card.contentURLString)
+                                print(error)
+                            case .finished: break
                             }
-                        } else {
-                            myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                        } receiveValue: { [weak self] data in
+                            if
+                                let data = data,
+                                let image = UIImage(data: data) {
+                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                let imageView = UIImageView(image: image)
+                                imageView.layer.masksToBounds = true
+                                myCell.addSubview(imageView)
+                                imageView.snp.makeConstraints { make in
+                                    make.top.bottom.leading.trailing.equalTo(myCell)
+                                }
+                            } else {
+                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                            }
                         }
-                    }
-                    .store(in: &cancellables)
+                        .store(in: &cancellables)
+                case .fromServer:
+                    FirebaseStorageManager.downloadData(urlString: card.contentURLString)
+                        .receive(on: DispatchQueue.main)
+                        .sink { completion in
+                            switch completion {
+                            case .finished: break
+                            case .failure(let error):
+                                print(error.localizedDescription)
+                            }
+                        } receiveValue: { [weak self] data in
+                            if
+                                let data = data,
+                                let image = UIImage(data: data) {
+                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                let imageView = UIImageView(image: image)
+                                imageView.layer.masksToBounds = true
+                                myCell.addSubview(imageView)
+                                imageView.snp.makeConstraints { make in
+                                    make.top.bottom.leading.trailing.equalTo(myCell)
+                                }
+                            } else {
+                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                            }
+                        }
+                        .store(in: &cancellables)
+                default: break
+                }
             }
         }
         return myCell
