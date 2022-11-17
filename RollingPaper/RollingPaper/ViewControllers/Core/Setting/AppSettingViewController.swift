@@ -31,6 +31,7 @@ final class AppSettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        toggleSwitchConfiguration()
         setupInitialConfig()
         configureDataSource()
         setView()
@@ -55,11 +56,17 @@ final class AppSettingViewController: UIViewController {
     
     private func configureDataSource() {
         
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionModel> { (cell, indexPath, item) in
+        let cellRegistration = UICollectionView.CellRegistration<SettingContentCell, AppSettingSectionModel> { (cell, indexPath, item) in
             var content = cell.defaultContentConfiguration()
+            var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+            headerDisclosureOption.tintColor = .black
+            if indexPath == [0, 1] {
+                cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
+            } else {
+                cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
+            }
             content.text = item.title
             cell.contentConfiguration = content
-            cell.accessories = []
         }
 
         dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: AppSettingSectionModel) -> UICollectionViewCell? in
@@ -85,9 +92,32 @@ final class AppSettingViewController: UIViewController {
         }
     }
     
+    private func toggleSwitchConfiguration() -> UICellAccessory.CustomViewConfiguration {
+        lazy var toggleSwitch: UISwitch = {
+            let toggleSwitch = UISwitch(frame: .zero)
+            toggleSwitch.isOn = false
+            toggleSwitch.addTarget(self, action: #selector(toggleSwitch(sender: )), for: .valueChanged)
+            return toggleSwitch
+        }()
+        
+        lazy var toggleAccessory = UICellAccessory.CustomViewConfiguration(
+            customView: toggleSwitch,
+            placement: .trailing(displayed: .always)
+        )
+        
+        return toggleAccessory
+    }
+    
+    @objc private func toggleSwitch(sender: UISwitch) {
+        if sender.isOn {
+            print("Expansion")
+        } else {
+            print("Collapse")
+        }
+    }
+    
     private func setView() {
         view.addSubview(collectionView)
-        // view.addSubview(colorSelectButton)
         
         collectionView.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
@@ -95,20 +125,44 @@ final class AppSettingViewController: UIViewController {
     }
 }
 
-/*
-class LocalPushCell: UICollectionViewListCell {
-    // LocalPushCell (토글)
+class SettingContentCell: UICollectionViewListCell {
+    
 }
 
 class LocalPushContentView: UIView, UIContentView {
-    // localPush 내부 뷰
+    var configuration: UIContentConfiguration
+    
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 class SelectedColorContentView: UIView, UIContentView {
-    // SelectedColor 내부 뷰
+    var configuration: UIContentConfiguration
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 class InformationContentView: UIView, UIContentView {
-    // InformationContent 내부 뷰
+    var configuration: UIContentConfiguration
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
-*/
+
