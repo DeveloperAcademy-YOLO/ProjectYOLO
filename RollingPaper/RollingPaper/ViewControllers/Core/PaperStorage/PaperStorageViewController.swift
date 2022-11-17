@@ -19,6 +19,8 @@ final class PaperStorageViewController: UIViewController {
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
     
+    lazy private var titleEmbedingTextField: UITextField = UITextField()
+    
     enum DataState {
         case nothing, onlyOpened, onlyClosed, both
     }
@@ -33,10 +35,10 @@ final class PaperStorageViewController: UIViewController {
     private lazy var paperCollectionView: PaperStorageCollectionView = {
         let paperCollectionView = PaperStorageCollectionView(frame: .zero, collectionViewLayout: .init())
         paperCollectionView.setCollectionViewLayout(getCollectionViewLayout(), animated: false)
- 
+        
         paperCollectionView.backgroundColor = .systemBackground
         paperCollectionView.alwaysBounceVertical = true
-
+        
         paperCollectionView.register(PaperStorageOpenedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageOpenedCollectionCell.identifier)
         paperCollectionView.register(PaperStorageClosedCollectionCell.self, forCellWithReuseIdentifier: PaperStorageClosedCollectionCell.identifier)
         paperCollectionView.register(PaperStorageCollectionHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaperStorageCollectionHeader.identifier)
@@ -86,7 +88,7 @@ final class PaperStorageViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
-                // 변화가 있으면 UI 업데이트 하기
+                    // 변화가 있으면 UI 업데이트 하기
                 case .initPapers:
                     self.updateLoadingView(isLoading: false)
                 case .papersAreUpdatedByTimer, .papersAreUpdatedInDatabase:
@@ -253,6 +255,107 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         viewIsChange = true
         navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
         return true
+    }
+    
+    private func sharePaperLink(_ sender: CGPoint, _ url: URL) {
+        let shareSheetVC = UIActivityViewController(
+            activityItems:
+                [
+                 url
+                ], applicationActivities: nil)
+        
+        self.present(shareSheetVC, animated: true, completion: nil)
+        
+        let rect: CGRect = .init(origin: sender, size: CGSize(width: 200, height: 200))
+        
+        shareSheetVC.popoverPresentationController?.sourceView = self.view
+        shareSheetVC.popoverPresentationController?.sourceRect = rect
+    }
+    
+    private func sharePaper(_ paper: PaperPreviewModel, _ sender: CGPoint) {
+        var linkSubscription: AnyCancellable?
+        linkSubscription = getPaperShareLink(creator: paper.creator, paperId: paper.paperId, paperTitle: paper.title, paperThumbnailURLString: paper.thumbnailURLString, route: .write)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    linkSubscription?.cancel()
+                case .finished: break
+                }
+            }, receiveValue: { [weak self] url in
+                self?.sharePaperLink(sender, url)
+                linkSubscription?.cancel()
+            })
+    }
+    
+    private func deletePaper(_ paper: PaperPreviewModel) {
+        let deleteVerifyText = self.titleEmbedingTextField.text
+        if deleteVerifyText == paper.title {
+            input.send(.paperDeleted(paperId: paper.paperId))
+        } else {
+            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
+            let confirm = UIAlertAction(title: "확인", style: .default)
+            alert.addAction(confirm)
+            alert.preferredAction = confirm
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func deleteAlert(_ paper: PaperPreviewModel) {
+        let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+        let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
+            self.deletePaper(paper)
+        }
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        allertController.addAction(delete)
+        allertController.addAction(cancel)
+        allertController.preferredAction = delete
+        allertController.addTextField { (deleteTitleTextField) in
+            deleteTitleTextField.placeholder = paper.title
+            self.titleEmbedingTextField = deleteTitleTextField
+        }
+        let popover = allertController.popoverPresentationController
+        popover?.sourceView = self.view
+        popover?.backgroundColor = .systemBackground
+        present(allertController, animated: true)
+    }
+    
+    //셀 눌렀을 때 ContextMenu 추가
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first else { return nil }
+        let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
+        let selectedPaper = papers[indexPath.item]
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            
+            let share = UIAction(
+                title: "페이퍼 공유하기",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                state: .off
+            ) { [weak self] _ in
+                self?.sharePaper(selectedPaper, point)
+            }
+            
+            let delete = UIAction(
+                title: "페이퍼 삭제하기",
+                image: UIImage(systemName: "trash"),
+                identifier: nil,
+                discoverabilityTitle: nil,
+                attributes: .destructive,
+                state: .off
+            ) { [weak self] _ in
+                self?.deleteAlert(selectedPaper)
+            }
+            
+            return UIMenu(
+                image: nil,
+                identifier: nil,
+                options: .singleSelection,
+                children: [share,delete]
+            )
+        }
+        return config
     }
 }
 
