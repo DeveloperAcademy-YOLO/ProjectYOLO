@@ -10,9 +10,9 @@ import UIKit
 final class GiftStorageLength {
     static let paperThumbnailCornerRadius: CGFloat = 12
     static let headerWidth: CGFloat = 200 // 임시
-    static let headerHeight: CGFloat = 29
-    static let headerLeftMargin: CGFloat = 37
-    static let sectionTopMargin: CGFloat = 16
+    static let headerHeight: CGFloat = 57
+    static let headerLeftMargin: CGFloat = 45
+    static let sectionTopMargin: CGFloat = -11
     static let sectionBottomMargin: CGFloat = 48
     static let sectionRightMargin: CGFloat = 36
     static let sectionLeftMargin: CGFloat = 36

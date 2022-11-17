@@ -14,7 +14,8 @@ final class GiftStorageCollectionHeader: UICollectionReusableView {
     
     private lazy var title: UILabel = {
         let title = UILabel()
-        title.font = .preferredFont(forTextStyle: .title2)
+        title.font = .systemFont(ofSize: 48, weight: .black)
+        title.textColor = UIColor(rgb: 0xD9D9D9)
         return title
     }()
     

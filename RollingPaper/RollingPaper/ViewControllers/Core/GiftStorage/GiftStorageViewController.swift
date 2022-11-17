@@ -171,17 +171,17 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.papers.count
+        return viewModel.papersByYear[viewModel.years[section]]?.count ?? 0
     }
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return viewModel.years.count
     }
     // 특정 위치의 셀
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GiftStorageCollectionCell.identifier, for: indexPath) as? GiftStorageCollectionCell else {return UICollectionViewCell()}
-
-        let paper = viewModel.papers[indexPath.item]
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GiftStorageCollectionCell.identifier, for: indexPath) as? GiftStorageCollectionCell,
+              let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item]
+        else {return UICollectionViewCell()}
         let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
         cell.setCell(paper: paper, thumbnail: thumbnail)
         
@@ -195,7 +195,7 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
                 withReuseIdentifier: GiftStorageCollectionHeader.identifier,
                 for: indexPath
             ) as? GiftStorageCollectionHeader else {return UICollectionReusableView()}
-            supplementaryView.setHeader(text: "aaa")
+            supplementaryView.setHeader(text: viewModel.years[indexPath.section])
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -203,9 +203,11 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
     }
     // 특정 셀 눌렀을 떄의 동작
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        setSelectedPaper(paperId: viewModel.papers[indexPath.item].paperId )
-        viewIsChange = true
-        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
+        // TODO: WrittenPaperViewController 말고 선물 전용 뷰로 이동해야함
+//        guard let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item] else {return false}
+//        setSelectedPaper(paperId: paper.paperId )
+//        viewIsChange = true
+//        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
         return true
     }
 }
