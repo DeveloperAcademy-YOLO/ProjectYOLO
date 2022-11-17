@@ -31,15 +31,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private var imageSticker: UIImage!
     
     private let imageShadowView: UIView = {
-        let aView = UIView()
-        aView.layer.shadowOffset = CGSize(width: 3, height: 3)
-        aView.layer.shadowOpacity = 0.2
-        aView.layer.shadowRadius = 30.0
-        aView.backgroundColor = .systemBackground
-        aView.layer.cornerRadius = 60
-        aView.layer.shadowColor = UIColor.black.cgColor
-        aView.translatesAutoresizingMaskIntoConstraints = false
-        return aView
+        let shadowUIView = UIView()
+        shadowUIView.layer.shadowOffset = CGSize(width: 3, height: 3)
+        shadowUIView.layer.shadowOpacity = 0.2
+        shadowUIView.layer.shadowRadius = 30.0
+        shadowUIView.backgroundColor = .systemBackground
+        shadowUIView.layer.cornerRadius = 60
+        shadowUIView.layer.shadowColor = UIColor.black.cgColor
+        shadowUIView.translatesAutoresizingMaskIntoConstraints = false
+        return shadowUIView
     }()
     
     lazy var rootUIImageView: UIImageView = {
@@ -200,7 +200,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         tapRecognizer.numberOfTapsRequired = 1
         someImageView.addGestureRecognizer(tapRecognizer)
         
-        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
@@ -301,21 +300,25 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func cameraOnButtonAppear() {
+        cameraOnButton.isHidden = false
         view.addSubview(cameraOnButton)
         cameraOnButtonConstraints()
     }
     
     private func cameraOffButtonAppear() {
+        cameraOnButton.isHidden = true
         view.addSubview(cameraOffButton)
         cameraOffButtonConstraints()
     }
     
     private func backgroundOnButtonAppear() {
+        backgroundOnButton.isHidden = false
         view.addSubview(backgroundOnButton)
         backgroundOnButtonConstraints()
     }
     
     private func backgroundOffButtonAppear() {
+        backgroundOnButton.isHidden = true
         view.addSubview(backgroundOffButton)
         backgroundOffButtonConstraints()
     }
@@ -326,21 +329,25 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func pencilButtonOn() {
+        pencilOnButton.isHidden = false
         view.addSubview(pencilOnButton)
         pencilOnButtonConstraints()
     }
     
     private func pencilButtonOff() {
+        pencilOnButton.isHidden = true
         view.addSubview(pencilOffButton)
         pencilOffButtonConstraints()
     }
     
     private func stickerButtonOn() {
+        stickerOnButton.isHidden = false
         view.addSubview(stickerOnButton)
         stickerOnButtonConstraints()
     }
     
     private func stickerButtonOff() {
+        stickerOnButton.isHidden = true
         view.addSubview(stickerOffButton)
         stickerOffButtonConstraints()
     }
@@ -356,13 +363,11 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func stickerCollectionViewDisappear() {
-        view.addSubview(imageShadowView)
         imageShadowView.isHidden = true
+        view.addSubview(imageShadowView)
         imageShadowViewConstraints()
         
-        view.addSubview(collectionView)
         collectionView.isHidden = true
-        collectionViewConstraints()
     }
     
     @objc func setPopOverView(_ sender: UIButton) {
@@ -376,6 +381,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         popover?.sourceView = sender
         popover?.sourceRect = CGRect(x: 25, y: 0, width: 50, height: 50)
         present(controller, animated: true)
+    }
+    
+    private func disableEditSticker() {
+        if selectedSticker != nil {
+            selectedSticker!.enabledControl = false
+            selectedSticker!.enabledBorder = false
+            selectedSticker = nil
+        }
     }
     
     @objc func togglebutton(_ gesture: UITapGestureRecognizer) {
@@ -405,14 +418,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func tapBackground(recognizer: UITapGestureRecognizer) {
         disableEditSticker()
-    }
-    
-    private func disableEditSticker() {
-        if selectedSticker != nil {
-            selectedSticker!.enabledControl = false
-            selectedSticker!.enabledBorder = false
-            selectedSticker = nil
-        }
     }
 }
 
