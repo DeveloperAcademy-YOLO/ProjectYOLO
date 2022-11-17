@@ -122,7 +122,7 @@ class PaperStorageViewModel {
         }
         // 만든 시간 순서대로 정렬
         papers = papersLocalOnly + papersFromServer
-        papers.sort(by: {return $0.date < $1.date})
+        papers.sort(by: {return $1.date < $0.date})
         
         // 열린 페이퍼와 닫힌 페이퍼 구분
         var opened = [PaperPreviewModel]()

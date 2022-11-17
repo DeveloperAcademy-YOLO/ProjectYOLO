@@ -208,9 +208,12 @@ class GiftStorageViewModel {
             }
         }
         
-        let papers = papersLocalOnly + papersFromServer
+        var papers = papersLocalOnly + papersFromServer
+        papers.sort(by: {return $1.date < $0.date})
+        
         var papersByYearTemp = [String: [PaperPreviewModel]]()
         var yearsTemp = [String]()
+        
         
         for paper in papers {
             let year = getYear(date: paper.date)
