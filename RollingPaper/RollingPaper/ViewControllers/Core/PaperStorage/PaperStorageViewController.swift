@@ -301,7 +301,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         }
     }
     
-    private func deleteAlert(_ sender: CGRect, _ paper: PaperPreviewModel) {
+    private func deleteAlert(_ paper: PaperPreviewModel) {
         let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
         let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
             self.deletePaper(paper)
@@ -322,7 +322,6 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     
     //셀 눌렀을 때 ContextMenu 추가
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        let senderPoint = CGRect(x: 0, y: 0, width: point.x, height: point.y)
         guard let indexPath = indexPaths.first else { return nil }
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         let selectedPaper = papers[indexPath.item]
@@ -346,7 +345,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 attributes: .destructive,
                 state: .off
             ) { [weak self] _ in
-                self?.deleteAlert(senderPoint, selectedPaper)
+                self?.deleteAlert(selectedPaper)
             }
             
             return UIMenu(
