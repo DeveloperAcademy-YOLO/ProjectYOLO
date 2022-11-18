@@ -18,7 +18,7 @@ final class PaperStorageViewController: UIViewController {
     private var splitViewIsOpened: Bool = true
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
-    private var contextChoose: Bool = false
+    private var isContextChosen: Bool = false
     
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     
@@ -97,7 +97,7 @@ final class PaperStorageViewController: UIViewController {
                 }
                 self.setDataState()
                 
-                if self.contextChoose == false {
+                if self.isContextChosen == false {
                     self.paperCollectionView.reloadData()
                 }
             })
@@ -327,7 +327,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     //셀 눌렀을 때 ContextMenu 추가
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
-        contextChoose = true
+        isContextChosen = true
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         let selectedPaper = papers[indexPath.item]
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
@@ -364,7 +364,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, dismissalPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        contextChoose = false
+        isContextChosen = false
         return nil
     }
 }
