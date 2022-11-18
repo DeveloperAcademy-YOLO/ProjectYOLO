@@ -222,11 +222,21 @@ final class SignUpViewController: UIViewController {
                 let signInVC = SignInViewController()
                 let navVC = UINavigationController(rootViewController: signInVC)
                 navVC.modalPresentationStyle = .pageSheet
-                modalPresentingVC.present(navVC, animated: true)
+                modalPresentingVC.present(navVC, animated: true) { [weak self] in
+                    self?.postUserInfo()
+                }
             }
         } else {
-            self.navigationController?.popViewController(animated: true)
+            self.navigationController?.popViewController(true, completion: { [weak self] in
+                self?.postUserInfo()
+            })
         }
+    }
+    
+    private func postUserInfo() {
+        let email = viewModel.email.value
+        let password = viewModel.password.value
+        NotificationCenter.default.post(name: .signUpDidSucceed, object: nil, userInfo: ["email": email, "password": password])
     }
     
     private func handleError(error: AuthManagerEnum) {

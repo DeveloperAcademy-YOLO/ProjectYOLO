@@ -142,11 +142,29 @@ final class SignInViewController: UIViewController {
         setSignInViewUI()
         bind()
         setKeyboardObserver()
+        setObserver()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         layoutIfModalView()
+    }
+    
+    deinit {
+        removeObserver()
+    }
+    
+    private func setObserver() {
+        NotificationCenter.default.addObserver(forName: .signUpDidSucceed, object: nil, queue: .main, using: { [weak self] notification in
+            guard
+                let email = notification.userInfo?["email"] as? String,
+                let password = notification.userInfo?["password"] as? String else { return }
+            print("aaa email: \(email) password: \(password)")
+        })
+    }
+    
+    private func removeObserver() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.signUpDidSucceed, object: nil)
     }
     
     private func bind() {
