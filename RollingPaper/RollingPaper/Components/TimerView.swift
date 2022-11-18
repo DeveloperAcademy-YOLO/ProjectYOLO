@@ -14,6 +14,7 @@ private final class Length {
     static let timerWidth1: CGFloat = 172
     static let timerWidth2: CGFloat = 116
     static let timerWidth3: CGFloat = 78
+    static let dateWidth: CGFloat = 95
     static let timerTopPadding: CGFloat = 6
     static let timerBottomPadding: CGFloat = 6
     static let timerRightPadding: CGFloat = 8
@@ -25,6 +26,7 @@ private final class Length {
     static let textWidth1: CGFloat = 132
     static let textWidth2: CGFloat = 76
     static let textWidth3: CGFloat = 38
+    static let dateTextWidth: CGFloat = 75
 }
 
 // 타이머 UI
@@ -52,7 +54,15 @@ final class TimerView: UIStackView {
         time.textColor = UIColor.white
         return time
     }()
-    
+    // 날짜 라벨
+    private lazy var dateLabel: UILabel = {
+        let dateLabel = UILabel()
+        dateLabel.font = .systemFont(ofSize: 14, weight: .bold)
+        dateLabel.textAlignment = .center
+        dateLabel.textColor = UIColor(rgb: 0x808080)
+        dateLabel.isHidden = true
+        return dateLabel
+    }()
     override init(frame: CGRect) {
         super.init(frame: frame)
         setMainView()
@@ -101,6 +111,13 @@ final class TimerView: UIStackView {
         return hourString + minString + secString
     }
     
+    // date타입을 특정 포맷으로 바꾸기 (2022.2.4)
+    private func changeTimeFormat2(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy.M.d"
+        return dateFormatter.string(from: date)
+    }
+    
     // 페이퍼 끝나는 시간 설정하도록 하기
     func setEndTime(time: Date) {
         endTime = time
@@ -113,19 +130,27 @@ final class TimerView: UIStackView {
         let timeInterval = Int(endTime.timeIntervalSince(Date()))
         
         // 30분 기준으로 타이머 색상 변경
-        backgroundColor = timeInterval > 60*30 ? UIColor.black.withAlphaComponent(0.32) : UIColor.red
+        if timeInterval > 60*30 {
+            backgroundColor = UIColor.black.withAlphaComponent(0.32)
+        } else if timeInterval > 0 {
+            backgroundColor = UIColor.red
+        } else {
+            backgroundColor = UIColor(rgb: 0xF0F0F0)
+        }
         
         // 남은 시간에 따라 레이아웃 가로 길이 조절
-        if timeInterval < 0 && remainTimeState != .end {
+        if timeInterval <= 0 && remainTimeState != .end {
             remainTimeState = .end
+            clock.isHidden = true
+            time.isHidden = true
+            dateLabel.isHidden = false
             snp.updateConstraints({ make in
-                make.width.equalTo(Length.timerWidth3)
+                make.width.equalTo(Length.dateWidth)
             })
             time.snp.updateConstraints({ make in
-                make.width.equalTo(Length.textWidth3)
+                make.width.equalTo(Length.dateTextWidth)
             })
-            // 나중에 UI 업데이트하기
-        } else if timeInterval >= 0 && timeInterval < 60 && remainTimeState != .second {
+        } else if timeInterval > 0 && timeInterval < 60 && remainTimeState != .second {
             remainTimeState = .second
             snp.updateConstraints({ make in
                 make.width.equalTo(Length.timerWidth3)
@@ -151,8 +176,8 @@ final class TimerView: UIStackView {
             })
         }
         
-        if timeInterval < 0 {
-            time.text = changeTimeFormat(second: 0)
+        if timeInterval <= 0 {
+            dateLabel.text = changeTimeFormat2(date: endTime)
         } else {
             time.text = changeTimeFormat(second: timeInterval)
         }
@@ -165,6 +190,7 @@ extension TimerView {
     private func configure() {
         addArrangedSubview(clock)
         addArrangedSubview(time)
+        addArrangedSubview(dateLabel)
     }
     
     private func setConstraints() {
