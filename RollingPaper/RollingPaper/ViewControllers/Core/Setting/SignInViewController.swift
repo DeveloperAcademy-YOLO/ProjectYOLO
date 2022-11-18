@@ -136,7 +136,17 @@ final class SignInViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
     private var currentFocusedTextfieldY: CGFloat = .zero
-
+    
+    init(email: String = "", password: String = "") {
+        emailTextField.text = email
+        passwordTextField.text = password
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setSignInViewUI()
@@ -157,9 +167,12 @@ final class SignInViewController: UIViewController {
     private func setObserver() {
         NotificationCenter.default.addObserver(forName: .signUpDidSucceed, object: nil, queue: .main, using: { [weak self] notification in
             guard
+                let self = self,
                 let email = notification.userInfo?["email"] as? String,
                 let password = notification.userInfo?["password"] as? String else { return }
-            print("aaa email: \(email) password: \(password)")
+            self.setTextFieldUI(textFieldFocused: .normal)
+            self.emailTextField.text = email
+            self.passwordTextField.text = password
         })
     }
     
