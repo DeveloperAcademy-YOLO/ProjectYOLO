@@ -136,6 +136,7 @@ final class SignInViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
     private var currentFocusedTextfieldY: CGFloat = .zero
+    private var observer: NSObjectProtocol?
     
     init(email: String = "", password: String = "") {
         emailTextField.text = email
@@ -165,7 +166,7 @@ final class SignInViewController: UIViewController {
     }
     
     private func setObserver() {
-        NotificationCenter.default.addObserver(forName: .signUpDidSucceed, object: nil, queue: .main, using: { [weak self] notification in
+        observer = NotificationCenter.default.addObserver(forName: .signUpDidSucceed, object: nil, queue: .main, using: { [weak self] notification in
             guard
                 let self = self,
                 let email = notification.userInfo?["email"] as? String,
@@ -177,7 +178,10 @@ final class SignInViewController: UIViewController {
     }
     
     private func removeObserver() {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.signUpDidSucceed, object: nil)
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        observer = nil
     }
     
     private func bind() {
