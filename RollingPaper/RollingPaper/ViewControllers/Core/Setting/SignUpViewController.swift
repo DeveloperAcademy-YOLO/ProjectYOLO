@@ -225,9 +225,7 @@ final class SignUpViewController: UIViewController {
                 let signInVC = SignInViewController(email: email, password: password)
                 let navVC = UINavigationController(rootViewController: signInVC)
                 navVC.modalPresentationStyle = .pageSheet
-                modalPresentingVC.present(navVC, animated: true) { [weak self] in
-                    self?.postUserInfo()
-                }
+                modalPresentingVC.present(navVC, animated: true)
             }
         } else {
             postUserInfo()
