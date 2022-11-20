@@ -54,6 +54,24 @@ final class CardResultViewController: UIViewController {
         return titleLabel
     }()
     
+    lazy var tipView: UIView = {
+        let tip = UIView()
+        
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: 0)) // 시작 위치
+        path.addLine(to: CGPoint(x: 127, y: 0))
+        path.addLine(to: CGPoint(x: 117, y: 10))
+        path.addLine(to: CGPoint(x: 107, y: 0))
+        
+        let shape = CAShapeLayer()
+        shape.path = path
+        shape.fillColor = UIColor.white.cgColor
+        shape.cornerRadius = 2
+        
+        tip.layer.addSublayer(shape)
+        return tip
+    }()
+    
     lazy var backwardButton: UIButton = {
         let button = UIButton()
         let backwardBtnImage = UIImage(systemName: "arrow.uturn.backward")!.resized(to: CGSize(width: 30, height: 30)).withTintColor(UIColor(red: 173, green: 173, blue: 173))
@@ -73,19 +91,6 @@ final class CardResultViewController: UIViewController {
         button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(createBtnPressed(_:)), for: .touchUpInside)
         return button
-    }()
-    
-    lazy var titleBounceView: UILabel = {
-        let titleLabel = UILabel()
-      //  let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: someImageView.bounds.height*0.5, width: 234, height: 54))
-        titleLabel.text = "이대로 게시할까요?"
-        titleLabel.text = "이대로 게시할까요?"
-        titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        titleLabel.backgroundColor = .white
-        titleLabel.layer.cornerRadius = 12
-        titleLabel.layer.masksToBounds = true
-        return titleLabel
     }()
     
     init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
@@ -109,9 +114,13 @@ final class CardResultViewController: UIViewController {
         view.addSubview(someImageView)
         someImageViewConstraints()
         
-        view.addSubview(titleBounceView)
+        view.addSubview(titleLabel)
         titleBounceViewConstraints()
         animationBounce()
+        
+        view.addSubview(tipView)
+        tipViewConstraints()
+        animationBounceTip()
         
         view.addSubview(backwardButton)
         backwardButtonConstraints()
@@ -130,7 +139,13 @@ final class CardResultViewController: UIViewController {
     
     private func animationBounce() {
         UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
-            self.titleBounceView.frame = CGRect(x: self.titleBounceView.frame.minX, y: self.titleBounceView.frame.minY+12, width: self.titleBounceView.frame.width, height: self.titleBounceView.frame.height)
+            self.titleLabel.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.minY+12, width: self.titleLabel.frame.width, height: self.titleLabel.frame.height)
+        }
+    }
+    
+    private func animationBounceTip() {
+        UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
+            self.tipView.frame = CGRect(x: self.tipView.frame.minX, y: self.tipView.frame.minY+12, width: self.tipView.frame.width, height: self.tipView.frame.height)
         }
     }
     
@@ -151,7 +166,7 @@ final class CardResultViewController: UIViewController {
 extension CardResultViewController {
     
     private func titleBounceViewConstraints() {
-        titleBounceView.snp.makeConstraints({ make in
+        titleLabel.snp.makeConstraints({ make in
             make.width.equalTo(234)
             make.height.equalTo(54)
             make.centerX.equalTo(self.view)
@@ -159,6 +174,14 @@ extension CardResultViewController {
             make.bottom.equalTo(someImageView.snp.top).offset(-30)
         })
     }
+    
+    private func tipViewConstraints() {
+        tipView.snp.makeConstraints({ make in
+            make.centerX.equalTo(titleLabel.snp.centerX).offset(-117)
+            make.top.equalTo(titleLabel.snp.bottom).offset(-1)
+        })
+    }
+    
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.52)
