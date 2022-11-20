@@ -57,20 +57,31 @@ final class CardResultViewController: UIViewController {
     lazy var tipView: UIView = {
         let tip = UIView()
         
-        let path = CGMutablePath()
-        path.move(to: CGPoint(x: 0, y: 0)) // 시작 위치
-        path.addLine(to: CGPoint(x: 127, y: 0))
-        path.addLine(to: CGPoint(x: 117, y: 10))
-        path.addLine(to: CGPoint(x: 107, y: 0))
+        let triangle = CAShapeLayer()
+        triangle.fillColor = UIColor.white.cgColor
+        triangle.path = createRoundedTriangle(width: 25, height: 15, radius: 2)
+        triangle.position = CGPoint(x: 0, y: 2)
         
-        let shape = CAShapeLayer()
-        shape.path = path
-        shape.fillColor = UIColor.white.cgColor
-        shape.cornerRadius = 2
+        tip.layer.addSublayer(triangle)
         
-        tip.layer.addSublayer(shape)
         return tip
     }()
+    
+    func createRoundedTriangle(width: CGFloat, height: CGFloat, radius: CGFloat) -> CGPath {
+        // Draw the triangle path with its origin at the center.
+        let point1 = CGPoint(x: -width / 2, y: -height / 2)
+        let point2 = CGPoint(x: width / 2, y: -height / 2)
+        let point3 = CGPoint(x: 0, y: height / 2)
+
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: height / 2))
+        path.addArc(tangent1End: point1, tangent2End: point2, radius: radius)
+        path.addArc(tangent1End: point2, tangent2End: point3, radius: radius)
+        path.addArc(tangent1End: point3, tangent2End: point1, radius: radius)
+        path.closeSubpath()
+
+        return path
+    }
     
     lazy var backwardButton: UIButton = {
         let button = UIButton()
@@ -177,8 +188,8 @@ extension CardResultViewController {
     
     private func tipViewConstraints() {
         tipView.snp.makeConstraints({ make in
-            make.centerX.equalTo(titleLabel.snp.centerX).offset(-117)
-            make.top.equalTo(titleLabel.snp.bottom).offset(-1)
+            make.centerX.equalTo(titleLabel.snp.centerX)
+            make.top.equalTo(titleLabel.snp.bottom)
         })
     }
     
