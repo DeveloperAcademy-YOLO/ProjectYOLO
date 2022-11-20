@@ -443,6 +443,7 @@ final class WrittenPaperViewController: UIViewController {
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
                 self.stopPaperBtnIsPressed = true
                 self.viewModel.stopPaper()
+                self.cardsList.reloadData()
                 self.setCustomNavBarButtons()
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -488,7 +489,11 @@ final class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
+        if self.stopPaperBtnIsPressed == true {
+            return self.viewModel.currentPaper?.cards.count ?? 0
+        } else {
+            return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
+        }
     }
     //commit collectionView
     func saveCard(_ indexPath: IndexPath) {
@@ -525,14 +530,9 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
         
-        
-        
-        if indexPath.row == 0 {
-            let addCardBtn = AddCardViewController()
-            myCell.addSubview(addCardBtn.view)
-        } else {
+        if self.stopPaperBtnIsPressed == true {
             guard let currentPaper = viewModel.currentPaper else { return myCell }
-            let card = currentPaper.cards[indexPath.row-1]
+            let card = currentPaper.cards[indexPath.row]
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                 let imageView = UIImageView(image: image)
                 imageView.layer.masksToBounds = true
@@ -566,16 +566,58 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                     }
                     .store(in: &cancellables)
             }
+        } else {
+            if indexPath.row == 0 {
+                let addCardBtn = AddCardViewController()
+                myCell.addSubview(addCardBtn.view)
+            } else {
+                guard let currentPaper = viewModel.currentPaper else { return myCell }
+                let card = currentPaper.cards[indexPath.row-1]
+                if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                    let imageView = UIImageView(image: image)
+                    imageView.layer.masksToBounds = true
+                    myCell.addSubview(imageView)
+                    imageView.snp.makeConstraints { make in
+                        make.top.bottom.leading.trailing.equalTo(myCell)
+                    }
+                    return myCell
+                } else {
+                    LocalStorageManager.downloadData(urlString: card.contentURLString)
+                        .receive(on: DispatchQueue.main)
+                        .sink { completion in
+                            switch completion {
+                            case .failure(let error): print(error)
+                            case .finished: break
+                            }
+                        } receiveValue: { [weak self] data in
+                            if
+                                let data = data,
+                                let image = UIImage(data: data) {
+                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                let imageView = UIImageView(image: image)
+                                imageView.layer.masksToBounds = true
+                                myCell.addSubview(imageView)
+                                imageView.snp.makeConstraints { make in
+                                    make.top.bottom.leading.trailing.equalTo(myCell)
+                                }
+                            } else {
+                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                            }
+                        }
+                        .store(in: &cancellables)
+                }
+            }
         }
+        
+        
         return myCell
     }
 }
 
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.row == 0 {
-            moveToCardRootView()
-        } else {
+        
+        if self.stopPaperBtnIsPressed == true {
             let presentingVC = MagnifiedCardViewController()
             let blurredVC = BlurredViewController()
             
@@ -584,11 +626,29 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
             self.present(blurredVC, animated: true)
             
             presentingVC.backgroundViewController = blurredVC
-            presentingVC.selectedCardIndex = indexPath.row - 1
+            presentingVC.selectedCardIndex = indexPath.row
             presentingVC.modalPresentationStyle = .overFullScreen
             present(presentingVC, animated: true)
             
-            collectionView.scrollToItem(at: [0, indexPath.row - 1], at: .centeredHorizontally, animated: true)
+            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        } else {
+            if indexPath.row == 0 {
+                moveToCardRootView()
+            } else {
+                let presentingVC = MagnifiedCardViewController()
+                let blurredVC = BlurredViewController()
+                
+                blurredVC.modalTransitionStyle = .crossDissolve
+                blurredVC.modalPresentationStyle = .currentContext
+                self.present(blurredVC, animated: true)
+                
+                presentingVC.backgroundViewController = blurredVC
+                presentingVC.selectedCardIndex = indexPath.row - 1
+                presentingVC.modalPresentationStyle = .overFullScreen
+                present(presentingVC, animated: true)
+                
+                collectionView.scrollToItem(at: [0, indexPath.row - 1], at: .centeredHorizontally, animated: true)
+            }
         }
     }
     
