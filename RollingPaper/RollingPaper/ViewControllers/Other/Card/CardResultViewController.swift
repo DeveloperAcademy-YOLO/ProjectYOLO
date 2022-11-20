@@ -24,7 +24,7 @@ final class CardResultViewController: UIViewController {
         aView.layer.shadowOpacity = 0.2
         aView.layer.shadowRadius = 30.0
         aView.backgroundColor = .systemBackground
-        aView.layer.cornerRadius = 60
+        aView.layer.cornerRadius = 24
         aView.layer.shadowColor = UIColor.black.cgColor
         aView.translatesAutoresizingMaskIntoConstraints = false
         return aView
@@ -37,7 +37,7 @@ final class CardResultViewController: UIViewController {
         theImageView.backgroundColor = .systemBackground
         theImageView.contentMode = .scaleToFill
         theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
+        theImageView.layer.cornerRadius = 24
         
         theImageView.image = image
         return theImageView
@@ -161,8 +161,8 @@ extension CardResultViewController {
     }
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.60)
-            make.height.equalTo(self.view.bounds.height * 0.60)
+            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -170,8 +170,8 @@ extension CardResultViewController {
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.60)
-            make.height.equalTo(self.view.bounds.height * 0.60)
+            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
