@@ -15,6 +15,26 @@ final class AppSettingViewController: UIViewController {
     private var viewModel = AppSettingViewModel()
     private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>! = nil
     
+    private let userPhoto: UIImageView = {
+        let photo = UIImageView()
+        photo.contentMode = UIView.ContentMode.scaleAspectFill
+        return photo
+    }()
+    
+    private let userName: UILabel = {
+        let name = UILabel()
+        name.text = "Guest"
+        name.font = UIFont.preferredFont(forTextStyle: .title3)
+        name.sizeToFit()
+        return name
+    }()
+    
+    private let chevronButton: UIButton = {
+        let chevronButton = UIButton(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        chevronButton.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        return chevronButton
+    }()
+    
     let colorSelectButton: UISegmentedControl = {
         let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
         colorSelectButton.backgroundColor = UIColor.systemGray4
@@ -31,7 +51,6 @@ final class AppSettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        toggleSwitchConfiguration()
         setupInitialConfig()
         configureDataSource()
         setView()
@@ -60,10 +79,18 @@ final class AppSettingViewController: UIViewController {
             var content = cell.defaultContentConfiguration()
             var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
             headerDisclosureOption.tintColor = .black
-            if indexPath == [0, 1] {
+            
+            switch indexPath {
+            case [0, 0]:
+            cell.accessories = [.customView(configuration: self.colorSelectConfiguration())]
+            case [0, 1]:
                 cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
-            } else {
+            case [1, 0]:
                 cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
+            case [1, 1]:
+                cell.accessories = [.disclosureIndicator()]
+            default:
+                break
             }
             content.text = item.title
             cell.contentConfiguration = content
@@ -102,10 +129,30 @@ final class AppSettingViewController: UIViewController {
         
         lazy var toggleAccessory = UICellAccessory.CustomViewConfiguration(
             customView: toggleSwitch,
-            placement: .trailing(displayed: .always)
+            placement: .trailing(),
+            isHidden: false
         )
         
         return toggleAccessory
+    }
+    
+    private func colorSelectConfiguration() -> UICellAccessory.CustomViewConfiguration {
+        let colorSelectButton: UISegmentedControl = {
+            let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
+            colorSelectButton.backgroundColor = UIColor.systemGray4
+            colorSelectButton.tintColor = UIColor.black
+            return colorSelectButton
+        }()
+        
+        lazy var colorSelectAccessory = UICellAccessory.CustomViewConfiguration(
+            customView: colorSelectButton,
+            placement: .trailing(),
+            isHidden: false,
+            reservedLayoutWidth: .actual,
+            maintainsFixedSize: true
+        )
+        
+        return colorSelectAccessory
     }
     
     @objc private func toggleSwitch(sender: UISwitch) {
@@ -165,4 +212,3 @@ class InformationContentView: UIView, UIContentView {
         fatalError("init(coder:) has not been implemented")
     }
 }
-

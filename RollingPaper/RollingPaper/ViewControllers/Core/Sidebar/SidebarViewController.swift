@@ -14,6 +14,8 @@ final private class Layout {
     static let userPhotoFrameWidthHeight = 44
     static let userNameFontSize: CGFloat = 20
     static let userPhotoToNamePadding: CGFloat = 16
+    static let userChevronFrameWidth = Int(Double(userInfoStackWidthSuperView) * 0.3 * 0.24)
+    static let userChevronWidthHeight = 15
     static let collectionViewCellBackgroundInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 6, trailing: 0)
     static let collectionViewCellimageToTextPadding: CGFloat = 16
     static let collectionViewCellInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
@@ -56,13 +58,29 @@ final class SidebarViewController: UIViewController {
         return name
     }()
     
+    private lazy var userNamePhotoStack: UIStackView = {
+        let userNamePhotoStack = UIStackView(arrangedSubviews: [userPhoto, userName])
+        userNamePhotoStack.axis = .horizontal
+        userNamePhotoStack.alignment = .fill
+        userNamePhotoStack.distribution = .equalSpacing
+        userNamePhotoStack.spacing = Layout.userPhotoToNamePadding
+        return userNamePhotoStack
+    }()
+    
+    private let chevronButton: UIButton = {
+        let chevronButton = UIButton(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        chevronButton.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        chevronButton.imageView?.contentMode = .scaleAspectFit
+        return chevronButton
+    }()
+    
     private lazy var userInfoStack: UIStackView = {
-        let userInfo = UIStackView(arrangedSubviews: [userPhoto, userName])
+        let userInfo = UIStackView(arrangedSubviews: [userNamePhotoStack, chevronButton])
         userInfo.axis = .horizontal
         userInfo.alignment = .center
-        userInfo.distribution = .fillProportionally
+        userInfo.distribution = .equalSpacing
         userInfo.spacing = 0
-        userInfo.setCustomSpacing(Layout.userPhotoToNamePadding, after: userPhoto)
+        userInfo.setCustomSpacing(10, after: userName)
         return userInfo
     }()
     
@@ -83,6 +101,19 @@ final class SidebarViewController: UIViewController {
             name: Notification.Name.viewChange,
             object: nil
         )
+
+        chevronButton.tapPublisher
+            .sink { _ in
+                NotificationCenter.default.post(
+                    name: Notification.Name.viewChangeFromSidebar,
+                    object: nil,
+                    userInfo: [NotificationViewKey.view: "프로필"])
+            }
+            .store(in: &cancellables)
+    }
+    
+    @objc private func didTapUserInfo(_ sender: UITapGestureRecognizer) {
+        print("UserInfoTapped!", sender)
     }
     
     override func viewDidLayoutSubviews() {
@@ -196,10 +227,12 @@ final class SidebarViewController: UIViewController {
             make.height.equalTo(userInfoStack.snp.width).dividedBy(3)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(Layout.userInfoStackTopSafeArea)
         }
+        
         userPhoto.snp.makeConstraints { make in
             make.height.equalTo(userInfoStack.snp.height).offset(-28)
             make.width.equalTo(userPhoto.snp.height)
         }
+
         userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
         userPhoto.layer.masksToBounds = true
     }
