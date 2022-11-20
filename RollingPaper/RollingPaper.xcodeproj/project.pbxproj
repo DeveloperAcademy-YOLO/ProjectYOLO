@@ -43,8 +43,8 @@
 		BCF2482128F65C06008CD0F9 /* PaperStorageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */; };
 		BCF2482328F65C3B008CD0F9 /* PaperStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */; };
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
+		C517143A2925D4020077BF66 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C51714392925D4020077BF66 /* GoogleService-Info.plist */; };
 		C539EFE02921041E00ED4F9E /* AddCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */; };
-		C54E5E96292514AE0042AA25 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C54E5E95292514AE0042AA25 /* GoogleService-Info.plist */; };
 		C59A110929236CF7009FF570 /* TimerDiscriptionBalloon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
@@ -145,8 +145,8 @@
 		BCF2482028F65C06008CD0F9 /* PaperStorageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewController.swift; sourceTree = "<group>"; };
 		BCF2482228F65C3B008CD0F9 /* PaperStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperStorageViewModel.swift; sourceTree = "<group>"; };
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
+		C51714392925D4020077BF66 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCardViewController.swift; sourceTree = "<group>"; };
-		C54E5E95292514AE0042AA25 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C5951E14291951FE00D55BC7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerDiscriptionBalloon.swift; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
@@ -302,7 +302,7 @@
 				D22E4AA128EBDC72001091DA /* AppDelegate.swift */,
 				D22E4AA328EBDC72001091DA /* SceneDelegate.swift */,
 				C5951E14291951FE00D55BC7 /* Info.plist */,
-				C54E5E95292514AE0042AA25 /* GoogleService-Info.plist */,
+				C51714392925D4020077BF66 /* GoogleService-Info.plist */,
 				D22E4AAA28EBDC73001091DA /* Assets.xcassets */,
 				D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */,
 				D22E4AB728EBDC8B001091DA /* ViewControllers */,
@@ -667,7 +667,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5AB305628EC119300C2E016 /* .swiftlint.yml in Resources */,
-				C54E5E96292514AE0042AA25 /* GoogleService-Info.plist in Resources */,
+				C517143A2925D4020077BF66 /* GoogleService-Info.plist in Resources */,
 				D22E4AAE28EBDC73001091DA /* LaunchScreen.storyboard in Resources */,
 				D22E4AAB28EBDC73001091DA /* Assets.xcassets in Resources */,
 			);

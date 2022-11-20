@@ -29,6 +29,13 @@ final class WrittenPaperViewController: UIViewController {
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
+    private var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.attributedTitle = NSAttributedString(string: "데이터를 불러오는 중입니다...")
+        control.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        
+        return control
+    }()
     
     private lazy var showBalloonButton: UIButton = UIButton()
     private lazy var customBackBtn: UIButton = {
@@ -89,6 +96,8 @@ final class WrittenPaperViewController: UIViewController {
         cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         cardsList.dataSource = self
         cardsList.delegate = self
+        cardsList.alwaysBounceVertical = true
+        cardsList.addSubview(refreshControl)
         
         return cardsList
     }()
@@ -479,6 +488,13 @@ final class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
+    }
+    
+    @objc private func pullToRefresh() {
+        DispatchQueue.main.async {
+            self.cardsList.reloadData()
+            self.refreshControl.endRefreshing()
+        }
     }
 }
 
