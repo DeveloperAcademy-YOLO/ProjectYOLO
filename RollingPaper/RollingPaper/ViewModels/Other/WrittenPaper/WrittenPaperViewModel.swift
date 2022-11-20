@@ -23,7 +23,7 @@ class WrittenPaperViewModel {
         case fromServer
     }
     
-    var currentPaper: PaperModel?
+    var currentPaper: PaperModel!
     let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
     private var paperID: String = ""
@@ -107,13 +107,10 @@ class WrittenPaperViewModel {
         }
     }
     
-    func stopPaper(_ paperID: String, from paperFrom: DataSource) {
-        //        switch paperFrom {
-        //        case .fromLocal: break
-        //
-        //        case .fromServer:
-        //            <#code#>
-        //        }
+    func stopPaper() {
+        currentPaper.endTime = currentPaper.date
+        serverDatabaseManager.updatePaper(paper: currentPaper!)
+        currentPaperPublisher.send(currentPaper)
     }
     
     func deletePaper(_ paperID: String, from paperFrom: DataSource) {

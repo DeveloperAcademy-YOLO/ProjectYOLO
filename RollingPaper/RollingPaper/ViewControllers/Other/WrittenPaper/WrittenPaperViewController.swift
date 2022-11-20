@@ -107,7 +107,7 @@ final class WrittenPaperViewController: UIViewController {
     
     lazy private var timeLabel: TimerView = {
         let timeLabel = TimerView()
-        timeLabel.setEndTime(time: viewModel.currentPaper?.endTime ?? Date())
+        timeLabel.setEndTime(time: viewModel.currentPaperPublisher.value?.endTime ?? Date())
         timeLabel.addSubview(showBalloonButton)
         return timeLabel
     }()
@@ -263,6 +263,7 @@ final class WrittenPaperViewController: UIViewController {
                 switch event {
                     // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
+                    self.timeLabel.setEndTime(time: self.viewModel.currentPaperPublisher.value!.endTime)
                     self.timeLabel.updateTime()
                 }
             })
@@ -276,18 +277,6 @@ final class WrittenPaperViewController: UIViewController {
             .sink { [weak self] paperModel in
                 if let paperModel = paperModel {
                     self?.titleLabel.text = paperModel.title
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
-    private func resetPaperEndTime() {
-        viewModel
-            .currentPaperPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] paperModel in
-                if let paperModel = paperModel {
-                    self?.viewModel.currentPaper?.endTime = paperModel.date
                 }
             }
             .store(in: &cancellables)
@@ -453,9 +442,8 @@ final class WrittenPaperViewController: UIViewController {
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
                 self.stopPaperBtnIsPressed = true
-                self.resetPaperEndTime()
+                self.viewModel.stopPaper()
                 self.setCustomNavBarButtons()
-                print("마감되었음")
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
