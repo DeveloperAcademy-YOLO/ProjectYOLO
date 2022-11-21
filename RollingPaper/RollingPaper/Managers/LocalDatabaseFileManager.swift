@@ -92,7 +92,9 @@ final class LocalDatabaseFileManager: DatabaseManager {
     private func bind() {
         FirebaseAuthManager.shared.userProfileSubject
             .sink { [weak self] userModel in
+                self?.papersSubject.send([])
                 self?.loadPaperPreviews(userModel: userModel)
+                print("aaa LocalDatabaseFileManager bind call")
             }
             .store(in: &cancellables)
     }
