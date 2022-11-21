@@ -23,6 +23,14 @@ class WrittenPaperViewModel {
         case fromServer
     }
     
+    enum Input {
+        
+    }
+    
+    enum Output {
+        
+    }
+    
     var currentPaper: PaperModel!
     let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
