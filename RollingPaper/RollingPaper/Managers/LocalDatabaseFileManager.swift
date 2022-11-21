@@ -15,11 +15,12 @@ final class LocalDatabaseFileManager: DatabaseManager {
     
     var papersSubject: CurrentValueSubject<[PaperPreviewModel], Never> = .init([])
     var paperSubject: CurrentValueSubject<PaperModel?, Never> = .init(nil)
+    private var cancellables = Set<AnyCancellable>()
     private let folderName = "/downloaded_papers"
     private let previewFolderName = "/downloaded_previews"
     private init() {
         createFolderIfNeeded()
-        loadPaperPreviews()
+        bind()
     }
     
     private func getDocumentDirectoryPath() -> URL? {
@@ -77,22 +78,39 @@ final class LocalDatabaseFileManager: DatabaseManager {
             }
         }
     }
-
+    
+    private func filterPaper(papers: [PaperModel], userModel: UserModel?) -> [PaperModel] {
+        var filteredPaper = [PaperModel]()
+        if let userModel = userModel {
+            filteredPaper = papers.filter({ ($0.creator?.email == userModel.email) || ($0.creator == nil) || ($0.cards.contains(where: {$0.creator?.email == userModel.email }))})
+        } else {
+            filteredPaper = papers.filter({ $0.creator == nil })
+        }
+        return filteredPaper
+    }
+    
+    private func bind() {
+        FirebaseAuthManager.shared.userProfileSubject
+            .sink { [weak self] userModel in
+                self?.loadPaperPreviews(userModel: userModel)
+            }
+            .store(in: &cancellables)
+    }
+    
     /// 이니셜라이즈 단에서 저장된 페이퍼 프리뷰 데이터 모두 로드
-    private func loadPaperPreviews() {
-        guard let previewDir = getPreviewDirectoryPath() else { return }
+    private func loadPaperPreviews(userModel: UserModel?) {
+        guard let paperDir = getPaperDirectoryPath() else { return }
         do {
-            let previewContents = try FileManager.default.contentsOfDirectory(at: previewDir, includingPropertiesForKeys: nil, options: [])
-            let previews = previewContents
-                .compactMap({ try? Data(contentsOf: $0 )})
-                .compactMap({ try? JSONDecoder().decode(PaperPreviewModel.self, from: $0)})
-            papersSubject.send(previews)
-            print("Paper Preview First Loaded Successfully")
+            let paperContents = try FileManager.default.contentsOfDirectory(at: paperDir, includingPropertiesForKeys: nil, options: [])
+            let papers = paperContents
+                .compactMap({ try? Data(contentsOf: $0) })
+                .compactMap({ try? JSONDecoder().decode(PaperModel.self, from: $0) })
+            let filteredPapers = filterPaper(papers: papers, userModel: userModel)
+            filteredPapers.forEach({ fetchPaperPreview(paperId: $0.paperId) })
         } catch {
             print(error.localizedDescription)
         }
     }
-    
     
     /// 페이퍼 데이터 추가, 페이퍼 프리뷰 데이터 추가, 페이퍼 프리뷰를 현재 로컬 데이터 퍼블리셔에 데이터 추가
     func addPaper(paper: PaperModel) {
@@ -182,6 +200,19 @@ final class LocalDatabaseFileManager: DatabaseManager {
         if let index = currentPaper.cards.firstIndex(where: { $0.cardId == card.cardId }) {
             currentPaper.cards[index] = card
             paperSubject.send(currentPaper)
+        }
+    }
+    
+    private func fetchPaperPreview(paperId: String) {
+        guard let fileDir = getPreviewFilePath(paperId: paperId) else { return }
+        do {
+            let paperPreviewData = try Data(contentsOf: fileDir)
+            let paperPreview = try JSONDecoder().decode(PaperPreviewModel.self, from: paperPreviewData)
+            let currentPreviews = papersSubject.value
+            let addedPreviews = currentPreviews + [paperPreview]
+            papersSubject.send(addedPreviews)
+        } catch {
+            print(error.localizedDescription)
         }
     }
     
