@@ -34,10 +34,14 @@ final class FirestoreManager: DatabaseManager {
     
     /// 현재 로그인된 유저 프로필 데이터 퍼블리셔 구독: (1). 유저 프로필이 변경될 때 감지 가능 (2). 로드 시 자동으로 현재 로그인된 유저가 작성한 페이퍼 프리뷰 배열을 로드
     private func bind() {
-        if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-            self.currentUserEmail = currentUserEmail
-            self.loadPaperPreviews()
-        }
+        FirebaseAuthManager.shared.userProfileSubject
+            .sink { [weak self] userModel in
+                self?.papersSubject.send([])
+                guard let userModel = userModel else { return }
+                self?.currentUserEmail = userModel.email
+                self?.loadPaperPreviews()
+            }
+            .store(in: &cancellables)
     }
     
     /// (1). 페이퍼 아이디를 통해 파이어베이스 내 저장된 페이퍼 탐색 및 페이퍼 퍼블리셔에 로드 (2). 페이퍼 아이디에 대한 페이퍼 데이터가 존재하지 않을 때 유저의 페이퍼 프리뷰 배열 업데이트
