@@ -23,7 +23,7 @@ class WrittenPaperViewModel {
         case fromServer
     }
     
-    var currentPaper: PaperModel?
+    var currentPaper: PaperModel!
     let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
     private var paperID: String = ""
@@ -52,6 +52,7 @@ class WrittenPaperViewModel {
             .sink { [weak self] userProfile in
                 guard let self = self else { return }
                 self.currentUser = userProfile
+                print("선택한 화면을 보고있는 유저 : \(userProfile)")
             }
             .store(in: &cancellables)
     }
@@ -97,8 +98,6 @@ class WrittenPaperViewModel {
         }
     }
     
-    func getRemainingTime(_ paperID: String) {}
-    
     func deleteCard(_ card: CardModel, from paperFrom: DataSource) {
         switch paperFrom {
         case .fromLocal:
@@ -108,15 +107,10 @@ class WrittenPaperViewModel {
         }
     }
     
-    func showCardDetail() {}
-    
-    func stopPaper(_ paperID: String, from paperFrom: DataSource) {
-        //        switch paperFrom {
-        //        case .fromLocal: break
-        //
-        //        case .fromServer:
-        //            <#code#>
-        //        }
+    func stopPaper() {
+        currentPaper.endTime = currentPaper.date
+        serverDatabaseManager.updatePaper(paper: currentPaper!)
+        currentPaperPublisher.send(currentPaper)
     }
     
     func deletePaper(_ paperID: String, from paperFrom: DataSource) {

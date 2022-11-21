@@ -1041,7 +1041,9 @@ Serializer::EncodeCompositeFilterOperator(CompositeFilter::Operator op) const {
       return google_firestore_v1_StructuredQuery_CompositeFilter_Operator_AND;
 
     case CompositeFilter::Operator::Or:
-      return google_firestore_v1_StructuredQuery_CompositeFilter_Operator_OR;
+      // TODO(orquery): Replace with Operator_OR.
+      return google_firestore_v1_StructuredQuery_CompositeFilter_Operator\
+_OPERATOR_UNSPECIFIED;
 
     default:
       HARD_FAIL("Unhandled CompositeFilter::Operator: %s", op);
@@ -1095,7 +1097,9 @@ CompositeFilter::Operator Serializer::DecodeCompositeFilterOperator(
     case google_firestore_v1_StructuredQuery_CompositeFilter_Operator_AND:
       return CompositeFilter::Operator::And;
 
-    case google_firestore_v1_StructuredQuery_CompositeFilter_Operator_OR:
+      // TODO(orquery): Replace with Operator_OR.
+    case google_firestore_v1_StructuredQuery_CompositeFilter_Operator\
+_OPERATOR_UNSPECIFIED:
       return CompositeFilter::Operator::Or;
 
     default:

@@ -35,15 +35,9 @@
 
 namespace firebase {
 namespace firestore {
-
 namespace bundle {
 class BundleSerializer;
-}  // namespace bundle
-
-namespace local {
-class LevelDbIndexManager;
-}  // namespace local
-
+}
 namespace core {
 
 using CollectionGroupId = std::shared_ptr<const std::string>;
@@ -97,10 +91,6 @@ class Target {
 
   int32_t limit() const {
     return limit_;
-  }
-
-  bool HasLimit() const {
-    return limit_ != kNoLimit;
   }
 
   const absl::optional<Bound>& start_at() const {
@@ -194,7 +184,6 @@ class Target {
   friend class Query;
   friend class remote::Serializer;
   friend class bundle::BundleSerializer;
-  friend class local::LevelDbIndexManager;
 
   /** Returns the field filters that target the given field path. */
   std::vector<FieldFilter> GetFieldFiltersForPath(
