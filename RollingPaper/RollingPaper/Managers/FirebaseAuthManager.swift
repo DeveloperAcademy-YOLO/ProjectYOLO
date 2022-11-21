@@ -318,12 +318,7 @@ extension FirebaseAuthManager: ASAuthorizationControllerDelegate, ASAuthorizatio
             return
         }
         
-        let firstName = appleIDCredential.fullName?.givenName ?? ""
-        let lastName = appleIDCredential.fullName?.familyName ?? ""
-        var name = firstName + lastName
-        if name.isEmpty {
-            name = "Default Name"
-        }
+        let name = "YOLO"
         
         let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
         auth.signIn(with: credential) { [weak self] _, error in

@@ -218,15 +218,25 @@ final class SignUpViewController: UIViewController {
     
     private func navigateToSignIn() {
         if let modalPresentingVC = presentingViewController as? SplitViewController {
-            modalPresentingVC.dismiss(animated: true) {
-                let signInVC = SignInViewController()
+            modalPresentingVC.dismiss(animated: true) { [weak self] in
+                guard
+                    let email = self?.viewModel.email.value,
+                    let password = self?.viewModel.password.value else { return }
+                let signInVC = SignInViewController(email: email, password: password)
                 let navVC = UINavigationController(rootViewController: signInVC)
                 navVC.modalPresentationStyle = .pageSheet
                 modalPresentingVC.present(navVC, animated: true)
             }
         } else {
+            postUserInfo()
             self.navigationController?.popViewController(animated: true)
         }
+    }
+    
+    private func postUserInfo() {
+        let email = viewModel.email.value
+        let password = viewModel.password.value
+        NotificationCenter.default.post(name: .signUpDidSucceed, object: nil, userInfo: ["email": email, "password": password])
     }
     
     private func handleError(error: AuthManagerEnum) {

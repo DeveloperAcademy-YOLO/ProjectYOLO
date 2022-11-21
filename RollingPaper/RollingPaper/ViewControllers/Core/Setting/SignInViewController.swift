@@ -136,6 +136,18 @@ final class SignInViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private let input: PassthroughSubject<SignInViewModel.Input, Never> = .init()
     private var currentFocusedTextfieldY: CGFloat = .zero
+    private var observer: NSObjectProtocol?
+
+        init(email: String = "", password: String = "") {
+            emailTextField.text = email
+            passwordTextField.text = password
+            passwordTextField.isSecureTextEntry = true
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -147,6 +159,31 @@ final class SignInViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         layoutIfModalView()
+    }
+    
+    deinit {
+        removeObserver()
+    }
+    
+    private func setObserver() {
+        observer = NotificationCenter.default.addObserver(forName: .signUpDidSucceed, object: nil, queue: .main, using: { [weak self] notification in
+            guard
+                let self = self,
+                let email = notification.userInfo?["email"] as? String,
+                let password = notification.userInfo?["password"] as? String else { return }
+            self.setTextFieldUI(textFieldFocused: .normal)
+            self.emailTextField.text = email
+            self.passwordTextField.text = password
+            self.emailTextField.sendActions(for: .editingDidEnd)
+            self.passwordTextField.sendActions(for: .editingDidEnd)
+        })
+    }
+    
+    private func removeObserver() {
+        if let observer = observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        observer = nil
     }
     
     private func bind() {
