@@ -86,7 +86,7 @@ final class AppSettingViewController: UIViewController {
             case [0, 1]:
                 cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
             case [1, 0]:
-                cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
+                cell.accessories = [.disclosureIndicator()]
             case [1, 1]:
                 cell.accessories = [.disclosureIndicator()]
             default:
@@ -119,6 +119,24 @@ final class AppSettingViewController: UIViewController {
         }
     }
     
+    @objc private func toggleSwitch(sender: UISwitch) {
+        if sender.isOn {
+            print("Expansion")
+        } else {
+            print("Collapse")
+        }
+    }
+    
+    private func setView() {
+        view.addSubview(collectionView)
+        
+        collectionView.snp.makeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+    }
+}
+
+extension AppSettingViewController {
     private func toggleSwitchConfiguration() -> UICellAccessory.CustomViewConfiguration {
         lazy var toggleSwitch: UISwitch = {
             let toggleSwitch = UISwitch(frame: .zero)
@@ -153,22 +171,6 @@ final class AppSettingViewController: UIViewController {
         )
         
         return colorSelectAccessory
-    }
-    
-    @objc private func toggleSwitch(sender: UISwitch) {
-        if sender.isOn {
-            print("Expansion")
-        } else {
-            print("Collapse")
-        }
-    }
-    
-    private func setView() {
-        view.addSubview(collectionView)
-        
-        collectionView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
-        }
     }
 }
 

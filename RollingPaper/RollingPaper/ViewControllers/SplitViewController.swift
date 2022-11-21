@@ -158,7 +158,19 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "설정":
             setViewController(appSettingViewController, for: .secondary)
         case "프로필":
-            setViewController(settingScreenViewController, for: .secondary)
+            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+                self.appSettingViewController.popToRootViewController(animated: false)
+                self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
+                if currentSecondaryView != "설정" {
+                    setViewController(appSettingViewController, for: .secondary)
+                }
+            } else {
+                self.appSettingViewController.popToRootViewController(animated: false)
+                self.appSettingViewController.pushViewController(SignInViewController(), animated: false)
+                if currentSecondaryView != "설정" {
+                    setViewController(appSettingViewController, for: .secondary)
+                }
+            }
         default:
             break
         }
@@ -186,13 +198,4 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             input.send(.viewIsOpened)
         }
     }
-    /*
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return true
-    }
-    
-    func primaryViewController(forExpanding splitViewController: UISplitViewController) -> UIViewController? {
-        return self.viewControllers.last
-    }
-     */
 }

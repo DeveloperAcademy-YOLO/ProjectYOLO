@@ -97,8 +97,15 @@ final class SidebarViewController: UIViewController {
         setInitialConfig()
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(changeSecondaryView(noitificaiton:)),
+            selector: #selector(changeSecondaryView(notification:)),
             name: Notification.Name.viewChange,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(changeSecondaryView(notification:)),
+            name: Notification.Name.viewChangeFromSidebar,
             object: nil
         )
 
@@ -129,10 +136,12 @@ final class SidebarViewController: UIViewController {
                                   scrollPosition: UICollectionView.ScrollPosition.centeredVertically)
     }
     
-    @objc private func changeSecondaryView(noitificaiton: Notification) {
-        guard let object = noitificaiton.userInfo?[NotificationViewKey.view] as? String else { return }
+    @objc private func changeSecondaryView(notification: Notification) {
+        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         if object == "보관함" {
             self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        } else if object == "프로필" {
+            self.collectionView.selectItem(at: IndexPath(row: 3, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
         }
     }
     
