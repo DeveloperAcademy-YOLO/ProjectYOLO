@@ -19,6 +19,7 @@ final class PaperStorageViewController: UIViewController {
     private var viewIsChange: Bool = false
     private var dataState: DataState = .nothing
     private var isContextChosen: Bool = false
+    private var isContextRepeated = false
     
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     
@@ -328,6 +329,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard let indexPath = indexPaths.first else { return nil }
         isContextChosen = true
+        isContextRepeated = true
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         let selectedPaper = papers[indexPath.item]
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
@@ -363,9 +365,14 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         return config
     }
     
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, dismissalPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-        isContextChosen = false
-        return nil
+    func collectionView(_ collectionView: UICollectionView, willEndContextMenuInteraction configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        isContextRepeated = false
+        DispatchQueue.main.asyncAfter(deadline: .now()+1.0) { [weak self] in
+            guard let self = self else { return }
+            if !self.isContextRepeated {
+                self.isContextChosen = false
+            }
+        }
     }
 }
 
