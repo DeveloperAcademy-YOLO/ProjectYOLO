@@ -516,7 +516,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     
     func deleteCard(_ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row]
+        let card = currentPaper.cards[indexPath.row - 1]
 
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
