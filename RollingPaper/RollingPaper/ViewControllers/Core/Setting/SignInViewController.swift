@@ -141,6 +141,7 @@ final class SignInViewController: UIViewController {
     init(email: String = "", password: String = "") {
         emailTextField.text = email
         passwordTextField.text = password
+        passwordTextField.isSecureTextEntry = true
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -174,6 +175,8 @@ final class SignInViewController: UIViewController {
             self.setTextFieldUI(textFieldFocused: .normal)
             self.emailTextField.text = email
             self.passwordTextField.text = password
+            self.emailTextField.sendActions(for: .editingDidEnd)
+            self.passwordTextField.sendActions(for: .editingDidEnd)
         })
     }
     
