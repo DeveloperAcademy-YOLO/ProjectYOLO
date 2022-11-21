@@ -17,18 +17,8 @@ class MagnifiedCardViewController: UIViewController {
     var selectedCardIndex: Int = 0
     private var deviceWidth = UIScreen.main.bounds.size.width
     private var deviceHeight = UIScreen.main.bounds.size.height
-    private lazy var closeBtn1: UIButton = {
-        let closeBtn = UIButton()
-        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
-        
-        return closeBtn
-    }()
-    private lazy var closeBtn2: UIButton = {
-        let closeBtn = UIButton()
-        closeBtn.addTarget(self, action: #selector(closeAction), for: .touchUpInside)
-        
-        return closeBtn
-    }()
+    private lazy var closeBtn1: UIButton = UIButton()
+    private lazy var closeBtn2: UIButton = UIButton()
     lazy private var cardsCollectionView: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 80, left: 155, bottom: 80, right: 155 )
@@ -56,11 +46,30 @@ class MagnifiedCardViewController: UIViewController {
         super.viewDidLoad()
         view.isOpaque = false
         view.backgroundColor = .clear
+        bind()
         view.addSubview(cardsCollectionView)
         view.addSubview(closeBtn1)
         view.addSubview(closeBtn2)
         setCloseBtn()
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handleDismiss)))
+    }
+    
+    private func bind() {
+        closeBtn1
+            .tapPublisher
+            .sink{ [weak self] in
+                self?.dismiss(animated: true)
+                self?.backgroundViewController.dismiss(animated: true)
+            }
+            .store(in: &cancellables)
+        
+        closeBtn2
+            .tapPublisher
+            .sink{ [weak self] in
+                self?.dismiss(animated: true)
+                self?.backgroundViewController.dismiss(animated: true)
+            }
+            .store(in: &cancellables)
     }
     
     private var viewTranslation = CGPoint(x: 0, y: 0)
@@ -78,7 +87,9 @@ class MagnifiedCardViewController: UIViewController {
                     self.view.transform = .identity
                 })
             } else {
-                closeAction()
+                dismiss(animated: true) {
+                    self.backgroundViewController.dismiss(animated: true)
+                }
             }
         default:
             break

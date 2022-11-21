@@ -89,22 +89,31 @@ std::vector<model::FieldIndex> MemoryIndexManager::GetFieldIndexes() const {
   return {};
 }
 
-model::IndexOffset MemoryIndexManager::GetMinOffset(const core::Target&) {
+absl::optional<model::FieldIndex> MemoryIndexManager::GetFieldIndex(
+    const core::Target& target) const {
+  (void)target;
+  return absl::nullopt;
+}
+
+const model::IndexOffset MemoryIndexManager::GetMinOffset(
+    const core::Target&) const {
   return model::IndexOffset::None();
 }
 
-model::IndexOffset MemoryIndexManager::GetMinOffset(const std::string&) const {
+const model::IndexOffset MemoryIndexManager::GetMinOffset(
+    const std::string&) const {
   return model::IndexOffset::None();
 }
 
-IndexManager::IndexType MemoryIndexManager::GetIndexType(const core::Target&) {
+IndexManager::IndexType MemoryIndexManager::GetIndexType(
+    const core::Target&) const {
   return IndexManager::IndexType::NONE;
 }
 
 absl::optional<std::vector<model::DocumentKey>>
-MemoryIndexManager::GetDocumentsMatchingTarget(const core::Target&) {
-  // Field indices are not supported with memory persistence.
-  return absl::nullopt;
+MemoryIndexManager::GetDocumentsMatchingTarget(const core::Target& target) {
+  (void)target;
+  return {};
 }
 
 absl::optional<std::string> MemoryIndexManager::GetNextCollectionGroupToUpdate()
@@ -112,12 +121,15 @@ absl::optional<std::string> MemoryIndexManager::GetNextCollectionGroupToUpdate()
   return absl::nullopt;
 }
 
-void MemoryIndexManager::UpdateCollectionGroup(const std::string&,
-                                               model::IndexOffset) {
-  // Field indices are not supported with memory persistence.
+void MemoryIndexManager::UpdateCollectionGroup(
+    const std::string& collection_group, model::IndexOffset offset) {
+  (void)collection_group;
+  (void)offset;
 }
 
-void MemoryIndexManager::UpdateIndexEntries(const model::DocumentMap&) {
+void MemoryIndexManager::UpdateIndexEntries(
+    const model::DocumentMap& documents) {
+  (void)documents;
 }
 
 }  // namespace local

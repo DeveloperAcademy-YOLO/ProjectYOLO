@@ -169,8 +169,6 @@ const char* EnumToString(
         return "OPERATOR_UNSPECIFIED";
     case google_firestore_v1_StructuredQuery_CompositeFilter_Operator_AND:
         return "AND";
-    case google_firestore_v1_StructuredQuery_CompositeFilter_Operator_OR:
-        return "OR";
     }
     return "<unknown enum value>";
 }

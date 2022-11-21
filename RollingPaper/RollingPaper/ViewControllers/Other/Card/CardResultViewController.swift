@@ -24,7 +24,7 @@ final class CardResultViewController: UIViewController {
         aView.layer.shadowOpacity = 0.2
         aView.layer.shadowRadius = 30.0
         aView.backgroundColor = .systemBackground
-        aView.layer.cornerRadius = 60
+        aView.layer.cornerRadius = 24
         aView.layer.shadowColor = UIColor.black.cgColor
         aView.translatesAutoresizingMaskIntoConstraints = false
         return aView
@@ -37,7 +37,7 @@ final class CardResultViewController: UIViewController {
         theImageView.backgroundColor = .systemBackground
         theImageView.contentMode = .scaleToFill
         theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 50
+        theImageView.layer.cornerRadius = 24
         
         theImageView.image = image
         return theImageView
@@ -53,6 +53,35 @@ final class CardResultViewController: UIViewController {
         titleLabel.layer.masksToBounds = true
         return titleLabel
     }()
+    
+    lazy var tipView: UIView = {
+        let tip = UIView()
+        
+        let triangle = CAShapeLayer()
+        triangle.fillColor = UIColor.white.cgColor
+        triangle.path = createRoundedTriangle(width: 25, height: 15, radius: 2)
+        triangle.position = CGPoint(x: 0, y: 2)
+        
+        tip.layer.addSublayer(triangle)
+        
+        return tip
+    }()
+    
+    func createRoundedTriangle(width: CGFloat, height: CGFloat, radius: CGFloat) -> CGPath {
+        // Draw the triangle path with its origin at the center.
+        let point1 = CGPoint(x: -width / 2, y: -height / 2)
+        let point2 = CGPoint(x: width / 2, y: -height / 2)
+        let point3 = CGPoint(x: 0, y: height / 2)
+
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: 0, y: height / 2))
+        path.addArc(tangent1End: point1, tangent2End: point2, radius: radius)
+        path.addArc(tangent1End: point2, tangent2End: point3, radius: radius)
+        path.addArc(tangent1End: point3, tangent2End: point1, radius: radius)
+        path.closeSubpath()
+
+        return path
+    }
     
     lazy var backwardButton: UIButton = {
         let button = UIButton()
@@ -73,19 +102,6 @@ final class CardResultViewController: UIViewController {
         button.layer.cornerRadius = 12
         button.addTarget(self, action: #selector(createBtnPressed(_:)), for: .touchUpInside)
         return button
-    }()
-    
-    lazy var titleBounceView: UILabel = {
-        let titleLabel = UILabel()
-      //  let titleLabel = UILabel(frame: CGRect(x: (view.bounds.width*0.5)-117, y: someImageView.bounds.height*0.5, width: 234, height: 54))
-        titleLabel.text = "이대로 게시할까요?"
-        titleLabel.text = "이대로 게시할까요?"
-        titleLabel.textAlignment = .center
-        titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        titleLabel.backgroundColor = .white
-        titleLabel.layer.cornerRadius = 12
-        titleLabel.layer.masksToBounds = true
-        return titleLabel
     }()
     
     init(resultImage: UIImage, viewModel: CardViewModel, isLocalDB: Bool) {
@@ -109,9 +125,13 @@ final class CardResultViewController: UIViewController {
         view.addSubview(someImageView)
         someImageViewConstraints()
         
-        view.addSubview(titleBounceView)
+        view.addSubview(titleLabel)
         titleBounceViewConstraints()
         animationBounce()
+        
+        view.addSubview(tipView)
+        tipViewConstraints()
+        animationBounceTip()
         
         view.addSubview(backwardButton)
         backwardButtonConstraints()
@@ -130,7 +150,13 @@ final class CardResultViewController: UIViewController {
     
     private func animationBounce() {
         UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
-            self.titleBounceView.frame = CGRect(x: self.titleBounceView.frame.minX, y: self.titleBounceView.frame.minY+12, width: self.titleBounceView.frame.width, height: self.titleBounceView.frame.height)
+            self.titleLabel.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.minY+12, width: self.titleLabel.frame.width, height: self.titleLabel.frame.height)
+        }
+    }
+    
+    private func animationBounceTip() {
+        UIView.animate(withDuration: 0.8, delay: 0.0, options: [.curveEaseInOut, .autoreverse, .repeat]) {
+            self.tipView.frame = CGRect(x: self.tipView.frame.minX, y: self.tipView.frame.minY+12, width: self.tipView.frame.width, height: self.tipView.frame.height)
         }
     }
     
@@ -151,7 +177,7 @@ final class CardResultViewController: UIViewController {
 extension CardResultViewController {
     
     private func titleBounceViewConstraints() {
-        titleBounceView.snp.makeConstraints({ make in
+        titleLabel.snp.makeConstraints({ make in
             make.width.equalTo(234)
             make.height.equalTo(54)
             make.centerX.equalTo(self.view)
@@ -159,10 +185,18 @@ extension CardResultViewController {
             make.bottom.equalTo(someImageView.snp.top).offset(-30)
         })
     }
+    
+    private func tipViewConstraints() {
+        tipView.snp.makeConstraints({ make in
+            make.centerX.equalTo(titleLabel.snp.centerX)
+            make.top.equalTo(titleLabel.snp.bottom)
+        })
+    }
+    
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.60)
-            make.height.equalTo(self.view.bounds.height * 0.60)
+            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })
@@ -170,8 +204,8 @@ extension CardResultViewController {
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.60)
-            make.height.equalTo(self.view.bounds.height * 0.60)
+            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
         })

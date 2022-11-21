@@ -67,7 +67,7 @@ internal class StorageGetDownloadURLTask: StorageTask, StorageTaskManagement {
         } else {
           if let data = data,
              let responseDictionary = try? JSONSerialization
-             .jsonObject(with: data) as? [String: Any] {
+             .jsonObject(with: data) as? [String: String] {
             downloadURL = strongSelf.downloadURLFromMetadataDictionary(responseDictionary)
             if downloadURL == nil {
               self.error = NSError(domain: StorageErrorDomain,
@@ -92,15 +92,15 @@ internal class StorageGetDownloadURLTask: StorageTask, StorageTaskManagement {
     }
   }
 
-  internal func downloadURLFromMetadataDictionary(_ dictionary: [String: Any]) -> URL? {
+  internal func downloadURLFromMetadataDictionary(_ dictionary: [String: String]) -> URL? {
     let downloadTokens = dictionary["downloadTokens"]
-    guard let downloadTokens = downloadTokens as? String,
+    guard let downloadTokens = downloadTokens,
           downloadTokens.count > 0 else {
       return nil
     }
     let downloadTokenArray = downloadTokens.components(separatedBy: ",")
     let bucket = dictionary["bucket"] ?? "<error: missing bucket>"
-    let path = dictionary["name"] as? String ?? "<error: missing path name>"
+    let path = dictionary["name"] ?? "<error: missing path name>"
     let fullPath = "/v0/b/\(bucket)/o/\(StorageUtils.GCSEscapedString(path))"
     var components = URLComponents()
     components.scheme = reference.storage.scheme

@@ -212,10 +212,15 @@ import Foundation
   open func putFile(from fileURL: URL,
                     metadata: StorageMetadata? = nil,
                     completion: ((_: StorageMetadata?, _: Error?) -> Void)?) -> StorageUploadTask {
-    let putMetadata: StorageMetadata = metadata ?? StorageMetadata()
-    if let path = path.object {
-      putMetadata.path = path
-      putMetadata.name = (path as NSString).lastPathComponent as String
+    var putMetadata: StorageMetadata
+    if metadata == nil {
+      putMetadata = StorageMetadata()
+      if let path = path.object {
+        putMetadata.path = path
+        putMetadata.name = (path as NSString).lastPathComponent as String
+      }
+    } else {
+      putMetadata = metadata!
     }
     let fetcherService = storage.fetcherServiceForApp
     let task = StorageUploadTask(reference: self,
