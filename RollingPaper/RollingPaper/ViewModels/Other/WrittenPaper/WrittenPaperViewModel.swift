@@ -62,10 +62,15 @@ class WrittenPaperViewModel {
                     self.stopPaper()
                     self.output.send(.paperStopped)
                 case .deletePaperTapped:
-                    break
+                    if self.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에도 페이퍼가 저장되어있으므로
+                        self.deletePaper(self.currentPaper.paperId, from: .fromServer)
+                        self.deletePaper(self.currentPaper.paperId, from: .fromLocal)
+                    } else {
+                        self.deletePaper(self.currentPaper.paperId, from: .fromLocal)
+                    }
+                    self.output.send(.paperDeleted)
                 case .paperShareTapped:
                     self.makePaperShareLink()
-                    
                     
                 case .giftTapped:
                     break
@@ -177,6 +182,7 @@ class WrittenPaperViewModel {
             serverDatabaseManager.resetPaper()
         }
         currentPaper = nil
+        self.currentPaperPublisher.send(currentPaper)
     }
     
     func makePaperShareLink() {
@@ -191,6 +197,27 @@ class WrittenPaperViewModel {
             } receiveValue: { url in
                 self.isPaperLinkMade = true
                 self.currentPaper.linkUrl = url
+                self.localDatabaseManager.updatePaper(paper: self.currentPaper)
+                self.serverDatabaseManager.addPaper(paper: self.currentPaper)
+                //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
+                self.currentPaperPublisher.send(self.currentPaper)
+                self.output.send(.paperLinkMade)
+            }
+            .store(in: &cancellables)
+    }
+    func makePaperGiftLink() {
+        getPaperShareLink(with: currentPaper, route: .gift)
+            .receive(on: DispatchQueue.main)
+            .sink { (completion) in
+                switch completion {
+                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
+                case .finished: break
+                case .failure(let error): print(error)
+                }
+            } receiveValue: { url in
+                self.isPaperLinkMade = true
+                self.currentPaper.linkUrl = url
+                self.currentPaper.isGift = true
                 self.localDatabaseManager.updatePaper(paper: self.currentPaper)
                 self.serverDatabaseManager.addPaper(paper: self.currentPaper)
                 //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
