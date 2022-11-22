@@ -190,7 +190,11 @@ final class WrittenPaperViewController: UIViewController {
                 case .paperTitleChanged:
                     self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
                 case .paperLinkMade:
-                    break
+                    if self?.viewModel.isSameCurrentUserAndCreator == true {
+                        self?.presentShareSheet(self?.paperLinkBtn ?? UIButton())
+                    } else {
+                        self?.presentSignUpModal(self?.paperLinkBtn ?? UIButton())
+                    }
                 case .giftLinkMade:
                     break
                 case .paperSavedOnServer:
@@ -252,23 +256,23 @@ final class WrittenPaperViewController: UIViewController {
         managePaperBtn
             .tapPublisher
             .sink { [weak self] in
+                self?.checkTimerBallon()
                 self?.setPopOverView(self?.managePaperBtn ?? UIButton())
-                if self?.timerBalloonBtnPressed == true {
-                    self?.timerDiscriptionBalloon.view.removeFromSuperview()
-                }
             }
             .store(in: &cancellables)
         
         paperLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.makeShareLink()
+                self?.checkTimerBallon()
+                self?.inputToVM.send(.paperShareTapped)
             }
             .store(in: &cancellables)
         
         createCardBtn
             .tapPublisher
             .sink { [weak self] in
+                self?.checkTimerBallon()
                 self?.moveToCardRootView()
             }
             .store(in: &cancellables)
@@ -284,6 +288,7 @@ final class WrittenPaperViewController: UIViewController {
             .isRefreshingPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
+                self?.checkTimerBallon()
                 self?.cardsList.reloadData()
                 self?.refreshControl.endRefreshing()
             }
@@ -304,6 +309,12 @@ final class WrittenPaperViewController: UIViewController {
                 }
             })
             .store(in: &cancellables)
+    }
+    
+    private func checkTimerBallon() {
+        if self.timerBalloonBtnPressed == true {
+            self.timerDiscriptionBalloon.view.removeFromSuperview()
+        }
     }
     
     private func setCustomNavBarButtons() {
@@ -359,44 +370,6 @@ final class WrittenPaperViewController: UIViewController {
         )
     }
     
-    private func makeCurrentPaperLink() {
-        guard let paper = viewModel.currentPaper else {return}
-        getPaperShareLink(with: paper, route: .write)
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { (completion) in
-                switch completion {
-                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
-                case .finished: break
-                case .failure(let error): print(error)
-                }
-            } receiveValue: { [weak self] url in
-                self?.viewModel.makePaperLinkToShare(input: url)
-            }
-            .store(in: &cancellables)
-    }
-    
-    private func makeShareLink() {
-        if self.timerBalloonBtnPressed == true {
-            self.timerDiscriptionBalloon.view.removeFromSuperview()
-        }
-        
-        if self.viewModel.isSameCurrentUserAndCreator {
-            self.makeCurrentPaperLink()
-            self.paperLinkBtnIsPressed = true
-            self.viewModel
-                .currentPaperPublisher
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] paperModel in
-                    if self?.paperLinkBtnIsPressed == true {
-                        self?.presentShareSheet(self?.paperLinkBtn ?? UIButton())
-                    }
-                }
-                .store(in: &cancellables)
-        } else {
-            presentSignUpModal(paperLinkBtn)
-        }
-    }
-    
     private func moveToCardRootView() {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         
@@ -405,9 +378,6 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func presentSignUpModal(_ sender: UIButton) {
-        if timerBalloonBtnPressed == true {
-            timerDiscriptionBalloon.view.removeFromSuperview()
-        }
         signInWithModal = true
         let signInVC = SignInViewController()
         let navVC = UINavigationController(rootViewController: signInVC)
@@ -497,13 +467,6 @@ final class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
-    }
-    
-    @objc private func pullToRefresh() {
-        DispatchQueue.main.async {
-            self.cardsList.reloadData()
-            self.refreshControl.endRefreshing()
-        }
     }
 }
 
