@@ -195,7 +195,7 @@ final class WrittenPaperViewController: UIViewController {
                         self?.presentSignUpModal(self?.paperLinkBtn ?? UIButton())
                     }
                 case .giftLinkMade:
-                    break
+                    self?.presentShareSheet(self?.giftLinkBtn ?? UIButton())
                 }
             }
             .store(in: &cancellables)
@@ -269,7 +269,7 @@ final class WrittenPaperViewController: UIViewController {
         giftLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                print("선물하기 링크 생성 완료")
+                self?.inputToVM.send(.giftTapped)
             }
             .store(in: &cancellables)
         

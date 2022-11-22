@@ -66,7 +66,6 @@ class WrittenPaperViewModel {
             .sink { [weak self] userProfile in
                 guard let self = self else { return }
                 self.currentUser = userProfile
-                print("선택한 화면을 보고있는 유저 : \(userProfile)")
             }
             .store(in: &cancellables)
     }
@@ -117,7 +116,7 @@ class WrittenPaperViewModel {
                 case .paperShareTapped:
                     self.makePaperShareLink()
                 case .giftTapped:
-                    break
+                    self.makePaperGiftLink()
                 case .moveToStorageTapped:
                     self.cleanPaperPublisher()
                 }
@@ -218,7 +217,7 @@ class WrittenPaperViewModel {
                 self.serverDatabaseManager.addPaper(paper: self.currentPaper)
                 //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
                 self.currentPaperPublisher.send(self.currentPaper)
-                self.output.send(.paperLinkMade)
+                self.output.send(.giftLinkMade)
             }
             .store(in: &cancellables)
     }
