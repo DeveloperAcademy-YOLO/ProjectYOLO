@@ -26,23 +26,20 @@ class WrittenPaperViewModel {
     
     enum Input {
         case changePaperTitleTapped(changedTitle: String, from: DataSource)
-        case addCardTapped
         case stopPaperTapped
         case deletePaperTapped
         case paperShareTapped
         case giftTapped
+        case moveToStorageTapped
     }
     
     enum Output {
-        case cardAdded
         case cardDeleted
         case paperStopped
         case paperDeleted
         case paperTitleChanged
         case paperLinkMade
         case giftLinkMade
-        case paperSavedOnServer
-        case paperSavedOnLocal
     }
     
     func transform(inputFromVC: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -56,8 +53,6 @@ class WrittenPaperViewModel {
                 case .changePaperTitleTapped(changedTitle: let changedTitle, from: .fromLocal):
                     self.changePaperTitle(input: changedTitle, from: .fromLocal)
                     self.output.send(.paperTitleChanged)
-                case .addCardTapped:
-                    break
                 case .stopPaperTapped:
                     self.stopPaper()
                     self.output.send(.paperStopped)
@@ -73,6 +68,9 @@ class WrittenPaperViewModel {
                     self.makePaperShareLink()
                     
                 case .giftTapped:
+                    break
+                case .moveToStorageTapped:
+                    self.cleanPaperPublisher()
                     break
                 }
             }
@@ -141,6 +139,11 @@ class WrittenPaperViewModel {
             .store(in: &cancellables)
     }
     
+    func cleanPaperPublisher() {
+        currentPaper = nil
+        currentPaperPublisher.send(currentPaper)
+    }
+    
     
     
     func changePaperTitle(input: String, from paperFrom: DataSource) {
@@ -182,7 +185,7 @@ class WrittenPaperViewModel {
             serverDatabaseManager.resetPaper()
         }
         currentPaper = nil
-        self.currentPaperPublisher.send(currentPaper)
+        currentPaperPublisher.send(currentPaper)
     }
     
     func makePaperShareLink() {

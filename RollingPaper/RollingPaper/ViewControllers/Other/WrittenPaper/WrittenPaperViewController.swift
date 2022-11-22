@@ -118,7 +118,7 @@ final class WrittenPaperViewController: UIViewController {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-        titleLabel.text = viewModel.currentPaper?.title
+        titleLabel.text = viewModel.currentPaperPublisher.value?.title
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         
@@ -179,13 +179,12 @@ final class WrittenPaperViewController: UIViewController {
             .sink { [weak self] receivedValue in
                 guard self != nil else { return }
                 switch receivedValue {
-                case .cardAdded:
-                    break
                 case .cardDeleted:
                     break
                 case .paperStopped:
                     self?.setCustomNavBarButtons()
                 case .paperDeleted:
+                    self?.inputToVM.send(.moveToStorageTapped)
                     self?.moveToPaperStorageView()
                 case .paperTitleChanged:
                     self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
@@ -196,10 +195,6 @@ final class WrittenPaperViewController: UIViewController {
                         self?.presentSignUpModal(self?.paperLinkBtn ?? UIButton())
                     }
                 case .giftLinkMade:
-                    break
-                case .paperSavedOnServer:
-                    break
-                case .paperSavedOnLocal:
                     break
                 }
             }
@@ -226,6 +221,7 @@ final class WrittenPaperViewController: UIViewController {
                 }
             }
             .store(in: &cancellables)
+        
         viewModel
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
@@ -248,6 +244,7 @@ final class WrittenPaperViewController: UIViewController {
         customBackBtn
             .tapPublisher
             .sink { [weak self] in
+                self?.inputToVM.send(.moveToStorageTapped)
                 self?.moveToPaperStorageView()
                 self?.signInWithModal = false
             }
@@ -354,6 +351,7 @@ final class WrittenPaperViewController: UIViewController {
             guard let paper = viewModel.currentPaper else { return }
             if viewModel.isPaperLinkMade {
                 viewModel.serverDatabaseManager.updatePaper(paper: paper)
+                viewModel.localDatabaseManager.updatePaper(paper: paper)
             } else {
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             }
