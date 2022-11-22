@@ -18,6 +18,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
     private var giftStorageViewController: UINavigationController!
+    private var appSettingViewController: UINavigationController!
     private var settingScreenViewController: UINavigationController!
 
     override func viewDidLoad() {
@@ -65,6 +66,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
         paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         giftStorageViewController = UINavigationController(rootViewController: GiftStorageViewController())
+        appSettingViewController = UINavigationController(rootViewController: AppSettingViewController())
         if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
             settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
@@ -128,6 +130,8 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
         case "설정":
+            setViewController(appSettingViewController, for:.secondary)
+        case "프로필":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
             } else {
@@ -152,7 +156,21 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
         case "설정":
-            setViewController(settingScreenViewController, for: .secondary)
+            setViewController(appSettingViewController, for: .secondary)
+        case "프로필":
+            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+                self.appSettingViewController.popToRootViewController(animated: false)
+                self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
+                if currentSecondaryView != "설정" {
+                    setViewController(appSettingViewController, for: .secondary)
+                }
+            } else {
+                self.appSettingViewController.popToRootViewController(animated: false)
+                self.appSettingViewController.pushViewController(SignInViewController(), animated: false)
+                if currentSecondaryView != "설정" {
+                    setViewController(appSettingViewController, for: .secondary)
+                }
+            }
         default:
             break
         }
@@ -163,8 +181,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
         case "signOut":
-            // paperTemplateSelectViewController = UINavigationController(rootViewController: PaperTemplateSelectViewController())
-            // paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
             paperTemplateSelectViewController.popToRootViewController(animated: false)
             paperStorageViewController.popToRootViewController(animated: false)
             // TODO: GiftboxViewController() 생성
@@ -181,13 +197,5 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         } else {
             input.send(.viewIsOpened)
         }
-    }
-    
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return true
-    }
-    
-    func primaryViewController(forExpanding splitViewController: UISplitViewController) -> UIViewController? {
-        return self.viewControllers.last
     }
 }

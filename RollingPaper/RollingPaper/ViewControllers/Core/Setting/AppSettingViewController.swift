@@ -15,6 +15,26 @@ final class AppSettingViewController: UIViewController {
     private var viewModel = AppSettingViewModel()
     private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>! = nil
     
+    private let userPhoto: UIImageView = {
+        let photo = UIImageView()
+        photo.contentMode = UIView.ContentMode.scaleAspectFill
+        return photo
+    }()
+    
+    private let userName: UILabel = {
+        let name = UILabel()
+        name.text = "Guest"
+        name.font = UIFont.preferredFont(forTextStyle: .title3)
+        name.sizeToFit()
+        return name
+    }()
+    
+    private let chevronButton: UIButton = {
+        let chevronButton = UIButton(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+        chevronButton.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        return chevronButton
+    }()
+    
     let colorSelectButton: UISegmentedControl = {
         let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
         colorSelectButton.backgroundColor = UIColor.systemGray4
@@ -55,11 +75,25 @@ final class AppSettingViewController: UIViewController {
     
     private func configureDataSource() {
         
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionModel> { (cell, indexPath, item) in
+        let cellRegistration = UICollectionView.CellRegistration<SettingContentCell, AppSettingSectionModel> { (cell, indexPath, item) in
             var content = cell.defaultContentConfiguration()
+            var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+            headerDisclosureOption.tintColor = .black
+            
+            switch indexPath {
+            case [0, 0]:
+            cell.accessories = [.customView(configuration: self.colorSelectConfiguration())]
+            case [0, 1]:
+                cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
+            case [1, 0]:
+                cell.accessories = [.disclosureIndicator()]
+            case [1, 1]:
+                cell.accessories = [.disclosureIndicator()]
+            default:
+                break
+            }
             content.text = item.title
             cell.contentConfiguration = content
-            cell.accessories = []
         }
 
         dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: AppSettingSectionModel) -> UICollectionViewCell? in
@@ -85,9 +119,16 @@ final class AppSettingViewController: UIViewController {
         }
     }
     
+    @objc private func toggleSwitch(sender: UISwitch) {
+        if sender.isOn {
+            print("Expansion")
+        } else {
+            print("Collapse")
+        }
+    }
+    
     private func setView() {
         view.addSubview(collectionView)
-        // view.addSubview(colorSelectButton)
         
         collectionView.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
@@ -95,20 +136,81 @@ final class AppSettingViewController: UIViewController {
     }
 }
 
-/*
-class LocalPushCell: UICollectionViewListCell {
-    // LocalPushCell (토글)
+extension AppSettingViewController {
+    private func toggleSwitchConfiguration() -> UICellAccessory.CustomViewConfiguration {
+        lazy var toggleSwitch: UISwitch = {
+            let toggleSwitch = UISwitch(frame: .zero)
+            toggleSwitch.isOn = false
+            toggleSwitch.addTarget(self, action: #selector(toggleSwitch(sender: )), for: .valueChanged)
+            return toggleSwitch
+        }()
+        
+        lazy var toggleAccessory = UICellAccessory.CustomViewConfiguration(
+            customView: toggleSwitch,
+            placement: .trailing(),
+            isHidden: false
+        )
+        
+        return toggleAccessory
+    }
+    
+    private func colorSelectConfiguration() -> UICellAccessory.CustomViewConfiguration {
+        let colorSelectButton: UISegmentedControl = {
+            let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
+            colorSelectButton.backgroundColor = UIColor.systemGray4
+            colorSelectButton.tintColor = UIColor.black
+            return colorSelectButton
+        }()
+        
+        lazy var colorSelectAccessory = UICellAccessory.CustomViewConfiguration(
+            customView: colorSelectButton,
+            placement: .trailing(),
+            isHidden: false,
+            reservedLayoutWidth: .actual,
+            maintainsFixedSize: true
+        )
+        
+        return colorSelectAccessory
+    }
+}
+
+class SettingContentCell: UICollectionViewListCell {
+    
 }
 
 class LocalPushContentView: UIView, UIContentView {
-    // localPush 내부 뷰
+    var configuration: UIContentConfiguration
+    
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 class SelectedColorContentView: UIView, UIContentView {
-    // SelectedColor 내부 뷰
+    var configuration: UIContentConfiguration
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 class InformationContentView: UIView, UIContentView {
-    // InformationContent 내부 뷰
+    var configuration: UIContentConfiguration
+    init(configuration: UIContentConfiguration) {
+        self.configuration = configuration
+        super.init(frame: .zero)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
-*/
