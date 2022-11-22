@@ -116,12 +116,10 @@ class WrittenPaperViewModel {
                     self.output.send(.paperDeleted)
                 case .paperShareTapped:
                     self.makePaperShareLink()
-                    
                 case .giftTapped:
                     break
                 case .moveToStorageTapped:
                     self.cleanPaperPublisher()
-                    break
                 }
             }
             .store(in: &cancellables)

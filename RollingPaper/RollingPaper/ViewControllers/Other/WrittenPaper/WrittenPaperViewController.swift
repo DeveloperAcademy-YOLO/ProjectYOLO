@@ -20,8 +20,6 @@ final class WrittenPaperViewController: UIViewController {
     
     private let inputToVM: PassthroughSubject<WrittenPaperViewModel.Input, Never> = .init()
     private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
-    private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
-    
     private lazy var cancellables = Set<AnyCancellable>()
     
     private lazy var paperLinkBtnIsPressed: Bool = false
@@ -308,12 +306,6 @@ final class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
-    private func checkTimerBallon() {
-        if self.timerBalloonBtnPressed == true {
-            self.timerDiscriptionBalloon.view.removeFromSuperview()
-        }
-    }
-    
     private func setCustomNavBarButtons() {
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
@@ -331,64 +323,6 @@ final class WrittenPaperViewController: UIViewController {
         }
         viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
         navigationItem.leftBarButtonItem = firstBarButton
-    }
-    
-    private func deletePaper() {
-        let deleteVerifyText = self.titleEmbedingTextField.text
-        if deleteVerifyText == self.viewModel.currentPaper?.title {
-            self.inputToVM.send(.deletePaperTapped)
-        } else {
-            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
-            let confirm = UIAlertAction(title: "확인", style: .default)
-            alert.addAction(confirm)
-            alert.preferredAction = confirm
-            self.present(alert, animated: true, completion: nil)
-        }
-    }
-    
-    private func moveToPaperStorageView() {
-        if viewModel.currentPaper != nil {
-            guard let paper = viewModel.currentPaper else { return }
-            if viewModel.isPaperLinkMade {
-                viewModel.serverDatabaseManager.updatePaper(paper: paper)
-                viewModel.localDatabaseManager.updatePaper(paper: paper)
-            } else {
-                viewModel.localDatabaseManager.updatePaper(paper: paper)
-            }
-        }
-        NotificationCenter.default.post(
-            name: Notification.Name.viewChange,
-            object: nil,
-            userInfo: [NotificationViewKey.view: "보관함"]
-        )
-    }
-    
-    private func moveToCardRootView() {
-        let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
-        
-        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
-    }
-    
-    private func presentSignUpModal(_ sender: UIButton) {
-        signInWithModal = true
-        let signInVC = SignInViewController()
-        let navVC = UINavigationController(rootViewController: signInVC)
-        navVC.modalPresentationStyle = .formSheet //로그인 모달에 x버튼 넣기 위함
-        present(navVC, animated: true)
-    }
-    
-    private func presentShareSheet(_ sender: UIButton) {
-        guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
-        let applicationActivities: [UIActivity]? = nil
-        let activityViewController = UIActivityViewController(
-            activityItems: [link] ,
-            applicationActivities: applicationActivities)
-        
-        let popover = activityViewController.popoverPresentationController
-        popover?.sourceView = sender
-        self.present(activityViewController, animated: true)
-        self.paperLinkBtnIsPressed = false
     }
     
     private func setPopOverView(_ sender: UIButton) {
@@ -459,6 +393,70 @@ final class WrittenPaperViewController: UIViewController {
         popover?.sourceView = sender
         popover?.backgroundColor = .systemBackground
         present(allertController, animated: true)
+    }
+    
+    private func deletePaper() {
+        let deleteVerifyText = self.titleEmbedingTextField.text
+        if deleteVerifyText == self.viewModel.currentPaper?.title {
+            self.inputToVM.send(.deletePaperTapped)
+        } else {
+            let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
+            let confirm = UIAlertAction(title: "확인", style: .default)
+            alert.addAction(confirm)
+            alert.preferredAction = confirm
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func presentSignUpModal(_ sender: UIButton) {
+        signInWithModal = true
+        let signInVC = SignInViewController()
+        let navVC = UINavigationController(rootViewController: signInVC)
+        navVC.modalPresentationStyle = .formSheet //로그인 모달에 x버튼 넣기 위함
+        present(navVC, animated: true)
+    }
+    
+    private func presentShareSheet(_ sender: UIButton) {
+        guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
+        let applicationActivities: [UIActivity]? = nil
+        let activityViewController = UIActivityViewController(
+            activityItems: [link] ,
+            applicationActivities: applicationActivities)
+        
+        let popover = activityViewController.popoverPresentationController
+        popover?.sourceView = sender
+        self.present(activityViewController, animated: true)
+        self.paperLinkBtnIsPressed = false
+    }
+    
+    private func moveToCardRootView() {
+        let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
+        
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
+    }
+    
+    private func moveToPaperStorageView() {
+        if viewModel.currentPaper != nil {
+            guard let paper = viewModel.currentPaper else { return }
+            if viewModel.isPaperLinkMade {
+                viewModel.serverDatabaseManager.updatePaper(paper: paper)
+                viewModel.localDatabaseManager.updatePaper(paper: paper)
+            } else {
+                viewModel.localDatabaseManager.updatePaper(paper: paper)
+            }
+        }
+        NotificationCenter.default.post(
+            name: Notification.Name.viewChange,
+            object: nil,
+            userInfo: [NotificationViewKey.view: "보관함"]
+        )
+    }
+    
+    private func checkTimerBallon() {
+        if self.timerBalloonBtnPressed == true {
+            self.timerDiscriptionBalloon.view.removeFromSuperview()
+        }
     }
 }
 
