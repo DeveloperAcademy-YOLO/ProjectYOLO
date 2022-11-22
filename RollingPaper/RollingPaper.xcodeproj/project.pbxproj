@@ -45,6 +45,7 @@
 		BCF2482529012589008CD0F9 /* SplitViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF2482429012589008CD0F9 /* SplitViewManager.swift */; };
 		C517143A2925D4020077BF66 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C51714392925D4020077BF66 /* GoogleService-Info.plist */; };
 		C539EFE02921041E00ED4F9E /* AddCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */; };
+		C56849D9292CF06E006E3EAE /* CardsInPaperCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56849D8292CF06E006E3EAE /* CardsInPaperCollectionCell.swift */; };
 		C59A110929236CF7009FF570 /* TimerDiscriptionBalloon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */; };
 		C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A7198A28F883D40003D593 /* UILabel+Padding.swift */; };
 		C5A8D274290844030006D244 /* MagnifiedCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */; };
@@ -147,6 +148,7 @@
 		BCF2482429012589008CD0F9 /* SplitViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewManager.swift; sourceTree = "<group>"; };
 		C51714392925D4020077BF66 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCardViewController.swift; sourceTree = "<group>"; };
+		C56849D8292CF06E006E3EAE /* CardsInPaperCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsInPaperCollectionCell.swift; sourceTree = "<group>"; };
 		C5951E14291951FE00D55BC7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerDiscriptionBalloon.swift; sourceTree = "<group>"; };
 		C5A7198A28F883D40003D593 /* UILabel+Padding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Padding.swift"; sourceTree = "<group>"; };
@@ -470,6 +472,7 @@
 				C5A8D273290844030006D244 /* MagnifiedCardViewController.swift */,
 				C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */,
 				C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */,
+				C56849D8292CF06E006E3EAE /* CardsInPaperCollectionCell.swift */,
 			);
 			path = WrittenPaper;
 			sourceTree = "<group>";
@@ -757,6 +760,7 @@
 				C5A7198B28F883D40003D593 /* UILabel+Padding.swift in Sources */,
 				D2B6308428EEE2A1008365CB /* UIView+Extensions.swift in Sources */,
 				BCC74A79291E1B2300582248 /* TimerView.swift in Sources */,
+				C56849D9292CF06E006E3EAE /* CardsInPaperCollectionCell.swift in Sources */,
 				C5B5853E2900DF1700454C75 /* WrittenPaperViewModel.swift in Sources */,
 				D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */,
 				BCF2481328ED5335008CD0F9 /* PaperTemplateSelectViewModel.swift in Sources */,
