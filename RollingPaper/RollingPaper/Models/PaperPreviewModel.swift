@@ -11,7 +11,7 @@ struct PaperPreviewModel: Codable {
     let paperId: String
     var creator: UserModel?
     let date: Date
-    let endTime: Date
+    var endTime: Date
     var title: String
     let templateString: String
     var template: TemplateModel {

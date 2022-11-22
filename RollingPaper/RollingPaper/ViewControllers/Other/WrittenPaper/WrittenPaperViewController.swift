@@ -181,6 +181,8 @@ final class WrittenPaperViewController: UIViewController {
                     break
                 case .paperStopped:
                     self?.setCustomNavBarButtons()
+                    self?.timeLabel.setEndTime(time: self?.viewModel.currentPaperPublisher.value?.endTime ?? Date())
+                    self?.cardsList.reloadData()
                 case .paperDeleted:
                     self?.inputToVM.send(.moveToStorageTapped)
                     self?.moveToPaperStorageView()
@@ -220,22 +222,14 @@ final class WrittenPaperViewController: UIViewController {
             }
             .store(in: &cancellables)
         
-        viewModel
-            .currentPaperPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] paper in
-                if let paper = paper {
-                    self?.cardsList.reloadData()
-                }
-            }
-            .store(in: &cancellables)
-        
         showBalloonButton
             .tapPublisher
             .sink { [weak self] in
-                self?.timerBalloonBtnPressed = true
-                self?.cardsList.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
-                self?.setBalloonLocation()
+                if self?.viewModel.currentPaperPublisher.value?.endTime != self?.viewModel.currentPaperPublisher.value?.date {
+                    self?.timerBalloonBtnPressed = true
+                    self?.cardsList.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                    self?.setBalloonLocation()
+                }
             }
             .store(in: &cancellables)
         
@@ -299,7 +293,6 @@ final class WrittenPaperViewController: UIViewController {
                 switch event {
                     // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
-                    self.timeLabel.setEndTime(time: self.viewModel.currentPaperPublisher.value!.endTime)
                     self.timeLabel.updateTime()
                 }
             })
@@ -318,7 +311,7 @@ final class WrittenPaperViewController: UIViewController {
         let stoppedPaperSetting: [UIBarButtonItem] = [fifthBarButton]
         
         navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
-        if self.stopPaperBtnIsPressed == true {
+        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
         viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
@@ -462,7 +455,7 @@ final class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if self.stopPaperBtnIsPressed == true {
+        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date{
             return self.viewModel.currentPaper?.cards.count ?? 0
         } else {
             return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
@@ -503,7 +496,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
         
-        if self.stopPaperBtnIsPressed == true {
+        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
             guard let currentPaper = viewModel.currentPaper else { return myCell }
             let card = currentPaper.cards[indexPath.row]
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -590,7 +583,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        if self.stopPaperBtnIsPressed == true {
+        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
             let presentingVC = MagnifiedCardViewController()
             let blurredVC = BlurredViewController()
             
