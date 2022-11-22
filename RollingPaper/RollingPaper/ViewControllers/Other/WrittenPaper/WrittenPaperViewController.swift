@@ -18,8 +18,10 @@ final class WrittenPaperViewController: UIViewController {
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let timeManager: TimeFlowManager = TimeFlowManager()
     
+    private let inputToVM: PassthroughSubject<WrittenPaperViewModel.Input, Never> = .init()
     private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private let currentUserSubject = PassthroughSubject<UserModel?, Never>()
+    
     private lazy var cancellables = Set<AnyCancellable>()
     
     private lazy var paperLinkBtnIsPressed: Bool = false
@@ -29,6 +31,7 @@ final class WrittenPaperViewController: UIViewController {
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
+    
     private var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.attributedTitle = NSAttributedString(string: "데이터를 불러오는 중입니다...")
@@ -39,7 +42,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var showBalloonButton: UIButton = UIButton()
     private lazy var customBackBtn: UIButton = {
         let btnImg = UIImage(systemName: "chevron.backward")?
-                        .withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 27, green: 27, blue: 27), renderingMode: .alwaysOriginal)
+            .withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 27, green: 27, blue: 27), renderingMode: .alwaysOriginal)
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         btn.setTitle("보관함", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
@@ -51,7 +54,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var managePaperBtn: UIButton = {
         let btnImg = UIImage(systemName: "ellipsis.circle")!
-                        .resized(to: CGSize(width: 30, height: 30))
+            .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
         
@@ -59,7 +62,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var paperLinkBtn: UIButton = {
         let btnImg = UIImage(systemName: "square.and.arrow.up")!
-                        .resized(to: CGSize(width: 30, height: 30))
+            .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
         
@@ -67,7 +70,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var createCardBtn: UIButton = {
         let btnImg = UIImage(systemName: "plus.rectangle.fill")!
-                        .resized(to: CGSize(width: 40, height: 30))
+            .resized(to: CGSize(width: 40, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
         
@@ -75,7 +78,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var giftLinkBtn: UIButton = {
         let btnImg = UIImage(systemName: "giftcard.fill")!
-                        .resized(to: CGSize(width: 51, height: 36))
+            .resized(to: CGSize(width: 51, height: 36))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
         btn.setImage(btnImg, for: .normal)
         
@@ -110,9 +113,7 @@ final class WrittenPaperViewController: UIViewController {
         timeLabel.addSubview(showBalloonButton)
         return timeLabel
     }()
-    
     private let timerDiscriptionBalloon = TimerDiscriptionBalloon()
-    
     lazy private var titleLabel: BasePaddingLabel = {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
@@ -123,7 +124,6 @@ final class WrittenPaperViewController: UIViewController {
         
         return titleLabel
     }()
-    
     lazy private var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = NSLayoutConstraint.Axis.horizontal
@@ -173,6 +173,34 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func bind() {
+        let outputFromVM = viewModel.transform(inputFromVC: inputToVM.eraseToAnyPublisher())
+        outputFromVM
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] receivedValue in
+                guard self != nil else { return }
+                switch receivedValue {
+                case .cardAdded:
+                    break
+                case .cardDeleted:
+                    break
+                case .paperStopped:
+                    self?.setCustomNavBarButtons()
+                case .paperDeleted:
+                    break
+                case .paperTitleChanged:
+                    self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
+                case .paperLinkMade:
+                    break
+                case .giftLinkMade:
+                    break
+                case .paperSavedOnServer:
+                    break
+                case .paperSavedOnLocal:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        
         FirebaseAuthManager.shared
             .userProfileSubject
             .sink { [weak self] userModel in
@@ -275,18 +303,6 @@ final class WrittenPaperViewController: UIViewController {
                     self.timeLabel.updateTime()
                 }
             })
-            .store(in: &cancellables)
-    }
-    
-    private func resetCurrentPaper() {
-        viewModel
-            .currentPaperPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] paperModel in
-                if let paperModel = paperModel {
-                    self?.titleLabel.text = paperModel.title
-                }
-            }
             .store(in: &cancellables)
     }
     
@@ -428,11 +444,9 @@ final class WrittenPaperViewController: UIViewController {
                 guard let changedPaperTitle = self.titleEmbedingTextField.text else { return }
                 
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
-                    self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromServer)
-                    self.resetCurrentPaper()
+                    self.inputToVM.send(.changePaperTitleTapped(changedTitle: changedPaperTitle, from: .fromServer))
                 } else {
-                    self.viewModel.changePaperTitle(input: changedPaperTitle, from: .fromLocal)
-                    self.resetCurrentPaper()
+                    self.inputToVM.send(.changePaperTitleTapped(changedTitle: changedPaperTitle, from: .fromLocal))
                 }
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -449,10 +463,8 @@ final class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
+                self.inputToVM.send(.stopPaperTapped)
                 self.stopPaperBtnIsPressed = true
-                self.viewModel.stopPaper()
-                self.cardsList.reloadData()
-                self.setCustomNavBarButtons()
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
@@ -525,7 +537,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     func deleteCard(_ indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaper else { return }
         let card = currentPaper.cards[indexPath.row - 1]
-
+        
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
         } else {

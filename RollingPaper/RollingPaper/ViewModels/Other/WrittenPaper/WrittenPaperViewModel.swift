@@ -16,6 +16,7 @@ class WrittenPaperViewModel {
     private var cancellables = Set<AnyCancellable>()
     let authManager: AuthManager = FirebaseAuthManager.shared
     let currentUserSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
+    private let output: PassthroughSubject<Output, Never> = .init()
     var currentUser: UserModel?
     
     enum DataSource {
@@ -24,11 +25,52 @@ class WrittenPaperViewModel {
     }
     
     enum Input {
-        
+        case changePaperTitleTapped(changedTitle: String, from: DataSource)
+        case addCardTapped
+        case stopPaperTapped
+        case deletePaperTapped
+        case paperLinkTapped
+        case giftTapped
     }
     
     enum Output {
-        
+        case cardAdded
+        case cardDeleted
+        case paperStopped
+        case paperDeleted
+        case paperTitleChanged
+        case paperLinkMade
+        case giftLinkMade
+        case paperSavedOnServer
+        case paperSavedOnLocal
+    }
+    
+    func transform(inputFromVC: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
+        inputFromVC
+            .sink{ [weak self] receivedValue in
+                guard let self = self else { return }
+                switch receivedValue {
+                case .changePaperTitleTapped(changedTitle: let changedTitle, from: .fromServer):
+                    self.changePaperTitle(input: changedTitle, from: .fromServer)
+                    self.output.send(.paperTitleChanged)
+                case .changePaperTitleTapped(changedTitle: let changedTitle, from: .fromLocal):
+                    self.changePaperTitle(input: changedTitle, from: .fromLocal)
+                    self.output.send(.paperTitleChanged)
+                case .addCardTapped:
+                    break
+                case .stopPaperTapped:
+                    self.stopPaper()
+                    self.output.send(.paperStopped)
+                case .deletePaperTapped:
+                    break
+                case .paperLinkTapped:
+                    break
+                case .giftTapped:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        return output.eraseToAnyPublisher()
     }
     
     var currentPaper: PaperModel!
@@ -91,13 +133,14 @@ class WrittenPaperViewModel {
             .store(in: &cancellables)
     }
     
+    
+    
     func changePaperTitle(input: String, from paperFrom: DataSource) {
         currentPaper?.title = input
         isTitleChanged = true
         guard let paper = currentPaper else { return }
         switch paperFrom {
         case .fromLocal:
-            print("from local: \(paper.title)")
             localDatabaseManager.updatePaper(paper: paper)
             currentPaperPublisher.send(paper)
         case .fromServer:
