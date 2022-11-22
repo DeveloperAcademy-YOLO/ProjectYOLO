@@ -22,7 +22,6 @@ final class WrittenPaperViewController: UIViewController {
     private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private lazy var cancellables = Set<AnyCancellable>()
     
-    private lazy var paperLinkBtnIsPressed: Bool = false
     private lazy var stopPaperBtnIsPressed: Bool = false
     private lazy var timerBalloonBtnPressed: Bool = false
     private lazy var signInWithModal: Bool = false
@@ -236,7 +235,6 @@ final class WrittenPaperViewController: UIViewController {
         customBackBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.inputToVM.send(.moveToStorageTapped)
                 self?.moveToPaperStorageView()
                 self?.signInWithModal = false
             }
@@ -419,7 +417,6 @@ final class WrittenPaperViewController: UIViewController {
         let popover = activityViewController.popoverPresentationController
         popover?.sourceView = sender
         self.present(activityViewController, animated: true)
-        self.paperLinkBtnIsPressed = false
     }
     
     private func moveToCardRootView() {
@@ -439,6 +436,7 @@ final class WrittenPaperViewController: UIViewController {
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             }
         }
+        self.inputToVM.send(.moveToStorageTapped)
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,

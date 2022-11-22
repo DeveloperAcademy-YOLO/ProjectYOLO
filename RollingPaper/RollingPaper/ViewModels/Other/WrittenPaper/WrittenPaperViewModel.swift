@@ -126,8 +126,16 @@ class WrittenPaperViewModel {
     }
     
     private func cleanPaperPublisher() {
+        //링크를 공유 받고 아무 조작을 하지 않고 보관함으로 가더라도 공유받은 사람의 로컬에 쌓이도록하기 위함
+        guard let paper = currentPaperPublisher.value else { return }
+        if paper.linkUrl != nil {
+            serverDatabaseManager.updatePaper(paper: paper)
+            localDatabaseManager.updatePaper(paper: paper)
+        }
         currentPaper = nil
         currentPaperPublisher.send(currentPaper)
+        localDatabaseManager.resetPaper()
+        serverDatabaseManager.resetPaper()
     }
 
     private func changePaperTitle(input: String, from paperFrom: DataSource) {
@@ -181,7 +189,7 @@ class WrittenPaperViewModel {
     
     private func makePaperShareLink() {
         getPaperShareLink(with: currentPaper, route: .write)
-            .receive(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink { (completion) in
                 switch completion {
                     // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
@@ -202,7 +210,7 @@ class WrittenPaperViewModel {
     
     private func makePaperGiftLink() {
         getPaperShareLink(with: currentPaper, route: .gift)
-            .receive(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.global(qos: .background))
             .sink { (completion) in
                 switch completion {
                     // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌

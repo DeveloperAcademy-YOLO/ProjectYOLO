@@ -55,6 +55,7 @@ class PaperSettingViewModel {
     private func createPaper() {
         var endTime = getPaperEndTime(duration: selectedTime)
         let paper = PaperModel(creator: currentUser, cards: [], date: Date(), endTime: endTime, title: self.paperTitle, templateString: template.template.templateString)
+        print("paper22222222 : \(paper)")
         databaseManager.addPaper(paper: paper)
         databaseManager.fetchPaper(paperId: paper.paperId)
     }
