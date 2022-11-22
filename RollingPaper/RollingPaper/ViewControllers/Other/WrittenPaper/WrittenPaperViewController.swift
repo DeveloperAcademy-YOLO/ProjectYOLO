@@ -205,7 +205,7 @@ final class WrittenPaperViewController: UIViewController {
             .sink { [weak self] userModel in
                 if
                     let userModel = userModel,
-                    var currentPaper = self?.viewModel.currentPaper {
+                    var currentPaper = self?.viewModel.currentPaperPublisher.value {
                     self?.viewModel.setCurrentUser()
                     if currentPaper.creator == nil && self?.signInWithModal == true {
                         currentPaper.creator = userModel
@@ -405,7 +405,6 @@ final class WrittenPaperViewController: UIViewController {
             let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
             let edit = UIAlertAction(title: "수정", style: .default) { _ in
                 guard let changedPaperTitle = self.titleEmbedingTextField.text else { return }
-                
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
                     self.inputToVM.send(.changePaperTitleTapped(changedTitle: changedPaperTitle, from: .fromServer))
                 } else {
@@ -416,7 +415,7 @@ final class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.addAction(edit)
             alert.addTextField { (editTitleTextField) in
-                editTitleTextField.text = self.viewModel.currentPaper?.title
+                editTitleTextField.text = self.viewModel.currentPaperPublisher.value?.title
                 self.titleEmbedingTextField = editTitleTextField
             }
             alert.preferredAction = edit
