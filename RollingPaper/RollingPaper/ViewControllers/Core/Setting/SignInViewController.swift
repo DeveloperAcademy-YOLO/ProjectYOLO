@@ -154,6 +154,7 @@ final class SignInViewController: UIViewController {
         setSignInViewUI()
         bind()
         setKeyboardObserver()
+        setObserver()
     }
     
     override func viewWillAppear(_ animated: Bool) {

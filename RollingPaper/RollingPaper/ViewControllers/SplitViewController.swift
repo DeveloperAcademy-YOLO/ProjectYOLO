@@ -136,10 +136,16 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             setViewController(appSettingViewController, for:.secondary)
             currentSecondaryView = "설정"
         case "프로필":
+            print("bbb profile did called from signInView")
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
-                self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
+                self.appSettingViewController.popViewController(false) {
+                    self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
+                }
+                
             } else {
-                self.settingScreenViewController.setViewControllers([SignInViewController()], animated: false)
+                self.appSettingViewController.popViewController(false) {
+                    self.appSettingViewController.pushViewController(SignInViewController(), animated: false)
+                }
             }
             currentSecondaryView = "설정"
         default:
@@ -154,11 +160,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             !((object == currentSecondaryView) && (object != "프로필")) else {
             return
         }
-        // object 동일은 X (설정 -> 프로필은 통과)
-        
-//        if (object == currentSecondaryView) && (object != "프로필") {
-//            return
-//        }
         
         switch object {
         case "새 페이퍼":

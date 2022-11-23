@@ -229,6 +229,7 @@ final class SignUpViewController: UIViewController {
             }
         } else {
             postUserInfo()
+            print("aaa postUserInfo call from signup")
             self.navigationController?.popViewController(animated: true)
         }
     }
