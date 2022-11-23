@@ -27,6 +27,16 @@ final class PaperStorageViewController: UIViewController {
         case nothing, onlyOpened, onlyClosed, both
     }
     
+    // 빈 화면일 때 보여주는 뷰
+    private lazy var emptyView: UILabel = {
+        let emptyView = UILabel()
+        emptyView.font = .systemFont(ofSize: 24)
+        emptyView.textColor = UIColor(rgb: 0xADADAD)
+        emptyView.text = "보관함이 비어있어요"
+        emptyView.textAlignment = .center
+        emptyView.isHidden = true
+        return emptyView
+    }()
     // 데이터 로딩시 보여줄 스피너
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
@@ -162,12 +172,17 @@ final class PaperStorageViewController: UIViewController {
     private func updateLoadingView(isLoading: Bool) {
         if isLoading {
             paperCollectionView.isHidden = true
+            emptyView.isHidden = true
             spinner.isHidden = false
             spinner.startAnimating()
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { [weak self] in
                 guard let self = self else {return}
-                self.paperCollectionView.isHidden = false
+                if self.dataState == .nothing {
+                    self.emptyView.isHidden = false
+                } else {
+                    self.paperCollectionView.isHidden = false
+                }
                 self.spinner.isHidden = true
                 self.spinner.stopAnimating()
             }
@@ -380,11 +395,15 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
 extension PaperStorageViewController {
     private func configure() {
         view.addSubview(spinner)
+        view.addSubview(emptyView)
         view.addSubview(paperCollectionView)
     }
     
     private func setConstraints() {
         spinner.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
+        emptyView.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
         })
         paperCollectionView.snp.makeConstraints({ make in
