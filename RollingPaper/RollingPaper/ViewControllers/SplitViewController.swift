@@ -119,6 +119,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         switch object {
         case "새 페이퍼":
             setViewController(paperTemplateSelectViewController, for: .secondary)
+            currentSecondaryView = "새 페이퍼"
         case "보관함":
             if currentSecondaryView == "새 페이퍼" {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
@@ -127,16 +128,20 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
+            currentSecondaryView = "보관함"
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
+            currentSecondaryView = "선물 상자"
         case "설정":
             setViewController(appSettingViewController, for:.secondary)
+            currentSecondaryView = "설정"
         case "프로필":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.settingScreenViewController.setViewControllers([SettingScreenViewController()], animated: false)
             } else {
                 self.settingScreenViewController.setViewControllers([SignInViewController()], animated: false)
             }
+            currentSecondaryView = "설정"
         default:
             break
         }
@@ -151,12 +156,16 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         switch object {
         case "새 페이퍼":
             setViewController(paperTemplateSelectViewController, for: .secondary)
+            currentSecondaryView = "새 페이퍼"
         case "보관함":
             setViewController(paperStorageViewController, for: .secondary)
+            currentSecondaryView = "보관함"
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
+            currentSecondaryView = "선물 상자"
         case "설정":
             setViewController(appSettingViewController, for: .secondary)
+            currentSecondaryView = "설정"
         case "프로필":
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.appSettingViewController.popToRootViewController(animated: false)
@@ -171,6 +180,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
                     setViewController(appSettingViewController, for: .secondary)
                 }
             }
+            currentSecondaryView = "설정"
         default:
             break
         }
