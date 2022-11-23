@@ -99,14 +99,17 @@ final class PaperStorageViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
+                self.setDataState()
+                
                 switch event {
                     // 변화가 있으면 UI 업데이트 하기
                 case .initPapers:
                     self.updateLoadingView(isLoading: false)
-                case .papersAreUpdatedByTimer, .papersAreUpdatedInDatabase:
+                case .papersAreUpdatedInDatabase:
+                    self.updateMainView()
+                case .papersAreUpdatedByTimer:
                     break
                 }
-                self.setDataState()
                 
                 if self.isContextChosen == false {
                     self.paperCollectionView.reloadData()
@@ -186,6 +189,17 @@ final class PaperStorageViewController: UIViewController {
                 self.spinner.isHidden = true
                 self.spinner.stopAnimating()
             }
+        }
+    }
+    
+    // 빈 화면인지 컨텐츠가 있는지 체크하고 해당하는 뷰 띄워주기
+    private func updateMainView() {
+        if dataState == .nothing {
+            emptyView.isHidden = false
+            paperCollectionView.isHidden = true
+        } else {
+            emptyView.isHidden = true
+            paperCollectionView.isHidden = false
         }
     }
     

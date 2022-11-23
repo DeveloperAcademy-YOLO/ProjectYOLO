@@ -94,7 +94,7 @@ final class GiftStorageViewController: UIViewController {
                 case .initPapers:
                     self.updateLoadingView(isLoading: false)
                 case .papersAreUpdatedInDatabase:
-                    break
+                    self.updateMainView()
                 }
                 self.paperCollectionView.reloadData()
             })
@@ -152,6 +152,17 @@ final class GiftStorageViewController: UIViewController {
                 self.spinner.isHidden = true
                 self.spinner.stopAnimating()
             }
+        }
+    }
+    
+    // 빈 화면인지 컨텐츠가 있는지 체크하고 해당하는 뷰 띄워주기
+    private func updateMainView() {
+        if viewModel.papersByYear.isEmpty {
+            emptyView.isHidden = false
+            paperCollectionView.isHidden = true
+        } else {
+            emptyView.isHidden = true
+            paperCollectionView.isHidden = false
         }
     }
     
