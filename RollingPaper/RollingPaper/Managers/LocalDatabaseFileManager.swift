@@ -190,6 +190,13 @@ final class LocalDatabaseFileManager: DatabaseManager {
                     try paperPreviewData.write(to: previewFileDir, options: .atomic)
                     papersSubject.send(currentPapers)
                 }
+                if currentPaper.endTime != paper.endTime {
+                    currentPaper.endTime = paper.endTime
+                    currentPapers[index] = currentPaper
+                    let paperPreviewData = try JSONEncoder().encode(currentPaper)
+                    try paperPreviewData.write(to: previewFileDir, options: .atomic)
+                    papersSubject.send(currentPapers)
+                }
             }
         } catch {
             print(error.localizedDescription)
