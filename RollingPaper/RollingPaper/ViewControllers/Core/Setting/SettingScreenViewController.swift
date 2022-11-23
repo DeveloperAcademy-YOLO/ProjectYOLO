@@ -141,12 +141,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                         NotificationCenter.default.post(
                             name: Notification.Name.viewChange,
                             object: nil,
-                            userInfo: [NotificationViewKey.view: "설정"]
-                        )
-                        NotificationCenter.default.post(
-                            name: Notification.Name.viewInit,
-                            object: nil,
-                            userInfo: [NotificationViewKey.view: "signOut"]
+                            userInfo: [NotificationViewKey.view: "프로필"]
                         )
                     }
                 case .userProfileChangeDidSuccess:
@@ -293,7 +288,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     @objc private func didCancelButton() {
         profileText.textField.resignFirstResponder()
         navigationItem.rightBarButtonItem?.title = "편집"
-        navigationItem.leftBarButtonItem?.title = nil
+//        navigationItem.leftBarButtonItem?.title = nil
         
         divideView.isHidden = false
         logoutButton.isHidden = false
@@ -392,7 +387,7 @@ extension SettingScreenViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(didEditButton))
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         
