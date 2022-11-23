@@ -399,7 +399,7 @@ final class SignInViewController: UIViewController {
             if
                 let currentNavVC = navigationController,
                 let currentVC = currentNavVC.viewControllers.last as? SignInViewController {
-                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "설정"])
+                NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "프로필"])
             }
         }
     }

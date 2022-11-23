@@ -149,10 +149,17 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     @objc private func changeSecondaryViewFromSidebar(notification: Notification) {
-        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
-        if self.currentSecondaryView == object {
+        guard
+            let object = notification.userInfo?[NotificationViewKey.view] as? String,
+            !((object == currentSecondaryView) && (object != "프로필")) else {
             return
         }
+        // object 동일은 X (설정 -> 프로필은 통과)
+        
+//        if (object == currentSecondaryView) && (object != "프로필") {
+//            return
+//        }
+        
         switch object {
         case "새 페이퍼":
             setViewController(paperTemplateSelectViewController, for: .secondary)
@@ -167,6 +174,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             setViewController(appSettingViewController, for: .secondary)
             currentSecondaryView = "설정"
         case "프로필":
+            print("aaa chagneSecondaryViewFromSidebar")
             if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
                 self.appSettingViewController.popToRootViewController(animated: false)
                 self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
