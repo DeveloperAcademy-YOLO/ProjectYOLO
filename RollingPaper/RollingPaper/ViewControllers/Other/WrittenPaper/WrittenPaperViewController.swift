@@ -28,6 +28,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var fromCardView: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
+    private var timeInterval: Double?
     private let now: Date = Date()
     
     private var refreshControl: UIRefreshControl = {
@@ -115,7 +116,6 @@ final class WrittenPaperViewController: UIViewController {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-//        titleLabel.text = viewModel.currentPaperPublisher.value?.title
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         
@@ -242,6 +242,9 @@ final class WrittenPaperViewController: UIViewController {
             .sink(receiveValue: { [weak self] paper in
                 if paper != nil {
                     self?.checkFetchingCorrectly(paper)
+                    self?.bindTimer()
+//                    self?.timeInterval = paper?.endTime.timeIntervalSince(Date())
+//                    print("self?.timeInterval: \(self?.timeInterval)")
                 }
             })
             .store(in: &cancellables)
@@ -293,7 +296,11 @@ final class WrittenPaperViewController: UIViewController {
         giftLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.inputToVM.send(.giftTapped)
+                if self?.viewModel.currentPaperPublisher.value?.creator != nil {
+                    self?.inputToVM.send(.giftTapped)
+                } else {
+                    self?.presentSignUpModal(self?.giftLinkBtn ?? UIButton())
+                }
             }
             .store(in: &cancellables)
         
@@ -318,6 +325,11 @@ final class WrittenPaperViewController: UIViewController {
                     // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
                     self.timeLabel.updateTime()
+                    self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
+                    print("self?.timeInterval 22: \(self.timeInterval)")
+                    if self.timeInterval ?? 1.0 <= 0.0 {
+                        self.checkFetchingCorrectly(self.viewModel.currentPaperPublisher.value)
+                    }
                 }
             })
             .store(in: &cancellables)
@@ -341,7 +353,8 @@ final class WrittenPaperViewController: UIViewController {
                 self.navigationController?.isNavigationBarHidden = false
                 self.drawView()
                 self.titleLabel.text = paper?.title
-                self.timeLabel.setEndTime(time: paper!.endTime)
+                self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
+//                self.timeInterval = paper?.endTime.timeIntervalSince(Date())
                 self.spinner.stopAnimating()
                 self.spinner.isHidden = true
         }
@@ -364,7 +377,7 @@ final class WrittenPaperViewController: UIViewController {
         if currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email {
             navigationItem.rightBarButtonItems = signInSetting
         } // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
-        if currentPaper.endTime == currentPaper.date {
+        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
         viewModel.isSameCurrentUserAndCreator = (currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email) ? true : false
@@ -509,7 +522,8 @@ final class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return 0 }
+        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
             return self.viewModel.currentPaperPublisher.value?.cards.count ?? 0
         } else {
             return ((self.viewModel.currentPaperPublisher.value?.cards.count ?? 0) + 1 )
@@ -549,9 +563,8 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
-        
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
-            guard let currentPaper = viewModel.currentPaperPublisher.value else { return myCell }
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return myCell }
+        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
             let card = currentPaper.cards[indexPath.row]
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                 let imageView = UIImageView(image: image)
@@ -634,8 +647,8 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
 
 extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
+        if currentPaper.endTime == currentPaper.date  || self.timeInterval ?? 1.0 <= 0.0 {
             let presentingVC = MagnifiedCardViewController()
             let blurredVC = BlurredViewController()
             
