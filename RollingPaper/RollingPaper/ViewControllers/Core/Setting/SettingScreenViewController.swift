@@ -265,11 +265,11 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     @objc private func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
         let alert = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction!) in
+        alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction) in
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "로그아웃", style: .destructive, handler: { (_: UIAlertAction!) in
+        alert.addAction(UIAlertAction(title: "로그아웃", style: .destructive, handler: { (_: UIAlertAction) in
             self.input.send(.signOutDidTap)
         }))
         present(alert, animated: true)
@@ -278,11 +278,11 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     @objc private func resignBtnPressed(_ gesture: UITapGestureRecognizer) {
         let alert = UIAlertController(title: " 회원 탈퇴를 하면 모든 기록이 사라집니다.", message: "회원 탈퇴를 하시겠습니까?", preferredStyle: .alert)
         
-        alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction!) in
+        alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_: UIAlertAction) in
             alert.dismiss(animated: true, completion: nil)
         }))
         
-        alert.addAction(UIAlertAction(title: "회원 탈퇴", style: .destructive, handler: { (_: UIAlertAction!) in
+        alert.addAction(UIAlertAction(title: "회원 탈퇴", style: .destructive, handler: { (_: UIAlertAction) in
             self.input.send(.resignDidTap)
         }))
         present(alert, animated: true)
