@@ -82,6 +82,7 @@ class PaperStorageViewModel {
                 for paper in self.papersFromLocal {
                     self.localPaperIds.insert(paper.paperId)
                 }
+                self.classifyPapers()
                 self.downloadLocalThumbnails(outputValue: .papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)
@@ -96,6 +97,7 @@ class PaperStorageViewModel {
                 for paper in self.papersFromServer {
                     self.serverPaperIds.insert(paper.paperId)
                 }
+                self.classifyPapers()
                 self.downloadServerThumbnails(outputValue: .papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)

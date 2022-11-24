@@ -18,6 +18,17 @@ final class GiftStorageViewController: UIViewController {
     private var splitViewIsOpened: Bool = true
     private var viewIsChange: Bool = false
     
+    // 빈 화면일 때 보여주는 뷰
+    private lazy var emptyView: UILabel = {
+        let emptyView = UILabel()
+        emptyView.font = .systemFont(ofSize: 24)
+        emptyView.textColor = UIColor(rgb: 0xADADAD)
+        emptyView.text = "선물함이 비어있어요"
+        emptyView.textAlignment = .center
+        emptyView.isHidden = true
+        return emptyView
+    }()
+    
     // 데이터 로딩시 보여줄 스피너
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
@@ -83,7 +94,7 @@ final class GiftStorageViewController: UIViewController {
                 case .initPapers:
                     self.updateLoadingView(isLoading: false)
                 case .papersAreUpdatedInDatabase:
-                    break
+                    self.updateMainView()
                 }
                 self.paperCollectionView.reloadData()
             })
@@ -126,16 +137,32 @@ final class GiftStorageViewController: UIViewController {
     // 로딩뷰 띄워주거나 없애기
     private func updateLoadingView(isLoading: Bool) {
         if isLoading {
+            emptyView.isHidden = true
             paperCollectionView.isHidden = true
             spinner.isHidden = false
             spinner.startAnimating()
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { [weak self] in
                 guard let self = self else {return}
-                self.paperCollectionView.isHidden = false
+                if self.viewModel.papersByYear.isEmpty {
+                    self.emptyView.isHidden = false
+                } else {
+                    self.paperCollectionView.isHidden = false
+                }
                 self.spinner.isHidden = true
                 self.spinner.stopAnimating()
             }
+        }
+    }
+    
+    // 빈 화면인지 컨텐츠가 있는지 체크하고 해당하는 뷰 띄워주기
+    private func updateMainView() {
+        if viewModel.papersByYear.isEmpty {
+            emptyView.isHidden = false
+            paperCollectionView.isHidden = true
+        } else {
+            emptyView.isHidden = true
+            paperCollectionView.isHidden = false
         }
     }
     
@@ -216,11 +243,15 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
 extension GiftStorageViewController {
     private func configure() {
         view.addSubview(spinner)
+        view.addSubview(emptyView)
         view.addSubview(paperCollectionView)
     }
     
     private func setConstraints() {
         spinner.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
+        emptyView.snp.makeConstraints({ make in
             make.edges.equalToSuperview()
         })
         paperCollectionView.snp.makeConstraints({ make in
