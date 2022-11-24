@@ -24,6 +24,7 @@ final class PaperTimePicker: UIViewController {
         let picker = UIPickerView()
         picker.delegate = self
         picker.dataSource = self
+        picker.selectRow(1, inComponent: 0, animated: false)
         return picker
     }()
     // 피커에 나오는 리스트 오른쪽에 추가하는 라벨
