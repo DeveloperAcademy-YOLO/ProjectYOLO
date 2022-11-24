@@ -20,7 +20,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     private let toolPicker = PKToolPicker()
     private let input: PassthroughSubject<CardViewModel.Input, Never> = .init()
     
-    private var stickerCount: Int = 1
+    private var stickerCount: Int = 0
     private var cancellables = Set<AnyCancellable>()
     private var backgroundImg: UIImage?
     
@@ -489,14 +489,16 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
             if let imageSticker = cell.myImage.image {
-                if stickerCount > 15 {
+                if stickerCount > 14 {
                     print("sticker over")
                     let alert = UIAlertController(title: "잠깐! 스티커가 너무 많아요.", message: "스티커를 더이상 추가 할 수 없습니다.", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction!) in
+                    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
                         alert.dismiss(animated: true, completion: nil)
                     }))
                     present(alert, animated: true)
                 } else {
+                    stickerCount += 1
+                    
                     let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
                     stickerView.center = someImageView.center
                     stickerView.stickerMinScale = 0.5
@@ -505,8 +507,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                     stickerView.enabledBorder = false
                     stickerView.tag = stickerCount
                     stickerView.delegate = self
-                    
-                    stickerCount += 1
+    
                     self.someImageView.addSubview(stickerView)
                 }
             } else {
