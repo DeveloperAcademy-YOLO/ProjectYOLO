@@ -8,7 +8,7 @@
 import AVFoundation
 import Combine
 import PencilKit
-import Photos
+import PhotosUI
 import IRSticker_swift
 import SnapKit
 import UIKit
@@ -69,6 +69,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         theImageView.layer.cornerRadius = 32
         theImageView.contentMode = .scaleAspectFill
         theImageView.image = backgroundImg
+        let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
+        tapRecognizer.numberOfTapsRequired = 1
+        theImageView.addGestureRecognizer(tapRecognizer)
         return theImageView
     }()
     
@@ -113,7 +116,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
         button.tintColor = .black
-        button.addTarget(self, action: #selector(importImage(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -129,7 +131,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
         button.tintColor = .black
-        button.addTarget(self, action: #selector(setPopOverView(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -151,7 +152,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
         button.tintColor = .black
-        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -167,7 +167,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         let button = UIButton()
         button.setImage(UIImage(named: "StickerToogleOn"), for: .normal)
         button.setImage(UIImage(named: "StickerToogleOn"), for: .highlighted)
-        button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -196,10 +195,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         view.addSubview(introWordingLabel)
         introWordingLabelConstraints()
         
-        let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
-        tapRecognizer.numberOfTapsRequired = 1
-        someImageView.addGestureRecognizer(tapRecognizer)
-        
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
@@ -225,7 +220,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         stickerCollectionViewDisappear()
         
         checkCameraPermission()
-        checkAlbumPermission()
         
         input.send(.viewDidLoad)
         bind()
@@ -419,6 +413,41 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     @objc func tapBackground(recognizer: UITapGestureRecognizer) {
         disableEditSticker()
     }
+    
+    @objc func importImage(_ gesture: UITapGestureRecognizer) {
+        self.cameraOnButtonAppear()
+        
+        var alertStyle = UIAlertController.Style.actionSheet
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            alertStyle = UIAlertController.Style.alert
+        }
+        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        
+        let cameraAction = UIAlertAction(title: "카메라", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.cameraImagePicker()
+            })
+        }
+        
+        let libraryAction = UIAlertAction(title: "사진 앨범", style: .default) { _ in
+            DispatchQueue.main.async(execute: {
+                self.addLibraryImage()
+                self.cameraOffButtonAppear()
+            })
+        }
+        
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
+            DispatchQueue.main.async(execute: {
+                self.cameraOffButtonAppear()
+            })
+        }
+        
+        actionSheet.addAction(cameraAction)
+        actionSheet.addAction(libraryAction)
+        actionSheet.addAction(cancelAction)
+        
+        present(actionSheet, animated: false, completion: nil)
+    }
 }
 
 extension CardCreateViewController: UIAdaptivePresentationControllerDelegate {
@@ -561,14 +590,31 @@ extension UIView {
     }
 }
 
-extension CardCreateViewController: UIImagePickerControllerDelegate {
-    private func libraryImagePicker(withType type: UIImagePickerController.SourceType) {
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        pickerController.sourceType = type
-        present(pickerController, animated: true)
-        cameraOffButtonAppear()
+extension CardCreateViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        let itemProvider = results.first?.itemProvider
+        if let itemProvider = itemProvider,
+           
+            itemProvider.canLoadObject(ofClass: UIImage.self) {
+            itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
+                DispatchQueue.main.sync {
+                    self.someImageView.image = image as? UIImage
+                }
+            }
+        }
     }
+    private func addLibraryImage() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        configuration.filter = .images
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        self.present(picker, animated: true, completion: nil)
+    }
+}
+
+extension CardCreateViewController: UIImagePickerControllerDelegate {
     
     private func checkCameraPermission() {
         AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
@@ -597,55 +643,6 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
         pushVC.cameraDevice = .front
         pushVC.modalPresentationStyle = .overFullScreen
         present(pushVC, animated: true)
-    }
-    
-    private func checkAlbumPermission() {
-        PHPhotoLibrary.requestAuthorization({ status in
-            switch status {
-            case .authorized:
-                print("Album: 권한 허용")
-            case .denied:
-                print("Album: 권한 거부")
-            case .restricted, .notDetermined:
-                print("Album: 선택하지 않음")
-            default:
-                break
-            }
-        })
-    }
-    
-    @objc func importImage(_ gesture: UITapGestureRecognizer) {
-        self.cameraOnButtonAppear()
-        
-        var alertStyle = UIAlertController.Style.actionSheet
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            alertStyle = UIAlertController.Style.alert
-        }
-        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
-        
-        let cameraAction = UIAlertAction(title: "Camera", style: .default) { _ in
-            DispatchQueue.main.async(execute: {
-                self.cameraImagePicker()
-            })
-        }
-        
-        let libraryAction = UIAlertAction(title: "Photo Library", style: .default) { _ in
-            DispatchQueue.main.async(execute: {
-                self.libraryImagePicker(withType: .photoLibrary)
-            })
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
-            DispatchQueue.main.async(execute: {
-                self.cameraOffButtonAppear()
-            })
-        }
-        
-        actionSheet.addAction(cameraAction)
-        actionSheet.addAction(libraryAction)
-        actionSheet.addAction(cancelAction)
-        
-        present(actionSheet, animated: false, completion: nil)
     }
 }
 

@@ -1035,7 +1035,6 @@
 				INFOPLIST_FILE = RollingPaper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "네모네모";
 				INFOPLIST_KEY_NSCameraUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -1077,7 +1076,6 @@
 				INFOPLIST_FILE = RollingPaper/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "네모네모";
 				INFOPLIST_KEY_NSCameraUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 카드작성 사진 첨부 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
