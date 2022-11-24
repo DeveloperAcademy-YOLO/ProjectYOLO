@@ -6,8 +6,18 @@
 //
 
 import UIKit
+import Combine
+import SnapKit
 
 class GiftPaperViewController: UIViewController {
+    
+    private var viewModel: GiftPaperViewModel = GiftPaperViewModel()
+    private let authManager: AuthManager = FirebaseAuthManager.shared
+//    private let inputToVM: PassthroughSubject<GiftPaperViewModel.Input, Never> = .init()
+    private lazy var cancellables = Set<AnyCancellable>()
+    
+    
+    
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
     
@@ -76,12 +86,54 @@ class GiftPaperViewController: UIViewController {
         stackViewConstraints()
         titleLabelConstraints()
 
+        bind()
+        
         view.backgroundColor = .blue
         self.splitViewController?.hide(.primary)
         setCustomNavBarButtons()
         
         view.addSubview(cardsList)
+        
+        
     }
+    
+    private func bind() {
+//        let outputFromVM = viewModel.transform(inputFromVC: inputToVM.eraseToAnyPublisher())
+//        outputFromVM
+//            .receive(on: DispatchQueue.main)
+//            .sink { [weak self] receivedValue in
+//                guard self != nil else { return }
+//                switch receivedValue {
+//                case .cardDeleted:
+//                    break
+//                }
+//            }
+//            .store(in: &cancellables)
+        
+        FirebaseAuthManager.shared
+            .userProfileSubject
+            .sink { [weak self] userModel in
+                if
+                    let userModel = userModel,
+                    var currentPaper = self?.viewModel.currentPaperPublisher.value {
+                    self?.viewModel.setCurrentUser()
+                    if currentPaper.creator == nil {
+                        currentPaper.creator = userModel
+                        self?.setCustomNavBarButtons()
+                        self?.viewModel.localDatabaseManager.updatePaper(paper: currentPaper)
+                        self?.viewModel.localDatabaseManager.fetchPaper(paperId: currentPaper.paperId)
+                        // 게스트가 생성 후 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
+                    } else {
+                        self?.viewModel.localDatabaseManager.fetchPaper(paperId: currentPaper.paperId)
+                        // creator 있던 페이퍼에 만든 사람이 로그인하면 네비바의 오른 쪽 버튼 UI다시 그려주기 위함
+                    }
+                    self?.setCustomNavBarButtons()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -115,9 +167,94 @@ extension GiftPaperViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
-        myCell.backgroundColor = UIColor.blue
+    //    myCell.backgroundColor = UIColor.blue
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
+        
+//        if self.viewModel.currentPaper.isGift == true {
+            if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
+                guard let currentPaper = viewModel.currentPaper else { return myCell }
+                let card = currentPaper.cards[indexPath.row]
+                if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                    let imageView = UIImageView(image: image)
+                    imageView.layer.masksToBounds = true
+                    myCell.addSubview(imageView)
+                    imageView.snp.makeConstraints { make in
+                        make.top.bottom.leading.trailing.equalTo(myCell)
+                    }
+                    return myCell
+                } else {
+                    LocalStorageManager.downloadData(urlString: card.contentURLString)
+                        .receive(on: DispatchQueue.main)
+                        .sink { completion in
+                            switch completion {
+                            case .failure(let error): print(error)
+                            case .finished: break
+                            }
+                        } receiveValue: { [weak self] data in
+                            if
+                                let data = data,
+                                let image = UIImage(data: data) {
+                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                let imageView = UIImageView(image: image)
+                                imageView.layer.masksToBounds = true
+                                myCell.addSubview(imageView)
+                                imageView.snp.makeConstraints { make in
+                                    make.top.bottom.leading.trailing.equalTo(myCell)
+                                }
+                            } else {
+                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                            }
+                        }
+                        .store(in: &cancellables)
+                }
+            } else {
+                if indexPath.row == 0 {
+                    let addCardBtn = AddCardViewController()
+                    myCell.addSubview(addCardBtn.view)
+                } else {
+                    guard let currentPaper = viewModel.currentPaper else { return myCell }
+                    let card = currentPaper.cards[indexPath.row-1]
+                    if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                        let imageView = UIImageView(image: image)
+                        imageView.layer.masksToBounds = true
+                        myCell.addSubview(imageView)
+                        imageView.snp.makeConstraints { make in
+                            make.top.bottom.leading.trailing.equalTo(myCell)
+                        }
+                        return myCell
+                    } else {
+                        LocalStorageManager.downloadData(urlString: card.contentURLString)
+                            .receive(on: DispatchQueue.main)
+                            .sink { completion in
+                                switch completion {
+                                case .failure(let error): print(error)
+                                case .finished: break
+                                }
+                            } receiveValue: { [weak self] data in
+                                if
+                                    let data = data,
+                                    let image = UIImage(data: data) {
+                                    NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                    let imageView = UIImageView(image: image)
+                                    imageView.layer.masksToBounds = true
+                                    myCell.addSubview(imageView)
+                                    imageView.snp.makeConstraints { make in
+                                        make.top.bottom.leading.trailing.equalTo(myCell)
+                                    }
+                                } else {
+                                    myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                                }
+                            }
+                            .store(in: &cancellables)
+                    }
+                }
+            }
+//            } else {
+//                print("no gift")
+//            }
+        
+        
         return myCell
     }
 }

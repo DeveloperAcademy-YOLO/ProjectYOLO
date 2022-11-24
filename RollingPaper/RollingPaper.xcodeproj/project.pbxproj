@@ -14,6 +14,7 @@
 		AF541589291E12C100A0CBD2 /* StickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF541588291E12C100A0CBD2 /* StickerCollectionViewCell.swift */; };
 		AF6FEE3C2902E2E400E44E7D /* CameraCustomPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6FEE3B2902E2E400E44E7D /* CameraCustomPickerController.swift */; };
 		AFBF86A4291AB47D00766D9C /* BackgroundButtonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBF86A3291AB47D00766D9C /* BackgroundButtonViewController.swift */; };
+		AFDD201B292FE7D8009B79E7 /* GiftPaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDD201A292FE7D8009B79E7 /* GiftPaperViewModel.swift */; };
 		AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */; };
 		AFE8D6EC28F6618C005B1F45 /* CardRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */; };
 		AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */; };
@@ -116,6 +117,7 @@
 		AF541588291E12C100A0CBD2 /* StickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		AF6FEE3B2902E2E400E44E7D /* CameraCustomPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCustomPickerController.swift; sourceTree = "<group>"; };
 		AFBF86A3291AB47D00766D9C /* BackgroundButtonViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundButtonViewController.swift; sourceTree = "<group>"; };
+		AFDD201A292FE7D8009B79E7 /* GiftPaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftPaperViewModel.swift; sourceTree = "<group>"; };
 		AFE8D6E828F50319005B1F45 /* CardCreateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardCreateViewController.swift; sourceTree = "<group>"; };
 		AFE8D6EB28F6618C005B1F45 /* CardRootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRootViewController.swift; sourceTree = "<group>"; };
 		AFE8D6ED28F6E270005B1F45 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
@@ -223,6 +225,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AFDD2019292FE7A5009B79E7 /* GiftPaper */ = {
+			isa = PBXGroup;
+			children = (
+				AFDD201A292FE7D8009B79E7 /* GiftPaperViewModel.swift */,
+			);
+			path = GiftPaper;
+			sourceTree = "<group>";
+		};
 		BC344FDB29231E0900A8C2DF /* GiftStorage */ = {
 			isa = PBXGroup;
 			children = (
@@ -493,6 +503,7 @@
 		D24145272919FA1B00437FE7 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				AFDD2019292FE7A5009B79E7 /* GiftPaper */,
 				D24145292919FA2800437FE7 /* WrittenPaper */,
 				D24145282919FA2300437FE7 /* Card */,
 			);
@@ -830,6 +841,7 @@
 				BCF2481B28F50CEC008CD0F9 /* UINavigationController+Extensions.swift in Sources */,
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
+				AFDD201B292FE7D8009B79E7 /* GiftPaperViewModel.swift in Sources */,
 				BC344FE629232B6C00A8C2DF /* GiftStorageLength.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
 				BCF2481928EFC4CF008CD0F9 /* PaperSettingViewModel.swift in Sources */,
