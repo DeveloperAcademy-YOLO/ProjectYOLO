@@ -431,12 +431,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         
         let libraryAction = UIAlertAction(title: "사진 앨범", style: .default) { _ in
             DispatchQueue.main.async(execute: {
-                var configuration = PHPickerConfiguration()
-                configuration.selectionLimit = 1
-                configuration.filter = .images
-                let picker = PHPickerViewController(configuration: configuration)
-                picker.delegate = self
-                self.present(picker, animated: true, completion: nil)
+                self.addLibraryImage()
                 self.cameraOffButtonAppear()
             })
         }
@@ -602,14 +597,20 @@ extension CardCreateViewController: PHPickerViewControllerDelegate {
         if let itemProvider = itemProvider,
            
             itemProvider.canLoadObject(ofClass: UIImage.self) {
-            
             itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
-                
                 DispatchQueue.main.sync {
                     self.someImageView.image = image as? UIImage
                 }
             }
         }
+    }
+    private func addLibraryImage() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        configuration.filter = .images
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        self.present(picker, animated: true, completion: nil)
     }
 }
 
