@@ -127,7 +127,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         super.viewDidLoad()
         setupLayout()
         bind()
-        checkAlbumPermission()
     }
     
     private func bind() {
@@ -147,7 +146,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                 case .userProfileChangeDidSuccess:
                     self.countChange = false
                     self.navigationItem.rightBarButtonItem?.title = "편집"
-                    self.navigationItem.leftBarButtonItem?.title = nil
+//                    self.navigationItem.leftBarButtonItem?.title = nil
                     self.divideView.isHidden = false
                     self.logoutButton.isHidden = false
                     self.resignButton.isHidden = false
@@ -173,7 +172,9 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         editPhotoButton
             .tapPublisher
             .sink { [weak self] in
-                self?.presentImagePicker(withType: .photoLibrary)
+                self?.checkAlbumPermission {
+                    DispatchQueue.main.async {self?.presentImagePicker(withType: .photoLibrary)}
+                }
             }
             .store(in: &cancellables)
         
@@ -244,11 +245,13 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         present(pickerController, animated: true)
     }
     
-    private func checkAlbumPermission() {
-        PHPhotoLibrary.requestAuthorization({ status in
+    private func checkAlbumPermission(completion: @escaping() -> Void) {
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
             switch status {
+            case .limited:
+                completion()
             case .authorized:
-                print("Album: 권한 허용")
+                completion()
             case .denied:
                 print("Album: 권한 거부")
             case .restricted, .notDetermined:
@@ -256,7 +259,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             default:
                 break
             }
-        })
+        }
     }
     
     @objc private func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
