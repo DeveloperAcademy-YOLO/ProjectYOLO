@@ -233,7 +233,7 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
         // TODO: WrittenPaperViewController 말고 선물 전용 뷰로 이동해야함
 //        guard let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item] else {return false}
 //        setSelectedPaper(paperId: paper.paperId )
-//        viewIsChange = true
+        viewIsChange = true
         navigationController?.pushViewController(GiftPaperViewController(), animated: true)
         return true
     }

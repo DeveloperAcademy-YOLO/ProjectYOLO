@@ -38,7 +38,14 @@ class GiftPaperViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.titleView = titleLabel
         view.backgroundColor = .blue
-        // Do any additional setup after loading the view.
+        self.splitViewController?.hide(.primary)
+        setCustomNavBarButtons()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.splitViewController?.hide(.primary)
+       // cardsList.reloadData()
     }
     
     @objc func cancelBtnPressed(_ gesture: UITapGestureRecognizer) {
