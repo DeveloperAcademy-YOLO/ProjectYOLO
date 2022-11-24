@@ -18,7 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let splitVC = SplitViewController(style: .doubleColumn)
         window.rootViewController = splitVC
         window.makeKeyAndVisible()
-        window.overrideUserInterfaceStyle = .light
         self.window = window
         print("Scene Delegate Come")
         
