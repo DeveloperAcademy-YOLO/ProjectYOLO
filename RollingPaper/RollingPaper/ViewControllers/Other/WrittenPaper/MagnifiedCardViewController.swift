@@ -105,7 +105,7 @@ class MagnifiedCardViewController: UIViewController {
 
 extension MagnifiedCardViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.currentPaper?.cards.count ?? 0
+        return viewModel.currentPaperPublisher.value?.cards.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -122,7 +122,7 @@ extension MagnifiedCardViewController: UICollectionViewDataSource {
         myCell.layer.masksToBounds = false;
         myCell.layer.shadowPath = UIBezierPath(roundedRect:myCell.bounds, cornerRadius:myCell.contentView.layer.cornerRadius).cgPath
         
-        guard let currentPaper = viewModel.currentPaper else { return myCell }
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return myCell }
         let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {

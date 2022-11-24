@@ -115,7 +115,7 @@ final class WrittenPaperViewController: UIViewController {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-        titleLabel.text = viewModel.currentPaperPublisher.value?.title
+//        titleLabel.text = viewModel.currentPaperPublisher.value?.title
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         
@@ -241,7 +241,7 @@ final class WrittenPaperViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] paper in
                 if paper != nil {
-                    self?.checkFetchingCorrectly(paper!)
+                    self?.checkFetchingCorrectly(paper)
                 }
             })
             .store(in: &cancellables)
@@ -340,6 +340,7 @@ final class WrittenPaperViewController: UIViewController {
                 self.navigationController?.setNavigationBarHidden(false, animated: false)
                 self.navigationController?.isNavigationBarHidden = false
                 self.drawView()
+                self.titleLabel.text = paper?.title
                 self.timeLabel.setEndTime(time: paper!.endTime)
                 self.spinner.stopAnimating()
                 self.spinner.isHidden = true
@@ -366,10 +367,11 @@ final class WrittenPaperViewController: UIViewController {
         if currentPaper.endTime == currentPaper.date {
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
-        viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
+        viewModel.isSameCurrentUserAndCreator = (currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email) ? true : false
     }
     
     private func setPopOverView(_ sender: UIButton) {
+        guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
         let attributedTitleString = NSAttributedString(string: "페이지 관리", attributes: [
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
             NSAttributedString.Key.strokeWidth: -5 ])
@@ -393,7 +395,7 @@ final class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.addAction(edit)
             alert.addTextField { (editTitleTextField) in
-                editTitleTextField.text = self.viewModel.currentPaperPublisher.value?.title
+                editTitleTextField.text = currentPaper.title
                 self.titleEmbedingTextField = editTitleTextField
             }
             alert.preferredAction = edit
@@ -424,7 +426,7 @@ final class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.preferredAction = delete
             alert.addTextField { (deleteTitleTextField) in
-                deleteTitleTextField.placeholder = self.viewModel.currentPaper?.title
+                deleteTitleTextField.placeholder = currentPaper.title
                 self.titleEmbedingTextField = deleteTitleTextField
             }
             self.present(alert, animated: true, completion: nil)
@@ -441,7 +443,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private func deletePaper() {
         let deleteVerifyText = self.titleEmbedingTextField.text
-        if deleteVerifyText == self.viewModel.currentPaper?.title {
+        if deleteVerifyText == self.viewModel.currentPaperPublisher.value?.title {
             self.inputToVM.send(.deletePaperTapped)
         } else {
             let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
@@ -482,15 +484,14 @@ final class WrittenPaperViewController: UIViewController {
     }
     
     private func moveToPaperStorageView() {
-        if viewModel.currentPaper != nil {
-            guard let paper = viewModel.currentPaper else { return }
+            guard let paper = viewModel.currentPaperPublisher.value else { return }
             if viewModel.isPaperLinkMade {
                 viewModel.serverDatabaseManager.updatePaper(paper: paper)
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             } else {
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             }
-        }
+        
         self.inputToVM.send(.moveToStorageTapped)
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
@@ -509,14 +510,14 @@ final class WrittenPaperViewController: UIViewController {
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
-            return self.viewModel.currentPaper?.cards.count ?? 0
+            return self.viewModel.currentPaperPublisher.value?.cards.count ?? 0
         } else {
-            return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
+            return ((self.viewModel.currentPaperPublisher.value?.cards.count ?? 0) + 1 )
         }
     }
     //commit collectionView
     func saveCard(_ indexPath: IndexPath) {
-        guard let currentPaper = viewModel.currentPaper else { return }
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         let card = currentPaper.cards[indexPath.row - 1]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -525,7 +526,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     
     func shareCard( _ indexPath: IndexPath, _ sender: CGPoint) {
-        guard let currentPaper = viewModel.currentPaper else { return }
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         let card = currentPaper.cards[indexPath.row - 1]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -534,7 +535,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
     }
     
     func deleteCard(_ indexPath: IndexPath) {
-        guard let currentPaper = viewModel.currentPaper else { return }
+        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         let card = currentPaper.cards[indexPath.row - 1]
         
         if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
@@ -550,7 +551,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
         myCell.layer.masksToBounds = true
         
         if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
-            guard let currentPaper = viewModel.currentPaper else { return myCell }
+            guard let currentPaper = viewModel.currentPaperPublisher.value else { return myCell }
             let card = currentPaper.cards[indexPath.row]
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                 let imageView = UIImageView(image: image)
@@ -590,7 +591,7 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                 let addCardBtn = AddCardViewController()
                 myCell.addSubview(addCardBtn.view)
             } else {
-                guard let currentPaper = viewModel.currentPaper else { return myCell }
+                guard let currentPaper = viewModel.currentPaperPublisher.value else { return myCell }
                 let card = currentPaper.cards[indexPath.row-1]
                 if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                     let imageView = UIImageView(image: image)
