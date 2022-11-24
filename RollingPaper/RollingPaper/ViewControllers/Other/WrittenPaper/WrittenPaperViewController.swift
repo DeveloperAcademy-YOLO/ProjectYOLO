@@ -149,6 +149,7 @@ final class WrittenPaperViewController: UIViewController {
         self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
         self.splitViewController?.hide(.primary)
+        self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
         inputToVM.send(.fetchingPaper)
         spinnerConstraints()
         view.addSubview(spinner)
@@ -161,6 +162,7 @@ final class WrittenPaperViewController: UIViewController {
             self.navigationController?.isNavigationBarHidden = false
             //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
         }
+        self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
         inputToVM.send(.fetchingPaper)
     }
     
@@ -243,8 +245,6 @@ final class WrittenPaperViewController: UIViewController {
                 if paper != nil {
                     self?.checkFetchingCorrectly(paper)
                     self?.bindTimer()
-//                    self?.timeInterval = paper?.endTime.timeIntervalSince(Date())
-//                    print("self?.timeInterval: \(self?.timeInterval)")
                 }
             })
             .store(in: &cancellables)
@@ -326,9 +326,8 @@ final class WrittenPaperViewController: UIViewController {
                 case .timeIsUpdated:
                     self.timeLabel.updateTime()
                     self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
-                    print("self?.timeInterval 22: \(self.timeInterval)")
                     if self.timeInterval ?? 1.0 <= 0.0 {
-                        self.checkFetchingCorrectly(self.viewModel.currentPaperPublisher.value)
+                        self.inputToVM.send(.fetchingPaper)
                     }
                 }
             })
@@ -343,20 +342,19 @@ final class WrittenPaperViewController: UIViewController {
         titleLabelConstraints()
         view.addSubview(cardsList)
         cardsList.reloadData()
+        self.spinner.stopAnimating()
+        self.spinner.isHidden = true
     }
     
     private func checkFetchingCorrectly(_ paper: PaperModel?) {
             DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
                 self.navigationController?.navigationBar.tintColor = .systemBlue
                 self.navigationController?.navigationBar.isHidden = false
                 self.navigationController?.setNavigationBarHidden(false, animated: false)
                 self.navigationController?.isNavigationBarHidden = false
-                self.drawView()
                 self.titleLabel.text = paper?.title
-                self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
-//                self.timeInterval = paper?.endTime.timeIntervalSince(Date())
-                self.spinner.stopAnimating()
-                self.spinner.isHidden = true
+                self.drawView()
         }
     }
     
