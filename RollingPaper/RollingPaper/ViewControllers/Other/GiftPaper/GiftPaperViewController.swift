@@ -8,7 +8,9 @@
 import UIKit
 
 class GiftPaperViewController: UIViewController {
-
+    private let deviceWidth = UIScreen.main.bounds.size.width
+    private let deviceHeight = UIScreen.main.bounds.size.height
+    
     lazy var leftButton: UIBarButtonItem = {
         let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
@@ -50,6 +52,24 @@ class GiftPaperViewController: UIViewController {
         return stackView
     }()
     
+    private lazy var cardsList: UICollectionView = {
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
+        layout.itemSize = CGSize(width: (deviceWidth-80)/3, height: ((deviceWidth-120)/3)*0.75)
+        layout.minimumInteritemSpacing = 20
+        layout.minimumLineSpacing = 20
+        
+        cardsList = UICollectionView(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: deviceHeight), collectionViewLayout: layout)
+        cardsList.center.x = view.center.x
+        cardsList.showsVerticalScrollIndicator = false
+        cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
+        cardsList.dataSource = self
+        cardsList.delegate = self
+        cardsList.alwaysBounceVertical = true
+        
+        return cardsList
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.titleView = stackView
@@ -59,6 +79,8 @@ class GiftPaperViewController: UIViewController {
         view.backgroundColor = .blue
         self.splitViewController?.hide(.primary)
         setCustomNavBarButtons()
+        
+        view.addSubview(cardsList)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,6 +104,29 @@ class GiftPaperViewController: UIViewController {
         
         self.navigationItem.standardAppearance = navBarAppearance
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
+    }
+}
+
+extension GiftPaperViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 100 // How many cells to display
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
+        myCell.backgroundColor = UIColor.blue
+        myCell.layer.cornerRadius = 12
+        myCell.layer.masksToBounds = true
+        return myCell
+    }
+}
+
+extension GiftPaperViewController: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("User tapped on item \(indexPath.row)")
+        collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
     }
 }
 
