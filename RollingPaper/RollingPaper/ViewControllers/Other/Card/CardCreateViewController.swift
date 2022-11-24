@@ -491,7 +491,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
             if let imageSticker = cell.myImage.image {
                 if stickerCount > 14 {
                     print("sticker over")
-                    let alert = UIAlertController(title: "잠깐! 스티커가 너무 많아요.", message: "스티커를 더이상 추가 할 수 없습니다.", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "잠깐! 스티커가 너무 많아요.", message: "스티커를 더 이상 추가 할 수 없습니다.", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
                         alert.dismiss(animated: true, completion: nil)
                     }))
