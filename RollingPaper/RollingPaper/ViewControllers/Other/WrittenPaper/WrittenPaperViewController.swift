@@ -176,9 +176,7 @@ final class WrittenPaperViewController: UIViewController {
     
     override func viewWillDisappear  (_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if timerBalloonBtnPressed == true {
-            timerDiscriptionBalloon.view.removeFromSuperview()
-        }
+        checkTimerBallon()
     }
     
     private func bind() {
@@ -253,7 +251,8 @@ final class WrittenPaperViewController: UIViewController {
             .sink { [weak self] in
                 if self?.viewModel.currentPaperPublisher.value?.endTime != self?.viewModel.currentPaperPublisher.value?.date {
                     self?.timerBalloonBtnPressed = true
-                    self?.cardsList.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                    self?.navigationController?.navigationBar.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                    self?.timerDiscriptionBalloon.view.isHidden = false
                     self?.setBalloonLocation()
                 }
             }
@@ -502,7 +501,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private func checkTimerBallon() {
         if self.timerBalloonBtnPressed == true {
-            self.timerDiscriptionBalloon.view.removeFromSuperview()
+            self.timerDiscriptionBalloon.view.isHidden = true
         }
     }
 }
@@ -789,6 +788,7 @@ extension WrittenPaperViewController {
     private func setBalloonLocation() {
         timerDiscriptionBalloon.view.snp.makeConstraints { make in
             make.centerX.equalTo(timeLabel.snp.centerX)
+            make.top.equalTo(50)
             make.width.equalTo(224)
             make.height.equalTo(81)
         }
