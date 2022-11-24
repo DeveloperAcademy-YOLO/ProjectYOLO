@@ -234,7 +234,7 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
 //        guard let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item] else {return false}
 //        setSelectedPaper(paperId: paper.paperId )
 //        viewIsChange = true
-//        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
+        navigationController?.pushViewController(GiftPaperViewController(), animated: true)
         return true
     }
 }
