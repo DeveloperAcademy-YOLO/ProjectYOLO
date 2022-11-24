@@ -25,6 +25,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var stopPaperBtnIsPressed: Bool = false
     private lazy var timerBalloonBtnPressed: Bool = false
     private lazy var signInWithModal: Bool = false
+    private lazy var fromCardView: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
     private let now: Date = Date()
@@ -106,7 +107,6 @@ final class WrittenPaperViewController: UIViewController {
     
     lazy private var timeLabel: TimerView = {
         let timeLabel = TimerView()
-        timeLabel.setEndTime(time: viewModel.currentPaperPublisher.value?.endTime ?? Date())
         timeLabel.addSubview(showBalloonButton)
         return timeLabel
     }()
@@ -132,24 +132,36 @@ final class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
+    private lazy var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .label
+        spinner.backgroundColor = .white
+        spinner.startAnimating()
+        return spinner
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        bindTimer()
+        self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.isNavigationBarHidden = true
+        self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
         self.splitViewController?.hide(.primary)
-        stackViewConstraints()
-        navigationItem.titleView = stackView
-        setCustomNavBarButtons()
-        titleLabelConstraints()
-        view.addSubview(cardsList)
+        inputToVM.send(.fetchingPaper)
+        spinnerConstraints()
+        view.addSubview(spinner)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
-        self.navigationController?.isNavigationBarHidden = false
-        cardsList.reloadData()
+        if fromCardView {
+            self.navigationController?.isNavigationBarHidden = false
+            //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
+        }
+        inputToVM.send(.fetchingPaper)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -188,13 +200,18 @@ final class WrittenPaperViewController: UIViewController {
                 case .paperTitleChanged:
                     self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
                 case .paperLinkMade:
-                    if self?.viewModel.isSameCurrentUserAndCreator == true {
-                        self?.presentShareSheet(self?.paperLinkBtn ?? UIButton())
+                    guard let paperLinkBtn = self?.paperLinkBtn else {return}
+                    guard let currentPaper = self?.viewModel.currentPaperPublisher.value else {return}
+                    if self?.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
+                        self?.presentShareSheet(paperLinkBtn)
                     } else {
-                        self?.presentSignUpModal(self?.paperLinkBtn ?? UIButton())
+                        self?.presentSignUpModal(paperLinkBtn)
                     }
                 case .giftLinkMade:
                     self?.presentShareSheet(self?.giftLinkBtn ?? UIButton())
+                case .fetchingSuccess:
+                    guard let currentPaper = self?.viewModel.currentPaperPublisher.value else {return}
+                    self?.checkFetchingCorrectly(currentPaper)
                 }
             }
             .store(in: &cancellables)
@@ -219,6 +236,16 @@ final class WrittenPaperViewController: UIViewController {
                     self?.setCustomNavBarButtons()
                 }
             }
+            .store(in: &cancellables)
+        
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] paper in
+                if paper != nil {
+                    self?.checkFetchingCorrectly(paper!)
+                }
+            })
             .store(in: &cancellables)
         
         showBalloonButton
@@ -297,7 +324,31 @@ final class WrittenPaperViewController: UIViewController {
             .store(in: &cancellables)
     }
     
+    private func drawView() {
+        setCustomNavBarButtons()
+        bindTimer()
+        stackViewConstraints()
+        navigationItem.titleView = stackView
+        titleLabelConstraints()
+        view.addSubview(cardsList)
+        cardsList.reloadData()
+    }
+    
+    private func checkFetchingCorrectly(_ paper: PaperModel?) {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                self.navigationController?.navigationBar.tintColor = .systemBlue
+                self.navigationController?.navigationBar.isHidden = false
+                self.navigationController?.setNavigationBarHidden(false, animated: false)
+                self.navigationController?.isNavigationBarHidden = false
+                self.drawView()
+                self.timeLabel.setEndTime(time: paper!.endTime)
+                self.spinner.stopAnimating()
+                self.spinner.isHidden = true
+        }
+    }
+    
     private func setCustomNavBarButtons() {
+        guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
         let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
@@ -308,12 +359,15 @@ final class WrittenPaperViewController: UIViewController {
         let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
         let stoppedPaperSetting: [UIBarButtonItem] = [fifthBarButton]
         
-        navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
+        navigationItem.rightBarButtonItems = signOutSetting
+        navigationItem.leftBarButtonItem = firstBarButton
+        if currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email {
+            navigationItem.rightBarButtonItems = signInSetting
+        } // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        if currentPaper.endTime == currentPaper.date {
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
         viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
-        navigationItem.leftBarButtonItem = firstBarButton
     }
     
     private func setPopOverView(_ sender: UIButton) {
@@ -421,6 +475,8 @@ final class WrittenPaperViewController: UIViewController {
     
     private func moveToCardRootView() {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
+        //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
+        fromCardView = true
         
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
@@ -453,7 +509,7 @@ final class WrittenPaperViewController: UIViewController {
 
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date{
+        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
             return self.viewModel.currentPaper?.cards.count ?? 0
         } else {
             return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
@@ -572,8 +628,6 @@ extension WrittenPaperViewController: UICollectionViewDataSource {
                 }
             }
         }
-        
-        
         return myCell
     }
 }
@@ -706,9 +760,16 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
 
 extension WrittenPaperViewController {
     private func stackViewConstraints() {
-        stackView.snp.makeConstraints { make in
+        stackView.snp.makeConstraints({ make in
             make.height.equalTo(36)
-        }
+        })
+    }
+    
+    private func spinnerConstraints() {
+        spinner.snp.makeConstraints({ make in
+            make.width.equalTo(deviceWidth)
+            make.height.equalTo(deviceHeight)
+        })
     }
     
     private func titleLabelConstraints() {

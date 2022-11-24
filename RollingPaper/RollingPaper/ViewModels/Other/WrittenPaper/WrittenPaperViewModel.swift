@@ -43,6 +43,7 @@ class WrittenPaperViewModel {
         case paperShareTapped
         case giftTapped
         case moveToStorageTapped
+        case fetchingPaper
     }
     
     enum Output {
@@ -52,11 +53,11 @@ class WrittenPaperViewModel {
         case paperTitleChanged
         case paperLinkMade
         case giftLinkMade
+        case fetchingSuccess
     }
     
     init() {
         setCurrentUser()
-        setCurrentPaper()
     }
     
     func setCurrentUser() {
@@ -83,18 +84,20 @@ class WrittenPaperViewModel {
                 }
             })
             .store(in: &cancellables)
-        
-        self.serverDatabaseManager.paperSubject
-            .sink(receiveValue: { [weak self] paper in
-                if let paper = paper {
-                    self?.currentPaper = paper
-                    self?.paperFrom = .fromServer
-                    self?.currentPaperPublisher.send(paper)
-                } else {
-                    print("서버 비었음")
-                }
-            })
-            .store(in: &cancellables)
+        if self.localDatabaseManager.paperSubject.value == nil {
+            self.serverDatabaseManager.paperSubject
+                .sink(receiveValue: { [weak self] paper in
+                    if let paper = paper {
+                        self?.currentPaper = paper
+                        self?.paperFrom = .fromServer
+                        self?.currentPaperPublisher.send(paper)
+                    } else {
+                        print("서버 비었음")
+                    }
+                })
+                .store(in: &cancellables)
+        }
+        self.output.send(.fetchingSuccess)
     }
     
     func transform(inputFromVC: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -119,6 +122,8 @@ class WrittenPaperViewModel {
                     self.makePaperGiftLink()
                 case .moveToStorageTapped:
                     self.cleanPaperPublisher()
+                case .fetchingPaper:
+                    self.setCurrentPaper()
                 }
             }
             .store(in: &cancellables)
