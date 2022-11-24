@@ -20,6 +20,8 @@ final class PaperStorageViewController: UIViewController {
     private var dataState: DataState = .nothing
     private var isContextChosen: Bool = false
     private var isContextRepeated = false
+    private var openedCellWidth = PaperStorageLength.openedPaperThumbnailWidth1
+    private var closedCellWidth = PaperStorageLength.closedPaperThumbnailWidth1
     
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     
@@ -159,9 +161,8 @@ final class PaperStorageViewController: UIViewController {
     
     // 컬렉션 뷰 셀의 가로 길이 업데이트하기
     private func updateLayout() {
-        let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
-        PaperStorageLength.openedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin+PaperStorageLength.openedCellHorizontalSpace+2))/2
-        PaperStorageLength.closedPaperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(PaperStorageLength.sectionLeftMargin+PaperStorageLength.sectionRightMargin))
+        openedCellWidth = splitViewIsOpened ? PaperStorageLength.openedPaperThumbnailWidth1 : PaperStorageLength.openedPaperThumbnailWidth2
+        closedCellWidth = splitViewIsOpened ? PaperStorageLength.closedPaperThumbnailWidth1 : PaperStorageLength.closedPaperThumbnailWidth2
         
         UIView.performWithoutAnimation({ [weak self] in
             guard let self = self else {return}
@@ -222,7 +223,7 @@ final class PaperStorageViewController: UIViewController {
 extension PaperStorageViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return indexPath.section == 0 ? CGSize(width: PaperStorageLength.openedPaperThumbnailWidth, height: PaperStorageLength.openedPaperThumbnailHeight) : CGSize(width: PaperStorageLength.closedPaperThumbnailWidth, height: PaperStorageLength.closedPaperThumbnailHeight)
+        return indexPath.section == 0 ? CGSize(width: openedCellWidth, height: PaperStorageLength.openedPaperThumbnailHeight) : CGSize(width: closedCellWidth, height: PaperStorageLength.closedPaperThumbnailHeight)
     }
     // 위아래 셀 간격
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -254,16 +255,16 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageOpenedCollectionCell.identifier, for: indexPath) as? PaperStorageOpenedCollectionCell else {return UICollectionViewCell()}
             let paper = viewModel.openedPapers[indexPath.item]
             let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-            cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime)
+            cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime, cellWidth: openedCellWidth)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageClosedCollectionCell.identifier, for: indexPath) as? PaperStorageClosedCollectionCell else {return UICollectionViewCell()}
             if dataState == .onlyOpened {
-                cell.setCell(paper: nil, thumbnail: nil)
+                cell.setCell(paper: nil, thumbnail: nil, cellWidth: 0)
             } else {
                 let paper = viewModel.closedPapers[indexPath.item]
                 let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-                cell.setCell(paper: paper, thumbnail: thumbnail)
+                cell.setCell(paper: paper, thumbnail: thumbnail, cellWidth: closedCellWidth)
             }
             return cell
         }
