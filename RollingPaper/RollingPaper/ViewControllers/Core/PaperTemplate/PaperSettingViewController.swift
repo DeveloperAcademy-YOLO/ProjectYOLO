@@ -13,6 +13,7 @@ final class PaperSettingViewController: UIViewController {
     private let textLimit = 30
     private let template: TemplateEnum
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
+    private let noTimeText = "0시간 00분"
     private var cancellables = Set<AnyCancellable>()
     private var viewModel: PaperSettingViewModel
     private var textState: TextState = .noText
@@ -164,7 +165,7 @@ final class PaperSettingViewController: UIViewController {
                 switch event {
                 case .timePickerChange(let time):
                     self.timePickerButton.setTitle(time, for: .normal)
-                    if time == "0시간 00분" {
+                    if time == noTimeText {
                         self.timerState = .noTime
                     } else {
                         self.timerState = .normal

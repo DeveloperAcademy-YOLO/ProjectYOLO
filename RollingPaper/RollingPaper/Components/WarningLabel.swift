@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class WarningLabel: UIStackView {
+final class WarningLabel: UIStackView {
     
     private var text = ""
     
