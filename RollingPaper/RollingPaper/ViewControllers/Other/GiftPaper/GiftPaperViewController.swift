@@ -22,6 +22,14 @@ class GiftPaperViewController: UIViewController {
         return button
     }()
     
+    lazy private var giftImage: UIImageView = {
+        let giftImage = UIImageView()
+        giftImage.image = UIImage(systemName: "giftcard.fill")?.resized(to: CGSize(width: 32, height: 22))
+        giftImage.tintColor = .black
+        giftImage.contentMode = .scaleAspectFit
+        return giftImage
+    }()
+    
     lazy private var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
@@ -30,13 +38,24 @@ class GiftPaperViewController: UIViewController {
         titleLabel.text = "선물 받은 페이퍼"
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
-        
         return titleLabel
+    }()
+    
+    lazy private var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = NSLayoutConstraint.Axis.horizontal
+        stackView.distribution = UIStackView.Distribution.equalSpacing
+        stackView.addArrangedSubview(self.giftImage)
+        stackView.addArrangedSubview(self.titleLabel)
+        return stackView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.titleView = titleLabel
+        navigationItem.titleView = stackView
+        stackViewConstraints()
+        titleLabelConstraints()
+
         view.backgroundColor = .blue
         self.splitViewController?.hide(.primary)
         setCustomNavBarButtons()
@@ -64,5 +83,19 @@ class GiftPaperViewController: UIViewController {
         self.navigationItem.standardAppearance = navBarAppearance
         self.navigationItem.scrollEdgeAppearance = navBarAppearance
     }
+}
 
+extension GiftPaperViewController {
+    private func stackViewConstraints() {
+        stackView.snp.makeConstraints { make in
+            make.height.equalTo(36)
+        }
+    }
+    
+    private func titleLabelConstraints() {
+        titleLabel.snp.makeConstraints({ make in
+            make.height.equalTo(36)
+            make.leading.equalTo(giftImage.snp.trailing).offset(5)
+        })
+    }
 }
