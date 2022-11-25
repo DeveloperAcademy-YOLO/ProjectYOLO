@@ -80,14 +80,14 @@ final class GiftStorageCollectionCell: UICollectionViewCell {
     }
     
     // 해당되는 셀 설정하기
-    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?) {
+    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?, cellWidth: CGFloat) {
         if let paper = paper {
             date.text = changeDateFormat(date: paper.endTime)
             title.text = paper.title
             sender.text = (paper.creator?.name ?? "?") + "님이 보낸 선물"
             preview.image = thumbnail
             preview.snp.updateConstraints({ make in
-                make.width.equalTo(GiftStorageLength.paperThumbnailWidth)
+                make.width.equalTo(cellWidth)
                 make.height.equalTo(GiftStorageLength.paperThumbnailHeight)
             })
             isHidden = false
@@ -116,7 +116,7 @@ extension GiftStorageCollectionCell {
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
-            make.width.equalTo(GiftStorageLength.paperThumbnailWidth)
+            make.width.equalTo(GiftStorageLength.paperThumbnailWidth1)
             make.height.equalTo(GiftStorageLength.paperThumbnailHeight)
         })
         previewOverlay.snp.makeConstraints({ make in

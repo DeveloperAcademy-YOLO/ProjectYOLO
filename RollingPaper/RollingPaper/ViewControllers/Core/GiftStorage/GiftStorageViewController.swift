@@ -17,6 +17,7 @@ final class GiftStorageViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private var splitViewIsOpened: Bool = true
     private var viewIsChange: Bool = false
+    private var cellWidth: CGFloat = GiftStorageLength.paperThumbnailWidth1
     
     // 빈 화면일 때 보여주는 뷰
     private lazy var emptyView: UILabel = {
@@ -129,8 +130,7 @@ final class GiftStorageViewController: UIViewController {
     
     // 컬렉션 뷰 셀의 가로 길이 업데이트하기
     private func updateLayout() {
-        let multiplyVal = splitViewIsOpened ? 0.75 : 1.0
-        GiftStorageLength.paperThumbnailWidth = (UIScreen.main.bounds.width*multiplyVal-(GiftStorageLength.sectionLeftMargin+GiftStorageLength.sectionRightMargin+GiftStorageLength.cellHorizontalSpace+2))/2
+        cellWidth = splitViewIsOpened ? GiftStorageLength.paperThumbnailWidth1 : GiftStorageLength.paperThumbnailWidth2
         paperCollectionView.reloadData()
     }
     
@@ -186,7 +186,7 @@ final class GiftStorageViewController: UIViewController {
 extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     // 셀의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: GiftStorageLength.paperThumbnailWidth, height: GiftStorageLength.paperThumbnailHeight)
+        return CGSize(width: cellWidth, height: GiftStorageLength.paperThumbnailHeight)
     }
     // 위아래 셀 간격
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -210,7 +210,7 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
               let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item]
         else {return UICollectionViewCell()}
         let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-        cell.setCell(paper: paper, thumbnail: thumbnail)
+        cell.setCell(paper: paper, thumbnail: thumbnail, cellWidth: cellWidth)
         
         return cell
     }
