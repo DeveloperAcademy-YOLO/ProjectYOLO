@@ -24,6 +24,7 @@
 		BC344FE32923225900A8C2DF /* GiftStorageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC344FE22923225900A8C2DF /* GiftStorageViewModel.swift */; };
 		BC344FE629232B6C00A8C2DF /* GiftStorageLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC344FE529232B6C00A8C2DF /* GiftStorageLength.swift */; };
 		BC95A92D292212CF00124665 /* TimeFlowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC95A92C292212CF00124665 /* TimeFlowManager.swift */; };
+		BCB9F901292F079600864CB4 /* WarningLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCB9F900292F079600864CB4 /* WarningLabel.swift */; };
 		BCC74A79291E1B2300582248 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A78291E1B2300582248 /* TimerView.swift */; };
 		BCC74A7B291E778800582248 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A7A291E778800582248 /* String+Extensions.swift */; };
 		BCC74A7D2922050B00582248 /* PaperSettingLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC74A7C2922050B00582248 /* PaperSettingLength.swift */; };
@@ -127,6 +128,7 @@
 		BC344FE22923225900A8C2DF /* GiftStorageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftStorageViewModel.swift; sourceTree = "<group>"; };
 		BC344FE529232B6C00A8C2DF /* GiftStorageLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftStorageLength.swift; sourceTree = "<group>"; };
 		BC95A92C292212CF00124665 /* TimeFlowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFlowManager.swift; sourceTree = "<group>"; };
+		BCB9F900292F079600864CB4 /* WarningLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningLabel.swift; sourceTree = "<group>"; };
 		BCC74A78291E1B2300582248 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		BCC74A7A291E778800582248 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		BCC74A7C2922050B00582248 /* PaperSettingLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSettingLength.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				D2B6308D28F16493008365CB /* SignUpTextField.swift */,
 				C5A7198A28F883D40003D593 /* UILabel+Padding.swift */,
 				BCC74A78291E1B2300582248 /* TimerView.swift */,
+				BCB9F900292F079600864CB4 /* WarningLabel.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -810,6 +813,7 @@
 				D2CB508F28FD49E70065C2A9 /* UNUserNotificationCenter+Extensions.swift in Sources */,
 				CFA10C97290585C7002B8653 /* Notification.Name+Extension.swift in Sources */,
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
+				BCB9F901292F079600864CB4 /* WarningLabel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,

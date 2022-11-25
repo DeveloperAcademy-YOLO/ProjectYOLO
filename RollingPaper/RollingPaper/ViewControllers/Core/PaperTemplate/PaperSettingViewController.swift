@@ -13,9 +13,11 @@ final class PaperSettingViewController: UIViewController {
     private let textLimit = 30
     private let template: TemplateEnum
     private let input: PassthroughSubject<PaperSettingViewModel.Input, Never> = .init()
+    private let noTimeText = "0시간 00분"
     private var cancellables = Set<AnyCancellable>()
-    private var textState: TextState = .noText
     private var viewModel: PaperSettingViewModel
+    private var textState: TextState = .noText
+    private var timerState: TimerState = .normal
     
     // 페이퍼 제목 입력하는 텍스트필드
     private lazy var paperTitleTextField: UITextField = {
@@ -41,21 +43,6 @@ final class PaperSettingViewController: UIViewController {
         titleLengthLabel.layer.cornerRadius = 9
         titleLengthLabel.layer.masksToBounds = true
         return titleLengthLabel
-    }()
-    // 조건에 따라 보여주는 경고 라벨
-    private lazy var warningLabel: UILabel = {
-        let warningLabel = UILabel()
-        warningLabel.textColor = .systemGray
-        warningLabel.font = .preferredFont(forTextStyle: .body)
-        return warningLabel
-    }()
-    // 경고 라벨 옆에 있는 이미지
-    private lazy var warningImage: UIImageView = {
-        let warningImage = UIImageView()
-        warningImage.contentMode = .center
-        warningImage.image = UIImage(systemName: "exclamationmark.bubble.fill")?.withTintColor(UIColor(rgb: 0xFF3B30), renderingMode: .alwaysOriginal)
-        warningImage.isHidden = true
-        return warningImage
     }()
     // 누르면 피커가 보이는 버튼
     private lazy var timePickerButton: UIButton = {
@@ -114,6 +101,12 @@ final class PaperSettingViewController: UIViewController {
     private lazy var limitTimeTitle: UILabel = {
         return getLabel(text: "제한 시간", style: .title3, color: .label)
     }()
+    private lazy var warningLabelForTitle: WarningLabel = {
+        return WarningLabel(text: "")
+    }()
+    private lazy var warningLabelForTimer: WarningLabel = {
+        return WarningLabel(text: "")
+    }()
     
     enum TextState {
         case normal, noText, tooLong
@@ -125,6 +118,18 @@ final class PaperSettingViewController: UIViewController {
                 return "페이퍼 제목을 입력해주세요!"
             case .tooLong:
                 return "페이퍼 제목이 너무 길어요!"
+            }
+        }
+    }
+    
+    enum TimerState {
+        case normal, noTime
+        var sentence: String {
+            switch self {
+            case .normal:
+                return ""
+            case .noTime:
+                return "최소 10분의 시간을 설정해주세요!"
             }
         }
     }
@@ -160,6 +165,13 @@ final class PaperSettingViewController: UIViewController {
                 switch event {
                 case .timePickerChange(let time):
                     self.timePickerButton.setTitle(time, for: .normal)
+                    if time == self.noTimeText {
+                        self.timerState = .noTime
+                    } else {
+                        self.timerState = .normal
+                        // 타이머 경고 라벨 설정하기
+                        self.setTimerWarningLabel(state: self.timerState)
+                    }
                 }
             })
             .store(in: &cancellables)
@@ -235,33 +247,52 @@ final class PaperSettingViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 guard let self = self else {return}
-                self.setWarningLabel(state: .normal)
+                self.setTitleWarningLabel(state: .normal)
             })
             .store(in: &cancellables)
     }
     
-    // 경고 라벨 종류 설정하기
-    private func setWarningLabel(state: TextState) {
-        warningLabel.text = state.sentence
+    // 제목 경고 라벨 종류 설정하기
+    private func setTitleWarningLabel(state: TextState) {
+        warningLabelForTitle.setText(text: state.sentence)
+        textState = state
         if state == .normal {
-            warningImage.isHidden = true
-            warningLabel.isHidden = true
+            warningLabelForTitle.showView(false)
         } else {
-            warningImage.isHidden = false
-            warningLabel.isHidden = false
+            warningLabelForTitle.showView(true)
+        }
+    }
+    
+    // 타이머 경고 라벨 종류 설정하기
+    private func setTimerWarningLabel(state: TimerState) {
+        warningLabelForTimer.setText(text: state.sentence)
+        timerState = state
+        if state == .normal {
+            warningLabelForTimer.showView(false)
+        } else {
+            warningLabelForTimer.showView(true)
         }
     }
     
     // 생성하기 버튼 눌렀을 때 경고 메시지 띄워주거나 페이퍼 뷰로 이동하기
     @objc private func createBtnPressed(_ sender: UIBarButtonItem) {
+        
+        // 글자 경고 라벨 보여주기
         let textCount = paperTitleTextField.text?.count ?? 0
         if textCount == 0 {
-            setWarningLabel(state: .noText)
+            textState = .noText
             paperTitleTextField.resignFirstResponder()
         } else if textCount > textLimit {
-            setWarningLabel(state: .tooLong)
+            textState = .tooLong
             paperTitleTextField.resignFirstResponder()
-        } else {
+        }
+        
+        // 텍스트 경고 라벨 보여주기
+        setTitleWarningLabel(state: textState)
+        // 타이머 경고 라벨 설정하기
+        setTimerWarningLabel(state: timerState)
+        
+        if timerState == .normal && textState == .normal {
               input.send(.endSettingPaper)
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
@@ -297,12 +328,12 @@ extension PaperSettingViewController {
         view.addSubview(subtitle1)
         view.addSubview(paperTitleTextField)
         view.addSubview(titleLengthLabel)
-        view.addSubview(warningImage)
-        view.addSubview(warningLabel)
+        view.addSubview(warningLabelForTitle)
         view.addSubview(title2)
         view.addSubview(subtitle2)
         view.addSubview(limitTimeTitle)
         view.addSubview(timePickerButton)
+        view.addSubview(warningLabelForTimer)
         thumbnail.addSubview(thumbnailTitle)
         thumbnail.addSubview(thumbnailDescription)
         paperTitleTextField.addSubview(textFieldBorder)
@@ -347,16 +378,12 @@ extension PaperSettingViewController {
             make.width.equalTo(PaperSettingLength.titleLengthLabelWidth)
             make.height.equalTo(PaperSettingLength.titleLengthLabelHeight)
         })
-        warningImage.snp.makeConstraints({ make in
+        warningLabelForTitle.snp.makeConstraints({ make in
             make.top.equalTo(paperTitleTextField.snp.bottom).offset(PaperSettingLength.warningLabelTopMargin)
             make.leading.equalTo(title1)
         })
-        warningLabel.snp.makeConstraints({ make in
-            make.top.equalTo(paperTitleTextField.snp.bottom).offset(PaperSettingLength.warningLabelTopMargin)
-            make.leading.equalTo(warningImage.snp.trailing).offset(10)
-        })
         title2.snp.makeConstraints({ make in
-            make.top.equalTo(warningLabel.snp.bottom).offset(PaperSettingLength.sectionSpacing)
+            make.top.equalTo(warningLabelForTitle.snp.bottom).offset(PaperSettingLength.sectionSpacing)
             make.leading.equalTo(title1)
             make.trailing.equalTo(title1)
         })
@@ -374,6 +401,10 @@ extension PaperSettingViewController {
             make.leading.equalTo(limitTimeTitle.snp.trailing).offset(PaperSettingLength.timePickerLeftMargin)
             make.width.equalTo(PaperSettingLength.timePickerButtonWidth)
             make.height.equalTo(PaperSettingLength.timePickerButtonHeight)
+        })
+        warningLabelForTimer.snp.makeConstraints({ make in
+            make.top.equalTo(timePickerButton.snp.bottom).offset(PaperSettingLength.warningLabelTopMargin)
+            make.leading.equalTo(limitTimeTitle)
         })
         textFieldBorder.snp.makeConstraints({ make in
             make.top.equalTo(paperTitleTextField.snp.bottom)
