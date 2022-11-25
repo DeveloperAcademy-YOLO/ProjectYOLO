@@ -165,7 +165,7 @@ final class PaperSettingViewController: UIViewController {
                 switch event {
                 case .timePickerChange(let time):
                     self.timePickerButton.setTitle(time, for: .normal)
-                    if time == noTimeText {
+                    if time == self.noTimeText {
                         self.timerState = .noTime
                     } else {
                         self.timerState = .normal
