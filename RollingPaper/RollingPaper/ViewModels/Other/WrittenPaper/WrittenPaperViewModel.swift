@@ -148,10 +148,8 @@ class WrittenPaperViewModel {
         switch paperFrom {
         case .fromLocal:
             localDatabaseManager.updatePaper(paper: paper)
-//            currentPaperPublisher.send(paper)
         case .fromServer:
             serverDatabaseManager.updatePaper(paper: paper)
-//            currentPaperPublisher.send(paper)
         }
     }
     

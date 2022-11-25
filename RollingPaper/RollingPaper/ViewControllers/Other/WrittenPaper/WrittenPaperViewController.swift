@@ -84,7 +84,7 @@ final class WrittenPaperViewController: UIViewController {
         return btn
     }()
     
-    private lazy var cardsList: UICollectionView = {
+    lazy var cardsList: UICollectionView = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
         layout.itemSize = CGSize(width: (deviceWidth-80)/3, height: ((deviceWidth-120)/3)*0.75)
@@ -521,6 +521,7 @@ final class WrittenPaperViewController: UIViewController {
 extension WrittenPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return 0 }
+        print("currentPaper from UICollectionViewDataSource: \(currentPaper)")
         if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
             return self.viewModel.currentPaperPublisher.value?.cards.count ?? 0
         } else {
@@ -647,35 +648,28 @@ extension WrittenPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         if currentPaper.endTime == currentPaper.date  || self.timeInterval ?? 1.0 <= 0.0 {
-            let presentingVC = MagnifiedCardViewController()
+            
             let blurredVC = BlurredViewController()
+            blurredVC.viewModel = self.viewModel
+            blurredVC.selectedCardIndex = indexPath.row
             
             blurredVC.modalTransitionStyle = .crossDissolve
             blurredVC.modalPresentationStyle = .currentContext
             self.present(blurredVC, animated: true)
-            
-            presentingVC.backgroundViewController = blurredVC
-            presentingVC.selectedCardIndex = indexPath.row
-            presentingVC.modalPresentationStyle = .overFullScreen
-            present(presentingVC, animated: true)
             
             collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         } else {
             if indexPath.row == 0 {
                 moveToCardRootView()
             } else {
-                let presentingVC = MagnifiedCardViewController()
                 let blurredVC = BlurredViewController()
+                blurredVC.viewModel = self.viewModel
+                blurredVC.selectedCardIndex = indexPath.row - 1
                 
                 blurredVC.modalTransitionStyle = .crossDissolve
                 blurredVC.modalPresentationStyle = .currentContext
                 self.present(blurredVC, animated: true)
-                
-                presentingVC.backgroundViewController = blurredVC
-                presentingVC.selectedCardIndex = indexPath.row - 1
-                presentingVC.modalPresentationStyle = .overFullScreen
-                present(presentingVC, animated: true)
-                
+
                 collectionView.scrollToItem(at: [0, indexPath.row - 1], at: .centeredHorizontally, animated: true)
             }
         }
