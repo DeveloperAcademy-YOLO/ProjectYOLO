@@ -26,13 +26,13 @@ class BlurredViewController: UIViewController {
         case closeDone
     }
     
-    private lazy var blurView = {
+    private lazy var blurView: UIVisualEffectView = {
         let blurView = UIVisualEffectView()
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
         return blurView
     }()
-    private lazy var presentingVC = {
+    private lazy var presentingVC: MagnifiedCardViewController = {
         let presentingVC = MagnifiedCardViewController()
         presentingVC.viewModel = self.viewModel
         presentingVC.selectedCardIndex = self.selectedCardIndex
