@@ -73,9 +73,9 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return 0 }
         if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
-            return self.viewModel?.currentPaperPublisher.value?.cards.count ?? 0
+            return currentPaper.cards.count
         } else {
-            return ((self.viewModel?.currentPaperPublisher.value?.cards.count ?? 0) + 1 )
+            return ((currentPaper.cards.count) + 1 )
         }
     }
     //commit collectionView
