@@ -75,7 +75,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     
     private lazy var managePaperBtn: UIButton = {
-        let btnImg = UIImage(systemName: "ellipsis.circle")!
+        let btnImg = UIImage(systemName: "ellipsis.circle")?
             .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -83,7 +83,7 @@ final class WrittenPaperViewController: UIViewController {
         return btn
     }()
     private lazy var paperLinkBtn: UIButton = {
-        let btnImg = UIImage(systemName: "square.and.arrow.up")!
+        let btnImg = UIImage(systemName: "square.and.arrow.up")?
             .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -91,7 +91,7 @@ final class WrittenPaperViewController: UIViewController {
         return btn
     }()
     private lazy var createCardBtn: UIButton = {
-        let btnImg = UIImage(systemName: "plus.rectangle.fill")!
+        let btnImg = UIImage(systemName: "plus.rectangle.fill")?
             .resized(to: CGSize(width: 40, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -99,7 +99,7 @@ final class WrittenPaperViewController: UIViewController {
         return btn
     }()
     private lazy var giftLinkBtn: UIButton = {
-        let btnImg = UIImage(systemName: "giftcard.fill")!
+        let btnImg = UIImage(systemName: "giftcard.fill")?
             .resized(to: CGSize(width: 51, height: 36))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -181,32 +181,31 @@ final class WrittenPaperViewController: UIViewController {
         outputFromVM
             .receive(on: DispatchQueue.main)
             .sink { [weak self] receivedValue in
-                guard self != nil else { return }
+                guard let self = self else { return }
                 switch receivedValue {
                 case .cardDeleted:
                     break
                 case .paperStopped:
-                    self?.setCustomNavBarButtons()
-                    self?.timeLabel.setEndTime(time: self?.viewModel.currentPaperPublisher.value?.endTime ?? Date())
-                    self?.cardsList.reloadData()
+                    self.setCustomNavBarButtons()
+                    self.timeLabel.setEndTime(time: self.viewModel.currentPaperPublisher.value?.endTime ?? Date())
+                    self.cardsList.reloadData()
                 case .paperDeleted:
-                    self?.inputToVM.send(.moveToStorageTapped)
-                    self?.moveToPaperStorageView()
+                    self.inputToVM.send(.moveToStorageTapped)
+                    self.moveToPaperStorageView()
                 case .paperTitleChanged:
-                    self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
+                    self.titleLabel.text = self.viewModel.currentPaperPublisher.value?.title
                 case .paperLinkMade:
-                    guard let paperLinkBtn = self?.paperLinkBtn else {return}
-                    guard let currentPaper = self?.viewModel.currentPaperPublisher.value else {return}
-                    if self?.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
-                        self?.presentShareSheet(paperLinkBtn)
+                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
+                    if self.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
+                        self.presentShareSheet(self.paperLinkBtn)
                     } else {
-                        self?.presentSignUpModal(paperLinkBtn)
+                        self.presentSignUpModal(self.paperLinkBtn)
                     }
                 case .giftLinkMade:
-                    self?.presentShareSheet(self?.giftLinkBtn ?? UIButton())
+                    self.presentShareSheet(self.giftLinkBtn)
                 case .fetchingSuccess:
-                    guard let currentPaper = self?.viewModel.currentPaperPublisher.value else {return}
-                    self?.checkFetchingCorrectly(currentPaper)
+                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
+                    self.checkFetchingCorrectly(currentPaper)
                 }
             }
             .store(in: &cancellables)

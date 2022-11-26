@@ -214,6 +214,18 @@ class WrittenPaperViewModel {
     
     private func makePaperGiftLink() {
         guard let currentPaper = currentPaperPublisher.value else {return}
+        serverDatabaseManager.convertPaperToGift(paper: currentPaper)
+            .sink { (completion) in
+                switch completion {
+                case .finished: break
+                case .failure(let error): print(error)
+                }
+            } receiveValue: { [weak self] paperWithGiftLink in
+                guard let self = self else {return}
+                self.currentPaperPublisher.value = paperWithGiftLink
+            }
+            .store(in: &cancellables)
+            
         getPaperShareLink(with: currentPaper, route: .gift)
             .receive(on: DispatchQueue.global(qos: .background))
             .sink { (completion) in
@@ -223,15 +235,16 @@ class WrittenPaperViewModel {
                 case .failure(let error): print(error)
                 }
             } receiveValue: { [weak self] url in
-                self?.isPaperLinkMade = true
-                self?.currentPaperPublisher.value?.isGift = true
-                self?.currentPaperPublisher.value?.linkUrl = url
-                guard let paper = self?.currentPaperPublisher.value else {return}
-                self?.localDatabaseManager.updatePaper(paper: paper)
-                self?.serverDatabaseManager.addPaper(paper: paper)
+                guard let self = self else {return}
+                self.isPaperLinkMade = true
+                self.currentPaperPublisher.value?.isGift = true
+//                self.currentPaperPublisher.value?.linkUrl = url
+                guard let paper = self.currentPaperPublisher.value else {return}
+                self.localDatabaseManager.updatePaper(paper: paper)
+                self.serverDatabaseManager.addPaper(paper: paper)
                 //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
-                self?.currentPaperPublisher.send(paper)
-                self?.output.send(.giftLinkMade)
+                self.currentPaperPublisher.send(paper)
+                self.output.send(.giftLinkMade)
             }
             .store(in: &cancellables)
     }
