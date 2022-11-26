@@ -16,8 +16,9 @@ final class GiftStorageLength {
     static let sectionBottomMargin: CGFloat = 48
     static let sectionRightMargin: CGFloat = 36
     static let sectionLeftMargin: CGFloat = 36
-    static var paperThumbnailWidth: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin)) // 반응형
-    static let paperThumbnailHeight: CGFloat = paperThumbnailWidth*0.16
+    static let paperThumbnailWidth1: CGFloat = (UIScreen.main.bounds.width*0.75-(sectionLeftMargin+sectionRightMargin+cellHorizontalSpace+2))
+    static let paperThumbnailWidth2: CGFloat = (UIScreen.main.bounds.width*1.0-(sectionLeftMargin+sectionRightMargin+cellHorizontalSpace+2))
+    static let paperThumbnailHeight: CGFloat = paperThumbnailWidth1*0.16
     static let cellHorizontalSpace: CGFloat = 0
     static let cellVerticalSpace: CGFloat = 10
     static let labelSpacing: CGFloat = 10

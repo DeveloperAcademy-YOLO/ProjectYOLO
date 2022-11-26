@@ -493,5 +493,6 @@ extension IRStickerView {
 
     func setContentImage(contentImage: UIImage?) {
         self.contentView.image = contentImage;
+        self.performShakeAnimation(targetView: self)
     }
 }

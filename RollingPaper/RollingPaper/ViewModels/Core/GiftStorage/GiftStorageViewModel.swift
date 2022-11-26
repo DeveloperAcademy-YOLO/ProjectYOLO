@@ -79,6 +79,7 @@ class GiftStorageViewModel {
     private func downloadLocalThumbnails(outputValue: Output) {
         var downloadCount = 0
         for paper in papersFromLocal {
+            if thumbnails[paper.paperId] != nil { continue }
             if let thumbnailURLString = paper.thumbnailURLString {
                 if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
                     // 진입 경로1 - 캐시 데이터를 통한 다운로드
@@ -137,6 +138,7 @@ class GiftStorageViewModel {
     private func downloadServerThumbnails(outputValue: Output) {
         var downloadCount = 0
         for paper in papersFromServer {
+            if thumbnails[paper.paperId] != nil { continue }
             if let thumbnailURLString = paper.thumbnailURLString {
                 if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
                     // 진입 경로1 - 캐시 데이터를 통한 다운로드

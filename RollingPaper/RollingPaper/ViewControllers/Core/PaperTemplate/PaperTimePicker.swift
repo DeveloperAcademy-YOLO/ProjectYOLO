@@ -10,8 +10,8 @@ import Combine
 
 // 제한시간 설정할 때 쓰는 피커
 final class PaperTimePicker: UIViewController {
-    private let hourList = ["0","1", "2", "3", "4", "5", "6"]
-    private let minuteList = ["01","00", "10", "20", "30", "40", "50"]
+    private let hourList = ["0", "1", "2", "3", "4", "5", "6"]
+    private let minuteList = ["00", "10", "20", "30", "40", "50"]
     private let hourLabel = "시간"
     private let minuteLabel = "분"
     private let viewModel: PaperSettingViewModel
@@ -24,6 +24,7 @@ final class PaperTimePicker: UIViewController {
         let picker = UIPickerView()
         picker.delegate = self
         picker.dataSource = self
+        picker.selectRow(1, inComponent: 0, animated: false)
         return picker
     }()
     // 피커에 나오는 리스트 오른쪽에 추가하는 라벨

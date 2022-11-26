@@ -70,13 +70,13 @@ final class PaperStorageClosedCollectionCell: UICollectionViewCell {
     }
     
     // 해당되는 셀 설정하기
-    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?) {
+    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?, cellWidth: CGFloat) {
         if let paper = paper {
             date.text = changeDateFormat(date: paper.endTime)
             title.text = paper.title
             preview.image = thumbnail
             preview.snp.updateConstraints({ make in
-                make.width.equalTo(PaperStorageLength.closedPaperThumbnailWidth)
+                make.width.equalTo(cellWidth)
                 make.height.equalTo(PaperStorageLength.closedPaperThumbnailHeight)
             })
             isHidden = false
@@ -104,7 +104,7 @@ extension PaperStorageClosedCollectionCell {
         preview.snp.makeConstraints({ make in
             make.top.equalToSuperview()
             make.leading.equalToSuperview()
-            make.width.equalTo(PaperStorageLength.closedPaperThumbnailWidth)
+            make.width.equalTo(PaperStorageLength.closedPaperThumbnailWidth1)
             make.height.equalTo(PaperStorageLength.closedPaperThumbnailHeight)
         })
         previewOverlay.snp.makeConstraints({ make in
