@@ -123,7 +123,7 @@ final class WrittenPaperViewController: UIViewController {
         return spinner
     }()
     
-    private lazy var tapGesture = {
+    private lazy var tapGesture: UITapGestureRecognizer = {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         tapGesture.cancelsTouchesInView = true
         
