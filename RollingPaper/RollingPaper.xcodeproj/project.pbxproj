@@ -57,6 +57,7 @@
 		C5E79FA12920EC170064B96B /* BlurredViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E79FA02920EC170064B96B /* BlurredViewController.swift */; };
 		C5F6954A28FEDA3800365719 /* WrittenPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */; };
 		C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */; };
+		C5FF91452931923E00FA4BDE /* CardsInPaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FF91442931923E00FA4BDE /* CardsInPaperViewController.swift */; };
 		CF1DEADE28F862720024EA1F /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */; };
 		CF265261291FB66A00C8171D /* AppSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF265260291FB66A00C8171D /* AppSettingViewController.swift */; };
 		CF265263291FB91D00C8171D /* AppSettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF265262291FB91D00C8171D /* AppSettingViewModel.swift */; };
@@ -163,6 +164,7 @@
 		C5E79FA02920EC170064B96B /* BlurredViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurredViewController.swift; sourceTree = "<group>"; };
 		C5F6954928FEDA3800365719 /* WrittenPaperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WrittenPaperViewController.swift; sourceTree = "<group>"; };
 		C5F6954B28FEDCF700365719 /* UIButton+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extensions.swift"; sourceTree = "<group>"; };
+		C5FF91442931923E00FA4BDE /* CardsInPaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsInPaperViewController.swift; sourceTree = "<group>"; };
 		CF1DEADD28F862720024EA1F /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
 		CF265260291FB66A00C8171D /* AppSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingViewController.swift; sourceTree = "<group>"; };
 		CF265262291FB91D00C8171D /* AppSettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingViewModel.swift; sourceTree = "<group>"; };
@@ -476,6 +478,7 @@
 				C539EFDF2921041E00ED4F9E /* AddCardViewController.swift */,
 				C59A110829236CF7009FF570 /* TimerDiscriptionBalloon.swift */,
 				C56849D8292CF06E006E3EAE /* CardsInPaperCollectionCell.swift */,
+				C5FF91442931923E00FA4BDE /* CardsInPaperViewController.swift */,
 			);
 			path = WrittenPaper;
 			sourceTree = "<group>";
@@ -754,6 +757,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5FF91452931923E00FA4BDE /* CardsInPaperViewController.swift in Sources */,
 				1573562F28FFA79B00EA565B /* SettingScreenViewController.swift in Sources */,
 				BCC74A812922061000582248 /* PaperTemplateSelectLength.swift in Sources */,
 				BC344FE32923225900A8C2DF /* GiftStorageViewModel.swift in Sources */,

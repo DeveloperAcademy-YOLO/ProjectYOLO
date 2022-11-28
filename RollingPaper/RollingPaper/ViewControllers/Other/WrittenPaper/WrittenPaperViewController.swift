@@ -25,16 +25,11 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var stopPaperBtnIsPressed: Bool = false
     private lazy var timerBalloonBtnPressed: Bool = false
     private lazy var signInWithModal: Bool = false
+    lazy var fromCardView: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
+    private var timeInterval: Double?
     private let now: Date = Date()
-    
-    private var refreshControl: UIRefreshControl = {
-        let control = UIRefreshControl()
-        control.attributedTitle = NSAttributedString(string: "데이터를 불러오는 중입니다...")
-        
-        return control
-    }()
     
     private lazy var showBalloonButton: UIButton = UIButton()
     private lazy var customBackBtn: UIButton = {
@@ -49,64 +44,12 @@ final class WrittenPaperViewController: UIViewController {
         
         return btn
     }()
-    private lazy var managePaperBtn: UIButton = {
-        let btnImg = UIImage(systemName: "ellipsis.circle")!
-            .resized(to: CGSize(width: 30, height: 30))
-        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        btn.setImage(btnImg, for: .normal)
-        
-        return btn
-    }()
-    private lazy var paperLinkBtn: UIButton = {
-        let btnImg = UIImage(systemName: "square.and.arrow.up")!
-            .resized(to: CGSize(width: 30, height: 30))
-        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        btn.setImage(btnImg, for: .normal)
-        
-        return btn
-    }()
-    private lazy var createCardBtn: UIButton = {
-        let btnImg = UIImage(systemName: "plus.rectangle.fill")!
-            .resized(to: CGSize(width: 40, height: 30))
-        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        btn.setImage(btnImg, for: .normal)
-        
-        return btn
-    }()
-    private lazy var giftLinkBtn: UIButton = {
-        let btnImg = UIImage(systemName: "giftcard.fill")!
-            .resized(to: CGSize(width: 51, height: 36))
-        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
-        btn.setImage(btnImg, for: .normal)
-        
-        return btn
-    }()
-    
-    private lazy var cardsList: UICollectionView = {
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 25, left: 20, bottom: 25, right: 20 )
-        layout.itemSize = CGSize(width: (deviceWidth-80)/3, height: ((deviceWidth-120)/3)*0.75)
-        layout.minimumInteritemSpacing = 20
-        layout.minimumLineSpacing = 20
-        
-        cardsList = UICollectionView(frame: CGRect(x: 0, y: 0, width: deviceWidth, height: deviceHeight), collectionViewLayout: layout)
-        cardsList.center.x = view.center.x
-        cardsList.showsVerticalScrollIndicator = false
-        cardsList.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
-        cardsList.dataSource = self
-        cardsList.delegate = self
-        cardsList.alwaysBounceVertical = true
-        cardsList.addSubview(refreshControl)
-        
-        return cardsList
-    }()
     
     //페이퍼의 제목 수정과 페이퍼 삭제, 두 곳에 쓰이는 UITextField 이므로 직접 쓰이는 곳에서 initialize를 해줘야 합니다.
     lazy private var titleEmbedingTextField: UITextField = UITextField()
     
     lazy private var timeLabel: TimerView = {
         let timeLabel = TimerView()
-        timeLabel.setEndTime(time: viewModel.currentPaperPublisher.value?.endTime ?? Date())
         timeLabel.addSubview(showBalloonButton)
         return timeLabel
     }()
@@ -115,7 +58,6 @@ final class WrittenPaperViewController: UIViewController {
         let titleLabel = BasePaddingLabel()
         //titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .left
-        titleLabel.text = viewModel.currentPaperPublisher.value?.title
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         
@@ -132,24 +74,91 @@ final class WrittenPaperViewController: UIViewController {
         return stackView
     }()
     
+    private lazy var managePaperBtn: UIButton = {
+        let btnImg = UIImage(systemName: "ellipsis.circle")?
+            .resized(to: CGSize(width: 30, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var paperLinkBtn: UIButton = {
+        let btnImg = UIImage(systemName: "square.and.arrow.up")?
+            .resized(to: CGSize(width: 30, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var createCardBtn: UIButton = {
+        let btnImg = UIImage(systemName: "plus.rectangle.fill")?
+            .resized(to: CGSize(width: 40, height: 30))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    private lazy var giftLinkBtn: UIButton = {
+        let btnImg = UIImage(systemName: "giftcard.fill")?
+            .resized(to: CGSize(width: 51, height: 36))
+        let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
+        btn.setImage(btnImg, for: .normal)
+        
+        return btn
+    }()
+    
+    private lazy var cardsList: UICollectionView = {
+        let cardsListView = CardsInPaperViewController()
+        cardsListView.viewModel = self.viewModel
+        cardsListView.callingVC = self
+        
+        return cardsListView
+    }()
+    
+    private lazy var spinner: UIActivityIndicatorView = {
+        let spinner = UIActivityIndicatorView()
+        spinner.color = .label
+        spinner.backgroundColor = .white
+        spinner.startAnimating()
+        return spinner
+    }()
+    
+    private lazy var tapGesture: UITapGestureRecognizer = {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = true
+        
+        return tapGesture
+    }()
+    
+    @objc func hideKeyboard() {
+        timerDiscriptionBalloon.view.isHidden = true
+        self.tapGesture.isEnabled = false
+        
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        bindTimer()
+        self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.isNavigationBarHidden = true
+        self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
         self.splitViewController?.hide(.primary)
-        stackViewConstraints()
-        navigationItem.titleView = stackView
-        setCustomNavBarButtons()
-        titleLabelConstraints()
-        view.addSubview(cardsList)
+        self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
+        inputToVM.send(.fetchingPaper)
+        spinnerConstraints()
+        view.addSubview(spinner)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.splitViewController?.hide(.primary)
-        self.navigationController?.isNavigationBarHidden = false
-        cardsList.reloadData()
+        if fromCardView {
+            self.navigationController?.isNavigationBarHidden = false
+            //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
+        }
+        self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
+        inputToVM.send(.fetchingPaper)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -164,9 +173,7 @@ final class WrittenPaperViewController: UIViewController {
     
     override func viewWillDisappear  (_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if timerBalloonBtnPressed == true {
-            timerDiscriptionBalloon.view.removeFromSuperview()
-        }
+        checkTimerBallon()
     }
     
     private func bind() {
@@ -174,27 +181,31 @@ final class WrittenPaperViewController: UIViewController {
         outputFromVM
             .receive(on: DispatchQueue.main)
             .sink { [weak self] receivedValue in
-                guard self != nil else { return }
+                guard let self = self else { return }
                 switch receivedValue {
                 case .cardDeleted:
                     break
                 case .paperStopped:
-                    self?.setCustomNavBarButtons()
-                    self?.timeLabel.setEndTime(time: self?.viewModel.currentPaperPublisher.value?.endTime ?? Date())
-                    self?.cardsList.reloadData()
+                    self.setCustomNavBarButtons()
+                    self.timeLabel.setEndTime(time: self.viewModel.currentPaperPublisher.value?.endTime ?? Date())
+                    self.cardsList.reloadData()
                 case .paperDeleted:
-                    self?.inputToVM.send(.moveToStorageTapped)
-                    self?.moveToPaperStorageView()
+                    self.inputToVM.send(.moveToStorageTapped)
+                    self.moveToPaperStorageView()
                 case .paperTitleChanged:
-                    self?.titleLabel.text = self?.viewModel.currentPaperPublisher.value?.title
+                    self.titleLabel.text = self.viewModel.currentPaperPublisher.value?.title
                 case .paperLinkMade:
-                    if self?.viewModel.isSameCurrentUserAndCreator == true {
-                        self?.presentShareSheet(self?.paperLinkBtn ?? UIButton())
+                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
+                    if self.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
+                        self.presentShareSheet(self.paperLinkBtn)
                     } else {
-                        self?.presentSignUpModal(self?.paperLinkBtn ?? UIButton())
+                        self.presentSignUpModal(self.paperLinkBtn)
                     }
                 case .giftLinkMade:
-                    self?.presentShareSheet(self?.giftLinkBtn ?? UIButton())
+                    self.presentShareSheet(self.giftLinkBtn)
+                case .fetchingSuccess:
+                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
+                    self.checkFetchingCorrectly(currentPaper)
                 }
             }
             .store(in: &cancellables)
@@ -221,12 +232,25 @@ final class WrittenPaperViewController: UIViewController {
             }
             .store(in: &cancellables)
         
+        viewModel
+            .currentPaperPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] paper in
+                if paper != nil {
+                    self?.checkFetchingCorrectly(paper)
+                    self?.bindTimer()
+                }
+            })
+            .store(in: &cancellables)
+        
         showBalloonButton
             .tapPublisher
             .sink { [weak self] in
                 if self?.viewModel.currentPaperPublisher.value?.endTime != self?.viewModel.currentPaperPublisher.value?.date {
                     self?.timerBalloonBtnPressed = true
-                    self?.cardsList.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                    self?.tapGesture.isEnabled = true
+                    self?.navigationController?.navigationBar.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
+                    self?.timerDiscriptionBalloon.view.isHidden = false
                     self?.setBalloonLocation()
                 }
             }
@@ -267,17 +291,11 @@ final class WrittenPaperViewController: UIViewController {
         giftLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.inputToVM.send(.giftTapped)
-            }
-            .store(in: &cancellables)
-        
-        refreshControl
-            .isRefreshingPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.checkTimerBallon()
-                self?.cardsList.reloadData()
-                self?.refreshControl.endRefreshing()
+                if self?.viewModel.currentPaperPublisher.value?.creator != nil {
+                    self?.inputToVM.send(.giftTapped)
+                } else {
+                    self?.presentSignUpModal(self?.giftLinkBtn ?? UIButton())
+                }
             }
             .store(in: &cancellables)
     }
@@ -292,12 +310,42 @@ final class WrittenPaperViewController: UIViewController {
                     // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
                     self.timeLabel.updateTime()
+                    self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
+                    if self.timeInterval ?? 1.0 <= 0.0 {
+                        self.inputToVM.send(.fetchingPaper)
+                    }
                 }
             })
             .store(in: &cancellables)
     }
     
+    private func drawView() {
+        setCustomNavBarButtons()
+        bindTimer()
+        stackViewConstraints()
+        navigationItem.titleView = stackView
+        titleLabelConstraints()
+        view.addGestureRecognizer(tapGesture)
+        view.addSubview(cardsList)
+        cardsList.reloadData()
+        self.spinner.stopAnimating()
+        self.spinner.isHidden = true
+    }
+    
+    private func checkFetchingCorrectly(_ paper: PaperModel?) {
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+                self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
+                self.navigationController?.navigationBar.tintColor = .systemBlue
+                self.navigationController?.navigationBar.isHidden = false
+                self.navigationController?.setNavigationBarHidden(false, animated: false)
+                self.navigationController?.isNavigationBarHidden = false
+                self.titleLabel.text = paper?.title
+                self.drawView()
+        }
+    }
+    
     private func setCustomNavBarButtons() {
+        guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
         let firstBarButton = UIBarButtonItem(customView: customBackBtn)
         let secondBarButton = UIBarButtonItem(customView: managePaperBtn)
         let thirdBarButton = UIBarButtonItem(customView: paperLinkBtn)
@@ -308,15 +356,19 @@ final class WrittenPaperViewController: UIViewController {
         let signOutSetting: [UIBarButtonItem] = [fourthBarButton, thirdBarButton]
         let stoppedPaperSetting: [UIBarButtonItem] = [fifthBarButton]
         
-        navigationItem.rightBarButtonItems = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? signInSetting : signOutSetting // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
+        navigationItem.rightBarButtonItems = signOutSetting
+        navigationItem.leftBarButtonItem = firstBarButton
+        if currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email {
+            navigationItem.rightBarButtonItems = signInSetting
+        } // creator 있는 페이지에 다른 사람이 로그인 하면 페이퍼 관리 버튼 안 보이게 하는 로직
+        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
             navigationItem.rightBarButtonItems = stoppedPaperSetting
         }
-        viewModel.isSameCurrentUserAndCreator = (viewModel.currentPaper?.creator != nil && viewModel.currentPaper?.creator?.email == viewModel.currentUser?.email) ? true : false
-        navigationItem.leftBarButtonItem = firstBarButton
+        viewModel.isSameCurrentUserAndCreator = (currentPaper.creator != nil && currentPaper.creator?.email == viewModel.currentUser?.email) ? true : false
     }
     
     private func setPopOverView(_ sender: UIButton) {
+        guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
         let attributedTitleString = NSAttributedString(string: "페이지 관리", attributes: [
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
             NSAttributedString.Key.strokeWidth: -5 ])
@@ -340,7 +392,7 @@ final class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.addAction(edit)
             alert.addTextField { (editTitleTextField) in
-                editTitleTextField.text = self.viewModel.currentPaperPublisher.value?.title
+                editTitleTextField.text = currentPaper.title
                 self.titleEmbedingTextField = editTitleTextField
             }
             alert.preferredAction = edit
@@ -371,7 +423,7 @@ final class WrittenPaperViewController: UIViewController {
             alert.addAction(cancel)
             alert.preferredAction = delete
             alert.addTextField { (deleteTitleTextField) in
-                deleteTitleTextField.placeholder = self.viewModel.currentPaper?.title
+                deleteTitleTextField.placeholder = currentPaper.title
                 self.titleEmbedingTextField = deleteTitleTextField
             }
             self.present(alert, animated: true, completion: nil)
@@ -388,7 +440,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private func deletePaper() {
         let deleteVerifyText = self.titleEmbedingTextField.text
-        if deleteVerifyText == self.viewModel.currentPaper?.title {
+        if deleteVerifyText == self.viewModel.currentPaperPublisher.value?.title {
             self.inputToVM.send(.deletePaperTapped)
         } else {
             let alert = UIAlertController(title: "제목을 잘못 입력하셨습니다", message: nil, preferredStyle: .alert)
@@ -421,21 +473,22 @@ final class WrittenPaperViewController: UIViewController {
     
     private func moveToCardRootView() {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
-        
+        //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
+        fromCardView = true
+        print("isLocalDB: \(isLocalDB)")
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
     
     private func moveToPaperStorageView() {
-        if viewModel.currentPaper != nil {
-            guard let paper = viewModel.currentPaper else { return }
+            guard let paper = viewModel.currentPaperPublisher.value else { return }
             if viewModel.isPaperLinkMade {
                 viewModel.serverDatabaseManager.updatePaper(paper: paper)
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             } else {
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             }
-        }
+        
         self.inputToVM.send(.moveToStorageTapped)
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
@@ -444,271 +497,25 @@ final class WrittenPaperViewController: UIViewController {
         )
     }
     
-    private func checkTimerBallon() {
+    func checkTimerBallon() {
         if self.timerBalloonBtnPressed == true {
-            self.timerDiscriptionBalloon.view.removeFromSuperview()
+            self.timerDiscriptionBalloon.view.isHidden = true
         }
-    }
 }
-
-extension WrittenPaperViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date{
-            return self.viewModel.currentPaper?.cards.count ?? 0
-        } else {
-            return ((self.viewModel.currentPaper?.cards.count ?? 0) + 1 )
-        }
-    }
-    //commit collectionView
-    func saveCard(_ indexPath: IndexPath) {
-        guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row - 1]
-        
-        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
-        }
-    }
-    
-    func shareCard( _ indexPath: IndexPath, _ sender: CGPoint) {
-        guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row - 1]
-        
-        if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-            imageShare(sender, image)
-        }
-    }
-    
-    func deleteCard(_ indexPath: IndexPath) {
-        guard let currentPaper = viewModel.currentPaper else { return }
-        let card = currentPaper.cards[indexPath.row - 1]
-        
-        if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
-            viewModel.deleteCard(card, from: .fromServer)
-        } else {
-            viewModel.deleteCard(card, from: .fromLocal)
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
-        myCell.layer.cornerRadius = 12
-        myCell.layer.masksToBounds = true
-        
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
-            guard let currentPaper = viewModel.currentPaper else { return myCell }
-            let card = currentPaper.cards[indexPath.row]
-            if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-                let imageView = UIImageView(image: image)
-                imageView.layer.masksToBounds = true
-                myCell.addSubview(imageView)
-                imageView.snp.makeConstraints { make in
-                    make.top.bottom.leading.trailing.equalTo(myCell)
-                }
-                return myCell
-            } else {
-                LocalStorageManager.downloadData(urlString: card.contentURLString)
-                    .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        switch completion {
-                        case .failure(let error): print(error)
-                        case .finished: break
-                        }
-                    } receiveValue: { [weak self] data in
-                        if
-                            let data = data,
-                            let image = UIImage(data: data) {
-                            NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                            let imageView = UIImageView(image: image)
-                            imageView.layer.masksToBounds = true
-                            myCell.addSubview(imageView)
-                            imageView.snp.makeConstraints { make in
-                                make.top.bottom.leading.trailing.equalTo(myCell)
-                            }
-                        } else {
-                            myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
-                        }
-                    }
-                    .store(in: &cancellables)
-            }
-        } else {
-            if indexPath.row == 0 {
-                let addCardBtn = AddCardViewController()
-                myCell.addSubview(addCardBtn.view)
-            } else {
-                guard let currentPaper = viewModel.currentPaper else { return myCell }
-                let card = currentPaper.cards[indexPath.row-1]
-                if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-                    let imageView = UIImageView(image: image)
-                    imageView.layer.masksToBounds = true
-                    myCell.addSubview(imageView)
-                    imageView.snp.makeConstraints { make in
-                        make.top.bottom.leading.trailing.equalTo(myCell)
-                    }
-                    return myCell
-                } else {
-                    LocalStorageManager.downloadData(urlString: card.contentURLString)
-                        .receive(on: DispatchQueue.main)
-                        .sink { completion in
-                            switch completion {
-                            case .failure(let error): print(error)
-                            case .finished: break
-                            }
-                        } receiveValue: { [weak self] data in
-                            if
-                                let data = data,
-                                let image = UIImage(data: data) {
-                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                                let imageView = UIImageView(image: image)
-                                imageView.layer.masksToBounds = true
-                                myCell.addSubview(imageView)
-                                imageView.snp.makeConstraints { make in
-                                    make.top.bottom.leading.trailing.equalTo(myCell)
-                                }
-                            } else {
-                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
-                            }
-                        }
-                        .store(in: &cancellables)
-                }
-            }
-        }
-        
-        
-        return myCell
-    }
-}
-
-extension WrittenPaperViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date {
-            let presentingVC = MagnifiedCardViewController()
-            let blurredVC = BlurredViewController()
-            
-            blurredVC.modalTransitionStyle = .crossDissolve
-            blurredVC.modalPresentationStyle = .currentContext
-            self.present(blurredVC, animated: true)
-            
-            presentingVC.backgroundViewController = blurredVC
-            presentingVC.selectedCardIndex = indexPath.row
-            presentingVC.modalPresentationStyle = .overFullScreen
-            present(presentingVC, animated: true)
-            
-            collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        } else {
-            if indexPath.row == 0 {
-                moveToCardRootView()
-            } else {
-                let presentingVC = MagnifiedCardViewController()
-                let blurredVC = BlurredViewController()
-                
-                blurredVC.modalTransitionStyle = .crossDissolve
-                blurredVC.modalPresentationStyle = .currentContext
-                self.present(blurredVC, animated: true)
-                
-                presentingVC.backgroundViewController = blurredVC
-                presentingVC.selectedCardIndex = indexPath.row - 1
-                presentingVC.modalPresentationStyle = .overFullScreen
-                present(presentingVC, animated: true)
-                
-                collectionView.scrollToItem(at: [0, indexPath.row - 1], at: .centeredHorizontally, animated: true)
-            }
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first else { return nil }
-        if indexPath.row == 0 {
-            return nil
-        }
-        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
-            
-            let save = UIAction(
-                title: "사진 앱에 저장하기",
-                image: UIImage(systemName: "photo.on.rectangle"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                state: .off
-            ) { [weak self] _ in
-                self?.saveCard(indexPath)
-            }
-            
-            let share = UIAction(
-                title: "공유하기",
-                image: UIImage(systemName: "square.and.arrow.up"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                state: .off
-            ) { [weak self] _ in
-                self?.shareCard(indexPath, point)
-            }
-            
-            let delete = UIAction(
-                title: "삭제하기",
-                image: UIImage(systemName: "trash"),
-                identifier: nil,
-                discoverabilityTitle: nil,
-                attributes: .destructive,
-                state: .off
-            ) { [weak self] _ in
-                self?.deleteCard(indexPath)
-            }
-            
-            return UIMenu(
-                image: nil,
-                identifier: nil,
-                options: .singleSelection,
-                children: [save, share, delete]
-            )
-        }
-        return config
-    }
-    
-    @objc func imageSave(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
-            let alert = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-        } else {
-            let alert = UIAlertController(title: "Saved!", message: "이미지가 사진첩에 저장이 되었습니다", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-        }
-    }
-    
-    private func imageShare(_ sender: CGPoint, _ image: UIImage) {
-        
-        let shareSheetVC = UIActivityViewController(
-            activityItems:
-                [
-                    image
-                ], applicationActivities: nil)
-        
-        // exclude some activity types from the list (optional)
-        shareSheetVC.excludedActivityTypes = [
-            UIActivity.ActivityType.message,
-            UIActivity.ActivityType.saveToCameraRoll,
-            UIActivity.ActivityType.assignToContact,
-            UIActivity.ActivityType.copyToPasteboard,
-            UIActivity.ActivityType.print,
-            UIActivity.ActivityType.addToReadingList
-        ]
-        
-        // present the view controller
-        self.present(shareSheetVC, animated: true, completion: nil)
-        
-        let rect: CGRect = .init(origin: sender, size: CGSize(width: 200, height: 200))
-        
-        shareSheetVC.popoverPresentationController?.sourceView = self.view
-        shareSheetVC.popoverPresentationController?.sourceRect = rect
-    }
 }
 
 extension WrittenPaperViewController {
     private func stackViewConstraints() {
-        stackView.snp.makeConstraints { make in
+        stackView.snp.makeConstraints({ make in
             make.height.equalTo(36)
-        }
+        })
+    }
+    
+    private func spinnerConstraints() {
+        spinner.snp.makeConstraints({ make in
+            make.width.equalTo(deviceWidth)
+            make.height.equalTo(deviceHeight)
+        })
     }
     
     private func titleLabelConstraints() {
@@ -728,6 +535,7 @@ extension WrittenPaperViewController {
     private func setBalloonLocation() {
         timerDiscriptionBalloon.view.snp.makeConstraints { make in
             make.centerX.equalTo(timeLabel.snp.centerX)
+            make.top.equalTo(50)
             make.width.equalTo(224)
             make.height.equalTo(81)
         }

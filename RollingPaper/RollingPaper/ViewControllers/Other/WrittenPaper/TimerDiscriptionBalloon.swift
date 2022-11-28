@@ -10,7 +10,6 @@ import SnapKit
 import UIKit
 
 class TimerDiscriptionBalloon: UIViewController {
-    private lazy var cancellables = Set<AnyCancellable>()
     private lazy var balloonImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .clear
@@ -46,26 +45,12 @@ class TimerDiscriptionBalloon: UIViewController {
         return stackView
     }()
     
-    private lazy var closeBtn: UIButton = UIButton()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        bind()
         view.addSubview(balloonImageView)
         view.addSubview(discriptionTextStack)
-        view.addSubview(closeBtn)
         balloonSizeConstraints()
         stackSizeConstraints()
-        closeBtnSizeConstraints()
-    }
-    
-    private func bind() {
-        closeBtn
-            .tapPublisher
-            .sink{ [weak self] in
-                self?.view.removeFromSuperview()
-            }
-            .store(in: &cancellables)
     }
     
     private func textLabelInit(_ label:BasePaddingLabel){
@@ -78,13 +63,6 @@ class TimerDiscriptionBalloon: UIViewController {
 }
 
 extension TimerDiscriptionBalloon {
-    private func closeBtnSizeConstraints() {
-        closeBtn.snp.makeConstraints({ make in
-            make.width.equalTo(224)
-            make.height.equalTo(81)
-        })
-    }
-    
     private func stackSizeConstraints() {
         discriptionTextStack.snp.makeConstraints({ make in
             make.width.equalTo(224)

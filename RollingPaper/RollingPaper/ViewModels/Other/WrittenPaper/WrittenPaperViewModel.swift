@@ -18,7 +18,6 @@ class WrittenPaperViewModel {
     private let output: PassthroughSubject<Output, Never> = .init()
     var currentUser: UserModel?
     
-    var currentPaper: PaperModel!
     let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
     private var paperID: String = ""
@@ -43,6 +42,7 @@ class WrittenPaperViewModel {
         case paperShareTapped
         case giftTapped
         case moveToStorageTapped
+        case fetchingPaper
     }
     
     enum Output {
@@ -52,11 +52,11 @@ class WrittenPaperViewModel {
         case paperTitleChanged
         case paperLinkMade
         case giftLinkMade
+        case fetchingSuccess
     }
     
     init() {
         setCurrentUser()
-        setCurrentPaper()
     }
     
     func setCurrentUser() {
@@ -74,7 +74,7 @@ class WrittenPaperViewModel {
         self.localDatabaseManager.paperSubject
             .sink(receiveValue: { [weak self] paper in
                 if let paper = paper {
-                    self?.currentPaper = paper
+                    self?.paperID = paper.paperId
                     self?.paperFrom = .fromLocal
                     self?.currentPaperPublisher.send(paper)
                 }
@@ -83,18 +83,20 @@ class WrittenPaperViewModel {
                 }
             })
             .store(in: &cancellables)
-        
-        self.serverDatabaseManager.paperSubject
-            .sink(receiveValue: { [weak self] paper in
-                if let paper = paper {
-                    self?.currentPaper = paper
-                    self?.paperFrom = .fromServer
-                    self?.currentPaperPublisher.send(paper)
-                } else {
-                    print("서버 비었음")
-                }
-            })
-            .store(in: &cancellables)
+        if self.localDatabaseManager.paperSubject.value == nil {
+            self.serverDatabaseManager.paperSubject
+                .sink(receiveValue: { [weak self] paper in
+                    if let paper = paper {
+                        self?.paperID = paper.paperId
+                        self?.paperFrom = .fromServer
+                        self?.currentPaperPublisher.send(paper)
+                    } else {
+                        print("서버 비었음")
+                    }
+                })
+                .store(in: &cancellables)
+        }
+        self.output.send(.fetchingSuccess)
     }
     
     func transform(inputFromVC: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -111,7 +113,7 @@ class WrittenPaperViewModel {
                 case .stopPaperTapped:
                     self.stopPaper()
                 case .deletePaperTapped:
-                    self.deletePaper(self.currentPaper.paperId)
+                    self.deletePaper(self.currentPaperPublisher.value?.paperId ?? "")
                     self.output.send(.paperDeleted)
                 case .paperShareTapped:
                     self.makePaperShareLink()
@@ -119,6 +121,8 @@ class WrittenPaperViewModel {
                     self.makePaperGiftLink()
                 case .moveToStorageTapped:
                     self.cleanPaperPublisher()
+                case .fetchingPaper:
+                    self.setCurrentPaper()
                 }
             }
             .store(in: &cancellables)
@@ -132,23 +136,20 @@ class WrittenPaperViewModel {
             serverDatabaseManager.updatePaper(paper: paper)
             localDatabaseManager.updatePaper(paper: paper)
         }
-        currentPaper = nil
-        currentPaperPublisher.send(currentPaper)
+        currentPaperPublisher.value = nil
         localDatabaseManager.resetPaper()
         serverDatabaseManager.resetPaper()
     }
 
     private func changePaperTitle(input: String, from paperFrom: DataSource) {
-        currentPaper?.title = input
+        currentPaperPublisher.value?.title = input
         isTitleChanged = true
-        guard let paper = currentPaper else { return }
+        guard let paper = currentPaperPublisher.value else { return }
         switch paperFrom {
         case .fromLocal:
             localDatabaseManager.updatePaper(paper: paper)
-            currentPaperPublisher.send(paper)
         case .fromServer:
             serverDatabaseManager.updatePaper(paper: paper)
-            currentPaperPublisher.send(paper)
         }
     }
     
@@ -162,7 +163,9 @@ class WrittenPaperViewModel {
     }
     
     private func stopPaper() {
-        currentPaper.endTime = currentPaper.date
+        guard let time = currentPaperPublisher.value?.date else {return}
+        currentPaperPublisher.value?.endTime = time
+        guard let currentPaper = currentPaperPublisher.value else {return}
         if self.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에도 페이퍼가 저장되어있으므로
             serverDatabaseManager.updatePaper(paper: currentPaper)
             localDatabaseManager.updatePaper(paper: currentPaper)
@@ -183,11 +186,11 @@ class WrittenPaperViewModel {
             localDatabaseManager.removePaper(paperId: paperID)
             localDatabaseManager.resetPaper()
         }
-        currentPaper = nil
-        currentPaperPublisher.send(currentPaper)
+        currentPaperPublisher.value = nil
     }
     
     private func makePaperShareLink() {
+        guard let currentPaper = currentPaperPublisher.value else {return}
         getPaperShareLink(with: currentPaper, route: .write)
             .receive(on: DispatchQueue.global(qos: .background))
             .sink { (completion) in
@@ -196,19 +199,33 @@ class WrittenPaperViewModel {
                 case .finished: break
                 case .failure(let error): print(error)
                 }
-            } receiveValue: { url in
-                self.isPaperLinkMade = true
-                self.currentPaper.linkUrl = url
-                self.localDatabaseManager.updatePaper(paper: self.currentPaper)
-                self.serverDatabaseManager.addPaper(paper: self.currentPaper)
+            } receiveValue: { [weak self] url in
+                self?.isPaperLinkMade = true
+                self?.currentPaperPublisher.value?.linkUrl = url
+                guard let paper = self?.currentPaperPublisher.value else {return}
+                self?.localDatabaseManager.updatePaper(paper: paper)
+                self?.serverDatabaseManager.addPaper(paper: paper)
                 //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
-                self.currentPaperPublisher.send(self.currentPaper)
-                self.output.send(.paperLinkMade)
+                self?.currentPaperPublisher.send(paper)
+                self?.output.send(.paperLinkMade)
             }
             .store(in: &cancellables)
     }
     
     private func makePaperGiftLink() {
+        guard let currentPaper = currentPaperPublisher.value else {return}
+//        serverDatabaseManager.convertPaperToGift(paper: currentPaper)
+//            .sink { (completion) in
+//                switch completion {
+//                case .finished: break
+//                case .failure(let error): print(error)
+//                }
+//            } receiveValue: { [weak self] paperWithGiftLink in
+//                guard let self = self else {return}
+//                self.currentPaperPublisher.value = paperWithGiftLink
+//            }
+//            .store(in: &cancellables)
+            
         getPaperShareLink(with: currentPaper, route: .gift)
             .receive(on: DispatchQueue.global(qos: .background))
             .sink { (completion) in
@@ -217,14 +234,16 @@ class WrittenPaperViewModel {
                 case .finished: break
                 case .failure(let error): print(error)
                 }
-            } receiveValue: { url in
+            } receiveValue: { [weak self] url in
+                guard let self = self else {return}
                 self.isPaperLinkMade = true
-                self.currentPaper.linkUrl = url
-                self.currentPaper.isGift = true
-                self.localDatabaseManager.updatePaper(paper: self.currentPaper)
-                self.serverDatabaseManager.addPaper(paper: self.currentPaper)
+                self.currentPaperPublisher.value?.isGift = true
+//                self.currentPaperPublisher.value?.linkUrl = url
+                guard let paper = self.currentPaperPublisher.value else {return}
+                self.localDatabaseManager.updatePaper(paper: paper)
+                self.serverDatabaseManager.addPaper(paper: paper)
                 //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
-                self.currentPaperPublisher.send(self.currentPaper)
+                self.currentPaperPublisher.send(paper)
                 self.output.send(.giftLinkMade)
             }
             .store(in: &cancellables)

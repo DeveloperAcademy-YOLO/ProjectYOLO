@@ -11,8 +11,9 @@ import SnapKit
 import Combine
 
 class MagnifiedCardViewController: UIViewController {
-    private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
+    var viewModel: WrittenPaperViewModel?
     private var cancellables = Set<AnyCancellable>()
+    private let inputToBackGroundVC: PassthroughSubject<BlurredViewController.Input, Never> = .init()
     //상위 뷰 에서 접근해야하는 변수
     var selectedCardIndex: Int = 0
     private var deviceWidth = UIScreen.main.bounds.size.width
@@ -55,19 +56,29 @@ class MagnifiedCardViewController: UIViewController {
     }
     
     private func bind() {
+        let output = backgroundViewController?.transform(inputfrom: inputToBackGroundVC.eraseToAnyPublisher())
+        output?
+            .receive(on: DispatchQueue.main)
+            .sink {[weak self] receivedValue in
+                guard self != nil else { return }
+                switch receivedValue {
+                case .closeDone:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        
         closeBtn1
             .tapPublisher
             .sink{ [weak self] in
-                self?.dismiss(animated: true)
-                self?.backgroundViewController.dismiss(animated: true)
+                self?.inputToBackGroundVC.send(.closeTapper)
             }
             .store(in: &cancellables)
         
         closeBtn2
             .tapPublisher
             .sink{ [weak self] in
-                self?.dismiss(animated: true)
-                self?.backgroundViewController.dismiss(animated: true)
+                self?.inputToBackGroundVC.send(.closeTapper)
             }
             .store(in: &cancellables)
     }
@@ -87,25 +98,17 @@ class MagnifiedCardViewController: UIViewController {
                     self.view.transform = .identity
                 })
             } else {
-                dismiss(animated: true) {
-                    self.backgroundViewController.dismiss(animated: true)
-                }
+                self.inputToBackGroundVC.send(.closeTapper)
             }
         default:
             break
-        }
-    }
-    
-    @objc func closeAction() {
-        dismiss(animated: true) {
-            self.backgroundViewController.dismiss(animated: true)
         }
     }
 }
 
 extension MagnifiedCardViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.currentPaper?.cards.count ?? 0
+        return viewModel?.currentPaperPublisher.value?.cards.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -122,7 +125,7 @@ extension MagnifiedCardViewController: UICollectionViewDataSource {
         myCell.layer.masksToBounds = false;
         myCell.layer.shadowPath = UIBezierPath(roundedRect:myCell.bounds, cornerRadius:myCell.contentView.layer.cornerRadius).cgPath
         
-        guard let currentPaper = viewModel.currentPaper else { return myCell }
+        guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
         let card = currentPaper.cards[indexPath.row]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -163,8 +166,6 @@ extension MagnifiedCardViewController: UICollectionViewDataSource {
     }
 }
 
-
-
 extension MagnifiedCardViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
@@ -200,13 +201,10 @@ extension MagnifiedCardViewController {
             make.width.equalTo(deviceWidth)
             make.height.equalTo(80)
         }
-        
         closeBtn2.snp.makeConstraints { make in
             make.top.equalTo(deviceHeight-80)
             make.width.equalTo(deviceWidth)
             make.height.equalTo(80)
         }
     }
-    
-    
 }
