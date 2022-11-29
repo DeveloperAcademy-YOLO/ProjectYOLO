@@ -9,6 +9,22 @@ import Foundation
 import UIKit
 
 struct AppSettingSectionModel: Hashable {
+    
+    init(title: String, subCells: [AppSettingSectionSubCellModel]? = nil) {
+        self.title = title
+        self.subCells = subCells
+    }
+    
     let title: String
-    let detailView: UIView
+    let subCells: [AppSettingSectionSubCellModel]?
+}
+
+struct AppSettingSectionSubCellModel: Hashable {
+    let title: String
+    let icon: UIImage?
+}
+
+enum ListItem: Hashable {
+    case header(AppSettingSectionModel)
+    case subCell(AppSettingSectionSubCellModel)
 }

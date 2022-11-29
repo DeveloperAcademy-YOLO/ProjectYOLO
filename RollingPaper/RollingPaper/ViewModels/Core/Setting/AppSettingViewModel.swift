@@ -44,12 +44,13 @@ class AppSettingViewModel {
     }
     
     let sectionData1 = [
-        AppSettingSectionModel(title: "색상 테마", detailView: UIView()),
-        AppSettingSectionModel(title: "알림", detailView: UIView())
+        AppSettingSectionModel(title: "색상 테마"),
+        AppSettingSectionModel(title: "알림")
     ]
     
     let sectionData2 = [
-        AppSettingSectionModel(title: "고객 지원", detailView: UIView()),
-        AppSettingSectionModel(title: "정보", detailView: UIView())
+        AppSettingSectionModel(title: "정보", subCells: [AppSettingSectionSubCellModel(title: "앱 정보", icon: UIImage(named: "logo")),
+                                                       AppSettingSectionSubCellModel(title: "오픈소스 라이센스", icon: nil)
+                                                      ])
     ]
 }

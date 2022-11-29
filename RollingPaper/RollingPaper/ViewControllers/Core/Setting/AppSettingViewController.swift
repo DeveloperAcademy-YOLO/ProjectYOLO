@@ -14,7 +14,12 @@ import UIKit
 final class AppSettingViewController: UIViewController {
     private var viewModel = AppSettingViewModel()
     private var cancellables = Set<AnyCancellable>()
-    private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>! = nil
+    private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>! = nil
+    let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
+    
+    @objc private func tapUserProfile() {
+        navigationController?.pushViewController(SettingScreenViewController(), animated: true)
+    }
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
@@ -108,6 +113,8 @@ final class AppSettingViewController: UIViewController {
             colorSelectButton.selectedSegmentIndex = 1
         }
         colorSelectButton.addTarget(self, action: #selector(didChangeValue(segment: )), for: .valueChanged)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
+        userInfoStack.addGestureRecognizer(tap)
     }
     
     @objc private func didChangeValue(segment: UISegmentedControl) {
@@ -181,37 +188,63 @@ final class AppSettingViewController: UIViewController {
             case [0, 1]:
                 cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
             case [1, 0]:
-                cell.accessories = [.disclosureIndicator()]
-            case [1, 1]:
-                cell.accessories = [.disclosureIndicator()]
+                let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+                cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
             default:
                 break
             }
             content.text = item.title
             cell.contentConfiguration = content
+            
+        }
+        
+        let subCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionSubCellModel> {
+            (cell, indexPath, subCellItem) in
+            var content = cell.defaultContentConfiguration()
+            content.image = subCellItem.icon
+            content.text = subCellItem.title
+            cell.accessories = indexPath == [1, 1] ? [.label(text: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "_") ] : []
+            cell.contentConfiguration = content
         }
 
-        dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: AppSettingSectionModel) -> UICollectionViewCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+        dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: ListItem) -> UICollectionViewCell? in
+            
+            switch item {
+            case .header(let headerItem):
+                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: headerItem)
+            case .subCell(let subCellItem):
+                return collectionView.dequeueConfiguredReusableCell(using: subCellRegistration, for: indexPath, item: subCellItem)
+            }
         }
 
         let sections: [AppSettingViewModel.Section] = [.section1, .section2]
-        var snapshot = NSDiffableDataSourceSnapshot<AppSettingViewModel.Section, AppSettingSectionModel>()
+        
+        var snapshot = NSDiffableDataSourceSnapshot<AppSettingViewModel.Section, ListItem>()
         snapshot.appendSections(sections)
-        dataSource.apply(snapshot, animatingDifferences: false)
-
-        for section in sections {
-            switch section {
-            case .section1:
-                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<AppSettingSectionModel>()
-                sectionSnapshot.append(viewModel.sectionData1)
-                dataSource.apply(sectionSnapshot, to: section)
-            case .section2:
-                var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<AppSettingSectionModel>()
-                sectionSnapshot.append(viewModel.sectionData2)
-                dataSource.apply(sectionSnapshot, to: section)
+        dataSource.apply(snapshot)
+        
+        applySnapshot(sectionData: viewModel.sectionData1, section: .section1)
+        applySnapshot(sectionData: viewModel.sectionData2, section: .section2)
+    }
+    
+    private func applySnapshot(sectionData: [AppSettingSectionModel], section: AppSettingViewModel.Section) {
+        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
+        
+        for headerItem in sectionData {
+           
+            // Create a header ListItem & append as parent
+            let headerListItem = ListItem.header(headerItem)
+            sectionSnapshot.append([headerListItem])
+            
+            // Create an array of symbol ListItem & append as children of headerListItem
+            
+            let subCellListItemArray = headerItem.subCells?.map { ListItem.subCell($0) }
+            if let subCellListItemArray = subCellListItemArray {
+                sectionSnapshot.append(subCellListItemArray, to: headerListItem)
+                // sectionSnapshot.expand([headerListItem])
             }
         }
+        dataSource.apply(sectionSnapshot, to: section, animatingDifferences: true)
     }
     
     @objc private func toggleSwitch(sender: UISwitch) {
