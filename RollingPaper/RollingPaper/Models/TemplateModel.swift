@@ -19,10 +19,10 @@ struct TemplateModel: Codable {
         return colorHexes.map({ UIColor(rgb: $0) })
     }
     var thumbnailString: String {
-        return "thumbnail_\(templateString)_detail.jpg"
+        return "thumbnail_\(templateString).jpg"
     }
     var thumbnailDetailString: String {
-        return "thumbnail_\(templateString)_detail.jpg"
+        return "thumbnail_\(templateString).jpg"
     }
     var thumbnail: UIImage? {
         return UIImage(named: thumbnailString)
