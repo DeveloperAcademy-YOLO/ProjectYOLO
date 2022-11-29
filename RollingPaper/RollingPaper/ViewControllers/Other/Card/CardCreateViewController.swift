@@ -113,6 +113,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return label
     }()
     
+    lazy var introWordingClearLabel: UILabel = {
+        let label = UILabel()
+        label.text = ""
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 30)
+        label.textColor = .lightGray
+        return label
+    }()
+    
     lazy var cameraOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
@@ -193,8 +202,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-        view.addSubview(introWordingLabel)
-        introWordingLabelConstraints()
+        
+        introWordingAppear()
         
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
@@ -318,6 +327,17 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         backgroundOffButtonConstraints()
     }
     
+    private func introWordingAppear() {
+        view.addSubview(introWordingLabel)
+        introWordingLabelConstraints()
+    }
+    
+    private func introWordingClearAppear() {
+        introWordingLabel.isHidden = true
+        view.addSubview(introWordingClearLabel)
+        introWordingClearLabelConstraints()
+    }
+    
     private func dividerAppear() {
         view.addSubview(divider)
         dividerConstraints()
@@ -367,6 +387,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func setPopOverView(_ sender: UIButton) {
         self.backgroundOnButtonAppear()
+        self.introWordingClearAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -720,6 +741,15 @@ extension CardCreateViewController {
     
     private func introWordingLabelConstraints() {
         introWordingLabel.snp.makeConstraints({ make in
+            make.width.equalTo(500)
+            make.height.equalTo(50)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
+    
+    private func introWordingClearLabelConstraints() {
+        introWordingClearLabel.snp.makeConstraints({ make in
             make.width.equalTo(500)
             make.height.equalTo(50)
             make.centerX.equalTo(self.view)
