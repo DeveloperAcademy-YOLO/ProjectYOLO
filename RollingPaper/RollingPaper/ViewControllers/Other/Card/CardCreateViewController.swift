@@ -438,6 +438,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
         self.cameraOnButtonAppear()
+        self.introWordingClearAppear()
         
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
