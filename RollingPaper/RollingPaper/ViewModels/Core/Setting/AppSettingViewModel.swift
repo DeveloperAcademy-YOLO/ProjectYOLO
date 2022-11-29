@@ -49,7 +49,7 @@ class AppSettingViewModel {
     ]
     
     let sectionData2 = [
-        AppSettingSectionModel(title: "정보", subCells: [AppSettingSectionSubCellModel(title: "앱 정보", icon: UIImage(named: "logo")),
+        AppSettingSectionModel(title: "정보", subCells: [AppSettingSectionSubCellModel(title: "앱 버전", icon: UIImage(named: "logo")),
                                                        AppSettingSectionSubCellModel(title: "오픈소스 라이센스", icon: nil)
                                                       ])
     ]

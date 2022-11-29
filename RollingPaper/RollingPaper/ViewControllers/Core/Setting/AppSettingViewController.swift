@@ -11,11 +11,10 @@ import Foundation
 import SnapKit
 import UIKit
 
-final class AppSettingViewController: UIViewController {
+final class AppSettingViewController: UIViewController, UICollectionViewDelegate {
     private var viewModel = AppSettingViewModel()
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>! = nil
-    let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
     
     @objc private func tapUserProfile() {
         navigationController?.pushViewController(SettingScreenViewController(), animated: true)
@@ -47,15 +46,14 @@ final class AppSettingViewController: UIViewController {
         let userNameStack = UIStackView(arrangedSubviews: [userName, userMail])
         userNameStack.axis = .vertical
         userNameStack.alignment = .leading
-        userNameStack.distribution = .equalSpacing
-        userNameStack.spacing = 10
+        userNameStack.distribution = .equalCentering
         return userNameStack
     }()
     
     private lazy var userNamePhotoStack: UIStackView = {
         let userNamePhotoStack = UIStackView(arrangedSubviews: [userPhoto, userNameStack])
         userNamePhotoStack.axis = .horizontal
-        userNamePhotoStack.alignment = .fill
+        userNamePhotoStack.alignment = .center
         userNamePhotoStack.distribution = .equalSpacing
         userNamePhotoStack.spacing = 16
         return userNamePhotoStack
@@ -112,6 +110,7 @@ final class AppSettingViewController: UIViewController {
         case .dark:
             colorSelectButton.selectedSegmentIndex = 1
         }
+        
         colorSelectButton.addTarget(self, action: #selector(didChangeValue(segment: )), for: .valueChanged)
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
         userInfoStack.addGestureRecognizer(tap)
@@ -137,7 +136,6 @@ final class AppSettingViewController: UIViewController {
     }
     
     private func bind() {
-        print("aaa sbind")
         viewModel
             .currentUserSubject
             .receive(on: DispatchQueue.main)
@@ -231,17 +229,13 @@ final class AppSettingViewController: UIViewController {
         var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
         
         for headerItem in sectionData {
-           
-            // Create a header ListItem & append as parent
+
             let headerListItem = ListItem.header(headerItem)
             sectionSnapshot.append([headerListItem])
-            
-            // Create an array of symbol ListItem & append as children of headerListItem
             
             let subCellListItemArray = headerItem.subCells?.map { ListItem.subCell($0) }
             if let subCellListItemArray = subCellListItemArray {
                 sectionSnapshot.append(subCellListItemArray, to: headerListItem)
-                // sectionSnapshot.expand([headerListItem])
             }
         }
         dataSource.apply(sectionSnapshot, to: section, animatingDifferences: true)
@@ -259,9 +253,11 @@ final class AppSettingViewController: UIViewController {
         view.addSubview(userInfoStack)
         userInfoStack.backgroundColor = .systemBackground
         userInfoStack.layer.cornerRadius = 12
-        userInfoStack.layer.borderWidth = 5
-        userInfoStack.layer.borderColor = UIColor.red.cgColor
+        // userInfoStack.layer.borderWidth =
+        // userInfoStack.layer.borderColor = UIColor.black.cgColor
         view.addSubview(collectionView)
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
         
         userInfoStack.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
@@ -276,9 +272,13 @@ final class AppSettingViewController: UIViewController {
         }
         
         collectionView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
             make.top.equalTo(userInfoStack.snp.bottom)
-            make.leading.trailing.bottom.equalToSuperview()
         }
+        
+        userNameStack.layoutMargins = UIEdgeInsets(top: 50, left: 0, bottom: 50, right: 0)
     }
 }
 
