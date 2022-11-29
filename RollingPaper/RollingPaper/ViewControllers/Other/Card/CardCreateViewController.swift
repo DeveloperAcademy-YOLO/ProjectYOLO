@@ -488,7 +488,8 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
-            if let imageSticker = cell.myImage.image {
+            guard let cellSticker = cell.myImage.image else { return }
+            if let imageSticker = UIImage(named: self.arrStickers[indexPath.item]) {
                 if stickerCount > 14 {
                     print("sticker over")
                     let alert = UIAlertController(title: "잠깐! 스티커가 너무 많아요.", message: "스티커를 더 이상 추가 할 수 없습니다.", preferredStyle: .alert)
@@ -499,7 +500,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                 } else {
                     stickerCount += 1
                     
-                    let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
+                    let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: cellSticker.size.width, height: cellSticker.size.height), contentImage: imageSticker)
                     stickerView.center = someImageView.center
                     stickerView.stickerMinScale = 0.5
                     stickerView.stickerMaxScale = 3.0
