@@ -98,7 +98,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         default :
             break
         }
-        self.viewWillAppear(true)
     }
     
     private func navigateToFlow(paperId: String, route: PaperShareRoute) {

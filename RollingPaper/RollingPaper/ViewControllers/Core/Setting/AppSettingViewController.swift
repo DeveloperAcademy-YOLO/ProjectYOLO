@@ -13,6 +13,7 @@ import UIKit
 
 final class AppSettingViewController: UIViewController {
     private var viewModel = AppSettingViewModel()
+    private var cancellables = Set<AnyCancellable>()
     private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, AppSettingSectionModel>! = nil
     
     private let userPhoto: UIImageView = {
@@ -24,19 +25,64 @@ final class AppSettingViewController: UIViewController {
     private let userName: UILabel = {
         let name = UILabel()
         name.text = "Guest"
-        name.font = UIFont.preferredFont(forTextStyle: .title3)
+        name.font = UIFont.preferredFont(forTextStyle: .title1)
         name.sizeToFit()
         return name
+    }()
+    
+    private let userMail: UILabel = {
+        let userMail = UILabel()
+        userMail.text = "Guest@Email.com"
+        userMail.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        userMail.sizeToFit()
+        return userMail
+    }()
+    
+    private lazy var userNameStack: UIStackView = {
+        let userNameStack = UIStackView(arrangedSubviews: [userName, userMail])
+        userNameStack.axis = .vertical
+        userNameStack.alignment = .leading
+        userNameStack.distribution = .equalSpacing
+        userNameStack.spacing = 10
+        return userNameStack
+    }()
+    
+    private lazy var userNamePhotoStack: UIStackView = {
+        let userNamePhotoStack = UIStackView(arrangedSubviews: [userPhoto, userNameStack])
+        userNamePhotoStack.axis = .horizontal
+        userNamePhotoStack.alignment = .fill
+        userNamePhotoStack.distribution = .equalSpacing
+        userNamePhotoStack.spacing = 16
+        return userNamePhotoStack
     }()
     
     private let chevronButton: UIButton = {
         let chevronButton = UIButton(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         chevronButton.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        chevronButton.imageView?.contentMode = .scaleAspectFit
         return chevronButton
     }()
     
+    private lazy var userInfoStack: UIStackView = {
+        let userInfo = UIStackView(arrangedSubviews: [userNamePhotoStack, chevronButton])
+        userInfo.axis = .horizontal
+        userInfo.alignment = .center
+        userInfo.distribution = .equalSpacing
+        userInfo.spacing = 0
+        userInfo.setCustomSpacing(10, after: userName)
+        return userInfo
+    }()
+    
+    lazy var colorSelectAccessory = UICellAccessory.CustomViewConfiguration(
+        customView: colorSelectButton,
+        placement: .trailing(),
+        isHidden: false,
+        reservedLayoutWidth: .actual,
+        maintainsFixedSize: true
+    )
+    
     let colorSelectButton: UISegmentedControl = {
-        let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
+        let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "System"])
         colorSelectButton.backgroundColor = UIColor.systemGray4
         colorSelectButton.tintColor = UIColor.black
         return colorSelectButton
@@ -53,7 +99,30 @@ final class AppSettingViewController: UIViewController {
         bind()
         setupInitialConfig()
         configureDataSource()
-        setView()
+        setupView()
+        
+        switch traitCollection.userInterfaceStyle {
+        case .light, .unspecified:
+            colorSelectButton.selectedSegmentIndex = 0
+        case .dark:
+            colorSelectButton.selectedSegmentIndex = 1
+        }
+        colorSelectButton.addTarget(self, action: #selector(didChangeValue(segment: )), for: .valueChanged)
+    }
+    
+    @objc private func didChangeValue(segment: UISegmentedControl) {
+        if segment.selectedSegmentIndex == 0 {
+            view.window?.overrideUserInterfaceStyle = .light
+        } else if segment.selectedSegmentIndex == 1 {
+            view.window?.overrideUserInterfaceStyle = .dark
+        } else { // TODO: 수정필요
+            switch traitCollection.userInterfaceStyle {
+            case .light, .unspecified:
+                view.window?.overrideUserInterfaceStyle = .dark
+            case .dark:
+                view.window?.overrideUserInterfaceStyle = .light
+            }
+        }
     }
     
     private func setupInitialConfig() {
@@ -61,7 +130,33 @@ final class AppSettingViewController: UIViewController {
     }
     
     private func bind() {
-        // bind()
+        print("aaa sbind")
+        viewModel
+            .currentUserSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] userModel in
+                if let userModel = userModel {
+                    print("aaa bind")
+                    self?.userName.text = userModel.name
+                    self?.userMail.text = userModel.email
+                } else {
+                    print("aaa bind")
+                    self?.userName.text = "Guest"
+                    self?.userMail.text = "Your@Email.signin"
+                }
+            }
+            .store(in: &cancellables)
+        viewModel
+            .currentPhotoSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] image in
+                if let image = image {
+                    self?.userPhoto.image = image
+                } else {
+                    self?.userPhoto.image = UIImage(systemName: "person.fill")
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func setLayout() -> UICollectionViewLayout {
@@ -82,7 +177,7 @@ final class AppSettingViewController: UIViewController {
             
             switch indexPath {
             case [0, 0]:
-            cell.accessories = [.customView(configuration: self.colorSelectConfiguration())]
+                cell.accessories = [.customView(configuration: self.colorSelectAccessory)]
             case [0, 1]:
                 cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
             case [1, 0]:
@@ -121,17 +216,35 @@ final class AppSettingViewController: UIViewController {
     
     @objc private func toggleSwitch(sender: UISwitch) {
         if sender.isOn {
-            print("Expansion")
+            UIApplication.shared.registerForRemoteNotifications()
         } else {
-            print("Collapse")
+            UIApplication.shared.unregisterForRemoteNotifications()
         }
     }
     
-    private func setView() {
+    private func setupView() {
+        view.addSubview(userInfoStack)
+        userInfoStack.backgroundColor = .systemBackground
+        userInfoStack.layer.cornerRadius = 12
+        userInfoStack.layer.borderWidth = 5
+        userInfoStack.layer.borderColor = UIColor.red.cgColor
         view.addSubview(collectionView)
         
+        userInfoStack.snp.makeConstraints { make in
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.height.equalTo(150)
+            make.top.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        userPhoto.snp.makeConstraints { make in
+            make.height.equalTo(userInfoStack.snp.height).inset(10)
+            make.width.equalTo(userPhoto.snp.height)
+        }
+        
         collectionView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
+            make.top.equalTo(userInfoStack.snp.bottom)
+            make.leading.trailing.bottom.equalToSuperview()
         }
     }
 }
@@ -175,42 +288,14 @@ extension AppSettingViewController {
 }
 
 class SettingContentCell: UICollectionViewListCell {
-    
-}
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        
+        guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
+        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
+            state.isSelected || state.isHighlighted ? .systemBackground : .systemBackground
+        }
 
-class LocalPushContentView: UIView, UIContentView {
-    var configuration: UIContentConfiguration
-    
-    init(configuration: UIContentConfiguration) {
-        self.configuration = configuration
-        super.init(frame: .zero)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-class SelectedColorContentView: UIView, UIContentView {
-    var configuration: UIContentConfiguration
-    init(configuration: UIContentConfiguration) {
-        self.configuration = configuration
-        super.init(frame: .zero)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-class InformationContentView: UIView, UIContentView {
-    var configuration: UIContentConfiguration
-    init(configuration: UIContentConfiguration) {
-        self.configuration = configuration
-        super.init(frame: .zero)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        self.backgroundConfiguration = backgroundConfig
     }
 }

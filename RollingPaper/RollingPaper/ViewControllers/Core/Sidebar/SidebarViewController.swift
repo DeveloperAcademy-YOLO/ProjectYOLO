@@ -126,7 +126,7 @@ final class SidebarViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         setProfileView()
-        setCollectionView()
+        setupCollectionView()
     }
     
     private func setInitialConfig() {
@@ -212,7 +212,7 @@ final class SidebarViewController: UIViewController {
         }
     }
     
-    private func setCollectionView() {
+    private func setupCollectionView() {
         view.addSubview(collectionView)
         collectionView.delegate = self
         collectionView.backgroundColor = .clear
