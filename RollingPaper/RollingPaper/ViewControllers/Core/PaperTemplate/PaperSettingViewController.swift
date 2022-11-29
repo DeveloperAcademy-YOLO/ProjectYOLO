@@ -60,6 +60,15 @@ final class PaperSettingViewController: UIViewController {
         let timePicker = PaperTimePicker(viewModel: viewModel)
         return timePicker
     }()
+    private lazy var gradientView: UIView = {
+        let gradientView = UIView()
+        gradientView.setGradient(
+            color1: UIColor(cgColor: CGColor(gray: 0.0, alpha: 0.0)),
+            color2: UIColor(cgColor: CGColor(gray: 0.0, alpha: 0.2)),
+            bounds: CGRect(x: 0, y: 0, width: PaperSettingLength.thumbnailWidth, height: PaperSettingLength.thumbnailHeight)
+        )
+        return gradientView
+    }()
     // 템플릿 썸네일 이미지
     private lazy var thumbnail: UIImageView = {
         let thumbnail = UIImageView()
@@ -334,12 +343,16 @@ extension PaperSettingViewController {
         view.addSubview(limitTimeTitle)
         view.addSubview(timePickerButton)
         view.addSubview(warningLabelForTimer)
+        thumbnail.addSubview(gradientView)
         thumbnail.addSubview(thumbnailTitle)
         thumbnail.addSubview(thumbnailDescription)
         paperTitleTextField.addSubview(textFieldBorder)
     }
     
     private func setConstraints() {
+        gradientView.snp.makeConstraints({ make in
+            make.edges.equalToSuperview()
+        })
         thumbnail.snp.makeConstraints({ make in
             make.leading.equalToSuperview().offset(PaperSettingLength.thumbnailLeftMargin)
             make.top.equalTo(view.safeAreaLayoutGuide).offset(PaperSettingLength.topMargin)
