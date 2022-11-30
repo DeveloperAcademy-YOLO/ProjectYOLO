@@ -44,4 +44,3 @@ final class SidebarViewModel {
             .store(in: &cancellables)
     }
 }
-

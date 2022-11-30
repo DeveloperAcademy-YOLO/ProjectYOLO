@@ -13,6 +13,7 @@ extension Notification.Name {
     static let deeplink = Notification.Name("deeplink")
     static let viewInit = Notification.Name("viewInit")
     static let signUpDidSucceed = Notification.Name("signUpDidSucceed")
+    static let colortheme = Notification.Name("ColorTheme")
 }
 
 enum NotificationViewKey {
