@@ -42,6 +42,12 @@ final class FirestoreManager: DatabaseManager {
                 self?.loadPaperPreviews()
             }
             .store(in: &cancellables)
+        
+        paperSubject
+            .sink { [weak self] paper in
+                print("BBB 지금 서버에서 받아와서 페이퍼 모델로 갖고 있는 값입니다: \(paper)")
+            }
+            .store(in: &cancellables)
     }
     
     /// (1). 페이퍼 아이디를 통해 파이어베이스 내 저장된 페이퍼 탐색 및 페이퍼 퍼블리셔에 로드 (2). 페이퍼 아이디에 대한 페이퍼 데이터가 존재하지 않을 때 유저의 페이퍼 프리뷰 배열 업데이트
@@ -117,10 +123,13 @@ final class FirestoreManager: DatabaseManager {
     
     /// 현재 작성 중 페이퍼가 있을 때(페이퍼 데이터 퍼블리셔 값이 유효할 때): (1). 파이어베이스 내 페이퍼 데이터 변경 (2). 로컬 페이퍼 데이터 퍼블리셔의 데이터 변경
     func addCard(paperId: String, card: CardModel) {
+        print("BBB 페이퍼 카드 추가 함수 시작")
         guard var currentPaper = paperSubject.value else { return }
         currentPaper.cards.append(card)
         currentPaper.thumbnailURLString = currentPaper.cards.randomElement()?.contentURLString
+        print("BBB 페이퍼 카드 추가 함수 중간")
         guard let paperDict = getPaperDict(with: currentPaper) else { return }
+        print("BBB 페이퍼 카드 추가 함수 마지막")
         database
             .collection(FireStoreConstants.papersPath.rawValue)
             .document(paperId)

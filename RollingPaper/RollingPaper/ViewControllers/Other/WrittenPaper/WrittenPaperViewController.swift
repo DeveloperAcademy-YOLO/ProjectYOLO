@@ -147,6 +147,7 @@ final class WrittenPaperViewController: UIViewController {
         inputToVM.send(.fetchingPaper)
         spinnerConstraints()
         view.addSubview(spinner)
+//        cardsList.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -477,9 +478,10 @@ final class WrittenPaperViewController: UIViewController {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
         fromCardView = true
-        print("isLocalDB: \(isLocalDB)")
+        print("aaa moveToCardRootView: \(isLocalDB)")
+        print("aaa moveToCardRootView's server paperValue: \(FirestoreManager.shared.paperSubject.value)")
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(isLocalDB: isLocalDB), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
     
     private func moveToPaperStorageView() {

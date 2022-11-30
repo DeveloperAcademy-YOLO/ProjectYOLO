@@ -145,7 +145,18 @@ final class CardResultViewController: UIViewController {
     }
     
     private func bind() {
-        _ = viewModel.transform(input: input.eraseToAnyPublisher())
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        output
+            .sink { [weak self] result in
+                switch result {
+                case .popToWrittenPaper:
+                    print("aaa Result Card pop to wrriten paper")
+                    let viewControllers: [UIViewController] = self?.navigationController!.viewControllers as [UIViewController]
+                    self?.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
+                default: break
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func animationBounce() {
@@ -168,9 +179,6 @@ final class CardResultViewController: UIViewController {
         print("게시하기 pressed")
         print(isLocalDB)
         self.input.send(.resultSend(isLocalDB: isLocalDB))
-        
-        let viewControllers: [UIViewController] = self.navigationController!.viewControllers as [UIViewController]
-        self.navigationController?.popToViewController(viewControllers[viewControllers.count - 3 ], animated: true)
     }
 }
 

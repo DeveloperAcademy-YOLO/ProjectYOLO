@@ -16,7 +16,7 @@ class CardViewModel {
     private let output: PassthroughSubject<Output, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
     
-    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
+    init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared, isLocalDB: Bool) {
         self.localDatabaseManager = localDatabaseManager
         self.serverDatabaseManager = serverDatabaseManager
     }
@@ -34,6 +34,7 @@ class CardViewModel {
         case getRecentCardBackgroundImgFail
         case getRecentCardResultImgSuccess(result: UIImage?)
         case getRecentCardResultImgFail
+        case popToWrittenPaper
     }
     
     func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -87,8 +88,6 @@ class CardViewModel {
         var currentCardURL: String = ""
         var resultCardModel: CardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
         
-        print("currentCardURL 넣기 전 CardModel \(resultCardModel)")
-        print("resultCardModel.cardId\(resultCardModel.cardId)")
         if isLocalDB {
             LocalStorageManager.uploadData(dataId: resultCardModel.cardId, data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
@@ -106,12 +105,15 @@ class CardViewModel {
                    
                     if let currentPaper = self?.localDatabaseManager.paperSubject.value {
                         self?.localDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
+                        self?.output.send(.popToWrittenPaper)
                     }
                 }
                 .store(in: &cancellables)
             print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         } else {
-            FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
+            print("aaa Firestore manager create start")
+            var uploadSubscription: AnyCancellable?
+            uploadSubscription = FirebaseStorageManager.uploadData(dataId: "\(currentTime)", data: recentResultImg, contentType: .jpeg, pathRoot: .card)
                 .sink { completion in
                     switch completion {
                     case .finished: break
@@ -119,14 +121,22 @@ class CardViewModel {
                         print(error.localizedDescription)
                     }
                 } receiveValue: { [weak self] cardURL in
-                    guard let currentCardURL = cardURL?.absoluteString else { return }
-                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                  
-                    if let currentPaper = self?.serverDatabaseManager.paperSubject.value {
-                        self?.serverDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
+                    guard let self = self else {
+                        print("BBB 지금 self 때문에 리턴되고 있어요 ㅠ")
+                        return
                     }
+                    guard
+                        let currentCardURL = cardURL?.absoluteString else {
+                        print("BBB 지금 카드 생성할 때 리턴되고 있어요 ㅠ")
+                        return
+                    }
+                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                    if let paperId = self.serverDatabaseManager.paperSubject.value?.paperId {
+                        self.serverDatabaseManager.addCard(paperId: paperId, card: resultCardModel)
+                    }
+                    self.output.send(.popToWrittenPaper)
+                    uploadSubscription?.cancel()
                 }
-            print("currentCardURL 넣은후 CardModel \(resultCardModel)")
         }
     }
     

@@ -263,6 +263,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
                         self.someImageView.image = UIImage(named: "Rectangle")
                         print("getRecentCardResultImgFail")
                     })
+                case .popToWrittenPaper: break
                 }
             })
             .store(in: &cancellables)

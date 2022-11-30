@@ -60,6 +60,8 @@ final class FirebaseStorageManager {
                             print(error.localizedDescription)
                             promise(.failure(error))
                         } else {
+                            print("url: \(url)")
+                            print("Upload Data and get URLString Succeed")
                             promise(.success(url))
                         }
                     })

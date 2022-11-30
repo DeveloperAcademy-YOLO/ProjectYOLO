@@ -75,6 +75,7 @@ class WrittenPaperViewModel {
             .combineLatest(serverDatabaseManager.paperSubject)
             .sink { [weak self] localPaper, serverPaper in
                 if let serverPaper = serverPaper {
+                    print("aaa serverPaper changed: \(serverPaper.cards.count)")
                     self?.paperFrom = .fromServer
                     self?.currentPaperPublisher.send(serverPaper)
                     self?.downloadServerCards()
@@ -305,6 +306,7 @@ class WrittenPaperViewModel {
                         self?.localDatabaseManager.resetPaper()
                         serverPaper.linkUrl = url
                         self?.serverDatabaseManager.addPaper(paper: serverPaper)
+                        self?.serverDatabaseManager.fetchPaper(paperId: serverPaper.paperId)
                         self?.currentPaperPublisher.send(serverPaper)
                         self?.paperFrom = .fromServer
                         self?.output.send(.paperLinkMade(url: url))
