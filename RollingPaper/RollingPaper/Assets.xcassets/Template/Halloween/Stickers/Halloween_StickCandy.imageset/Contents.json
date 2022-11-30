@@ -2,7 +2,18 @@
   "images" : [
     {
       "filename" : "Halloween_StickCandy.png",
-      "idiom" : "universal"
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Halloween_StickCandy 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Halloween_StickCandy 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

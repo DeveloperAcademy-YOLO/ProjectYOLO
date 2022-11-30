@@ -2,7 +2,18 @@
   "images" : [
     {
       "filename" : "Beige_old_paper.png",
-      "idiom" : "universal"
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Beige_old_paper 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Beige_old_paper 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

@@ -113,15 +113,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return label
     }()
     
-    lazy var introWordingClearLabel: UILabel = {
-        let label = UILabel()
-        label.text = ""
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 30)
-        label.textColor = .lightGray
-        return label
-    }()
-    
     lazy var cameraOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
@@ -202,8 +193,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-        
-        introWordingAppear()
+        view.addSubview(introWordingLabel)
+        introWordingLabelConstraints()
         
         view.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
@@ -327,17 +318,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         backgroundOffButtonConstraints()
     }
     
-    private func introWordingAppear() {
-        view.addSubview(introWordingLabel)
-        introWordingLabelConstraints()
-    }
-    
-    private func introWordingClearAppear() {
-        introWordingLabel.isHidden = true
-        view.addSubview(introWordingClearLabel)
-        introWordingClearLabelConstraints()
-    }
-    
     private func dividerAppear() {
         view.addSubview(divider)
         dividerConstraints()
@@ -387,7 +367,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func setPopOverView(_ sender: UIButton) {
         self.backgroundOnButtonAppear()
-        self.introWordingClearAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -438,7 +417,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
         self.cameraOnButtonAppear()
-        self.introWordingClearAppear()
         
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -510,11 +488,10 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("Click Collection cell \(indexPath.item)")
         if let cell = collectionView.cellForItem(at: indexPath) as? StickerCollectionViewCell {
-            guard let cellSticker = cell.myImage.image else { return }
-            if let imageSticker = UIImage(named: self.arrStickers[indexPath.item]) {
+            if let imageSticker = cell.myImage.image {
                 if stickerCount > 14 {
                     print("sticker over")
-                    let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "잠깐! 스티커가 너무 많아요.", message: "스티커를 더 이상 추가 할 수 없습니다.", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
                         alert.dismiss(animated: true, completion: nil)
                     }))
@@ -522,7 +499,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                 } else {
                     stickerCount += 1
                     
-                    let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: cellSticker.size.width, height: cellSticker.size.height), contentImage: imageSticker)
+                    let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: imageSticker.size.width, height: imageSticker.size.height), contentImage: imageSticker)
                     stickerView.center = someImageView.center
                     stickerView.stickerMinScale = 0.5
                     stickerView.stickerMaxScale = 3.0
@@ -742,15 +719,6 @@ extension CardCreateViewController {
     
     private func introWordingLabelConstraints() {
         introWordingLabel.snp.makeConstraints({ make in
-            make.width.equalTo(500)
-            make.height.equalTo(50)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    private func introWordingClearLabelConstraints() {
-        introWordingClearLabel.snp.makeConstraints({ make in
             make.width.equalTo(500)
             make.height.equalTo(50)
             make.centerX.equalTo(self.view)
