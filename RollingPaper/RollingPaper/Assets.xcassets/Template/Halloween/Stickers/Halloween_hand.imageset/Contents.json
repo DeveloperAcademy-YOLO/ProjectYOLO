@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Halloween_hand.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

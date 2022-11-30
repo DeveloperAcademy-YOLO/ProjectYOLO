@@ -2,18 +2,7 @@
   "images" : [
     {
       "filename" : "Beige_gingerbread.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "Beige_gingerbread 1.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "Beige_gingerbread 2.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "idiom" : "universal"
     }
   ],
   "info" : {

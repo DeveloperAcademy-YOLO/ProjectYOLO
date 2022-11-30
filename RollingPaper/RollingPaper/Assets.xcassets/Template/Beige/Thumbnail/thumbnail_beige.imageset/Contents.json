@@ -1,19 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "thumbnail_beige.jpg",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "thumbnail_beige 1.jpg",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "thumbnail_beige 2.jpg",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "thumbnail_beige_detail.jpg",
+      "idiom" : "universal"
     }
   ],
   "info" : {
