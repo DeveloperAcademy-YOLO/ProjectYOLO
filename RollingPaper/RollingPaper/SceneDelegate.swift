@@ -15,6 +15,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
+        if let colorTheme = UserDefaults.standard.value(forKey: "colorTheme") as? String {
+            switch colorTheme {
+            case "light":
+                window.overrideUserInterfaceStyle = .light
+            case "dark":
+                window.overrideUserInterfaceStyle = .dark
+            default:
+                window.overrideUserInterfaceStyle = .unspecified
+            }
+        } else {
+            window.overrideUserInterfaceStyle = .unspecified
+            UserDefaults.standard.set("system", forKey: "colorTheme")
+        }
         let splitVC = SplitViewController(style: .doubleColumn)
         window.rootViewController = splitVC
         window.makeKeyAndVisible()
