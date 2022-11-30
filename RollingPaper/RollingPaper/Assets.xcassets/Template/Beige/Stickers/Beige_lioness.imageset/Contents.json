@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Beige_lioness.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
