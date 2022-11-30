@@ -26,25 +26,26 @@ final class PaperTemplateSelectViewModel {
     private func saveRecentTemplate(template: TemplateEnum) {
         var recentTemplates = getRecentTemplates()
         
+        if let index = recentTemplates.firstIndex(of: template) {
+            recentTemplates.remove(at: index)
+        }
+        
         switch recentTemplates.count {
         case 0:
             UserDefaults.standard.set(template.template.templateString, forKey: userDefaultsKey[2])
+            UserDefaults.standard.set("", forKey: userDefaultsKey[1])
+            UserDefaults.standard.set("", forKey: userDefaultsKey[0])
         case 1:
+            UserDefaults.standard.set(recentTemplates[0].template.templateString, forKey: userDefaultsKey[2])
             UserDefaults.standard.set(template.template.templateString, forKey: userDefaultsKey[1])
-        case 2:
+            UserDefaults.standard.set("", forKey: userDefaultsKey[0])
+        case 2, 3:
+            UserDefaults.standard.set(recentTemplates[1].template.templateString, forKey: userDefaultsKey[2])
+            UserDefaults.standard.set(recentTemplates[0].template.templateString, forKey: userDefaultsKey[1])
             UserDefaults.standard.set(template.template.templateString, forKey: userDefaultsKey[0])
-        case 3:
-            recentTemplates[2] = recentTemplates[1]
-            recentTemplates[1] = recentTemplates[0]
-            recentTemplates[0] = template
-            for (idx, recentTemplate) in recentTemplates.enumerated() {
-                UserDefaults.standard.set(recentTemplate.template.templateString, forKey: userDefaultsKey[idx])
-            }
         default:
             break
         }
-        
-        
     }
     
     // 최근 템플릿이 존재하는지 확인하고 가져오기
