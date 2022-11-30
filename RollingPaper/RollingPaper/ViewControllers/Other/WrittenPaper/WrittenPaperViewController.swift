@@ -110,8 +110,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var cardsList: UICollectionView = {
         let cardsListView = CardsInPaperViewController()
         cardsListView.viewModel = self.viewModel
-        cardsListView.callingVC = self
-        
+        cardsListView.callingVC = self        
         return cardsListView
     }()
     
@@ -194,15 +193,10 @@ final class WrittenPaperViewController: UIViewController {
                     self.moveToPaperStorageView()
                 case .paperTitleChanged:
                     self.titleLabel.text = self.viewModel.currentPaperPublisher.value?.title
-                case .paperLinkMade:
-                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
-                    if self.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
-                        self.presentShareSheet(self.paperLinkBtn)
-                    } else {
-                        self.presentSignUpModal(self.paperLinkBtn)
-                    }
-                case .giftLinkMade:
-                    self.presentShareSheet(self.giftLinkBtn)
+                case .paperLinkMade(let url):
+                    self.presentShareSheet(self.paperLinkBtn, url: url)
+                case .giftLinkMade(let url):
+                    self.presentShareSheet(self.giftLinkBtn, url: url)
                 case .fetchingSuccess:
                     guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
                     self.checkFetchingCorrectly(currentPaper)
@@ -236,9 +230,13 @@ final class WrittenPaperViewController: UIViewController {
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] paper in
-                if paper != nil {
+                print("aaa currentPaperPublisher has changed: \(paper)")
+                if let paper = paper {
                     self?.checkFetchingCorrectly(paper)
                     self?.bindTimer()
+                    self?.titleLabel.text = paper.title
+                    self?.timeLabel.setEndTime(time: paper.endTime)
+                    self?.cardsList.reloadData()
                 }
             })
             .store(in: &cancellables)
@@ -275,8 +273,13 @@ final class WrittenPaperViewController: UIViewController {
         paperLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.checkTimerBallon()
-                self?.inputToVM.send(.paperShareTapped)
+                guard let self = self else { return }
+                self.checkTimerBallon()
+                if self.viewModel.isSameCurrentUserAndCreator == true && self.viewModel.currentPaperPublisher.value?.creator != nil {
+                    self.inputToVM.send(.paperShareTapped)
+                } else {
+                    self.presentSignUpModal(self.paperLinkBtn)
+                }
             }
             .store(in: &cancellables)
         
@@ -459,11 +462,10 @@ final class WrittenPaperViewController: UIViewController {
         present(navVC, animated: true)
     }
     
-    private func presentShareSheet(_ sender: UIButton) {
-        guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
+    private func presentShareSheet(_ sender: UIButton, url: URL) {
         let applicationActivities: [UIActivity]? = nil
         let activityViewController = UIActivityViewController(
-            activityItems: [link] ,
+            activityItems: [url] ,
             applicationActivities: applicationActivities)
         
         let popover = activityViewController.popoverPresentationController

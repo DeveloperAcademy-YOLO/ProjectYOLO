@@ -93,6 +93,7 @@ class PaperStorageViewModel {
             .sink(receiveValue: { [weak self] paperPreviews in
                 guard let self = self else {return}
                 self.papersFromServer = paperPreviews
+                print("aaa pepaerFromsServer Count: \(self.papersFromServer.count)")
                 self.serverPaperIds.removeAll()
                 for paper in self.papersFromServer {
                     self.serverPaperIds.insert(paper.paperId)
@@ -152,7 +153,13 @@ class PaperStorageViewModel {
     private func downloadLocalThumbnails(outputValue: Output) {
         var downloadCount = 0
         for paper in papersFromLocal {
-            if thumbnails[paper.paperId] != nil { continue }
+            if thumbnails[paper.paperId] != nil {
+                downloadCount += 1
+                if downloadCount == papersFromLocal.count {
+                    self.output.send(outputValue)
+                }
+                continue
+            }
             if let thumbnailURLString = paper.thumbnailURLString {
                 if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
                     // 진입 경로1 - 캐시 데이터를 통한 다운로드
@@ -211,12 +218,21 @@ class PaperStorageViewModel {
     private func downloadServerThumbnails(outputValue: Output) {
         var downloadCount = 0
         for paper in papersFromServer {
-            if thumbnails[paper.paperId] != nil { continue }
+            if thumbnails[paper.paperId] != nil {
+                downloadCount += 1
+                if downloadCount == papersFromServer.count {
+                    self.output.send(outputValue)
+                }
+                continue
+            }
             if let thumbnailURLString = paper.thumbnailURLString {
                 if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
+                    
                     // 진입 경로1 - 캐시 데이터를 통한 다운로드
                     thumbnails[paper.paperId] = cachedImage
                     downloadCount += 1
+                    print("aaa 1번 경로")
+                    print("aaa downloadCOunt: \(downloadCount)")
                     // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                     if downloadCount == papersFromServer.count {
                         self.output.send(outputValue)
@@ -229,7 +245,10 @@ class PaperStorageViewModel {
                             // 진입 경로2 - 캐시 데이터를 통한 다운로드
                             case .failure(let error):
                                 print(error)
+                                
                                 downloadCount += 1
+                                print("aaa 2번 경로")
+                                print("aaa downloadCOunt: \(downloadCount)")
                                 // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                                 if downloadCount == self.papersFromServer.count {
                                     self.output.send(outputValue)
@@ -244,7 +263,10 @@ class PaperStorageViewModel {
                                 self.thumbnails[paper.paperId] = image
                                 NSCacheManager.shared.setImage(image: image, name: thumbnailURLString)
                             }
+                            
                             downloadCount += 1
+                            print("aaa 3번 경로")
+                            print("aaa downloadCOunt: \(downloadCount)")
                             // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                             if downloadCount == self.papersFromServer.count {
                                 self.output.send(outputValue)
@@ -254,7 +276,10 @@ class PaperStorageViewModel {
                 }
             } else {
                 // 진입 경로3 - 썸네일 주소가 nil 일때 아무것도 안함
+                
                 downloadCount += 1
+                print("aaa 4번 경로")
+                print("aaa downloadCOunt: \(downloadCount)")
                 // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
                 if downloadCount == papersFromServer.count {
                     self.output.send(outputValue)
