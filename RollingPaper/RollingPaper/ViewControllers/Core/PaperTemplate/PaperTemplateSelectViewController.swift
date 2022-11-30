@@ -14,10 +14,14 @@ class PaperTemplateSelectViewController: UIViewController {
     private let viewModel = PaperTemplateSelectViewModel()
     private let input: PassthroughSubject<PaperTemplateSelectViewModel.Input, Never> = .init()
     private var cancellables = Set<AnyCancellable>()
-    private var recentTemplate: TemplateEnum?
     private var isLoading: Bool = true
+    private var recentTemplates = [TemplateEnum]()
     private var isRecentExist: Bool {
-        return recentTemplate == nil ? false : true
+        return recentTemplates.count == 0 ? false : true
+    }
+    
+    enum RecentExistState {
+        case none, one, two, all
     }
     
     // 데이터 로딩시 보여줄 스피너
@@ -75,11 +79,12 @@ class PaperTemplateSelectViewController: UIViewController {
                 guard let self = self else {return}
                 switch event {
                 // 최근 템플릿 설정하기
-                case .getRecentTemplateSuccess(let template):
-                    self.recentTemplate = template
+                case .getRecentTemplateSuccess(let templates):
+                    self.recentTemplates = templates
                 case .getRecentTemplateFail:
-                    self.recentTemplate = nil
+                    self.recentTemplates = []
                 }
+                
                 self.templateCollectionView.reloadData()
                 if !self.isLoading {
                     self.updateLoadingView()
@@ -159,7 +164,7 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
     }
     // 섹션별 셀 개수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return isRecentExist && section == 0 ? 1 : viewModel.getTemplates().count
+        return isRecentExist && section == 0 ? recentTemplates.count : viewModel.getTemplates().count
     }
     // 섹션의 개수
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -169,8 +174,7 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperTemplateCollectionCell.identifier, for: indexPath) as? PaperTemplateCollectionCell else {return UICollectionViewCell()}
         if isRecentExist && indexPath.section == 0 {
-            guard let recentTemplate = recentTemplate?.template else {return UICollectionViewCell()}
-            cell.setCell(template: recentTemplate)
+            cell.setCell(template: recentTemplates[indexPath.item].template)
         } else {
             cell.setCell(template: viewModel.getTemplates()[indexPath.item].template)
         }
@@ -195,9 +199,8 @@ extension PaperTemplateSelectViewController: UICollectionViewDelegate, UICollect
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         // 템플릿을 터치하는 순간 최근 템플릿으로 설정하기 위해 input에 값 설정하기
         if isRecentExist && indexPath.section == 0 {
-            guard let recentTemplate = recentTemplate else {return false}
-            navigationController?.pushViewController(PaperSettingViewController(template: recentTemplate), animated: true) {
-                self.input.send(.newTemplateTap(template: recentTemplate))
+            navigationController?.pushViewController(PaperSettingViewController(template: recentTemplates[indexPath.item]), animated: true) {
+                self.input.send(.newTemplateTap(template: self.recentTemplates[indexPath.item]))
             }
         } else {
             let selectedTemplate = viewModel.getTemplates()[indexPath.item]
