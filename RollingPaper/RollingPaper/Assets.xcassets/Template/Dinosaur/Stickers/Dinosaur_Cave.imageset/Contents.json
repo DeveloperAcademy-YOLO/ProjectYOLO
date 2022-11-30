@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Dinosaur_Cave.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

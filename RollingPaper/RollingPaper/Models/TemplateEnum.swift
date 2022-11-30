@@ -17,6 +17,7 @@ enum TemplateEnum: String, CaseIterable {
     case nature
     case retro
     case bear
+    case dinosaur
     
     var template: TemplateModel {
         switch self {
@@ -38,6 +39,8 @@ enum TemplateEnum: String, CaseIterable {
             return TemplateModel(templateString: "retro", templateTitle: "레트로", templateDescription: "레트로 감성을 느껴보세요.", colorHexes: [], stickerNames: ["Retro_Retro1", "Retro_Retro2", "Retro_Retro3", "Retro_Retro4", "Retro_Retro5", "Retro_Retro6", "Retro_Retro7", "Retro_Retro8", "Retro_Retro9", "Retro_Retro10", "Retro_Retro11"], backgroundImageNames: ["Pattern_Retro1", "Pattern_Retro2", "Pattern_Retro3", "Pattern_Retro4"])
         case .bear:
             return TemplateModel(templateString: "bear", templateTitle: "곰돌이", templateDescription: "앙증맞는 곰돌이 스티커가 들어있어요.", colorHexes: [], stickerNames: ["Bear_Sticker12", "Bear_Sticker11", "Bear_Sticker10", "Bear_Sticker4", "Bear_Sticker5", "Bear_Sticker6", "Bear_Sticker7", "Bear_Sticker8", "Bear_Sticker9", "Bear_Sticker3", "Bear_Sticker2", "Bear_Sticker1"], backgroundImageNames: ["Rectangle_white", "Pattern_bear1", "Pattern_bear2", "Pattern_bear3"])
+        case .dinosaur:
+            return TemplateModel(templateString: "dinosaur", templateTitle: "공룡", templateDescription: "쥐라기시대의 웅장함을 느껴보세요!", colorHexes: [], stickerNames: ["Dinosaur_Bird", "Dinosaur_Bird2", "Dinosaur_Cave", "Dinosaur_Dinosaur1", "Dinosaur_Dinosaur2", "Dinosaur_Dinosaur3", "Dinosaur_Dinosaur4", "Dinosaur_Dinosaur5", "Dinosaur_Dinosaur6", "Dinosaur_Dinosaur7", "Dinosaur_Dinosaur8", "Dinosaur_Dinosaur9", "Dinosaur_Dinosaur10", "Dinosaur_Dinosaur11", "Dinosaur_Mastodon", "Dinosaur_Person"], backgroundImageNames: ["Pattern_Dinosaur1", "Pattern_Dinosaur2", "Pattern_Dinosaur3", "Pattern_Dinosaur4"])
         }
     }
 }
