@@ -34,7 +34,7 @@ enum TemplateEnum: String, CaseIterable {
         case .retro:
             return TemplateModel(templateString: "retro", templateTitle: "레트로", templateDescription: "레트로 감성을 느껴보세요.", colorHexes: [], stickerNames: ["Retro_Retro1", "Retro_Retro2", "Retro_Retro3", "Retro_Retro4", "Retro_Retro5", "Retro_Retro6", "Retro_Retro7", "Retro_Retro8", "Retro_Retro9", "Retro_Retro10", "Retro_Retro11"], backgroundImageNames: ["Pattern_Retro1", "Pattern_Retro2", "Pattern_Retro3", "Pattern_Retro4"])
         case .bear:
-            return TemplateModel(templateString: "bear", templateTitle: "곰돌이", templateDescription: "앙증맞는 곰돌이 스티커가 들어있어요.", colorHexes: [], stickerNames: ["Bear_Sticker12", "Bear_Sticker11", "Bear_Sticker10", "Bear_Sticker4", "Bear_Sticker5", "Bear_Sticker6", "Bear_Sticker7", "Bear_Sticker8", "Bear_Sticker9", "Bear_Sticker3", "Bear_Sticker2", "Bear_Sticker1"], backgroundImageNames: ["Rectangle_white", "Pattern_bear1", "Pattern_Retro3", "Pattern_Retro4"])
+            return TemplateModel(templateString: "bear", templateTitle: "곰돌이", templateDescription: "앙증맞는 곰돌이 스티커가 들어있어요.", colorHexes: [], stickerNames: ["Bear_Sticker12", "Bear_Sticker11", "Bear_Sticker10", "Bear_Sticker4", "Bear_Sticker5", "Bear_Sticker6", "Bear_Sticker7", "Bear_Sticker8", "Bear_Sticker9", "Bear_Sticker3", "Bear_Sticker2", "Bear_Sticker1"], backgroundImageNames: ["Rectangle_white", "Pattern_bear1", "Pattern_bear2", "Pattern_bear3"])
         }
     }
 }
