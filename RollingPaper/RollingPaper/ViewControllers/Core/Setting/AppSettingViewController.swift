@@ -12,13 +12,10 @@ import SnapKit
 import UIKit
 
 final class AppSettingViewController: UIViewController, UICollectionViewDelegate {
+    
     private var viewModel = AppSettingViewModel()
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>! = nil
-    
-    @objc private func tapUserProfile() {
-        navigationController?.pushViewController(SettingScreenViewController(), animated: true)
-    }
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
@@ -84,6 +81,12 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
         maintainsFixedSize: true
     )
     
+    lazy var toggleAccessory = UICellAccessory.CustomViewConfiguration(
+        customView: toggleSwitch,
+        placement: .trailing(),
+        isHidden: false
+    )
+    
     let colorSelectButton: UISegmentedControl = {
         let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "System"])
         colorSelectButton.backgroundColor = UIColor.systemGray4
@@ -91,8 +94,15 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
         return colorSelectButton
     }()
     
+    lazy var toggleSwitch: UISwitch = {
+        let toggleSwitch = UISwitch(frame: .zero)
+        toggleSwitch.isOn = false
+        toggleSwitch.addTarget(self, action: #selector(toggleSwitch(sender: )), for: .valueChanged)
+        return toggleSwitch
+    }()
+    
     lazy var collectionView: UICollectionView = {
-        var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setLayout())
+        var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setupCollectionViewLayout())
         collectionView.isScrollEnabled = false
         return collectionView
     }()
@@ -100,39 +110,10 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        setupInitialConfig()
+        setupViewInitialSetting()
         configureDataSource()
         setupView()
-        
-        switch traitCollection.userInterfaceStyle {
-        case .light, .unspecified:
-            colorSelectButton.selectedSegmentIndex = 0
-        case .dark:
-            colorSelectButton.selectedSegmentIndex = 1
-        }
-        
-        colorSelectButton.addTarget(self, action: #selector(didChangeValue(segment: )), for: .valueChanged)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
-        userInfoStack.addGestureRecognizer(tap)
-    }
-    
-    @objc private func didChangeValue(segment: UISegmentedControl) {
-        if segment.selectedSegmentIndex == 0 {
-            view.window?.overrideUserInterfaceStyle = .light
-        } else if segment.selectedSegmentIndex == 1 {
-            view.window?.overrideUserInterfaceStyle = .dark
-        } else { // TODO: 수정필요
-            switch traitCollection.userInterfaceStyle {
-            case .light, .unspecified:
-                view.window?.overrideUserInterfaceStyle = .dark
-            case .dark:
-                view.window?.overrideUserInterfaceStyle = .light
-            }
-        }
-    }
-    
-    private func setupInitialConfig() {
-        view.backgroundColor = .systemGray6
+        setupGestures()
     }
     
     private func bind() {
@@ -141,11 +122,9 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userModel in
                 if let userModel = userModel {
-                    print("aaa bind")
                     self?.userName.text = userModel.name
                     self?.userMail.text = userModel.email
                 } else {
-                    print("aaa bind")
                     self?.userName.text = "Guest"
                     self?.userMail.text = "Your@Email.signin"
                 }
@@ -164,89 +143,23 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
             .store(in: &cancellables)
     }
     
-    private func setLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
-            var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-            config.headerMode = .none
-            return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
+    private func setupViewInitialSetting() {
+        view.backgroundColor = .systemGray6
+        
+        switch traitCollection.userInterfaceStyle {
+        case .light, .unspecified:
+            colorSelectButton.selectedSegmentIndex = 0
+        case .dark:
+            colorSelectButton.selectedSegmentIndex = 1
+        @unknown default:
+            fatalError("Color Theme Change Error!")
         }
-        return layout
     }
     
-    private func configureDataSource() {
-        
-        let cellRegistration = UICollectionView.CellRegistration<SettingContentCell, AppSettingSectionModel> { (cell, indexPath, item) in
-            var content = cell.defaultContentConfiguration()
-            var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
-            headerDisclosureOption.tintColor = .black
-            
-            switch indexPath {
-            case [0, 0]:
-                cell.accessories = [.customView(configuration: self.colorSelectAccessory)]
-            case [0, 1]:
-                cell.accessories = [.customView(configuration: self.toggleSwitchConfiguration())]
-            case [1, 0]:
-                let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
-                cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
-            default:
-                break
-            }
-            content.text = item.title
-            cell.contentConfiguration = content
-            
-        }
-        
-        let subCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionSubCellModel> {
-            (cell, indexPath, subCellItem) in
-            var content = cell.defaultContentConfiguration()
-            content.image = subCellItem.icon
-            content.text = subCellItem.title
-            cell.accessories = indexPath == [1, 1] ? [.label(text: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "_") ] : []
-            cell.contentConfiguration = content
-        }
-
-        dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: ListItem) -> UICollectionViewCell? in
-            
-            switch item {
-            case .header(let headerItem):
-                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: headerItem)
-            case .subCell(let subCellItem):
-                return collectionView.dequeueConfiguredReusableCell(using: subCellRegistration, for: indexPath, item: subCellItem)
-            }
-        }
-
-        let sections: [AppSettingViewModel.Section] = [.section1, .section2]
-        
-        var snapshot = NSDiffableDataSourceSnapshot<AppSettingViewModel.Section, ListItem>()
-        snapshot.appendSections(sections)
-        dataSource.apply(snapshot)
-        
-        applySnapshot(sectionData: viewModel.sectionData1, section: .section1)
-        applySnapshot(sectionData: viewModel.sectionData2, section: .section2)
-    }
-    
-    private func applySnapshot(sectionData: [AppSettingSectionModel], section: AppSettingViewModel.Section) {
-        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
-        
-        for headerItem in sectionData {
-
-            let headerListItem = ListItem.header(headerItem)
-            sectionSnapshot.append([headerListItem])
-            
-            let subCellListItemArray = headerItem.subCells?.map { ListItem.subCell($0) }
-            if let subCellListItemArray = subCellListItemArray {
-                sectionSnapshot.append(subCellListItemArray, to: headerListItem)
-            }
-        }
-        dataSource.apply(sectionSnapshot, to: section, animatingDifferences: true)
-    }
-    
-    @objc private func toggleSwitch(sender: UISwitch) {
-        if sender.isOn {
-            UIApplication.shared.registerForRemoteNotifications()
-        } else {
-            UIApplication.shared.unregisterForRemoteNotifications()
-        }
+    private func setupGestures() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapUserProfile))
+        userInfoStack.addGestureRecognizer(tap)
+        colorSelectButton.addTarget(self, action: #selector(didChangeValue(segment: )), for: .valueChanged)
     }
     
     private func setupView() {
@@ -282,53 +195,109 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     }
 }
 
-extension AppSettingViewController {
-    private func toggleSwitchConfiguration() -> UICellAccessory.CustomViewConfiguration {
-        lazy var toggleSwitch: UISwitch = {
-            let toggleSwitch = UISwitch(frame: .zero)
-            toggleSwitch.isOn = false
-            toggleSwitch.addTarget(self, action: #selector(toggleSwitch(sender: )), for: .valueChanged)
-            return toggleSwitch
-        }()
-        
-        lazy var toggleAccessory = UICellAccessory.CustomViewConfiguration(
-            customView: toggleSwitch,
-            placement: .trailing(),
-            isHidden: false
-        )
-        
-        return toggleAccessory
+extension AppSettingViewController { // CollectionView
+    
+    private func setupCollectionViewLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
+            var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            config.headerMode = .none
+            return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
+        }
+        return layout
     }
     
-    private func colorSelectConfiguration() -> UICellAccessory.CustomViewConfiguration {
-        let colorSelectButton: UISegmentedControl = {
-            let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "Custom"])
-            colorSelectButton.backgroundColor = UIColor.systemGray4
-            colorSelectButton.tintColor = UIColor.black
-            return colorSelectButton
-        }()
+    private func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionModel> { (cell, indexPath, item) in
+            var content = cell.defaultContentConfiguration()
+            var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+            headerDisclosureOption.tintColor = .black
+            
+            switch indexPath {
+            case [0, 0]:
+                cell.accessories = [.customView(configuration: self.colorSelectAccessory)]
+            case [0, 1]:
+                cell.accessories = [.customView(configuration: self.toggleAccessory)]
+            case [1, 0]:
+                let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
+                cell.accessories = [.outlineDisclosure(options: headerDisclosureOption)]
+            default:
+                break
+            }
+            content.text = item.title
+            cell.contentConfiguration = content
+        }
         
-        lazy var colorSelectAccessory = UICellAccessory.CustomViewConfiguration(
-            customView: colorSelectButton,
-            placement: .trailing(),
-            isHidden: false,
-            reservedLayoutWidth: .actual,
-            maintainsFixedSize: true
-        )
+        let subCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionSubCellModel> {
+            (cell, indexPath, subCellItem) in
+            var content = cell.defaultContentConfiguration()
+            content.image = subCellItem.icon
+            content.text = subCellItem.title
+            cell.accessories = indexPath == [1, 1] ? [.label(text: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "_") ] : []
+            cell.contentConfiguration = content
+        }
+
+        dataSource = UICollectionViewDiffableDataSource<AppSettingViewModel.Section, ListItem>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, item: ListItem) -> UICollectionViewCell? in
+            
+            switch item {
+            case .header(let headerItem):
+                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: headerItem)
+            case .subCell(let subCellItem):
+                return collectionView.dequeueConfiguredReusableCell(using: subCellRegistration, for: indexPath, item: subCellItem)
+            }
+        }
+
+        let sections: [AppSettingViewModel.Section] = [.section1, .section2]
         
-        return colorSelectAccessory
+        var snapshot = NSDiffableDataSourceSnapshot<AppSettingViewModel.Section, ListItem>()
+        snapshot.appendSections(sections)
+        dataSource.apply(snapshot)
+        applySnapshot(sectionData: viewModel.sectionData1, section: .section1)
+        applySnapshot(sectionData: viewModel.sectionData2, section: .section2)
+    }
+    
+    private func applySnapshot(sectionData: [AppSettingSectionModel], section: AppSettingViewModel.Section) {
+        var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
+        
+        for headerItem in sectionData {
+
+            let headerListItem = ListItem.header(headerItem)
+            sectionSnapshot.append([headerListItem])
+            
+            let subCellListItemArray = headerItem.subCells?.map { ListItem.subCell($0) }
+            if let subCellListItemArray = subCellListItemArray {
+                sectionSnapshot.append(subCellListItemArray, to: headerListItem)
+            }
+        }
+        dataSource.apply(sectionSnapshot, to: section, animatingDifferences: true)
     }
 }
 
-class SettingContentCell: UICollectionViewListCell {
-    override func updateConfiguration(using state: UICellConfigurationState) {
-        super.updateConfiguration(using: state)
-        
-        guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
-        backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
-            state.isSelected || state.isHighlighted ? .systemBackground : .systemBackground
-        }
+extension AppSettingViewController { // ListCellAccessory
+    
+    @objc private func tapUserProfile() {
+        navigationController?.pushViewController(SettingScreenViewController(), animated: true)
+    }
 
-        self.backgroundConfiguration = backgroundConfig
+    @objc private func toggleSwitch(sender: UISwitch) {
+        if sender.isOn {
+            UIApplication.shared.registerForRemoteNotifications()
+        } else {
+            UIApplication.shared.unregisterForRemoteNotifications()
+        }
+    }
+    
+    @objc private func didChangeValue(segment: UISegmentedControl) {
+        if segment.selectedSegmentIndex == 0 {
+            view.window?.overrideUserInterfaceStyle = .light
+        } else if segment.selectedSegmentIndex == 1 {
+            view.window?.overrideUserInterfaceStyle = .dark
+        } else { // TODO: 수정필요
+            switch traitCollection.userInterfaceStyle {
+            case .light, .unspecified:
+                view.window?.overrideUserInterfaceStyle = .dark
+            case .dark:
+                view.window?.overrideUserInterfaceStyle = .light
+            }
+        }
     }
 }
