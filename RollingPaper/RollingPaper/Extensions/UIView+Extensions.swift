@@ -14,4 +14,11 @@ extension UIView {
             addSubview(view)
         }
     }
+    
+    func setGradient(color1: UIColor, color2: UIColor, bounds: CGRect) {
+        let gradient: CAGradientLayer = CAGradientLayer()
+        gradient.colors = [color1.cgColor, color2.cgColor]
+        gradient.frame = bounds
+        layer.addSublayer(gradient)
+    }
 }
