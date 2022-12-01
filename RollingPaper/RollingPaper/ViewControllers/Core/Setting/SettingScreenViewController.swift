@@ -5,11 +5,10 @@
 //  Created by 임 용관 on 2022/10/12.
 //
 
-import AVFoundation
 import Combine
 import CombineCocoa
 import Foundation
-import Photos
+import PhotosUI
 import SnapKit
 import UIKit
 
@@ -172,9 +171,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         editPhotoButton
             .tapPublisher
             .sink { [weak self] in
-//                self?.checkAlbumPermission {
-                    DispatchQueue.main.async {self?.presentImagePicker(withType: .photoLibrary)}
-//                }
+                DispatchQueue.main.async {self?.addLibraryImage()}
             }
             .store(in: &cancellables)
         
@@ -226,41 +223,6 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
             }
             .store(in: &cancellables)
     }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        self.dismiss(animated: true) {
-            if let image = info[.editedImage] as? UIImage {
-                self.profileImage.image = image
-            } else if let image = info[.originalImage] as? UIImage {
-                self.countChange = true
-                self.profileImage.image = image
-            }
-        }
-    }
-    
-    private func presentImagePicker(withType type: UIImagePickerController.SourceType) {
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        pickerController.sourceType = type
-        present(pickerController, animated: true)
-    }
-    
-//    private func checkAlbumPermission(completion: @escaping() -> Void) {
-//        PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
-//            switch status {
-//            case .limited:
-//                completion()
-//            case .authorized:
-//                completion()
-//            case .denied:
-//                print("Album: 권한 거부")
-//            case .restricted, .notDetermined:
-//                print("Album: 선택하지 않음")
-//            default:
-//                break
-//            }
-//        }
-//    }
     
     @objc private func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
         let alert = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
@@ -375,22 +337,44 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
     }
 }
 
+extension SettingScreenViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        let itemProvider = results.first?.itemProvider
+        if let itemProvider = itemProvider,
+           
+            itemProvider.canLoadObject(ofClass: UIImage.self) {
+            itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
+                DispatchQueue.main.sync {
+                    self.profileImage.image = image as? UIImage
+                }
+            }
+        }
+    }
+    private func addLibraryImage() {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 1
+        configuration.filter = .images
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        self.present(picker, animated: true, completion: nil)
+    }
+}
+
 // extension for SnapKit
 extension SettingScreenViewController {
     private func setupLayout() {
         view.backgroundColor = .systemBackground
         
         profileImage.addSubview(visualEffectView)
-        profileImage.addSubview(editPhotoButton)        
-        view.addSubviews([profileImage, profileText, profileLabel, divideView, logoutButton, resignButton, editButton])        
-        profileImage.addSubview(spinner)
+        profileImage.addSubview(editPhotoButton)
+        view.addSubviews([profileImage, profileText, profileLabel, divideView, logoutButton, resignButton, editButton])
+//        profileImage.addSubview(spinner)
 
         let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(didBackgroundTap))
         view.addGestureRecognizer(backgroundTap)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "편집", style: .done, target: self, action: #selector(didEditButton))
-        
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "", style: .done, target: self, action: #selector(didCancelButton))
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         
@@ -403,9 +387,9 @@ extension SettingScreenViewController {
             make.width.equalTo(180)
         })
 
-        spinner.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
+//        spinner.snp.makeConstraints { make in
+//            make.center.equalToSuperview()
+//        }
 
         editPhotoButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
