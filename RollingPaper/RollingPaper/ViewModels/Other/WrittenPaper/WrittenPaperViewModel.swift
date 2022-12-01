@@ -16,13 +16,13 @@ class WrittenPaperViewModel {
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     private let output: PassthroughSubject<Output, Never> = .init()
+    private var images = [String: UIImage]()
     var currentUser: UserModel?
     
     let currentPaperPublisher: CurrentValueSubject<PaperModel?, Never> = .init(nil)
     var paperFrom: DataSource?
     private var paperID: String = ""
     
-    var isTitleChanged: Bool = false
     var isPaperLinkMade: Bool = false
     var isSameCurrentUserAndCreator: Bool = false
     
@@ -50,8 +50,8 @@ class WrittenPaperViewModel {
         case paperStopped
         case paperDeleted
         case paperTitleChanged
-        case paperLinkMade
-        case giftLinkMade
+        case paperLinkMade(url: URL)
+        case giftLinkMade(url: URL)
         case fetchingSuccess
     }
     
@@ -71,33 +71,128 @@ class WrittenPaperViewModel {
     }
     
     private func setCurrentPaper() {
-        self.localDatabaseManager.paperSubject
-            .sink(receiveValue: { [weak self] paper in
-                if let paper = paper {
-                    self?.paperID = paper.paperId
+        localDatabaseManager.paperSubject
+            .combineLatest(serverDatabaseManager.paperSubject)
+            .sink { [weak self] localPaper, serverPaper in
+                if let serverPaper = serverPaper {
+                    print("aaa serverPaper changed: \(serverPaper.cards.count)")
+                    self?.paperFrom = .fromServer
+                    self?.currentPaperPublisher.send(serverPaper)
+                    self?.downloadServerCards()
+                } else if let localPaper = localPaper {
                     self?.paperFrom = .fromLocal
-                    self?.currentPaperPublisher.send(paper)
+                    self?.currentPaperPublisher.send(localPaper)
+                    self?.downloadLocalCards()
+                } else {
+                    self?.images.removeAll()
+                    self?.currentPaperPublisher.send(nil)
                 }
-                else {
-                    print("로컬 비었음")
-                }
-            })
+
+            }
             .store(in: &cancellables)
-        if self.localDatabaseManager.paperSubject.value == nil {
-            self.serverDatabaseManager.paperSubject
-                .sink(receiveValue: { [weak self] paper in
-                    if let paper = paper {
-                        self?.paperID = paper.paperId
-                        self?.paperFrom = .fromServer
-                        self?.currentPaperPublisher.send(paper)
-                    } else {
-                        print("서버 비었음")
-                    }
-                })
-                .store(in: &cancellables)
-        }
-        self.output.send(.fetchingSuccess)
     }
+        
+    // url을 통해 로컬에 저장되어있는 썸네일 다운받아오기
+    private func downloadLocalCards() {
+        var downloadCount = 0
+        guard let paper = currentPaperPublisher.value else { return }
+        for card in paper.cards {
+            let urlString = card.contentURLString
+            if images[urlString] != nil {
+                continue
+            }
+            
+            if let cachedImage = NSCacheManager.shared.getImage(name: urlString) {
+                    // 진입 경로1 - 캐시 데이터를 통한 다운로드
+                images[card.cardId] = cachedImage
+                downloadCount += 1
+                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                if downloadCount == paper.cards.count {
+                    // 완료 신호
+                }
+            } else {
+                LocalStorageManager.downloadData(urlString: urlString)
+                    .receive(on: DispatchQueue.global(qos: .background))
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            print(error)
+                            downloadCount += 1
+                            // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                            if downloadCount == paper.cards.count {
+                                // 완료 신호
+                            }
+                        case .finished: break
+                        }
+                    }, receiveValue: { [weak self] data in
+                        guard let self = self else {return}
+                        if let data = data,
+                           let image = UIImage(data: data) {
+                            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+                            self.images[card.cardId] = image
+                            NSCacheManager.shared.setImage(image: image, name: urlString)
+                        }
+                        downloadCount += 1
+                        // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                        if downloadCount == paper.cards.count {
+                            // 완료 신호
+                        }
+                    })
+                    .store(in: &cancellables)
+            }
+        }
+    }
+    
+    private func downloadServerCards() {
+        var downloadCount = 0
+        guard let paper = currentPaperPublisher.value else { return }
+        for card in paper.cards {
+            let urlString = card.contentURLString
+            if images[urlString] != nil {
+                continue
+            }
+            
+            if let cachedImage = NSCacheManager.shared.getImage(name: urlString) {
+                    // 진입 경로1 - 캐시 데이터를 통한 다운로드
+                images[card.cardId] = cachedImage
+                downloadCount += 1
+                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                if downloadCount == paper.cards.count {
+                    // 완료 신호
+                }
+            } else {
+                FirebaseStorageManager.downloadData(urlString: urlString)
+                    .receive(on: DispatchQueue.global(qos: .background))
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            print(error)
+                            downloadCount += 1
+                            // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                            if downloadCount == paper.cards.count {
+                                // 완료 신호
+                            }
+                        case .finished: break
+                        }
+                    }, receiveValue: { [weak self] data in
+                        guard let self = self else {return}
+                        if let data = data,
+                           let image = UIImage(data: data) {
+                            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+                            self.images[card.cardId] = image
+                            NSCacheManager.shared.setImage(image: image, name: urlString)
+                        }
+                        downloadCount += 1
+                        // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
+                        if downloadCount == paper.cards.count {
+                            // 완료 신호
+                        }
+                    })
+                    .store(in: &cancellables)
+            }
+        }
+    }
+    
     
     func transform(inputFromVC: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         inputFromVC
@@ -142,9 +237,8 @@ class WrittenPaperViewModel {
     }
 
     private func changePaperTitle(input: String, from paperFrom: DataSource) {
-        currentPaperPublisher.value?.title = input
-        isTitleChanged = true
-        guard let paper = currentPaperPublisher.value else { return }
+        guard var paper = currentPaperPublisher.value else { return }
+        paper.title = input
         switch paperFrom {
         case .fromLocal:
             localDatabaseManager.updatePaper(paper: paper)
@@ -186,66 +280,153 @@ class WrittenPaperViewModel {
             localDatabaseManager.removePaper(paperId: paperID)
             localDatabaseManager.resetPaper()
         }
-        currentPaperPublisher.value = nil
+        currentPaperPublisher.send(nil)
     }
     
     private func makePaperShareLink() {
-        guard let currentPaper = currentPaperPublisher.value else {return}
-        getPaperShareLink(with: currentPaper, route: .write)
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { (completion) in
-                switch completion {
-                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
-                case .finished: break
-                case .failure(let error): print(error)
+        if let url = currentPaperPublisher.value?.linkUrl {
+            output.send(.paperLinkMade(url: url))
+            return
+        }
+        guard
+            let currentPaper = currentPaperPublisher.value,
+            paperFrom == .fromLocal else { return }
+        var paperSubscription: AnyCancellable?
+        paperSubscription = getServerSidePaper(paper: currentPaper)
+            .sink { serverPaper in
+                var linkSubscription: AnyCancellable?
+                var serverPaper = serverPaper
+                if let thumbnailURLSgtring = serverPaper.cards.randomElement()?.contentURLString {
+                    serverPaper.thumbnailURLString = thumbnailURLSgtring
                 }
-            } receiveValue: { [weak self] url in
-                self?.isPaperLinkMade = true
-                self?.currentPaperPublisher.value?.linkUrl = url
-                guard let paper = self?.currentPaperPublisher.value else {return}
-                self?.localDatabaseManager.updatePaper(paper: paper)
-                self?.serverDatabaseManager.addPaper(paper: paper)
-                //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
-                self?.currentPaperPublisher.send(paper)
-                self?.output.send(.paperLinkMade)
+                linkSubscription = getPaperShareLink(with: serverPaper, route: .write)
+                    .sink { completion in
+                    } receiveValue: { [weak self] url in
+                        self?.isPaperLinkMade = true
+                        self?.localDatabaseManager.resetPaper()
+                        serverPaper.linkUrl = url
+                        self?.serverDatabaseManager.addPaper(paper: serverPaper)
+                        self?.serverDatabaseManager.fetchPaper(paperId: serverPaper.paperId)
+                        self?.currentPaperPublisher.send(serverPaper)
+                        self?.paperFrom = .fromServer
+                        self?.output.send(.paperLinkMade(url: url))
+                        print("aaa makePaperShareLink made")
+                        linkSubscription?.cancel()
+                    }
+                paperSubscription?.cancel()
             }
-            .store(in: &cancellables)
     }
     
     private func makePaperGiftLink() {
-        guard let currentPaper = currentPaperPublisher.value else {return}
-//        serverDatabaseManager.convertPaperToGift(paper: currentPaper)
-//            .sink { (completion) in
-//                switch completion {
-//                case .finished: break
-//                case .failure(let error): print(error)
-//                }
-//            } receiveValue: { [weak self] paperWithGiftLink in
-//                guard let self = self else {return}
-//                self.currentPaperPublisher.value = paperWithGiftLink
-//            }
-//            .store(in: &cancellables)
-            
-        getPaperShareLink(with: currentPaper, route: .gift)
-            .receive(on: DispatchQueue.global(qos: .background))
-            .sink { (completion) in
-                switch completion {
-                    // 링크가 만들어지면 isPaperLinkMade 값을 바꿔줌
-                case .finished: break
-                case .failure(let error): print(error)
+        guard let currentPaper = currentPaperPublisher.value else { return }
+        
+        if paperFrom == .fromServer {
+            serverToGift()
+        } else {
+            var paperSubscription: AnyCancellable?
+            paperSubscription = getServerSidePaper(paper: currentPaper)
+                .sink { [weak self] serverPaper in
+                    self?.localDatabaseManager.resetPaper()
+                    self?.serverDatabaseManager.addPaper(paper: serverPaper)
+                    self?.currentPaperPublisher.send(serverPaper)
+                    self?.paperFrom = .fromServer
+                    self?.serverToGift()
+                    paperSubscription?.cancel()
                 }
-            } receiveValue: { [weak self] url in
-                guard let self = self else {return}
-                self.isPaperLinkMade = true
-                self.currentPaperPublisher.value?.isGift = true
-//                self.currentPaperPublisher.value?.linkUrl = url
-                guard let paper = self.currentPaperPublisher.value else {return}
-                self.localDatabaseManager.updatePaper(paper: paper)
-                self.serverDatabaseManager.addPaper(paper: paper)
-                //링크 만드는 순간 로컬데이터 지워주는 타이밍 얘기해봐야해서 일단 로컬, 서버 둘 다 업뎃하도록 함
-                self.currentPaperPublisher.send(paper)
-                self.output.send(.giftLinkMade)
+        }
+    }
+    
+    private func serverToGift() {
+        guard
+            paperFrom == .fromServer,
+            let currentPaper = currentPaperPublisher.value else {return }
+        var convertSubscription: AnyCancellable?
+        convertSubscription = serverDatabaseManager.convertPaperToGift(paper: currentPaper)
+            .sink { completion in
+                switch completion {
+                case .failure(let error): print(error.localizedDescription)
+                case .finished: break
+                }
+            } receiveValue: { [weak self] giftPaper in
+                var shareSubscription: AnyCancellable?
+                shareSubscription = getPaperShareLink(with: giftPaper, route: .gift)
+                    .sink { completion in
+                        switch completion {
+                        case .failure(let error): print(error.localizedDescription)
+                        case .finished: break
+                        }
+                    } receiveValue: { url in
+                        self?.output.send(.giftLinkMade(url: url))
+                        shareSubscription?.cancel()
+                    }
+                convertSubscription?.cancel()
             }
-            .store(in: &cancellables)
+    }
+    
+    private func getServerSidePaper(paper: PaperModel) -> AnyPublisher<PaperModel, Never> {
+        // 각 카드의 현재 이미지를 서버에 저장한 뒤 해당 URL 주소를 새롭게 변경한 페이퍼 모델을 리턴
+        let temp = paper.cards
+        var newCard = [CardModel]()
+        var paper = paper
+        let tempCardPublisher: CurrentValueSubject<[CardModel], Never> = .init([])
+        
+        let arrayPublisher = paper
+            .cards
+            .map { card in
+                var cardSubscription: AnyCancellable?
+                cardSubscription = setServerSideCard(card: card)
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                            cardSubscription?.cancel()
+                        case .finished: break
+                        }
+                    }, receiveValue: { card in
+                        let currentCards = tempCardPublisher.value
+                        let newCards = currentCards + [card]
+                        tempCardPublisher.send(newCards)
+                        cardSubscription?.cancel()
+                    })
+            }
+        return Future { promise in
+            tempCardPublisher
+                .sink { cardModels  in
+                    print("aaa tempCardPublisher: \(cardModels.count)")
+                    if cardModels.count == paper.cards.count {
+                        paper.cards = cardModels
+                        promise(.success(paper))
+                    }
+                }
+                .store(in: &self.cancellables)
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    // card -> image data -> server saved url + card return
+    private func setServerSideCard(card: CardModel) -> AnyPublisher<CardModel, Error> {
+        var card = card
+        return Future { [weak self] promise in
+            if
+                let image = self?.images[card.cardId],
+                let data = image.jpegData(compressionQuality: 0.8) {
+                var uploadSubscription: AnyCancellable?
+                uploadSubscription = FirebaseStorageManager.uploadData(dataId: card.cardId, data: data, contentType: .jpeg, pathRoot: .card)
+                    .sink { completion in
+                        switch completion {
+                        case .failure(let error):
+                            promise(.failure(error))
+                            uploadSubscription?.cancel()
+                        case .finished: break
+                        }
+                    } receiveValue: { url in
+                        card.contentURLString = url?.absoluteString ?? ""
+                        promise(.success(card))
+                    }
+            } else {
+                promise(.failure(URLError(.badURL)))
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }

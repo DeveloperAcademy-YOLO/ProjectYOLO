@@ -96,6 +96,7 @@ class CardRootViewController: UIViewController {
                     DispatchQueue.main.async(execute: {
                         print("result Page bind fail")
                     })
+                case .popToWrittenPaper: break                    
                 }
             })
             .store(in: &cancellables)

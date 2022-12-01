@@ -110,8 +110,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var cardsList: UICollectionView = {
         let cardsListView = CardsInPaperViewController()
         cardsListView.viewModel = self.viewModel
-        cardsListView.callingVC = self
-        
+        cardsListView.callingVC = self        
         return cardsListView
     }()
     
@@ -148,6 +147,7 @@ final class WrittenPaperViewController: UIViewController {
         inputToVM.send(.fetchingPaper)
         spinnerConstraints()
         view.addSubview(spinner)
+//        cardsList.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -194,15 +194,10 @@ final class WrittenPaperViewController: UIViewController {
                     self.moveToPaperStorageView()
                 case .paperTitleChanged:
                     self.titleLabel.text = self.viewModel.currentPaperPublisher.value?.title
-                case .paperLinkMade:
-                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
-                    if self.viewModel.isSameCurrentUserAndCreator == true && currentPaper.creator != nil {
-                        self.presentShareSheet(self.paperLinkBtn)
-                    } else {
-                        self.presentSignUpModal(self.paperLinkBtn)
-                    }
-                case .giftLinkMade:
-                    self.presentShareSheet(self.giftLinkBtn)
+                case .paperLinkMade(let url):
+                    self.presentShareSheet(self.paperLinkBtn, url: url)
+                case .giftLinkMade(let url):
+                    self.presentShareSheet(self.giftLinkBtn, url: url)
                 case .fetchingSuccess:
                     guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
                     self.checkFetchingCorrectly(currentPaper)
@@ -236,9 +231,13 @@ final class WrittenPaperViewController: UIViewController {
             .currentPaperPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] paper in
-                if paper != nil {
+                print("aaa currentPaperPublisher has changed: \(paper)")
+                if let paper = paper {
                     self?.checkFetchingCorrectly(paper)
                     self?.bindTimer()
+                    self?.titleLabel.text = paper.title
+                    self?.timeLabel.setEndTime(time: paper.endTime)
+                    self?.cardsList.reloadData()
                 }
             })
             .store(in: &cancellables)
@@ -275,8 +274,13 @@ final class WrittenPaperViewController: UIViewController {
         paperLinkBtn
             .tapPublisher
             .sink { [weak self] in
-                self?.checkTimerBallon()
-                self?.inputToVM.send(.paperShareTapped)
+                guard let self = self else { return }
+                self.checkTimerBallon()
+                if self.viewModel.isSameCurrentUserAndCreator == true && self.viewModel.currentPaperPublisher.value?.creator != nil {
+                    self.inputToVM.send(.paperShareTapped)
+                } else {
+                    self.presentSignUpModal(self.paperLinkBtn)
+                }
             }
             .store(in: &cancellables)
         
@@ -459,11 +463,10 @@ final class WrittenPaperViewController: UIViewController {
         present(navVC, animated: true)
     }
     
-    private func presentShareSheet(_ sender: UIButton) {
-        guard let link = self.viewModel.currentPaperPublisher.value?.linkUrl else {return}
+    private func presentShareSheet(_ sender: UIButton, url: URL) {
         let applicationActivities: [UIActivity]? = nil
         let activityViewController = UIActivityViewController(
-            activityItems: [link] ,
+            activityItems: [url] ,
             applicationActivities: applicationActivities)
         
         let popover = activityViewController.popoverPresentationController
@@ -475,9 +478,10 @@ final class WrittenPaperViewController: UIViewController {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
         fromCardView = true
-        print("isLocalDB: \(isLocalDB)")
+        print("aaa moveToCardRootView: \(isLocalDB)")
+        print("aaa moveToCardRootView's server paperValue: \(FirestoreManager.shared.paperSubject.value)")
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
-        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
+        self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(isLocalDB: isLocalDB), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
     
     private func moveToPaperStorageView() {

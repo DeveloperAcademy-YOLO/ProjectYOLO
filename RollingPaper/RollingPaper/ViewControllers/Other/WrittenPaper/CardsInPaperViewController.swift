@@ -65,7 +65,7 @@ class CardsInPaperViewController: UICollectionView {
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return }
         guard let callingVC = callingVC else { return }
         callingVC.fromCardView = true
-        callingVC.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
+        callingVC.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(isLocalDB: isLocalDB), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
 }
 
@@ -110,52 +110,14 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        print("bbb CardsInPaperView indexPath: \(indexPath)")
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
-        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
-            let card = currentPaper.cards[indexPath.row]
-            if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
-                let imageView = UIImageView(image: image)
-                imageView.layer.masksToBounds = true
-                myCell.addSubview(imageView)
-                imageView.snp.makeConstraints { make in
-                    make.top.bottom.leading.trailing.equalTo(myCell)
-                }
-                return myCell
-            } else {
-                LocalStorageManager.downloadData(urlString: card.contentURLString)
-                    .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        switch completion {
-                        case .failure(let error): print(error)
-                        case .finished: break
-                        }
-                    } receiveValue: { [weak self] data in
-                        if
-                            let data = data,
-                            let image = UIImage(data: data) {
-                            NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
-                            let imageView = UIImageView(image: image)
-                            imageView.layer.masksToBounds = true
-                            myCell.addSubview(imageView)
-                            imageView.snp.makeConstraints { make in
-                                make.top.bottom.leading.trailing.equalTo(myCell)
-                            }
-                        } else {
-                            myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
-                        }
-                    }
-                    .store(in: &cancellables)
-            }
-        } else {
-            if indexPath.row == 0 {
-                let addCardBtn = AddCardViewController()
-                myCell.addSubview(addCardBtn.view)
-            } else {
-                guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
-                let card = currentPaper.cards[indexPath.row-1]
+        if viewModel?.paperFrom == .fromLocal {
+            if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
+                let card = currentPaper.cards[indexPath.row]
                 if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                     let imageView = UIImageView(image: image)
                     imageView.layer.masksToBounds = true
@@ -189,9 +151,138 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
                         }
                         .store(in: &cancellables)
                 }
+            } else {
+                if indexPath.row == 0 {
+                    let addCardBtn = AddCardViewController()
+                    myCell.addSubview(addCardBtn.view)
+                } else {
+                    guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
+                    let card = currentPaper.cards[indexPath.row-1]
+                    if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                        let imageView = UIImageView(image: image)
+                        imageView.layer.masksToBounds = true
+                        myCell.addSubview(imageView)
+                        imageView.snp.makeConstraints { make in
+                            make.top.bottom.leading.trailing.equalTo(myCell)
+                        }
+                        return myCell
+                    } else {
+                        LocalStorageManager.downloadData(urlString: card.contentURLString)
+                            .receive(on: DispatchQueue.main)
+                            .sink { completion in
+                                switch completion {
+                                case .failure(let error): print(error)
+                                case .finished: break
+                                }
+                            } receiveValue: { [weak self] data in
+                                if
+                                    let data = data,
+                                    let image = UIImage(data: data) {
+                                    NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                    let imageView = UIImageView(image: image)
+                                    imageView.layer.masksToBounds = true
+                                    myCell.addSubview(imageView)
+                                    imageView.snp.makeConstraints { make in
+                                        make.top.bottom.leading.trailing.equalTo(myCell)
+                                    }
+                                } else {
+                                    myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                                }
+                            }
+                            .store(in: &cancellables)
+                    }
+                }
             }
+            return myCell
+        } else {
+            print("BBB server data cell make UI")
+            if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
+                print("BBB endTime == currentpaper date")
+                let card = currentPaper.cards[indexPath.row]
+                if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                    let imageView = UIImageView(image: image)
+                    imageView.layer.masksToBounds = true
+                    myCell.addSubview(imageView)
+                    imageView.snp.makeConstraints { make in
+                        make.top.bottom.leading.trailing.equalTo(myCell)
+                    }
+                    return myCell
+                } else {
+                    FirebaseStorageManager.downloadData(urlString: card.contentURLString)
+                        .receive(on: DispatchQueue.main)
+                        .sink { completion in
+                            switch completion {
+                            case .failure(let error): print(error)
+                            case .finished: break
+                            }
+                        } receiveValue: { [weak self] data in
+                            if
+                                let data = data,
+                                let image = UIImage(data: data) {
+                                NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                let imageView = UIImageView(image: image)
+                                imageView.layer.masksToBounds = true
+                                myCell.addSubview(imageView)
+                                imageView.snp.makeConstraints { make in
+                                    make.top.bottom.leading.trailing.equalTo(myCell)
+                                }
+                            } else {
+                                myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                            }
+                        }
+                        .store(in: &cancellables)
+                }
+            } else {
+                print("BBB endTime != currentpaper date")
+                if indexPath.row == 0 {
+                    let addCardBtn = AddCardViewController()
+                    myCell.addSubview(addCardBtn.view)
+                } else {
+                    guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
+                    let card = currentPaper.cards[indexPath.row-1]
+                    print("BBB Card: \(indexPath.row - 1)")
+                    if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
+                        let imageView = UIImageView(image: image)
+                        imageView.layer.masksToBounds = true
+                        myCell.addSubview(imageView)
+                        imageView.snp.makeConstraints { make in
+                            make.top.bottom.leading.trailing.equalTo(myCell)
+                        }
+                        return myCell
+                    } else {
+                        print("BBB FirebaseStorage download start")
+                        FirebaseStorageManager.downloadData(urlString: card.contentURLString)
+                            .receive(on: DispatchQueue.main)
+                            .sink { completion in
+                                switch completion {
+                                case .failure(let error): print(error)
+                                case .finished: break
+                                }
+                            } receiveValue: { [weak self] data in
+                                if
+                                    let data = data,
+                                    let image = UIImage(data: data) {
+                                    NSCacheManager.shared.setImage(image: image, name: card.contentURLString)
+                                    let imageView = UIImageView(image: image)
+                                    imageView.layer.masksToBounds = true
+                                    myCell.addSubview(imageView)
+                                    imageView.snp.makeConstraints { make in
+                                        make.top.bottom.leading.trailing.equalTo(myCell)
+                                    }
+                                    print("bbb currentPaper updated! ")
+                                    DispatchQueue.main.async { [weak self] in
+                                        self?.reloadData()
+                                    }
+                                } else {
+                                    myCell.addSubview(UIImageView(image: UIImage(systemName: "person.circle")))
+                                }
+                            }
+                            .store(in: &cancellables)
+                    }
+                }
+            }
+            return myCell
         }
-        return myCell
     }
 }
 
