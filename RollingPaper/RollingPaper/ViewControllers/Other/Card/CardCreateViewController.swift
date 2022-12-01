@@ -91,7 +91,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         setCollectionView.translatesAutoresizingMaskIntoConstraints = false
         setCollectionView.layer.masksToBounds = true
         setCollectionView.layer.cornerRadius = 60
-        
         return setCollectionView
     }()
     
