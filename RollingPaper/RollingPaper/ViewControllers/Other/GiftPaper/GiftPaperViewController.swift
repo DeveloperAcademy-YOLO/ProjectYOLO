@@ -13,7 +13,6 @@ class GiftPaperViewController: UIViewController {
     
     private var viewModel: GiftPaperViewModel = GiftPaperViewModel()
     private let authManager: AuthManager = FirebaseAuthManager.shared
-//    private let inputToVM: PassthroughSubject<GiftPaperViewModel.Input, Never> = .init()
     private lazy var cancellables = Set<AnyCancellable>()
     
     private let deviceWidth = UIScreen.main.bounds.size.width
@@ -44,7 +43,6 @@ class GiftPaperViewController: UIViewController {
         let titleLabel = UILabel()
         titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .center
-   //     titleLabel.text = viewModel.currentPaperPublisher.value?.title
         titleLabel.text = "선물 받은 페이퍼"
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
@@ -103,17 +101,6 @@ class GiftPaperViewController: UIViewController {
     }
     
     private func bind() {
-//        let outputFromVM = viewModel.transform(inputFromVC: inputToVM.eraseToAnyPublisher())
-//        outputFromVM
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] receivedValue in
-//                guard self != nil else { return }
-//                switch receivedValue {
-//                case .cardDeleted:
-//                    break
-//                }
-//            }
-//            .store(in: &cancellables)
         
         FirebaseAuthManager.shared
             .userProfileSubject
@@ -172,9 +159,6 @@ extension GiftPaperViewController: UICollectionViewDataSource {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
-        print("@@@@@@@@")
-        print("@@@@@@@@self.viewModel.currentPaper\(self.viewModel.currentPaper)")
-        print("@@@@@@@@self.viewModel.currentUser\(self.viewModel.currentUser)")
         
         if self.viewModel.currentPaperPublisher.value?.endTime == self.viewModel.currentPaperPublisher.value?.date && self.viewModel.currentPaperPublisher.value?.isGift == true {
             guard let currentPaper = viewModel.currentPaper else { return myCell }
