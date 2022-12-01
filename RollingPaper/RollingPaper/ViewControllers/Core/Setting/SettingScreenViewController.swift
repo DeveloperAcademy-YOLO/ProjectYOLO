@@ -172,9 +172,9 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         editPhotoButton
             .tapPublisher
             .sink { [weak self] in
-                self?.checkAlbumPermission {
+//                self?.checkAlbumPermission {
                     DispatchQueue.main.async {self?.presentImagePicker(withType: .photoLibrary)}
-                }
+//                }
             }
             .store(in: &cancellables)
         
@@ -245,22 +245,22 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
         present(pickerController, animated: true)
     }
     
-    private func checkAlbumPermission(completion: @escaping() -> Void) {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
-            switch status {
-            case .limited:
-                completion()
-            case .authorized:
-                completion()
-            case .denied:
-                print("Album: 권한 거부")
-            case .restricted, .notDetermined:
-                print("Album: 선택하지 않음")
-            default:
-                break
-            }
-        }
-    }
+//    private func checkAlbumPermission(completion: @escaping() -> Void) {
+//        PHPhotoLibrary.requestAuthorization(for: .readWrite) { (status) in
+//            switch status {
+//            case .limited:
+//                completion()
+//            case .authorized:
+//                completion()
+//            case .denied:
+//                print("Album: 권한 거부")
+//            case .restricted, .notDetermined:
+//                print("Album: 선택하지 않음")
+//            default:
+//                break
+//            }
+//        }
+//    }
     
     @objc private func logOutBtnPressed(_ gesture: UITapGestureRecognizer) {
         let alert = UIAlertController(title: "로그아웃", message: "로그아웃 하시겠습니까?", preferredStyle: .alert)
