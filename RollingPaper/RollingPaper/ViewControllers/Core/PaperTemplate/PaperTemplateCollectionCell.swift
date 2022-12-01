@@ -48,10 +48,14 @@ final class PaperTemplateCollectionCell: UICollectionViewCell {
     // 해당되는 셀 설정하기
     func setCell(template: TemplateModel) {
         imageView.image = template.thumbnail
-        title.text = template.templateString
+        title.text = template.templateString.firstUppercased
     }
 }
 
+extension StringProtocol {
+    var firstUppercased: String { return prefix(1).uppercased() + dropFirst() }
+    var firstCapitalized: String { return prefix(1).capitalized + dropFirst() }
+}
 // 스냅킷 설정
 extension PaperTemplateCollectionCell {
     private func configure() {

@@ -110,7 +110,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var cardsList: UICollectionView = {
         let cardsListView = CardsInPaperViewController()
         cardsListView.viewModel = self.viewModel
-        cardsListView.callingVC = self        
+        cardsListView.callingVC = self
         return cardsListView
     }()
     
@@ -408,6 +408,7 @@ final class WrittenPaperViewController: UIViewController {
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
                 self.inputToVM.send(.stopPaperTapped)
                 self.stopPaperBtnIsPressed = true
+                self.timerInput.send(.viewDidDisappear)
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
