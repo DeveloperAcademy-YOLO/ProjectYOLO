@@ -145,14 +145,15 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     
     private func setupViewInitialSetting() {
         view.backgroundColor = .systemGray6
-        
-        switch traitCollection.userInterfaceStyle {
-        case .light, .unspecified:
+        switch UserDefaults.standard.string(forKey: "colorTheme") {
+        case "light":
             colorSelectButton.selectedSegmentIndex = 0
-        case .dark:
+        case "dark":
             colorSelectButton.selectedSegmentIndex = 1
-        @unknown default:
-            fatalError("Color Theme Change Error!")
+        case "system":
+            colorSelectButton.selectedSegmentIndex = 2
+        default:
+            fatalError("unexpected color theme detected!")
         }
     }
     
@@ -211,7 +212,6 @@ extension AppSettingViewController { // CollectionView
             var content = cell.defaultContentConfiguration()
             var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
             headerDisclosureOption.tintColor = .black
-            
             switch indexPath {
             case [0, 0]:
                 cell.accessories = [.customView(configuration: self.colorSelectAccessory)]
@@ -289,15 +289,13 @@ extension AppSettingViewController { // ListCellAccessory
     @objc private func didChangeValue(segment: UISegmentedControl) {
         if segment.selectedSegmentIndex == 0 {
             view.window?.overrideUserInterfaceStyle = .light
+            UserDefaults.standard.set("light", forKey: "colorTheme")
         } else if segment.selectedSegmentIndex == 1 {
             view.window?.overrideUserInterfaceStyle = .dark
-        } else { // TODO: 수정필요
-            switch traitCollection.userInterfaceStyle {
-            case .light, .unspecified:
-                view.window?.overrideUserInterfaceStyle = .dark
-            case .dark:
-                view.window?.overrideUserInterfaceStyle = .light
-            }
+            UserDefaults.standard.set("dark", forKey: "colorTheme")
+        } else {
+            view.window?.overrideUserInterfaceStyle = .unspecified
+            UserDefaults.standard.set("system", forKey: "colorTheme")
         }
     }
 }

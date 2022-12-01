@@ -51,11 +51,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             selector: #selector(initializeNavigationStack(notification:)),
             name: .viewInit,
             object: nil)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(darckModeButtonTapped(notification: )),
-            name: .colortheme,
-            object: nil)
     }
     
     private func setupSplitView() {
@@ -86,18 +81,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             let routeString = notification.userInfo?["route"] as? String,
             let route = PaperShareRoute(rawValue: routeString) else { return }
         navigateToFlow(paperId: paperId, route: route)
-    }
-    
-    @objc private func darckModeButtonTapped(notification: Notification) {
-        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
-        switch object {
-        case "light" :
-            UserDefaults.standard.set("Light", forKey: "Appearance")
-        case "dark" :
-            UserDefaults.standard.set("Dark", forKey: "Appearance")
-        default :
-            break
-        }
     }
     
     private func navigateToFlow(paperId: String, route: PaperShareRoute) {
