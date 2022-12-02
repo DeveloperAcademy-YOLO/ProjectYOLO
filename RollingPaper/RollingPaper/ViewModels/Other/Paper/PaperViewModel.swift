@@ -18,8 +18,8 @@ class PaperViewModel {
         case changeTitle(title: String)
         case changeTime(time: Date)
         case deletePaperDidTap
-        case moveDidTap
         case refreshDidTap
+        case viewDidDisappear
         case shareDidTap
         case giftDidTap
     }
@@ -98,9 +98,8 @@ class PaperViewModel {
                 case .deletePaperDidTap:
                     self?.handleDeletePaper()
                     self?.output.send(.moveToStorage)
-                case .moveDidTap:
+                case .viewDidDisappear:
                     self?.handleUpdatePaper()
-                    self?.output.send(.moveToStorage)
                 case .refreshDidTap: self?.handleRefreshPaper()
                 case .shareDidTap: break
                 case .giftDidTap: break

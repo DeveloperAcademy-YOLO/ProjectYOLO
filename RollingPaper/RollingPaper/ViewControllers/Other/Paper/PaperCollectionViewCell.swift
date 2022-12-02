@@ -42,7 +42,6 @@ class PaperCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with card: CardModel, paperSource: PaperViewModel.PaperSource) {
-        print("bbb paperSource: \(paperSource)")
         switch paperSource {
         case .fromServer:
             if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {

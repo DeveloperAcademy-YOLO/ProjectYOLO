@@ -480,10 +480,7 @@
 		D24145242919F9B700437FE7 /* Other */ = {
 			isa = PBXGroup;
 			children = (
-				D2503B492939BF00007DB116 /* PaperCollectionViewDataSource.swift */,
-				D2503B472939BEBF007DB116 /* PaperViewController.swift */,
-				D2503B4B2939BF19007DB116 /* PaperCollectionViewCell.swift */,
-				D2503B4D2939BF55007DB116 /* PaperViewModel.swift */,
+				D2503B512939E2E4007DB116 /* Paper */,
 				D24145262919FA0200437FE7 /* Card */,
 				D24145252919F9C400437FE7 /* WrittenPaper */,
 				D2225E2B29232C5F00CAC434 /* GiftPaper */,
@@ -520,6 +517,7 @@
 		D24145272919FA1B00437FE7 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				D2503B522939E312007DB116 /* Paper */,
 				AFDD2019292FE7A5009B79E7 /* GiftPaper */,
 				D24145292919FA2800437FE7 /* WrittenPaper */,
 				D24145282919FA2300437FE7 /* Card */,
@@ -598,6 +596,24 @@
 				D2503B4F2939C978007DB116 /* NetworkingManager.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		D2503B512939E2E4007DB116 /* Paper */ = {
+			isa = PBXGroup;
+			children = (
+				D2503B492939BF00007DB116 /* PaperCollectionViewDataSource.swift */,
+				D2503B472939BEBF007DB116 /* PaperViewController.swift */,
+				D2503B4B2939BF19007DB116 /* PaperCollectionViewCell.swift */,
+			);
+			path = Paper;
+			sourceTree = "<group>";
+		};
+		D2503B522939E312007DB116 /* Paper */ = {
+			isa = PBXGroup;
+			children = (
+				D2503B4D2939BF55007DB116 /* PaperViewModel.swift */,
+			);
+			path = Paper;
 			sourceTree = "<group>";
 		};
 		DBA722253A40AAB24E0738F8 /* Frameworks */ = {

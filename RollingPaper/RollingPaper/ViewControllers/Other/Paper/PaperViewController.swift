@@ -26,7 +26,7 @@ class PaperViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private let viewModel = PaperViewModel()
     private let input: PassthroughSubject<PaperViewModel.Input, Never> = .init()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -38,9 +38,19 @@ class PaperViewController: UIViewController {
         collectionView.frame = view.bounds
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        input.send(.viewDidDisappear)
+    }
+    
     private func setUI() {
         view.backgroundColor = .systemRed
         view.addSubview(collectionView)
+        setNavigationBar()
+    }
+    
+    private func setNavigationBar() {
+        
     }
     
     private func bind() {
@@ -49,12 +59,38 @@ class PaperViewController: UIViewController {
             .sink { [weak self] result in
                 switch result {
                 case .moveToStorage:
-                    NotificationCenter.default.post(name: .viewChange, object: nil, userInfo: [NotificationViewKey.view: "보관함"])
+                    self?.navigationController?.popViewController(animated: true)
                 case .link(url: let url):
                     break
                 }
-        }
-        .store(in: &cancellables)
+            }
+            .store(in: &cancellables)
+        viewModel.paper
+            .combineLatest(viewModel.currentUser)
+            .sink { [weak self] paper, user in
+                guard let paper = paper else { return }
+                if let user = user {
+                    if paper.creator == user {
+                        
+                    } else {
+                        
+                    }
+                } else {
+                    
+                }
+            }
+            .store(in: &cancellables)
+    }
+}
+
+extension PaperViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("selected item")
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        print("context menu did tap")
+        return nil
     }
 }
 
