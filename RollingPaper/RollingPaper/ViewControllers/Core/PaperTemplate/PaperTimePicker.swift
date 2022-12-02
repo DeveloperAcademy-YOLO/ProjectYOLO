@@ -67,7 +67,7 @@ final class PaperTimePicker: UIViewController {
             let label = UILabel()
             label.text = labels[index]
             label.font = .systemFont(ofSize: fontSize)
-            label.textColor = .black
+            label.textColor = .label
             label.sizeToFit()
             labelList.append(label)
         }

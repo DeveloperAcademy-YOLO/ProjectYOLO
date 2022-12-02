@@ -19,11 +19,11 @@ class GiftPaperViewController: UIViewController {
     private let deviceHeight = UIScreen.main.bounds.size.height
     
     lazy var leftButton: UIBarButtonItem = {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("선물 상자", for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        customBackBtn.setTitleColor(.black, for: .normal)
+        customBackBtn.setTitleColor(.label, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
@@ -34,7 +34,7 @@ class GiftPaperViewController: UIViewController {
     lazy private var giftImage: UIImageView = {
         let giftImage = UIImageView()
         giftImage.image = UIImage(systemName: "giftcard.fill")?.resized(to: CGSize(width: 32, height: 22))
-        giftImage.tintColor = .black
+        giftImage.tintColor = .label
         giftImage.contentMode = .scaleAspectFit
         return giftImage
     }()

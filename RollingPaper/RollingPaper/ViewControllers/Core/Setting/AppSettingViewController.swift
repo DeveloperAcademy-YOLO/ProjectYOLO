@@ -103,6 +103,7 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     
     lazy var collectionView: UICollectionView = {
         var collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: setupCollectionViewLayout())
+        collectionView.backgroundColor = .clear
         collectionView.isScrollEnabled = false
         return collectionView
     }()
@@ -110,10 +111,14 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        setupGestures()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         setupViewInitialSetting()
         configureDataSource()
         setupView()
-        setupGestures()
     }
     
     private func bind() {
@@ -144,7 +149,7 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     }
     
     private func setupViewInitialSetting() {
-        view.backgroundColor = .systemGray6
+        view.backgroundColor = .systemBackground
         switch UserDefaults.standard.string(forKey: "colorTheme") {
         case "light":
             colorSelectButton.selectedSegmentIndex = 0
@@ -165,11 +170,9 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     
     private func setupView() {
         view.addSubview(userInfoStack)
+        view.addSubview(collectionView)
         userInfoStack.backgroundColor = .systemBackground
         userInfoStack.layer.cornerRadius = 12
-        // userInfoStack.layer.borderWidth =
-        // userInfoStack.layer.borderColor = UIColor.black.cgColor
-        view.addSubview(collectionView)
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         
@@ -192,6 +195,8 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
             make.top.equalTo(userInfoStack.snp.bottom)
         }
         
+        userPhoto.layer.cornerRadius = userPhoto.frame.width / 2
+        userPhoto.layer.masksToBounds = true
         userNameStack.layoutMargins = UIEdgeInsets(top: 50, left: 0, bottom: 50, right: 0)
     }
 }
@@ -202,6 +207,7 @@ extension AppSettingViewController { // CollectionView
         let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
             var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             config.headerMode = .none
+            config.backgroundColor = .clear
             return NSCollectionLayoutSection.list(using: config, layoutEnvironment: layoutEnvironment)
         }
         return layout
@@ -259,7 +265,6 @@ extension AppSettingViewController { // CollectionView
         var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<ListItem>()
         
         for headerItem in sectionData {
-
             let headerListItem = ListItem.header(headerItem)
             sectionSnapshot.append([headerListItem])
             
@@ -272,7 +277,7 @@ extension AppSettingViewController { // CollectionView
     }
 }
 
-extension AppSettingViewController { // ListCellAccessory
+extension AppSettingViewController {
     
     @objc private func tapUserProfile() {
         navigationController?.pushViewController(SettingScreenViewController(), animated: true)
