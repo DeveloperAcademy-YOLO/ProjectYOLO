@@ -288,7 +288,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         let papers = indexPath.section == 0 ? self.viewModel.openedPapers: self.viewModel.closedPapers
         self.setSelectedPaper(paperId: papers[indexPath.item].paperId )
         viewIsChange = true
-        navigationController?.pushViewController(WrittenPaperViewController(), animated: true)
+        navigationController?.pushViewController(PaperViewController(), animated: true)
         return true
     }
     

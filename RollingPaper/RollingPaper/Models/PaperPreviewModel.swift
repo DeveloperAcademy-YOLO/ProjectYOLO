@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PaperPreviewModel: Codable {
+struct PaperPreviewModel: Codable, Hashable {
     let paperId: String
     var creator: UserModel?
     let date: Date
@@ -19,4 +19,8 @@ struct PaperPreviewModel: Codable {
     }
     var thumbnailURLString: String?
     var isGift: Bool = false
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(paperId)
+    }
 }

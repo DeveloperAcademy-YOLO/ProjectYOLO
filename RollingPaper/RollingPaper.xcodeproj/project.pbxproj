@@ -79,6 +79,11 @@
 		D22E4ACB28EBFDEA001091DA /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4ACA28EBFDEA001091DA /* SignUpViewModel.swift */; };
 		D22E4AD428EC52DB001091DA /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */; };
 		D24AB02728F90DCC007BDC1F /* LocalStorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */; };
+		D2503B482939BEBF007DB116 /* PaperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2503B472939BEBF007DB116 /* PaperViewController.swift */; };
+		D2503B4A2939BF00007DB116 /* PaperCollectionViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2503B492939BF00007DB116 /* PaperCollectionViewDataSource.swift */; };
+		D2503B4C2939BF19007DB116 /* PaperCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2503B4B2939BF19007DB116 /* PaperCollectionViewCell.swift */; };
+		D2503B4E2939BF55007DB116 /* PaperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2503B4D2939BF55007DB116 /* PaperViewModel.swift */; };
+		D2503B502939C978007DB116 /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2503B4F2939C978007DB116 /* NetworkingManager.swift */; };
 		D251BDBD28ED206F0094ECD9 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBC28ED206F0094ECD9 /* UserModel.swift */; };
 		D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDBE28ED219D0094ECD9 /* PaperModel.swift */; };
 		D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D251BDC428ED26EE0094ECD9 /* CardModel.swift */; };
@@ -188,6 +193,11 @@
 		D22E4AD028EC46FC001091DA /* RollingPaper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RollingPaper.entitlements; sourceTree = "<group>"; };
 		D22E4AD328EC52DB001091DA /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		D24AB02628F90DCC007BDC1F /* LocalStorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorageManager.swift; sourceTree = "<group>"; };
+		D2503B472939BEBF007DB116 /* PaperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperViewController.swift; sourceTree = "<group>"; };
+		D2503B492939BF00007DB116 /* PaperCollectionViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperCollectionViewDataSource.swift; sourceTree = "<group>"; };
+		D2503B4B2939BF19007DB116 /* PaperCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperCollectionViewCell.swift; sourceTree = "<group>"; };
+		D2503B4D2939BF55007DB116 /* PaperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperViewModel.swift; sourceTree = "<group>"; };
+		D2503B4F2939C978007DB116 /* NetworkingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingManager.swift; sourceTree = "<group>"; };
 		D251BDBC28ED206F0094ECD9 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		D251BDBE28ED219D0094ECD9 /* PaperModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperModel.swift; sourceTree = "<group>"; };
 		D251BDC428ED26EE0094ECD9 /* CardModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardModel.swift; sourceTree = "<group>"; };
@@ -470,6 +480,10 @@
 		D24145242919F9B700437FE7 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				D2503B492939BF00007DB116 /* PaperCollectionViewDataSource.swift */,
+				D2503B472939BEBF007DB116 /* PaperViewController.swift */,
+				D2503B4B2939BF19007DB116 /* PaperCollectionViewCell.swift */,
+				D2503B4D2939BF55007DB116 /* PaperViewModel.swift */,
 				D24145262919FA0200437FE7 /* Card */,
 				D24145252919F9C400437FE7 /* WrittenPaper */,
 				D2225E2B29232C5F00CAC434 /* GiftPaper */,
@@ -581,6 +595,7 @@
 			isa = PBXGroup;
 			children = (
 				D2EF708E29066FA10007E611 /* DynamicLinks+Funcs.swift */,
+				D2503B4F2939C978007DB116 /* NetworkingManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -786,6 +801,7 @@
 				CF265263291FB91D00C8171D /* AppSettingViewModel.swift in Sources */,
 				BCF2481128ED512A008CD0F9 /* PaperTemplateSelectViewController.swift in Sources */,
 				D251BDC528ED26EE0094ECD9 /* CardModel.swift in Sources */,
+				D2503B4E2939BF55007DB116 /* PaperViewModel.swift in Sources */,
 				D251BDCF28ED54A40094ECD9 /* DatabaseManager.swift in Sources */,
 				1573563128FFA7FF00EA565B /* SettingScreenViewModel.swift in Sources */,
 				BC344FE12923222700A8C2DF /* GiftStorageCollectionCell.swift in Sources */,
@@ -800,6 +816,7 @@
 				BCC74A7D2922050B00582248 /* PaperSettingLength.swift in Sources */,
 				D2B6308028EE870D008365CB /* UIControl+Extensions.swift in Sources */,
 				C5F6954C28FEDCF700365719 /* UIButton+Extensions.swift in Sources */,
+				D2503B482939BEBF007DB116 /* PaperViewController.swift in Sources */,
 				D2B6308E28F16493008365CB /* SignUpTextField.swift in Sources */,
 				AF6FEE3C2902E2E400E44E7D /* CameraCustomPickerController.swift in Sources */,
 				BCE6FEC2291B921C0093C36E /* PaperStorageCollectionHeader.swift in Sources */,
@@ -826,7 +843,9 @@
 				D251BDBF28ED219D0094ECD9 /* PaperModel.swift in Sources */,
 				BCB9F901292F079600864CB4 /* WarningLabel.swift in Sources */,
 				AFE8D6EE28F6E270005B1F45 /* CardViewModel.swift in Sources */,
+				D2503B4A2939BF00007DB116 /* PaperCollectionViewDataSource.swift in Sources */,
 				C5B5853C29001AFF00454C75 /* UIImage+Extension.swift in Sources */,
+				D2503B502939C978007DB116 /* NetworkingManager.swift in Sources */,
 				D251BDD128ED54DD0094ECD9 /* LocalDatabaseFileManager.swift in Sources */,
 				BCE6FEBA291B90430093C36E /* PaperStorageOpenedCollectionCell.swift in Sources */,
 				AFE8D6EA28F50319005B1F45 /* CardCreateViewController.swift in Sources */,
@@ -846,6 +865,7 @@
 				AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */,
 				D22E4AA228EBDC72001091DA /* AppDelegate.swift in Sources */,
 				AFDD201B292FE7D8009B79E7 /* GiftPaperViewModel.swift in Sources */,
+				D2503B4C2939BF19007DB116 /* PaperCollectionViewCell.swift in Sources */,
 				BC344FE629232B6C00A8C2DF /* GiftStorageLength.swift in Sources */,
 				D22E4AA428EBDC72001091DA /* SceneDelegate.swift in Sources */,
 				BCF2481928EFC4CF008CD0F9 /* PaperSettingViewModel.swift in Sources */,
@@ -1041,11 +1061,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
@@ -1061,11 +1079,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1083,11 +1100,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RollingPaper/RollingPaper.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4JPWGVR2ZN;
+				DEVELOPMENT_TEAM = 4JPWGVR2ZN;
 				ENABLE_TESTING_SEARCH_PATHS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RollingPaper/Info.plist;
@@ -1103,11 +1118,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = Yolo.RollingPaper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = YOLO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-struct PaperModel: Codable {
+struct PaperModel: Codable, Hashable {
     var paperId = UUID().uuidString
     var creator: UserModel?
     var cards: [CardModel]
@@ -22,4 +22,8 @@ struct PaperModel: Codable {
     }
     var thumbnailURLString: String?
     var isGift: Bool = false
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(paperId)
+    }
 }
