@@ -254,17 +254,17 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         if indexPath.section == 0 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageOpenedCollectionCell.identifier, for: indexPath) as? PaperStorageOpenedCollectionCell else {return UICollectionViewCell()}
             let paper = viewModel.openedPapers[indexPath.item]
-            let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-            cell.setCell(paper: paper, thumbnail: thumbnail, now: viewModel.currentTime, cellWidth: openedCellWidth)
+            let isLocal = viewModel.localPaperIds.contains(paper.paperId) ? true : false
+            cell.setCell(paper: paper, now: viewModel.currentTime, cellWidth: openedCellWidth, isLocal: isLocal)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageClosedCollectionCell.identifier, for: indexPath) as? PaperStorageClosedCollectionCell else {return UICollectionViewCell()}
             if dataState == .onlyOpened {
-                cell.setCell(paper: nil, thumbnail: nil, cellWidth: 0)
+                cell.setCell(paper: nil, cellWidth: 0, isLocal: true)
             } else {
                 let paper = viewModel.closedPapers[indexPath.item]
-                let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-                cell.setCell(paper: paper, thumbnail: thumbnail, cellWidth: closedCellWidth)
+                let isLocal = viewModel.localPaperIds.contains(paper.paperId) ? true : false
+                cell.setCell(paper: paper, cellWidth: closedCellWidth, isLocal: isLocal)
             }
             return cell
         }
