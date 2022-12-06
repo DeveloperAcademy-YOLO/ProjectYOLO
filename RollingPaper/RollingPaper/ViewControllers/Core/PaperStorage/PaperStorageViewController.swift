@@ -109,11 +109,7 @@ final class PaperStorageViewController: UIViewController {
                     self.updateLoadingView(isLoading: false)
                 case .papersAreUpdatedInDatabase:
                     self.updateMainView()
-                case .papersAreUpdatedByTimer:
-                    break
-                }
-                
-                if self.isContextChosen == false {
+                case .reloadData:
                     self.paperCollectionView.reloadData()
                 }
             })
@@ -255,7 +251,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageOpenedCollectionCell.identifier, for: indexPath) as? PaperStorageOpenedCollectionCell else {return UICollectionViewCell()}
             let paper = viewModel.openedPapers[indexPath.item]
             let isLocal = viewModel.localPaperIds.contains(paper.paperId) ? true : false
-            cell.setCell(paper: paper, now: viewModel.currentTime, cellWidth: openedCellWidth, isLocal: isLocal)
+            cell.setCell(paper: paper, cellWidth: openedCellWidth, timeFlowManager: viewModel.timeFlowManager, isLocal: isLocal)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PaperStorageClosedCollectionCell.identifier, for: indexPath) as? PaperStorageClosedCollectionCell else {return UICollectionViewCell()}

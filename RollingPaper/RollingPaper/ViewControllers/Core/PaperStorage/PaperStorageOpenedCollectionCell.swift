@@ -58,10 +58,11 @@ final class PaperStorageOpenedCollectionCell: UICollectionViewCell {
     }
     
     // 해당되는 셀 설정하기
-    func setCell(paper: PaperPreviewModel, now: Date, cellWidth: CGFloat, isLocal: Bool) {
+    func setCell(paper: PaperPreviewModel, cellWidth: CGFloat, timeFlowManager: TimeFlowManager, isLocal: Bool) {
         timer.setEndTime(time: paper.endTime)
         title.text = paper.title
         preview.image = paper.template.thumbnail
+        bindTimer(timeFlowManager: timeFlowManager)
         if let url = paper.thumbnailURLString {
             isLocal ? downloadImageFromLocal(thumbnailUrl: url) : downloadImageFromServer(thumbnailUrl: url)
         }
@@ -69,6 +70,22 @@ final class PaperStorageOpenedCollectionCell: UICollectionViewCell {
             make.width.equalTo(cellWidth)
             make.height.equalTo(PaperStorageLength.openedPaperThumbnailHeight)
         })
+    }
+    
+    // 타이머 연동시키기
+    private func bindTimer(timeFlowManager: TimeFlowManager) {
+        let timerOutput = timeFlowManager.transform(input: nil)
+        timerOutput
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
+                case .timeIsUpdated:
+                    self.timer.updateTime()
+                }
+            })
+            .store(in: &cancellables)
     }
     
     private func downloadImageFromLocal(thumbnailUrl: String) {

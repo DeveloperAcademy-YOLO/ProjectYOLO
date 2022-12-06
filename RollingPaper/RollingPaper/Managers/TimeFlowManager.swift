@@ -35,7 +35,8 @@ final class TimeFlowManager {
     }
     
     // 뷰가 나타나면 타이머 연결, 사라지면 타이머 해제
-    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
+    func transform(input: AnyPublisher<Input, Never>?) -> AnyPublisher<Output, Never> {
+        guard let input = input else { return output.eraseToAnyPublisher()}
         input
             .receive(on: DispatchQueue.global(qos: .background))
             .sink(receiveValue: { [weak self] event in

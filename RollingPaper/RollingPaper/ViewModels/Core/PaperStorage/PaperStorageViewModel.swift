@@ -9,17 +9,17 @@ import Combine
 import UIKit
 
 class PaperStorageViewModel {
-    private let timeFlowManager = TimeFlowManager()
+    let timeFlowManager = TimeFlowManager()
     private let timerInput: PassthroughSubject<TimeFlowManager.Input, Never> = .init()
     private let output: PassthroughSubject<Output, Never> = .init()
     private let localDatabaseManager: DatabaseManager
     private let serverDatabaseManager: DatabaseManager
+    private var isPaperClosed: Bool = false
     private var cancellables = Set<AnyCancellable>()
     private var papersFromLocal = [PaperPreviewModel]()
     private var papersFromServer = [PaperPreviewModel]()
     private var papers = [PaperPreviewModel]()
     
-    var currentTime: Date = Date()
     var serverPaperIds = Set<String>()
     var localPaperIds = Set<String>()
     var openedPaperIds = Set<String>()
@@ -36,7 +36,7 @@ class PaperStorageViewModel {
     enum Output {
         case initPapers
         case papersAreUpdatedInDatabase
-        case papersAreUpdatedByTimer
+        case reloadData
     }
     
     init(localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared, serverDatabaseManager: DatabaseManager = FirestoreManager.shared) {
@@ -56,9 +56,10 @@ class PaperStorageViewModel {
                 switch event {
                 // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
-                    self.updateCurrentTime()
                     self.classifyPapers()
-                    self.output.send(.papersAreUpdatedByTimer)
+                    if self.isPaperClosed {
+                        self.output.send(.reloadData)
+                    }
                 }
             })
             .store(in: &cancellables)
@@ -72,38 +73,30 @@ class PaperStorageViewModel {
     // 데이터베이스 메니저 연동
     private func bindDatabaseManager() {
         localDatabaseManager.papersSubject
-            .receive(on: DispatchQueue.global(qos: .background))
             .map(filterPaperPreviewModels)
-            .sink(receiveValue: { [weak self] paperPreviews in
+            .combineLatest(serverDatabaseManager.papersSubject.map(filterPaperPreviewModels))
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] localPapers, serverPapers in
                 guard let self = self else {return}
-                self.papersFromLocal = paperPreviews
-                self.localPaperIds.removeAll()
+                self.papersFromLocal = localPapers
+                self.papersFromServer = serverPapers
+                
+                var localIds = Set<String>()
+                var serverIds = Set<String>()
+                
                 for paper in self.papersFromLocal {
-                    self.localPaperIds.insert(paper.paperId)
+                    localIds.insert(paper.paperId)
                 }
-                self.classifyPapers()
-            })
-            .store(in: &cancellables)
-        
-        serverDatabaseManager.papersSubject
-            .receive(on: DispatchQueue.global(qos: .background))
-            .map(filterPaperPreviewModels)
-            .sink(receiveValue: { [weak self] paperPreviews in
-                guard let self = self else {return}
-                self.papersFromServer = paperPreviews
-                print("aaa pepaerFromsServer Count: \(self.papersFromServer.count)")
-                self.serverPaperIds.removeAll()
                 for paper in self.papersFromServer {
-                    self.serverPaperIds.insert(paper.paperId)
+                    serverIds.insert(paper.paperId)
                 }
+                
+                self.localPaperIds = localIds
+                self.serverPaperIds = serverIds
                 self.classifyPapers()
+                self.output.send(.reloadData)
             })
             .store(in: &cancellables)
-    }
-    
-    // 현재 시간 업데이트하기
-    private func updateCurrentTime() {
-        self.currentTime = Date()
     }
     
     // 서버와 로컬에 있는 페이퍼들 합쳐서, 열린 페이퍼와 닫힌 페이퍼로 구분하기
@@ -132,7 +125,7 @@ class PaperStorageViewModel {
         var closedIds = Set<String>()
         
         for paper in papers {
-            let timeInterval = Int(paper.endTime.timeIntervalSince(currentTime))
+            let timeInterval = Int(paper.endTime.timeIntervalSince(Date()))
             if timeInterval > 0 {
                 openedIds.insert(paper.paperId)
                 opened.append(paper)
@@ -141,6 +134,8 @@ class PaperStorageViewModel {
                 closed.append(paper)
             }
         }
+
+        isPaperClosed = closedIds.count > closedPaperIds.count ? true : false
         
         openedPaperIds = openedIds
         closedPaperIds = closedIds
@@ -158,7 +153,6 @@ class PaperStorageViewModel {
                 // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
                 case .viewDidAppear:
                     self.timerInput.send(.viewDidAppear)
-                    self.updateCurrentTime()
                     self.classifyPapers()
                     self.output.send(.initPapers)
                 // 뷰가 사라졌다는 시그널이 오면 타이머한테 알려줘서 타이머 해제시키기
