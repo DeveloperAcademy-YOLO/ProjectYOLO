@@ -81,18 +81,18 @@ class PaperStorageViewModel {
                 self.papersFromLocal = localPapers
                 self.papersFromServer = serverPapers
                 
-                var localIds = Set<String>()
-                var serverIds = Set<String>()
+                var localPaperIdsTemp = Set<String>()
+                var serverPaperIdsTemp = Set<String>()
                 
                 for paper in self.papersFromLocal {
-                    localIds.insert(paper.paperId)
+                    localPaperIdsTemp.insert(paper.paperId)
                 }
                 for paper in self.papersFromServer {
-                    serverIds.insert(paper.paperId)
+                    serverPaperIdsTemp.insert(paper.paperId)
                 }
                 
-                self.localPaperIds = localIds
-                self.serverPaperIds = serverIds
+                self.localPaperIds = localPaperIdsTemp
+                self.serverPaperIds = serverPaperIdsTemp
                 self.classifyPapers()
                 self.output.send(.reloadData)
             })
@@ -119,28 +119,28 @@ class PaperStorageViewModel {
         papers.sort(by: {return $1.date < $0.date})
         
         // 열린 페이퍼와 닫힌 페이퍼 구분
-        var opened = [PaperPreviewModel]()
-        var closed = [PaperPreviewModel]()
-        var openedIds = Set<String>()
-        var closedIds = Set<String>()
+        var openedPapersTemp = [PaperPreviewModel]()
+        var closedPapersTemp = [PaperPreviewModel]()
+        var openedPaperIdsTemp = Set<String>()
+        var closedPaperIdsTemp = Set<String>()
         
         for paper in papers {
             let timeInterval = Int(paper.endTime.timeIntervalSince(Date()))
             if timeInterval > 0 {
-                openedIds.insert(paper.paperId)
-                opened.append(paper)
+                openedPaperIdsTemp.insert(paper.paperId)
+                openedPapersTemp.append(paper)
             } else {
-                closedIds.insert(paper.paperId)
-                closed.append(paper)
+                closedPaperIdsTemp.insert(paper.paperId)
+                closedPapersTemp.append(paper)
             }
         }
 
-        isPaperClosed = closedIds.count > closedPaperIds.count ? true : false
+        isPaperClosed = closedPaperIdsTemp.count > closedPaperIds.count ? true : false
         
-        openedPaperIds = openedIds
-        closedPaperIds = closedIds
-        openedPapers = opened
-        closedPapers = closed
+        openedPaperIds = openedPaperIdsTemp
+        closedPaperIds = closedPaperIdsTemp
+        openedPapers = openedPapersTemp
+        closedPapers = closedPapersTemp
     }
     
     // view controller에서 시그널을 받으면 그에 따라 어떤 행동을 할지 정함
