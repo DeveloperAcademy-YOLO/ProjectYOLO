@@ -7,10 +7,12 @@
 
 import SnapKit
 import UIKit
+import Combine
 
 // 컬렉션 뷰에 들어가는 셀들을 보여주는 뷰 (종료된거)
 final class GiftStorageCollectionCell: UICollectionViewCell {
     static let identifier = "CollectionCell"
+    private var cancellables = Set<AnyCancellable>()
     
     // 셀 전체를 나타내는 뷰
     private let cell = UIView()
@@ -80,12 +82,15 @@ final class GiftStorageCollectionCell: UICollectionViewCell {
     }
     
     // 해당되는 셀 설정하기
-    func setCell(paper: PaperPreviewModel?, thumbnail: UIImage?, cellWidth: CGFloat) {
+    func setCell(paper: PaperPreviewModel?, cellWidth: CGFloat, isLocal: Bool) {
         if let paper = paper {
             date.text = changeDateFormat(date: paper.endTime)
             title.text = paper.title
             sender.text = (paper.creator?.name ?? "?") + "님이 보낸 선물"
-            preview.image = thumbnail
+            preview.image = paper.template.thumbnail
+            if let url = paper.thumbnailURLString {
+                isLocal ? downloadImageFromLocal(thumbnailUrl: url) : downloadImageFromServer(thumbnailUrl: url)
+            }
             preview.snp.updateConstraints({ make in
                 make.width.equalTo(cellWidth)
                 make.height.equalTo(GiftStorageLength.paperThumbnailHeight)
@@ -93,6 +98,60 @@ final class GiftStorageCollectionCell: UICollectionViewCell {
             isHidden = false
         } else {
             isHidden = true
+        }
+    }
+    
+    private func downloadImageFromLocal(thumbnailUrl: String) {
+        if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailUrl) {
+            // 진입 경로1 - 캐시 데이터를 통한 다운로드
+            preview.image = cachedImage
+        } else {
+            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+            LocalStorageManager.downloadData(urlString: thumbnailUrl)
+                .receive(on: DispatchQueue.global(qos: .background))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        print(error)
+                    case .finished: break
+                    }
+                }, receiveValue: { [weak self] data in
+                    guard let self = self else {return}
+                    if let data = data, let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.preview.image = image
+                        }
+                        NSCacheManager.shared.setImage(image: image, name: thumbnailUrl)
+                    }
+                })
+                .store(in: &cancellables)
+        }
+    }
+    
+    private func downloadImageFromServer(thumbnailUrl: String) {
+        if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailUrl) {
+            // 진입 경로1 - 캐시 데이터를 통한 다운로드
+            preview.image = cachedImage
+        } else {
+            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+            FirebaseStorageManager.downloadData(urlString: thumbnailUrl)
+                .receive(on: DispatchQueue.global(qos: .background))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        print(error)
+                    case .finished: break
+                    }
+                }, receiveValue: { [weak self] data in
+                    guard let self = self else {return}
+                    if let data = data, let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.preview.image = image
+                        }
+                        NSCacheManager.shared.setImage(image: image, name: thumbnailUrl)
+                    }
+                })
+                .store(in: &cancellables)
         }
     }
 }

@@ -45,165 +45,29 @@ class GiftStorageViewModel {
     // 데이터베이스 메니저 연동
     private func bindDatabaseManager() {
         localDatabaseManager.papersSubject
-            .receive(on: DispatchQueue.global(qos: .background))
             .map(filterPaperPreviewModels)
-            .sink(receiveValue: { [weak self] paperPreviews in
+            .combineLatest(serverDatabaseManager.papersSubject.map(filterPaperPreviewModels))
+            .receive(on: DispatchQueue.global(qos: .background))
+            .sink(receiveValue: { [weak self] localPapers, serverPapers in
                 guard let self = self else {return}
-                self.papersFromLocal = paperPreviews
-                self.localPaperIds.removeAll()
+                self.papersFromLocal = localPapers
+                self.papersFromServer = serverPapers
+                
+                var localPaperIdsTemp = Set<String>()
+                var serverPaperIdsTemp = Set<String>()
+                
                 for paper in self.papersFromLocal {
-                    self.localPaperIds.insert(paper.paperId)
+                    localPaperIdsTemp.insert(paper.paperId)
                 }
-                self.sortPapers()
-                self.downloadLocalThumbnails(outputValue: .papersAreUpdatedInDatabase)
-            })
-            .store(in: &cancellables)
-        
-        serverDatabaseManager.papersSubject
-            .receive(on: DispatchQueue.global(qos: .background))
-            .map(filterPaperPreviewModels)
-            .sink(receiveValue: { [weak self] paperPreviews in
-                guard let self = self else {return}
-                self.papersFromServer = paperPreviews
-                self.serverPaperIds.removeAll()
                 for paper in self.papersFromServer {
-                    self.serverPaperIds.insert(paper.paperId)
+                    serverPaperIdsTemp.insert(paper.paperId)
                 }
+                
+                self.localPaperIds = localPaperIdsTemp
+                self.serverPaperIds = serverPaperIdsTemp
                 self.sortPapers()
-                self.downloadServerThumbnails(outputValue: .papersAreUpdatedInDatabase)
             })
             .store(in: &cancellables)
-    }
-    
-    // url을 통해 로컬에 저장되어있는 썸네일 다운받아오기
-    private func downloadLocalThumbnails(outputValue: Output) {
-        var downloadCount = 0
-        for paper in papersFromLocal {
-            if thumbnails[paper.paperId] != nil {
-                downloadCount += 1
-                if downloadCount == papersFromLocal.count {
-                    self.output.send(outputValue)
-                }
-                continue
-            }
-            if let thumbnailURLString = paper.thumbnailURLString {
-                if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
-                    // 진입 경로1 - 캐시 데이터를 통한 다운로드
-                    thumbnails[paper.paperId] = cachedImage
-                    downloadCount += 1
-                    // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                    if downloadCount == papersFromLocal.count {
-                        self.output.send(outputValue)
-                    }
-                } else {
-                    LocalStorageManager.downloadData(urlString: thumbnailURLString)
-                        .receive(on: DispatchQueue.global(qos: .background))
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            case .failure(let error):
-                                print(error)
-                                downloadCount += 1
-                                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                                if downloadCount == self.papersFromLocal.count {
-                                    self.output.send(outputValue)
-                                }
-                            case .finished: break
-                            }
-                        }, receiveValue: { [weak self] data in
-                            guard let self = self else {return}
-                            if let data = data,
-                               let image = UIImage(data: data) {
-                                // 진입 경로2 - 파이어베이스에 접근해서 다운로드
-                                self.thumbnails[paper.paperId] = image
-                                NSCacheManager.shared.setImage(image: image, name: thumbnailURLString)
-                            }
-                            downloadCount += 1
-                            // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                            if downloadCount == self.papersFromLocal.count {
-                                self.output.send(outputValue)
-                            }
-                        })
-                        .store(in: &cancellables)
-                }
-            } else {
-                // 진입 경로3 - 썸네일 주소가 nil 일때 아무것도 안함
-                downloadCount += 1
-                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                if downloadCount == papersFromLocal.count {
-                    self.output.send(outputValue)
-                }
-            }
-        }
-        
-        if papersFromLocal.isEmpty {
-            output.send(outputValue)
-        }
-    }
-    
-    // url을 통해 서버에 저장되어있는 썸네일 다운받아오기
-    private func downloadServerThumbnails(outputValue: Output) {
-        var downloadCount = 0
-        for paper in papersFromServer {
-            if thumbnails[paper.paperId] != nil {
-                downloadCount += 1
-                if downloadCount == papersFromServer.count {
-                    self.output.send(outputValue)
-                }
-                continue
-            }
-            if let thumbnailURLString = paper.thumbnailURLString {
-                if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailURLString) {
-                    // 진입 경로1 - 캐시 데이터를 통한 다운로드
-                    thumbnails[paper.paperId] = cachedImage
-                    downloadCount += 1
-                    // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                    if downloadCount == papersFromServer.count {
-                        self.output.send(outputValue)
-                    }
-                } else {
-                    FirebaseStorageManager.downloadData(urlString: thumbnailURLString)
-                        .receive(on: DispatchQueue.global(qos: .background))
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            // 진입 경로2 - 캐시 데이터를 통한 다운로드
-                            case .failure(let error):
-                                print(error)
-                                downloadCount += 1
-                                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                                if downloadCount == self.papersFromServer.count {
-                                    self.output.send(outputValue)
-                                }
-                            case .finished: break
-                            }
-                        }, receiveValue: { [weak self] data in
-                            guard let self = self else {return}
-                            if let data = data,
-                               let image = UIImage(data: data) {
-                                // 진입 경로2 - 파이어베이스에 접근해서 다운로드
-                                self.thumbnails[paper.paperId] = image
-                                NSCacheManager.shared.setImage(image: image, name: thumbnailURLString)
-                            }
-                            downloadCount += 1
-                            // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                            if downloadCount == self.papersFromServer.count {
-                                self.output.send(outputValue)
-                            }
-                        })
-                        .store(in: &cancellables)
-                }
-            } else {
-                // 진입 경로3 - 썸네일 주소가 nil 일때 아무것도 안함
-                downloadCount += 1
-                // 모든 썸네일을 다운 받는게 완료되면 view controller에게 알려주기
-                if downloadCount == papersFromServer.count {
-                    self.output.send(outputValue)
-                }
-            }
-        }
-        
-        if papersFromServer.isEmpty {
-            output.send(outputValue)
-        }
     }
     
     // 페이퍼 날짜별로 정렬하기
@@ -261,8 +125,6 @@ class GiftStorageViewModel {
                 // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
                 case .viewDidAppear:
                     self.sortPapers()
-                    self.downloadLocalThumbnails(outputValue: .initPapers)
-                    self.downloadServerThumbnails(outputValue: .initPapers)
                 // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
                 case .paperSelected(let paperId):
                     if self.serverPaperIds.contains(paperId) {
