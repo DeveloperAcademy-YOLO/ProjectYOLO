@@ -20,11 +20,11 @@ class CardRootViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     lazy var leftButton: UIBarButtonItem = {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("돌아가기", for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        customBackBtn.setTitleColor(.black, for: .normal)
+        customBackBtn.setTitleColor(.label, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
@@ -36,7 +36,7 @@ class CardRootViewController: UIViewController {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customCompleteBtn.setTitle("완료", for: .normal)
         customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        customCompleteBtn.setTitleColor(.black, for: .normal)
+        customCompleteBtn.setTitleColor(.label, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)

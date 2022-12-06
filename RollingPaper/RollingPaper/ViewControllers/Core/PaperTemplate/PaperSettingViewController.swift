@@ -49,10 +49,10 @@ final class PaperSettingViewController: UIViewController {
         let timePickerButton = UIButton()
         timePickerButton.addTarget(self, action: #selector(onClickedTimePickerButton(_:)), for: .touchUpInside)
         timePickerButton.setTitle(PaperSettingViewModel.defaultTime, for: .normal)
-        timePickerButton.setTitleColor(.black, for: .normal)
-        timePickerButton.backgroundColor = .black
+        timePickerButton.setTitleColor(.label, for: .normal)
         timePickerButton.layer.cornerRadius = PaperSettingLength.timePickerButtonRadius
-        timePickerButton.backgroundColor = UIColor(rgb: 0x767680).withAlphaComponent(0.12)
+        timePickerButton.backgroundColor = .systemGray5
+        // timePickerButton.backgroundColor = UIColor(rgb: 0x767680).withAlphaComponent(0.12)
         return timePickerButton
     }()
     // 제한 시간 정할 수 있는 피커
@@ -188,11 +188,11 @@ final class PaperSettingViewController: UIViewController {
     
     // 네비게이션 바 초기화
     private func setNavigationBar() {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 100, green: 100, blue: 100), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
         let leftCustomBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         leftCustomBackBtn.setTitle("템플릿", for: .normal)
         leftCustomBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        leftCustomBackBtn.setTitleColor(.black, for: .normal)
+        leftCustomBackBtn.setTitleColor(.label, for: .normal)
         leftCustomBackBtn.setImage(customBackBtnImage, for: .normal)
         leftCustomBackBtn.addLeftPadding(5)
         leftCustomBackBtn.addTarget(self, action: #selector(backBtnPressed), for: .touchUpInside)
@@ -200,7 +200,7 @@ final class PaperSettingViewController: UIViewController {
         let righCustomCreateBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         righCustomCreateBtn.setTitle("생성하기", for: .normal)
         righCustomCreateBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
-        righCustomCreateBtn.setTitleColor(.black, for: .normal)
+        righCustomCreateBtn.setTitleColor(.label, for: .normal)
         righCustomCreateBtn.addTarget(self, action: #selector(createBtnPressed), for: .touchUpInside)
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: leftCustomBackBtn)

@@ -186,7 +186,6 @@ final class SidebarViewController: UIViewController {
             content.text = category.name
             content.textProperties.font = UIFont.preferredFont(forTextStyle: .title3)
             content.imageToTextPadding = Layout.collectionViewCellimageToTextPadding
-            content.imageProperties.tintColor = .systemGray3
             content.imageProperties.maximumSize = Layout.collectionViewCellImageSize
             content.directionalLayoutMargins = Layout.collectionViewCellInsets
             cell.contentConfiguration = content
@@ -264,10 +263,10 @@ class CategoryCell: UICollectionViewListCell {
         super.updateConfiguration(using: state)
         guard var contentConfig = self.contentConfiguration?.updated(for: state) as? UIListContentConfiguration else { return }
         contentConfig.textProperties.colorTransformer = UIConfigurationColorTransformer { color in
-            state.isSelected || state.isHighlighted ? .black : .black
+            state.isSelected || state.isHighlighted ? .black : .label
         }
         contentConfig.image = UIImage(systemName: state.isSelected || state.isHighlighted ? categoryData[1] + ".fill" : categoryData[1])
-        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .black : .black
+        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .black : .label
         
         guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
         backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
