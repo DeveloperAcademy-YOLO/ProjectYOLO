@@ -43,13 +43,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return shadowUIView
     }()
     
-    private let dotView: UIView = {
-        let imageBorder = UIView()
-        imageBorder.layer.masksToBounds = true
-        imageBorder.layer.cornerRadius = 32
-        return imageBorder
-    }()
-    
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.isUserInteractionEnabled = true
@@ -112,7 +105,22 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     lazy var introWordingLabel: UILabel = {
         let label = UILabel()
-        label.text = "사진 또는 배경을 넣어 주세요."
+        
+        
+        let attributedString = NSMutableAttributedString(string: "")
+        let cameraImageAttachment = NSTextAttachment()
+        let paletteImageAttachment = NSTextAttachment()
+        cameraImageAttachment.image = UIImage(systemName: "camera.fill")
+        paletteImageAttachment.image = UIImage(systemName: "paintpalette.fill")
+        cameraImageAttachment.bounds = CGRect(x: 0, y: -10, width: 50, height: 40)
+        paletteImageAttachment.bounds = CGRect(x: 0, y: -10, width: 45, height: 40)
+        attributedString.append(NSAttributedString(attachment: cameraImageAttachment))
+        attributedString.append(NSAttributedString(string: "카메라 버튼과 "))
+        attributedString.append(NSAttributedString(attachment: paletteImageAttachment))
+        attributedString.append(NSAttributedString(string: "그림 버튼을 눌러서 배경을 넣어주세요."))
+        
+        
+        label.attributedText = attributedString
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 30)
         label.textColor = .lightGray
@@ -467,7 +475,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         if UIDevice.current.userInterfaceIdiom == .pad {
             alertStyle = UIAlertController.Style.alert
         }
-        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        let actionSheet = UIAlertController(title: "사진 가져오기", message: nil, preferredStyle: alertStyle)
         
         let cameraAction = UIAlertAction(title: "카메라", style: .default) { _ in
             DispatchQueue.main.async(execute: {
@@ -553,7 +561,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                     stickerView.enabledBorder = false
                     stickerView.tag = stickerCount
                     stickerView.delegate = self
-    
+                    
                     self.someImageView.addSubview(stickerView)
                 }
             } else {
@@ -649,22 +657,22 @@ extension UIView {
     
     func addDashedBorder() {
         let color = UIColor.gray.cgColor
-
-      let shapeLayer: CAShapeLayer = CAShapeLayer()
-      let frameSize = self.frame.size
-      let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
-
-      shapeLayer.bounds = shapeRect
-      shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
-      shapeLayer.fillColor = UIColor.clear.cgColor
-      shapeLayer.strokeColor = color
-      shapeLayer.lineWidth = 2
-      shapeLayer.lineJoin = CAShapeLayerLineJoin.round
-      shapeLayer.lineDashPattern = [10, 15]
-      shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: 27).cgPath
-
-      self.layer.addSublayer(shapeLayer)
-      }
+        
+        let shapeLayer: CAShapeLayer = CAShapeLayer()
+        let frameSize = self.frame.size
+        let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+        
+        shapeLayer.bounds = shapeRect
+        shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = color
+        shapeLayer.lineWidth = 2
+        shapeLayer.lineJoin = CAShapeLayerLineJoin.round
+        shapeLayer.lineDashPattern = [10, 15]
+        shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: 27).cgPath
+        
+        self.layer.addSublayer(shapeLayer)
+    }
 }
 
 extension CardCreateViewController: PHPickerViewControllerDelegate {
@@ -677,42 +685,42 @@ extension CardCreateViewController: PHPickerViewControllerDelegate {
             itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.sync {
                     let alert = UIAlertController(title: "사진의 용도를 선택해 주세요.", message: "", preferredStyle: .alert)
-                         
-                         alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
-                             self.someImageView.image = image as? UIImage
-                         }))
-                         alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
-                             
-                             if self.stickerOnButton.isHidden == true {
-                                 self.toggleAction()
-                             }
-                             
-                             if let imageSticker = image as? UIImage {
-                                 if self.stickerCount > 14 {
-                                     print("sticker over")
-                                     let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
-                                     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
-                                         alert.dismiss(animated: true, completion: nil)
-                                     }))
-                                     self.present(alert, animated: true)
-                                 } else {
-                                     self.stickerCount += 1
-                                     
-                                     let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: imageSticker)
-                                     stickerView.center = self.someImageView.center
-                                     stickerView.stickerMinScale = 0.5
-                                     stickerView.stickerMaxScale = 3.0
-                                     stickerView.enabledControl = false
-                                     stickerView.enabledBorder = false
-                                     stickerView.tag = self.stickerCount
-                                     stickerView.delegate = self
-                     
-                                     self.someImageView.addSubview(stickerView)
-                                 }
-                             } else {
-                                 print("Sticker not loaded")
-                             }
-                         }))
+                    
+                    alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                        self.someImageView.image = image as? UIImage
+                    }))
+                    alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                        
+                        if self.stickerOnButton.isHidden == true {
+                            self.toggleAction()
+                        }
+                        
+                        if let imageSticker = image as? UIImage {
+                            if self.stickerCount > 14 {
+                                print("sticker over")
+                                let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
+                                    alert.dismiss(animated: true, completion: nil)
+                                }))
+                                self.present(alert, animated: true)
+                            } else {
+                                self.stickerCount += 1
+                                
+                                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: imageSticker)
+                                stickerView.center = self.someImageView.center
+                                stickerView.stickerMinScale = 0.5
+                                stickerView.stickerMaxScale = 3.0
+                                stickerView.enabledControl = false
+                                stickerView.enabledBorder = false
+                                stickerView.tag = self.stickerCount
+                                stickerView.delegate = self
+                                
+                                self.someImageView.addSubview(stickerView)
+                            }
+                        } else {
+                            print("Sticker not loaded")
+                        }
+                    }))
                     self.present(alert, animated: true)
                 }
             }
@@ -743,46 +751,46 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
         DispatchQueue.main.sync {
-                        let alert = UIAlertController(title: "사진의 용도를 선택해 주세요.", message: "", preferredStyle: .alert)
-                             
-                             alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
-                                 if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-                                     self.someImageView.image = pickedImage
-                                 }
-
-                             }))
-                             alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
-                                 if self.stickerOnButton.isHidden == true {
-                                     self.toggleAction()
-                                 }
+            let alert = UIAlertController(title: "사진의 용도를 선택해 주세요.", message: "", preferredStyle: .alert)
             
-                                 if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-                                     if self.stickerCount > 14 {
-                                         print("sticker over")
-                                         let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
-                                         alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
-                                             alert.dismiss(animated: true, completion: nil)
-                                         }))
-                                         self.present(alert, animated: true)
-                                     } else {
-                                         self.stickerCount += 1
-                                         let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: pickedImage)
-                                         stickerView.center = self.someImageView.center
-                                         stickerView.stickerMinScale = 0.5
-                                         stickerView.stickerMaxScale = 3.0
-                                         stickerView.enabledControl = false
-                                         stickerView.enabledBorder = false
-                                         stickerView.tag = self.stickerCount
-                                         stickerView.delegate = self
-                         
-                                         self.someImageView.addSubview(stickerView)
-                                     }
-                                 } else {
-                                     print("Sticker not loaded")
-                                 }
-                             }))
+            alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+                    self.someImageView.image = pickedImage
+                }
+                
+            }))
+            alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                if self.stickerOnButton.isHidden == true {
+                    self.toggleAction()
+                }
+                
+                if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+                    if self.stickerCount > 14 {
+                        print("sticker over")
+                        let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
+                            alert.dismiss(animated: true, completion: nil)
+                        }))
                         self.present(alert, animated: true)
+                    } else {
+                        self.stickerCount += 1
+                        let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: pickedImage)
+                        stickerView.center = self.someImageView.center
+                        stickerView.stickerMinScale = 0.5
+                        stickerView.stickerMaxScale = 3.0
+                        stickerView.enabledControl = false
+                        stickerView.enabledBorder = false
+                        stickerView.tag = self.stickerCount
+                        stickerView.delegate = self
+                        
+                        self.someImageView.addSubview(stickerView)
                     }
+                } else {
+                    print("Sticker not loaded")
+                }
+            }))
+            self.present(alert, animated: true)
+        }
     }
     
     private func cameraImagePicker() {
@@ -977,4 +985,3 @@ extension CardCreateViewController {
         })
     }
 }
-

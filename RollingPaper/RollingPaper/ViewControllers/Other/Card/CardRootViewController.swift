@@ -132,7 +132,7 @@ class CardRootViewController: UIViewController {
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         let cardCreateViewVC = self.children[0] as? CardCreateViewController
         if cardCreateViewVC?.someImageView.image == nil {
-            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 배경을 넣어주세요.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "왼쪽 도구를 이용하여 배경을 넣어주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
                 alert.dismiss(animated: true, completion: nil)
             }))
