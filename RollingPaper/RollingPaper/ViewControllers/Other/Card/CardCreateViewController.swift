@@ -106,7 +106,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var introWordingLabel: UILabel = {
         let label = UILabel()
         
-        
         let attributedString = NSMutableAttributedString(string: "")
         let cameraImageAttachment = NSTextAttachment()
         let paletteImageAttachment = NSTextAttachment()
@@ -115,10 +114,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         cameraImageAttachment.bounds = CGRect(x: 0, y: -10, width: 50, height: 40)
         paletteImageAttachment.bounds = CGRect(x: 0, y: -10, width: 45, height: 40)
         attributedString.append(NSAttributedString(attachment: cameraImageAttachment))
-        attributedString.append(NSAttributedString(string: "카메라 버튼과 "))
+        attributedString.append(NSAttributedString(string: "(카메라 버튼)과 "))
         attributedString.append(NSAttributedString(attachment: paletteImageAttachment))
-        attributedString.append(NSAttributedString(string: "그림 버튼을 눌러서 배경을 넣어주세요."))
-        
+        attributedString.append(NSAttributedString(string: "(그림 버튼)을 눌러 배경을 채워주세요."))
         
         label.attributedText = attributedString
         label.textAlignment = .center
@@ -253,6 +251,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "\(background ?? "Rectangle")")
+                        self.introWordingDisAppear()
+                        
                         print("get background ImgSuccess")
                     })
                 case .getRecentCardBackgroundImgFail:
@@ -393,7 +393,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func setPopOverView(_ sender: UIButton) {
         self.backgroundOnButtonAppear()
-        self.introWordingDisAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -469,7 +468,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
         self.cameraOnButtonAppear()
-        self.introWordingDisAppear()
         
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -684,12 +682,13 @@ extension CardCreateViewController: PHPickerViewControllerDelegate {
             itemProvider.canLoadObject(ofClass: UIImage.self) {
             itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.sync {
-                    let alert = UIAlertController(title: "사진의 용도를 선택해 주세요.", message: "", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "사진을 어떤 용도로 쓰시겠어요?", message: "", preferredStyle: .alert)
                     
-                    alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                    alert.addAction(UIAlertAction(title: "배경", style: .default, handler: { (_: UIAlertAction) in
+                        self.introWordingDisAppear()
                         self.someImageView.image = image as? UIImage
                     }))
-                    alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+                    alert.addAction(UIAlertAction(title: "스티커", style: .default, handler: { (_: UIAlertAction) in
                         
                         if self.stickerOnButton.isHidden == true {
                             self.toggleAction()
@@ -751,15 +750,16 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
         DispatchQueue.main.sync {
-            let alert = UIAlertController(title: "사진의 용도를 선택해 주세요.", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: "사진을 어떤 용도로 쓰시겠어요?", message: "", preferredStyle: .alert)
             
-            alert.addAction(UIAlertAction(title: "배경으로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+            alert.addAction(UIAlertAction(title: "배경", style: .default, handler: { (_: UIAlertAction) in
                 if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+                    self.introWordingDisAppear()
                     self.someImageView.image = pickedImage
                 }
                 
             }))
-            alert.addAction(UIAlertAction(title: "스티커로 쓰기", style: .default, handler: { (_: UIAlertAction) in
+            alert.addAction(UIAlertAction(title: "스티커", style: .default, handler: { (_: UIAlertAction) in
                 if self.stickerOnButton.isHidden == true {
                     self.toggleAction()
                 }
@@ -838,40 +838,39 @@ extension CardCreateViewController {
     private func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.height * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.height * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func canvasViewConstraints() {
         canvasView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.height * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func introWordingLabelConstraints() {
         introWordingLabel.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.height * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
         })
     }
     
@@ -880,7 +879,7 @@ extension CardCreateViewController {
             make.width.equalTo(740)
             make.height.equalTo(120)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.bottom).offset(-140)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-20)
         })
     }
     
@@ -889,7 +888,7 @@ extension CardCreateViewController {
             make.width.equalTo(740)
             make.height.equalTo(120)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.bottom).offset(-140)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-20)
         })
     }
     
