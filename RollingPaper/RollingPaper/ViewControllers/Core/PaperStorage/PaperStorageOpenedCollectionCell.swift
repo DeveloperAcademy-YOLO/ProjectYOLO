@@ -51,15 +51,95 @@ final class PaperStorageOpenedCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        preview.image = nil
+        title.text = nil
+    }
+    
     // 해당되는 셀 설정하기
-    func setCell(paper: PaperPreviewModel, thumbnail: UIImage?, now: Date, cellWidth: CGFloat) {
+    func setCell(paper: PaperPreviewModel, cellWidth: CGFloat, timeFlowManager: TimeFlowManager, isLocal: Bool) {
         timer.setEndTime(time: paper.endTime)
         title.text = paper.title
-        preview.image = thumbnail
+        preview.image = paper.template.thumbnail
+        bindTimer(timeFlowManager: timeFlowManager)
+        if let url = paper.thumbnailURLString {
+            isLocal ? downloadImageFromLocal(thumbnailUrl: url) : downloadImageFromServer(thumbnailUrl: url)
+        }
         preview.snp.updateConstraints({ make in
             make.width.equalTo(cellWidth)
             make.height.equalTo(PaperStorageLength.openedPaperThumbnailHeight)
         })
+    }
+    
+    // 타이머 연동시키기
+    private func bindTimer(timeFlowManager: TimeFlowManager) {
+        let timerOutput = timeFlowManager.transform(input: nil)
+        timerOutput
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] event in
+                guard let self = self else {return}
+                switch event {
+                // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
+                case .timeIsUpdated:
+                    self.timer.updateTime()
+                }
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func downloadImageFromLocal(thumbnailUrl: String) {
+        if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailUrl) {
+            // 진입 경로1 - 캐시 데이터를 통한 다운로드
+            preview.image = cachedImage
+        } else {
+            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+            LocalStorageManager.downloadData(urlString: thumbnailUrl)
+                .receive(on: DispatchQueue.global(qos: .background))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        print(error)
+                    case .finished: break
+                    }
+                }, receiveValue: { [weak self] data in
+                    guard let self = self else {return}
+                    if let data = data, let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.preview.image = image
+                        }
+                        NSCacheManager.shared.setImage(image: image, name: thumbnailUrl)
+                    }
+                })
+                .store(in: &cancellables)
+        }
+    }
+    
+    private func downloadImageFromServer(thumbnailUrl: String) {
+        if let cachedImage = NSCacheManager.shared.getImage(name: thumbnailUrl) {
+            // 진입 경로1 - 캐시 데이터를 통한 다운로드
+            preview.image = cachedImage
+        } else {
+            // 진입 경로2 - 파이어베이스에 접근해서 다운로드
+            FirebaseStorageManager.downloadData(urlString: thumbnailUrl)
+                .receive(on: DispatchQueue.global(qos: .background))
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        print(error)
+                    case .finished: break
+                    }
+                }, receiveValue: { [weak self] data in
+                    guard let self = self else {return}
+                    if let data = data, let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            self.preview.image = image
+                        }
+                        NSCacheManager.shared.setImage(image: image, name: thumbnailUrl)
+                    }
+                })
+                .store(in: &cancellables)
+        }
     }
 }
 

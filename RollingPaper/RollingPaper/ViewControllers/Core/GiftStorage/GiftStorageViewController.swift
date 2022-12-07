@@ -97,7 +97,6 @@ final class GiftStorageViewController: UIViewController {
                 case .papersAreUpdatedInDatabase:
                     self.updateMainView()
                 }
-                self.paperCollectionView.reloadData()
             })
             .store(in: &cancellables)
     }
@@ -210,7 +209,8 @@ extension GiftStorageViewController: UICollectionViewDelegate, UICollectionViewD
               let paper = viewModel.papersByYear[viewModel.years[indexPath.section]]?[indexPath.item]
         else {return UICollectionViewCell()}
         let thumbnail = viewModel.thumbnails[paper.paperId, default: paper.template.thumbnail]
-        cell.setCell(paper: paper, thumbnail: thumbnail, cellWidth: cellWidth)
+        let isLocal = viewModel.localPaperIds.contains(paper.paperId) ? true : false
+        cell.setCell(paper: paper, cellWidth: cellWidth, isLocal: isLocal)
         
         return cell
     }
