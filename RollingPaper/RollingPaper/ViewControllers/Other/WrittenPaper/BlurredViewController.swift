@@ -32,6 +32,7 @@ class BlurredViewController: UIViewController {
         
         return blurView
     }()
+    
     private lazy var presentingVC: MagnifiedCardViewController = {
         let presentingVC = MagnifiedCardViewController()
         presentingVC.viewModel = self.viewModel
@@ -41,12 +42,21 @@ class BlurredViewController: UIViewController {
         return presentingVC
     }()
     
+    private lazy var downButton: UIButton = {
+       let button = UIButton()
+        button.setImage(systemName: "chevron.down")
+        button.tintColor = .label
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(blurView)
         present(presentingVC, animated: true)
         animationIn()
         setBlurView()
+        view.addSubview(downButton)
+        downLabelConstraint()
     }
     
     func transform(inputfrom: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
@@ -79,6 +89,15 @@ extension BlurredViewController {
             make.leading.equalTo(0)
             make.width.equalTo(deviceWidth)
             make.height.equalTo(deviceHeight)
+        }
+    }
+    
+    func downLabelConstraint() {
+        downButton.snp.makeConstraints { make in
+            make.width.equalTo(40)
+            make.height.equalTo(40)
+            make.centerX.equalTo(self.blurView)
+            make.bottom.equalTo(blurView.snp.bottom).offset(-20)
         }
     }
 }
