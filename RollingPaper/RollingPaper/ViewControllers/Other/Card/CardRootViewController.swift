@@ -20,7 +20,7 @@ class CardRootViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     lazy var leftButton: UIBarButtonItem = {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label, renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("돌아가기", for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)

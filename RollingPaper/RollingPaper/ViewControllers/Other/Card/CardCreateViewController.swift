@@ -202,6 +202,10 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         fatalError("init(coder:) has not been implemented")
     }
     
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
@@ -749,15 +753,12 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true)
-        DispatchQueue.main.sync {
             let alert = UIAlertController(title: "사진을 어떤 용도로 쓰시겠어요?", message: "", preferredStyle: .alert)
-            
             alert.addAction(UIAlertAction(title: "배경", style: .default, handler: { (_: UIAlertAction) in
                 if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
                     self.introWordingDisAppear()
                     self.someImageView.image = pickedImage
                 }
-                
             }))
             alert.addAction(UIAlertAction(title: "스티커", style: .default, handler: { (_: UIAlertAction) in
                 if self.stickerOnButton.isHidden == true {
@@ -774,7 +775,7 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
                         self.present(alert, animated: true)
                     } else {
                         self.stickerCount += 1
-                        let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: pickedImage)
+                        let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 250, height: 200), contentImage: pickedImage)
                         stickerView.center = self.someImageView.center
                         stickerView.stickerMinScale = 0.5
                         stickerView.stickerMaxScale = 3.0
@@ -790,7 +791,6 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
                 }
             }))
             self.present(alert, animated: true)
-        }
     }
     
     private func cameraImagePicker() {
