@@ -36,7 +36,7 @@ final class WrittenPaperViewController: UIViewController {
         let btnImg = UIImage(systemName: "chevron.backward")?
             .withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 27, green: 27, blue: 27), renderingMode: .alwaysOriginal)
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
-        btn.setTitle("보관함", for: .normal)
+        btn.setTitle("담벼락", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         btn.setTitleColor(UIColor(named: "customBlack"), for: .normal)
         btn.setImage(btnImg, for: .normal)
@@ -498,7 +498,7 @@ final class WrittenPaperViewController: UIViewController {
         NotificationCenter.default.post(
             name: Notification.Name.viewChange,
             object: nil,
-            userInfo: [NotificationViewKey.view: "보관함"]
+            userInfo: [NotificationViewKey.view: "담벼락"]
         )
     }
     
