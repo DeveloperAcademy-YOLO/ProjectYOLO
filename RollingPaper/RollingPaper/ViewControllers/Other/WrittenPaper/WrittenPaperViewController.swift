@@ -258,6 +258,7 @@ final class WrittenPaperViewController: UIViewController {
             .tapPublisher
             .sink { [weak self] in
                 self?.moveToPaperStorageView()
+                self?.inputToVM.send(.moveToStorageTapped)
                 self?.signInWithModal = false
             }
             .store(in: &cancellables)
