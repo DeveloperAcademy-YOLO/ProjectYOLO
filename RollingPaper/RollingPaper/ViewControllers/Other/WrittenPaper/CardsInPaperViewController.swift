@@ -15,7 +15,6 @@ class CardsInPaperViewController: UICollectionView {
     var callingVC: WrittenPaperViewController?
     private let inputToVM: PassthroughSubject<WrittenPaperViewModel.Input, Never> = .init()
     private lazy var cancellables = Set<AnyCancellable>()
-    private var timeInterval: Double?
     
     private var refreshController: UIRefreshControl = {
         let control = UIRefreshControl()
@@ -72,7 +71,7 @@ class CardsInPaperViewController: UICollectionView {
 extension CardsInPaperViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return 0 }
-        if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
+        if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
             return currentPaper.cards.count
         } else {
             return ((currentPaper.cards.count) + 1 )
@@ -116,7 +115,7 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
         myCell.layer.masksToBounds = true
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
         if viewModel?.paperFrom == .fromLocal {
-            if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
+            if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
                 let card = currentPaper.cards[indexPath.row]
                 if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
                     let imageView = UIImageView(image: image)
@@ -196,7 +195,7 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
             return myCell
         } else {
             print("BBB server data cell make UI")
-            if currentPaper.endTime == currentPaper.date || self.timeInterval ?? 1.0 <= 0.0 {
+            if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
                 print("BBB endTime == currentpaper date")
                 let card = currentPaper.cards[indexPath.row]
                 if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
@@ -289,7 +288,7 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
 extension CardsInPaperViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return }
-        if currentPaper.endTime == currentPaper.date  || self.timeInterval ?? 1.0 <= 0.0 {
+        if currentPaper.endTime == currentPaper.date  || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
             
             let blurredVC = BlurredViewController()
             blurredVC.viewModel = self.viewModel

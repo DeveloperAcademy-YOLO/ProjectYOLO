@@ -14,6 +14,7 @@ import Photos
 import UIKit
 
 final class WrittenPaperViewController: UIViewController {
+    private var isFirst: Bool = true
     private var viewModel: WrittenPaperViewModel = WrittenPaperViewModel()
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let timeManager: TimeFlowManager = TimeFlowManager()
@@ -28,7 +29,7 @@ final class WrittenPaperViewController: UIViewController {
     lazy var fromCardView: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
-    private var timeInterval: Double?
+    var timeInterval: Double?
     private let now: Date = Date()
     
     private lazy var showBalloonButton: UIButton = UIButton()
@@ -38,7 +39,7 @@ final class WrittenPaperViewController: UIViewController {
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         btn.setTitle("담벼락", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        btn.setTitleColor(UIColor(named: "customBlack"), for: .normal)
+        btn.setTitleColor(.black, for: .normal)
         btn.setImage(btnImg, for: .normal)
         btn.addLeftPadding(5)
         
@@ -117,7 +118,6 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
         spinner.color = .label
-        spinner.backgroundColor = .white
         spinner.startAnimating()
         return spinner
     }()
@@ -134,20 +134,17 @@ final class WrittenPaperViewController: UIViewController {
         self.tapGesture.isEnabled = false
         
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        self.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.isNavigationBarHidden = true
-        self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
+        bindTimer()
         self.splitViewController?.hide(.primary)
-        self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
         inputToVM.send(.fetchingPaper)
         spinnerConstraints()
         view.addSubview(spinner)
-//        cardsList.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -158,7 +155,6 @@ final class WrittenPaperViewController: UIViewController {
             //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
         }
         self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
-        inputToVM.send(.fetchingPaper)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -188,7 +184,6 @@ final class WrittenPaperViewController: UIViewController {
                 case .paperStopped:
                     self.setCustomNavBarButtons()
                     self.timeLabel.setEndTime(time: self.viewModel.currentPaperPublisher.value?.endTime ?? Date())
-                    self.cardsList.reloadData()
                 case .paperDeleted:
                     self.inputToVM.send(.moveToStorageTapped)
                     self.moveToPaperStorageView()
@@ -198,9 +193,6 @@ final class WrittenPaperViewController: UIViewController {
                     self.presentShareSheet(self.paperLinkBtn, url: url)
                 case .giftLinkMade(let url):
                     self.presentShareSheet(self.giftLinkBtn, url: url)
-                case .fetchingSuccess:
-                    guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
-                    self.checkFetchingCorrectly(currentPaper)
                 }
             }
             .store(in: &cancellables)
@@ -232,12 +224,17 @@ final class WrittenPaperViewController: UIViewController {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] paper in
                 print("aaa currentPaperPublisher has changed: \(paper)")
+                guard let self = self else {return}
                 if let paper = paper {
-                    self?.checkFetchingCorrectly(paper)
-                    self?.bindTimer()
-                    self?.titleLabel.text = paper.title
-                    self?.timeLabel.setEndTime(time: paper.endTime)
-                    self?.cardsList.reloadData()
+                    // 내꺼에서 보관함에서 터치해서 -> 최초에 페이퍼가 설정됐을때 하는 것들
+                    // 다른 사람이 카드를 추가한다거나 등등의 상황에도 실행이됨
+                    if self.isFirst {
+                        self.checkFetchingCorrectly(paper) // 딱 1번만 실행되야함
+                        self.isFirst = false
+                    }
+                    self.titleLabel.text = paper.title
+                    self.timeLabel.setEndTime(time: paper.endTime)
+                    self.cardsList.reloadData()
                 }
             })
             .store(in: &cancellables)
@@ -245,7 +242,9 @@ final class WrittenPaperViewController: UIViewController {
         showBalloonButton
             .tapPublisher
             .sink { [weak self] in
+                guard let tapGesture = self?.tapGesture else {return}
                 if self?.viewModel.currentPaperPublisher.value?.endTime != self?.viewModel.currentPaperPublisher.value?.date {
+                    self?.view.addGestureRecognizer(tapGesture)
                     self?.timerBalloonBtnPressed = true
                     self?.tapGesture.isEnabled = true
                     self?.navigationController?.navigationBar.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
@@ -311,12 +310,16 @@ final class WrittenPaperViewController: UIViewController {
             .sink(receiveValue: { [weak self] event in
                 guard let self = self else {return}
                 switch event {
+                    // 1초마다 신호가 들어와서 아래 코드들이 실행됨
                     // 시간이 업데이트됨에 따라서 페이퍼 분류 및 UI 업데이트 하도록 시그널 보내기
                 case .timeIsUpdated:
                     self.timeLabel.updateTime()
+                    // 현재 페이퍼의 endtime - 현재 시간 -> 글자로 표시
+                    // 현재 페이퍼의 endtime? -> setEndtime 설정을 해줌
                     self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
-                    if self.timeInterval ?? 1.0 <= 0.0 {
-                        self.inputToVM.send(.fetchingPaper)
+                    if self.timeInterval ?? 0.0 <= 0.0 {
+                        self.setCustomNavBarButtons()
+                        self.cardsList.reloadData()
                     }
                 }
             })
@@ -325,26 +328,20 @@ final class WrittenPaperViewController: UIViewController {
     
     private func drawView() {
         setCustomNavBarButtons()
-        bindTimer()
         stackViewConstraints()
         navigationItem.titleView = stackView
         titleLabelConstraints()
-        view.addGestureRecognizer(tapGesture)
         view.addSubview(cardsList)
-        cardsList.reloadData()
         self.spinner.stopAnimating()
         self.spinner.isHidden = true
     }
     
     private func checkFetchingCorrectly(_ paper: PaperModel?) {
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
-                self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
-                self.navigationController?.navigationBar.tintColor = .systemBlue
-                self.navigationController?.navigationBar.isHidden = false
-                self.navigationController?.setNavigationBarHidden(false, animated: false)
-                self.navigationController?.isNavigationBarHidden = false
-                self.titleLabel.text = paper?.title
-                self.drawView()
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+            self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
+            self.navigationController?.isNavigationBarHidden = false
+            self.titleLabel.text = paper?.title
+            self.drawView()
         }
     }
     
@@ -406,9 +403,9 @@ final class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
+                self.timerInput.send(.viewDidDisappear)
                 self.inputToVM.send(.stopPaperTapped)
                 self.stopPaperBtnIsPressed = true
-                self.timerInput.send(.viewDidDisappear)
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
             alert.addAction(cancel)
@@ -421,6 +418,7 @@ final class WrittenPaperViewController: UIViewController {
                                                  handler: {_ in
             let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
             let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
+                self.timerInput.send(.viewDidDisappear)
                 self.deletePaper()
             }
             let cancel = UIAlertAction(title: "취소", style: .cancel)
@@ -479,34 +477,31 @@ final class WrittenPaperViewController: UIViewController {
         let isLocalDB: Bool = viewModel.paperFrom == .fromLocal ? true : false
         //해당 뷰컨이 카드 생성후에 나타났을 때는 네비바가 사라지지 않게하기 위함
         fromCardView = true
-        print("aaa moveToCardRootView: \(isLocalDB)")
-        print("aaa moveToCardRootView's server paperValue: \(FirestoreManager.shared.paperSubject.value)")
         guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
         self.navigationController?.pushViewController(CardRootViewController(viewModel: CardViewModel(isLocalDB: isLocalDB), isLocalDB: isLocalDB, currentPaper: currentPaper), animated: true)
     }
     
     private func moveToPaperStorageView() {
-            guard let paper = viewModel.currentPaperPublisher.value else { return }
+        if let paper = viewModel.currentPaperPublisher.value {
             if viewModel.isPaperLinkMade {
                 viewModel.serverDatabaseManager.updatePaper(paper: paper)
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             } else {
                 viewModel.localDatabaseManager.updatePaper(paper: paper)
             }
-        
-        self.inputToVM.send(.moveToStorageTapped)
-        NotificationCenter.default.post(
-            name: Notification.Name.viewChange,
-            object: nil,
-            userInfo: [NotificationViewKey.view: "담벼락"]
-        )
+        }
+        navigationController?.popViewController(true, completion: {
+            self.viewModel.cancellables.removeAll()
+        })
+
     }
     
     func checkTimerBallon() {
         if self.timerBalloonBtnPressed == true {
+            self.view.removeGestureRecognizer(self.tapGesture)
             self.timerDiscriptionBalloon.view.isHidden = true
         }
-}
+    }
 }
 
 extension WrittenPaperViewController {
