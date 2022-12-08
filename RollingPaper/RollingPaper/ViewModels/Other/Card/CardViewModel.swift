@@ -101,7 +101,7 @@ class CardViewModel {
                         let currentCardURL = cardURL?.absoluteString,
                         let recentImage = UIImage(data: recentResultImg) else { return }
                     NSCacheManager.shared.setImage(image: recentImage, name: currentCardURL)
-                     resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
+                    resultCardModel.contentURLString = currentCardURL
                    
                     if let currentPaper = self?.localDatabaseManager.paperSubject.value {
                         self?.localDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
@@ -130,9 +130,9 @@ class CardViewModel {
                         print("BBB 지금 카드 생성할 때 리턴되고 있어요 ㅠ")
                         return
                     }
-                    resultCardModel = CardModel(date: currentTime, contentURLString: currentCardURL)
-                    if let paperId = self.serverDatabaseManager.paperSubject.value?.paperId {
-                        self.serverDatabaseManager.addCard(paperId: paperId, card: resultCardModel)
+                    resultCardModel.contentURLString = currentCardURL
+                    if let currentPaper = self.serverDatabaseManager.paperSubject.value {
+                        self.serverDatabaseManager.addCard(paperId: currentPaper.paperId, card: resultCardModel)
                     }
                     self.output.send(.popToWrittenPaper)
                     uploadSubscription?.cancel()
