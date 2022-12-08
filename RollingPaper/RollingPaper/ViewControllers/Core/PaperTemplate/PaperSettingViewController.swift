@@ -96,40 +96,40 @@ final class PaperSettingViewController: UIViewController {
         return thumbnailDescription
     }()
     private lazy var title1: UILabel = {
-        return getLabel(text: "롤링페이퍼 제목", style: .title2, color: .label)
-    }()
-    private lazy var subtitle1: UILabel = {
-        return getLabel(text: "누가 이 롤링페이퍼를 받게 되는지, 왜 받는지를 포함해서 적어주세요", style: .body, color: .secondaryLabel)
-    }()
-    private lazy var title2: UILabel = {
-        return getLabel(text: "타이머 설정", style: .title2, color: .label)
-    }()
-    private lazy var subtitle2: UILabel = {
-        return getLabel(text: "타이머가 종료되면 더이상 롤링페이퍼 내용을 작성하거나 편집할 수 없게 됩니다", style: .body, color: .secondaryLabel)
-    }()
-    private lazy var limitTimeTitle: UILabel = {
-        return getLabel(text: "제한 시간", style: .title3, color: .label)
-    }()
-    private lazy var warningLabelForTitle: WarningLabel = {
-        return WarningLabel(text: "")
-    }()
-    private lazy var warningLabelForTimer: WarningLabel = {
-        return WarningLabel(text: "")
-    }()
-    
-    enum TextState {
-        case normal, noText, tooLong
-        var sentence: String {
-            switch self {
-            case .normal:
-                return ""
-            case .noText:
-                return "페이퍼 제목을 입력해주세요!"
-            case .tooLong:
-                return "페이퍼 제목이 너무 길어요!"
+            return getLabel(text: "보드 제목", style: .title2, color: .label)
+        }()
+        private lazy var subtitle1: UILabel = {
+            return getLabel(text: "보드에 붙여질 카드의 내용이 어떤 내용인지 제목을 통해 요약해주세요.", style: .body, color: .secondaryLabel)
+        }()
+        private lazy var title2: UILabel = {
+            return getLabel(text: "타이머 설정", style: .title2, color: .label)
+        }()
+        private lazy var subtitle2: UILabel = {
+            return getLabel(text: "타이머가 종료되면 더이상 보드에 카드를 추가하거나 편집할 수 없게 됩니다.", style: .body, color: .secondaryLabel)
+        }()
+        private lazy var limitTimeTitle: UILabel = {
+            return getLabel(text: "제한 시간", style: .title3, color: .label)
+        }()
+        private lazy var warningLabelForTitle: WarningLabel = {
+            return WarningLabel(text: "")
+        }()
+        private lazy var warningLabelForTimer: WarningLabel = {
+            return WarningLabel(text: "")
+        }()
+        
+        enum TextState {
+            case normal, noText, tooLong
+            var sentence: String {
+                switch self {
+                case .normal:
+                    return ""
+                case .noText:
+                    return "보드 제목을 입력해주세요!"
+                case .tooLong:
+                    return "보드 제목이 너무 길어요!"
+                }
             }
         }
-    }
     
     enum TimerState {
         case normal, noTime

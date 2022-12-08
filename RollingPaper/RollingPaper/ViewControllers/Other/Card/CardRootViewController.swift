@@ -161,7 +161,7 @@ class CardRootViewController: UIViewController {
         print("cancelBtnPressed")
         let cardCreateViewVC = self.children[0] as? CardCreateViewController
         if cardCreateViewVC?.someImageView.image != nil {
-            let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
+            let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "보드로 돌아가시겠습니까?", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction) in
                 alert.dismiss(animated: true, completion: nil)

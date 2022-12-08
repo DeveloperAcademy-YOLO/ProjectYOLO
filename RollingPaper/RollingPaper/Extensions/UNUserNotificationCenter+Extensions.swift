@@ -15,8 +15,8 @@ extension UNUserNotificationCenter {
         let date = paper.endTime
         let dateComponent = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second, .timeZone], from: date)
         let content = UNMutableNotificationContent()
-        content.title = "\(paper.title) 페이퍼 완성!"
-        content.body = "작성이 끝난 롤링페이퍼를 펼쳐보세요!"
+        content.title = "\(paper.title) 보드 완성!"
+        content.body = "작성이 끝난 보드를 열어보세요!"
         content.sound = .default
         content.badge = (currentBadgeCount + 1) as NSNumber
         content.userInfo = ["paperId": paper.paperId, "type": "made"]

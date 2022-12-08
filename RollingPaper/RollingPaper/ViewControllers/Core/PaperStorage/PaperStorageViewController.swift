@@ -273,7 +273,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
                 withReuseIdentifier: PaperStorageCollectionHeader.identifier,
                 for: indexPath
             ) as? PaperStorageCollectionHeader else {return UICollectionReusableView()}
-            supplementaryView.setHeader(text: indexPath.section == 0 ? "진행중인 페이퍼" : "종료된 페이퍼")
+            supplementaryView.setHeader(text: indexPath.section == 0 ? "작성 중인 보드" : "완성된 보드")
             return supplementaryView
         } else {
             return UICollectionReusableView()
@@ -333,7 +333,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
     }
     
     private func deleteAlert(_ paper: PaperPreviewModel) {
-        let allertController = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+        let allertController = UIAlertController(title: "보드 삭제", message: "보드를 삭제하려면 보드 제목을 하단에 입력해주세요.", preferredStyle: .alert)
         let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
             self.deletePaper(paper)
         }
@@ -361,7 +361,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
         let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
             
             let share = UIAction(
-                title: "페이퍼 공유하기",
+                title: "보드 공유하기",
                 image: UIImage(systemName: "square.and.arrow.up"),
                 identifier: nil,
                 discoverabilityTitle: nil,
@@ -371,7 +371,7 @@ extension PaperStorageViewController: UICollectionViewDelegate, UICollectionView
             }
             
             let delete = UIAction(
-                title: "페이퍼 삭제하기",
+                title: "보드 삭제하기",
                 image: UIImage(systemName: "trash"),
                 identifier: nil,
                 discoverabilityTitle: nil,

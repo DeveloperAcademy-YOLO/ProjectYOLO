@@ -373,7 +373,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private func setPopOverView(_ sender: UIButton) {
         guard let currentPaper = self.viewModel.currentPaperPublisher.value else {return}
-        let attributedTitleString = NSAttributedString(string: "페이지 관리", attributes: [
+        let attributedTitleString = NSAttributedString(string: "보드 관리", attributes: [
             NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15),
             NSAttributedString.Key.strokeWidth: -5 ])
         let attributedMessageString = NSAttributedString(string: "정보를 수정하거나 삭제할 수 있습니다.", attributes: [
@@ -383,7 +383,7 @@ final class WrittenPaperViewController: UIViewController {
         
         allertController.addAction(UIAlertAction(title: "수정", style: .default,
                                                  handler: {_ in
-            let alert = UIAlertController(title: "페이퍼 제목 수정", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: "보드 제목 수정", message: "", preferredStyle: .alert)
             let edit = UIAlertAction(title: "수정", style: .default) { _ in
                 guard let changedPaperTitle = self.titleEmbedingTextField.text else { return }
                 if self.viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
@@ -404,7 +404,7 @@ final class WrittenPaperViewController: UIViewController {
         }))
         allertController.addAction(UIAlertAction(title: "마감", style: .default,
                                                  handler: {_ in
-            let alert = UIAlertController(title: "페이퍼 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
+            let alert = UIAlertController(title: "보드 마감", message: "마감하면 더이상 메세지 카드를 남길 수 없습니다. 마감하시겠어요?", preferredStyle: .alert)
             let stop = UIAlertAction(title: "확인", style: .default) { _ in
                 self.inputToVM.send(.stopPaperTapped)
                 self.stopPaperBtnIsPressed = true
@@ -419,7 +419,7 @@ final class WrittenPaperViewController: UIViewController {
         
         allertController.addAction(UIAlertAction(title: "삭제", style: .destructive,
                                                  handler: {_ in
-            let alert = UIAlertController(title: "페이퍼 삭제", message: "페이퍼를 삭제하려면 페이퍼 제목을 하단에 입력해주세요.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "보드 삭제", message: "보드를 삭제하려면 보드 제목을 하단에 입력해주세요.", preferredStyle: .alert)
             let delete = UIAlertAction(title: "삭제", style: .destructive) { _ in
                 self.deletePaper()
             }

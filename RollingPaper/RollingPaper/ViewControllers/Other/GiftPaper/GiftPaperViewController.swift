@@ -43,7 +43,7 @@ class GiftPaperViewController: UIViewController {
         let titleLabel = UILabel()
         titleLabel.frame = CGRect(x: 0, y: 0, width: 400, height: 36)
         titleLabel.textAlignment = .center
-        titleLabel.text = "선물 받은 페이퍼"
+        titleLabel.text = "선물 받은 보드"
         titleLabel.font = UIFont.preferredFont(for: UIFont.TextStyle.title3, weight: UIFont.Weight.bold)
         titleLabel.numberOfLines = 1
         return titleLabel
