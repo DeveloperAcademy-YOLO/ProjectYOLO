@@ -215,12 +215,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         
         introWordingAppear()
         
-        rootUIImageView.addSubview(someImageView)
-        someImageViewConstraints()
-        
-        rootUIImageView.addSubview(canvasView)
-        canvasViewConstraints()
-        
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
         
