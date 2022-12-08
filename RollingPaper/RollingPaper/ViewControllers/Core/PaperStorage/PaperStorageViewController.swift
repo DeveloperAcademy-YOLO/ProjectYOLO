@@ -34,7 +34,7 @@ final class PaperStorageViewController: UIViewController {
         let emptyView = UILabel()
         emptyView.font = .systemFont(ofSize: 24)
         emptyView.textColor = UIColor(rgb: 0xADADAD)
-        emptyView.text = "보관함이 비어있어요"
+        emptyView.text = "담벼락이 비어있어요"
         emptyView.textAlignment = .center
         emptyView.isHidden = true
         return emptyView

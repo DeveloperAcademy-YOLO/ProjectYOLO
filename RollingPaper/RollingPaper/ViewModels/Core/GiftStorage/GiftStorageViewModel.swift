@@ -125,6 +125,7 @@ class GiftStorageViewModel {
                 // 뷰가 나타났다는 시그널이 오면 타이머 bind 시키고 썸네일 새로 다운받기
                 case .viewDidAppear:
                     self.sortPapers()
+                    self.output.send(.initPapers)
                 // 특정 페이퍼가 선택되면 로컬/서버 인지 구분하고 fetchpaper 실행
                 case .paperSelected(let paperId):
                     if self.serverPaperIds.contains(paperId) {
