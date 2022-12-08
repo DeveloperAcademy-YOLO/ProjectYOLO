@@ -146,6 +146,7 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
                 }
             }
             .store(in: &cancellables)
+        collectionView.delegate = self
     }
     
     private func setupViewInitialSetting() {
@@ -171,9 +172,8 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     private func setupView() {
         view.addSubview(userInfoStack)
         view.addSubview(collectionView)
-        userInfoStack.backgroundColor = .systemBackground
+        userInfoStack.backgroundColor = .systemGray6
         userInfoStack.layer.cornerRadius = 12
-        collectionView.backgroundColor = .clear
         collectionView.delegate = self
         
         userInfoStack.snp.makeConstraints { make in
@@ -199,12 +199,16 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
         userPhoto.layer.masksToBounds = true
         userNameStack.layoutMargins = UIEdgeInsets(top: 50, left: 0, bottom: 50, right: 0)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+    }
 }
 
 extension AppSettingViewController { // CollectionView
     
     private func setupCollectionViewLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
+        let layout = UICollectionViewCompositionalLayout { section, layoutEnvironment in
             var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             config.headerMode = .none
             config.backgroundColor = .clear
@@ -217,7 +221,7 @@ extension AppSettingViewController { // CollectionView
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AppSettingSectionModel> { (cell, indexPath, item) in
             var content = cell.defaultContentConfiguration()
             var headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
-            headerDisclosureOption.tintColor = .black
+            headerDisclosureOption.tintColor = .label
             switch indexPath {
             case [0, 0]:
                 cell.accessories = [.customView(configuration: self.colorSelectAccessory)]
@@ -230,6 +234,9 @@ extension AppSettingViewController { // CollectionView
                 break
             }
             content.text = item.title
+            let view = UIView()
+            view.backgroundColor = .systemGray6
+            cell.backgroundView = view
             cell.contentConfiguration = content
         }
         
@@ -280,7 +287,10 @@ extension AppSettingViewController { // CollectionView
 extension AppSettingViewController {
     
     @objc private func tapUserProfile() {
-        navigationController?.pushViewController(SettingScreenViewController(), animated: true)
+        NotificationCenter.default.post(name: .viewChange,
+                                        object: nil,
+                                        userInfo: [NotificationViewKey.view: "프로필"]
+        )
     }
 
     @objc private func toggleSwitch(sender: UISwitch) {

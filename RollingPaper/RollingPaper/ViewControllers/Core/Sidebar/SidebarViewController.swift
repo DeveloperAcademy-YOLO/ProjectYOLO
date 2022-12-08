@@ -263,20 +263,13 @@ class CategoryCell: UICollectionViewListCell {
         super.updateConfiguration(using: state)
         guard var contentConfig = self.contentConfiguration?.updated(for: state) as? UIListContentConfiguration else { return }
         contentConfig.textProperties.colorTransformer = UIConfigurationColorTransformer { color in
-            state.isSelected || state.isHighlighted ? .black : .label
+            state.isSelected || state.isHighlighted ? .systemBackground : .label
         }
-        contentConfig.image = {
-            if categoryData[1] == "square.and.pencil" {
-                return UIImage(systemName: categoryData[1])
-            } else {
-                return UIImage(systemName: state.isSelected || state.isHighlighted ? categoryData[1] + ".fill" : categoryData[1])
-            }
-        }()
-        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .black : .label
+        contentConfig.imageProperties.tintColor = state.isSelected || state.isHighlighted ? .white : .tintColor
         
         guard var backgroundConfig = self.backgroundConfiguration?.updated(for: state) else { return }
         backgroundConfig.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
-            state.isSelected || state.isHighlighted ? .systemGray3 : .clear
+            state.isSelected || state.isHighlighted ? .tintColor : .clear
         }
         
         self.contentConfiguration = contentConfig
