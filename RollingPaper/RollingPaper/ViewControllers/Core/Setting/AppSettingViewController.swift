@@ -208,7 +208,7 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
 extension AppSettingViewController { // CollectionView
     
     private func setupCollectionViewLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { _, layoutEnvironment in
+        let layout = UICollectionViewCompositionalLayout { section, layoutEnvironment in
             var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             config.headerMode = .none
             config.backgroundColor = .clear
