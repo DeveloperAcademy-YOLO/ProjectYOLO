@@ -114,9 +114,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         cameraImageAttachment.bounds = CGRect(x: 0, y: -10, width: 50, height: 40)
         paletteImageAttachment.bounds = CGRect(x: 0, y: -10, width: 45, height: 40)
         attributedString.append(NSAttributedString(attachment: cameraImageAttachment))
-        attributedString.append(NSAttributedString(string: " 와  "))
+        attributedString.append(NSAttributedString(string: "와  "))
         attributedString.append(NSAttributedString(attachment: paletteImageAttachment))
-        attributedString.append(NSAttributedString(string: " 을 눌러 배경을 채워주세요."))
+        attributedString.append(NSAttributedString(string: "을 눌러 배경을 채워주세요."))
         
         label.attributedText = attributedString
         label.textAlignment = .center
@@ -178,15 +178,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     lazy var stickerOnButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "StickerToogleOn"), for: .normal)
-        button.setImage(UIImage(named: "StickerToogleOn"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToggleOn"), for: .normal)
+        button.setImage(UIImage(named: "StickerToggleOn"), for: .highlighted)
         return button
     }()
     
     lazy var stickerOffButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "StickerToogleOff"), for: .normal)
-        button.setImage(UIImage(named: "StickerToogleOff"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToggleOff"), for: .normal)
+        button.setImage(UIImage(named: "StickerToggleOff"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
