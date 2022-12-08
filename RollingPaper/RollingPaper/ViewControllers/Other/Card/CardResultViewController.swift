@@ -30,15 +30,22 @@ final class CardResultViewController: UIViewController {
         return aView
     }()
     
+    lazy var uiView: UIView = {
+        let uiView = UIView()
+        uiView.isUserInteractionEnabled = true
+        uiView.layer.masksToBounds = true
+        uiView.layer.cornerRadius = 24
+        uiView.layer.borderWidth = 1
+        uiView.layer.borderColor = UIColor(red: 128, green: 128, blue: 128).cgColor
+        return uiView
+    }()
+    
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView(frame: someImageShadow.bounds)
         theImageView.translatesAutoresizingMaskIntoConstraints = false
         theImageView.isUserInteractionEnabled = true
         theImageView.backgroundColor = .systemBackground
         theImageView.contentMode = .scaleToFill
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 24
-        
         theImageView.image = image
         return theImageView
     }()
@@ -68,7 +75,6 @@ final class CardResultViewController: UIViewController {
     }()
     
     func createRoundedTriangle(width: CGFloat, height: CGFloat, radius: CGFloat) -> CGPath {
-        // Draw the triangle path with its origin at the center.
         let point1 = CGPoint(x: -width / 2, y: -height / 2)
         let point2 = CGPoint(x: width / 2, y: -height / 2)
         let point3 = CGPoint(x: 0, y: height / 2)
@@ -122,7 +128,10 @@ final class CardResultViewController: UIViewController {
         view.addSubview(someImageShadow)
         someImageShadowConstraints()
         
-        view.addSubview(someImageView)
+        view.addSubview(uiView)
+        uiViewConstraints()
+        
+        uiView.addSubview(someImageView)
         someImageViewConstraints()
         
         view.addSubview(titleLabel)
@@ -200,10 +209,19 @@ extension CardResultViewController {
             make.top.equalTo(titleLabel.snp.bottom)
         })
     }
+   
+    private func uiViewConstraints() {
+        uiView.snp.makeConstraints({ make in
+            make.width.equalTo(self.view.bounds.width * 0.57)
+            make.height.equalTo(self.view.bounds.height * 0.57)
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+        })
+    }
     
     private func someImageShadowConstraints() {
         someImageShadow.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.width.equalTo(self.view.bounds.width * 0.57)
             make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)
@@ -212,7 +230,7 @@ extension CardResultViewController {
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
-            make.width.equalTo(self.view.bounds.width * 0.52)
+            make.width.equalTo(self.view.bounds.width * 0.57)
             make.height.equalTo(self.view.bounds.height * 0.57)
             make.centerX.equalTo(self.view)
             make.centerY.equalTo(self.view)

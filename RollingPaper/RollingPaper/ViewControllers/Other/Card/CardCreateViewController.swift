@@ -43,6 +43,16 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return shadowUIView
     }()
     
+    lazy var uiView: UIView = {
+        let uiView = UIView()
+        uiView.isUserInteractionEnabled = true
+        uiView.layer.masksToBounds = true
+        uiView.layer.cornerRadius = 32
+        uiView.layer.borderWidth = 1
+        uiView.layer.borderColor = UIColor.systemGray6.cgColor
+        return uiView
+    }()
+    
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.isUserInteractionEnabled = true
@@ -66,8 +76,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 32
         theImageView.contentMode = .scaleAspectFill
         theImageView.image = backgroundImg
         let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
@@ -202,15 +210,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         fatalError("init(coder:) has not been implemented")
     }
     
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
         
-        view.addSubview(rootUIImageView)
+        view.addSubview(uiView)
+        uiViewConstraints()
+        
+        uiView.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
         introWordingAppear()
@@ -829,6 +836,16 @@ extension UIImage {
 }
 
 extension CardCreateViewController {
+    private func uiViewConstraints() {
+        uiView.snp.makeConstraints({ make in
+            make.width.equalTo(self.view.bounds.width * 0.80)
+            make.height.equalTo(self.view.bounds.height * 0.80)
+            make.top.equalTo(self.view.snp.top).offset(60)
+            make.centerX.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
+        })
+    }
+    
     private func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
