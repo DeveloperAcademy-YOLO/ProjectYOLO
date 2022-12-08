@@ -28,7 +28,7 @@ final class WrittenPaperViewController: UIViewController {
     lazy var fromCardView: Bool = false
     private let deviceWidth = UIScreen.main.bounds.size.width
     private let deviceHeight = UIScreen.main.bounds.size.height
-    private var timeInterval: Double?
+    var timeInterval: Double?
     private let now: Date = Date()
     
     private lazy var showBalloonButton: UIButton = UIButton()
@@ -117,7 +117,6 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
         spinner.color = .label
-//        spinner.backgroundColor = .white
         spinner.startAnimating()
         return spinner
     }()
@@ -134,20 +133,20 @@ final class WrittenPaperViewController: UIViewController {
         self.tapGesture.isEnabled = false
         
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-//        self.navigationController?.navigationBar.isHidden = true
-//        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.isNavigationBarHidden = true
-//        self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
+        if self.timeInterval ?? -0.1 >= 0.0 {
+            bindTimer()
+        }
         self.splitViewController?.hide(.primary)
         self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
         inputToVM.send(.fetchingPaper)
         spinnerConstraints()
         view.addSubview(spinner)
-//        cardsList.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -234,7 +233,6 @@ final class WrittenPaperViewController: UIViewController {
                 print("aaa currentPaperPublisher has changed: \(paper)")
                 if let paper = paper {
                     self?.checkFetchingCorrectly(paper)
-                    self?.bindTimer()
                     self?.titleLabel.text = paper.title
                     self?.timeLabel.setEndTime(time: paper.endTime)
                     self?.cardsList.reloadData()
@@ -331,7 +329,6 @@ final class WrittenPaperViewController: UIViewController {
         stackViewConstraints()
         navigationItem.titleView = stackView
         titleLabelConstraints()
-//        view.addGestureRecognizer(tapGesture)
         view.addSubview(cardsList)
         cardsList.reloadData()
         self.spinner.stopAnimating()
@@ -341,9 +338,6 @@ final class WrittenPaperViewController: UIViewController {
     private func checkFetchingCorrectly(_ paper: PaperModel?) {
             DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
                 self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
-//                self.navigationController?.navigationBar.tintColor = .systemBlue
-//                self.navigationController?.navigationBar.isHidden = false
-//                self.navigationController?.setNavigationBarHidden(false, animated: false)
                 self.navigationController?.isNavigationBarHidden = false
                 self.titleLabel.text = paper?.title
                 self.drawView()
