@@ -15,7 +15,6 @@ class CardsInPaperViewController: UICollectionView {
     var callingVC: WrittenPaperViewController?
     private let inputToVM: PassthroughSubject<WrittenPaperViewModel.Input, Never> = .init()
     private lazy var cancellables = Set<AnyCancellable>()
-//    private var timeInterval: Double?
     
     private var refreshController: UIRefreshControl = {
         let control = UIRefreshControl()

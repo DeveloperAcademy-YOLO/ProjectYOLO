@@ -12,7 +12,7 @@ import Combine
 class WrittenPaperViewModel {
     let localDatabaseManager: DatabaseManager = LocalDatabaseFileManager.shared
     let serverDatabaseManager: DatabaseManager = FirestoreManager.shared
-    private var cancellables = Set<AnyCancellable>()
+    var cancellables = Set<AnyCancellable>()
     private let authManager: AuthManager = FirebaseAuthManager.shared
     private let currentUserSubject: CurrentValueSubject<UserModel?, Never> = .init(nil)
     private let output: PassthroughSubject<Output, Never> = .init()
@@ -52,7 +52,6 @@ class WrittenPaperViewModel {
         case paperTitleChanged
         case paperLinkMade(url: URL)
         case giftLinkMade(url: URL)
-        case fetchingSuccess
     }
     
     init() {
@@ -71,6 +70,7 @@ class WrittenPaperViewModel {
     }
     
     private func setCurrentPaper() {
+        print("setCurrentPaper")
         localDatabaseManager.paperSubject
             .combineLatest(serverDatabaseManager.paperSubject)
             .sink { [weak self] localPaper, serverPaper in
@@ -234,6 +234,7 @@ class WrittenPaperViewModel {
         currentPaperPublisher.value = nil
         localDatabaseManager.resetPaper()
         serverDatabaseManager.resetPaper()
+        cancellables.removeAll()
     }
 
     private func changePaperTitle(input: String, from paperFrom: DataSource) {
@@ -245,6 +246,7 @@ class WrittenPaperViewModel {
         case .fromServer:
             serverDatabaseManager.updatePaper(paper: paper)
         }
+        currentPaperPublisher.send(paper)
     }
     
     func deleteCard(_ card: CardModel, from paperFrom: DataSource) {
