@@ -114,9 +114,9 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         cameraImageAttachment.bounds = CGRect(x: 0, y: -10, width: 50, height: 40)
         paletteImageAttachment.bounds = CGRect(x: 0, y: -10, width: 45, height: 40)
         attributedString.append(NSAttributedString(attachment: cameraImageAttachment))
-        attributedString.append(NSAttributedString(string: "(카메라 버튼)과 "))
+        attributedString.append(NSAttributedString(string: " 와  "))
         attributedString.append(NSAttributedString(attachment: paletteImageAttachment))
-        attributedString.append(NSAttributedString(string: "(그림 버튼)을 눌러 배경을 채워주세요."))
+        attributedString.append(NSAttributedString(string: " 을 눌러 배경을 채워주세요."))
         
         label.attributedText = attributedString
         label.textAlignment = .center
