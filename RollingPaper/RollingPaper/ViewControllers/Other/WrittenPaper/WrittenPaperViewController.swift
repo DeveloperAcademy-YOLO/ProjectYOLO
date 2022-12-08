@@ -38,7 +38,7 @@ final class WrittenPaperViewController: UIViewController {
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         btn.setTitle("보관함", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        btn.setTitleColor(UIColor(named: "customBlack"), for: .normal)
+        btn.setTitleColor(.black, for: .normal)
         btn.setImage(btnImg, for: .normal)
         btn.addLeftPadding(5)
         
@@ -117,7 +117,7 @@ final class WrittenPaperViewController: UIViewController {
     private lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView()
         spinner.color = .label
-        spinner.backgroundColor = .white
+//        spinner.backgroundColor = .white
         spinner.startAnimating()
         return spinner
     }()
@@ -137,10 +137,10 @@ final class WrittenPaperViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        self.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+//        self.navigationController?.navigationBar.isHidden = true
+//        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.navigationController?.isNavigationBarHidden = true
-        self.navigationController?.navigationBar.tintColor = UIColor.white
+//        self.navigationController?.navigationBar.tintColor = UIColor.white
         bind()
         self.splitViewController?.hide(.primary)
         self.timeInterval = self.viewModel.currentPaperPublisher.value?.endTime.timeIntervalSince(Date())
@@ -245,7 +245,9 @@ final class WrittenPaperViewController: UIViewController {
         showBalloonButton
             .tapPublisher
             .sink { [weak self] in
+                guard let tapGesture = self?.tapGesture else {return}
                 if self?.viewModel.currentPaperPublisher.value?.endTime != self?.viewModel.currentPaperPublisher.value?.date {
+                    self?.view.addGestureRecognizer(tapGesture)
                     self?.timerBalloonBtnPressed = true
                     self?.tapGesture.isEnabled = true
                     self?.navigationController?.navigationBar.addSubview(self?.timerDiscriptionBalloon.view ?? UIView())
@@ -329,7 +331,7 @@ final class WrittenPaperViewController: UIViewController {
         stackViewConstraints()
         navigationItem.titleView = stackView
         titleLabelConstraints()
-        view.addGestureRecognizer(tapGesture)
+//        view.addGestureRecognizer(tapGesture)
         view.addSubview(cardsList)
         cardsList.reloadData()
         self.spinner.stopAnimating()
@@ -339,9 +341,9 @@ final class WrittenPaperViewController: UIViewController {
     private func checkFetchingCorrectly(_ paper: PaperModel?) {
             DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
                 self.timeLabel.setEndTime(time: paper?.endTime ?? Date())
-                self.navigationController?.navigationBar.tintColor = .systemBlue
-                self.navigationController?.navigationBar.isHidden = false
-                self.navigationController?.setNavigationBarHidden(false, animated: false)
+//                self.navigationController?.navigationBar.tintColor = .systemBlue
+//                self.navigationController?.navigationBar.isHidden = false
+//                self.navigationController?.setNavigationBarHidden(false, animated: false)
                 self.navigationController?.isNavigationBarHidden = false
                 self.titleLabel.text = paper?.title
                 self.drawView()
@@ -504,6 +506,7 @@ final class WrittenPaperViewController: UIViewController {
     
     func checkTimerBallon() {
         if self.timerBalloonBtnPressed == true {
+            self.view.removeGestureRecognizer(self.tapGesture)
             self.timerDiscriptionBalloon.view.isHidden = true
         }
 }
