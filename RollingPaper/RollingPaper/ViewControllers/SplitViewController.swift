@@ -13,7 +13,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
-    private var currentSecondaryView = "새 페이퍼"
+    private var currentSecondaryView = "새로운 보드"
     private var sidebarViewController: UINavigationController!
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
@@ -117,18 +117,18 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     @objc private func changeSecondaryView(notification: Notification) {
         guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
         switch object {
-        case "새 페이퍼":
+        case "새로운 보드":
             setViewController(paperTemplateSelectViewController, for: .secondary)
-            currentSecondaryView = "새 페이퍼"
-        case "보관함":
-            if currentSecondaryView == "새 페이퍼" {
+            currentSecondaryView = "새로운 보드"
+        case "담벼락":
+            if currentSecondaryView == "새로운 보드" {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
                 self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
                 setViewController(paperStorageViewController, for: .secondary)
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
-            currentSecondaryView = "보관함"
+            currentSecondaryView = "담벼락"
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
             currentSecondaryView = "선물 상자"
@@ -162,12 +162,12 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         }
         
         switch object {
-        case "새 페이퍼":
+        case "새로운 보드":
             setViewController(paperTemplateSelectViewController, for: .secondary)
-            currentSecondaryView = "새 페이퍼"
-        case "보관함":
+            currentSecondaryView = "새로운 보드"
+        case "담벼락":
             setViewController(paperStorageViewController, for: .secondary)
-            currentSecondaryView = "보관함"
+            currentSecondaryView = "담벼락"
         case "선물 상자":
             setViewController(giftStorageViewController, for: .secondary)
             currentSecondaryView = "선물 상자"

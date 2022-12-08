@@ -38,10 +38,10 @@ final class SidebarViewController: UIViewController {
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
     private let sideBarCategories: [CategoryModel] = [
-        CategoryModel(name: "새 페이퍼", icon: "doc.on.doc.fill"),
-        CategoryModel(name: "보관함", icon: "folder.fill"),
-        CategoryModel(name: "선물 상자", icon: "giftcard.fill"),
-        CategoryModel(name: "설정", icon: "gearshape.fill")
+        CategoryModel(name: "새로운 보드", icon: "square.and.pencil"),
+        CategoryModel(name: "담벼락", icon: "square.grid.2x2"),
+        CategoryModel(name: "선물 상자", icon: "giftcard"),
+        CategoryModel(name: "설정", icon: "gearshape")
     ]
     
     private let userPhoto: UIImageView = {
@@ -138,7 +138,7 @@ final class SidebarViewController: UIViewController {
     
     @objc private func changeSecondaryView(notification: Notification) {
         guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
-        if object == "보관함" {
+        if object == "담벼락" {
             self.collectionView.selectItem(at: IndexPath(row: 1, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
         } else if object == "프로필" {
             self.collectionView.selectItem(at: IndexPath(row: 3, section: 0), animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
