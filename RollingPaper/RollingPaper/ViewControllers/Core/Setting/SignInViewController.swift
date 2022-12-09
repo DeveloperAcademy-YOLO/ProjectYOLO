@@ -457,7 +457,7 @@ extension SignInViewController {
         let topOffset = (view.frame.height - 332 + 85 + 72) / 2
         logoImageView.snp.makeConstraints({ make in
             make.width.equalTo(120)
-            make.height.equalTo(85)
+            make.height.equalTo(120)
             make.centerX.equalToSuperview()
             make.bottom.equalTo(emailTextField.snp.top).offset(-72)
         })
@@ -578,6 +578,9 @@ extension SignInViewController {
     private func layoutIfModalView() {
         if presentingViewController != nil {
             let topOffset = (view.frame.height - 332 + 85 + 72) / 2
+            logoImageView.snp.updateConstraints({ make in
+                make.bottom.equalTo(emailTextField.snp.top).offset(-36)
+            })
             emailTextField.snp.updateConstraints({ make in
                 make.top.equalToSuperview().offset(topOffset)
             })
