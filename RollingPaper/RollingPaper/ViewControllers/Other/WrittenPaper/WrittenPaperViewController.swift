@@ -34,8 +34,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private lazy var showBalloonButton: UIButton = UIButton()
     private lazy var customBackBtn: UIButton = {
-        let btnImg = UIImage(systemName: "chevron.backward")?
-            .withTintColor(UIColor(named: "customBlack") ?? UIColor(red: 27, green: 27, blue: 27), renderingMode: .alwaysOriginal)
+        let btnImg = UIImage(systemName: "chevron.backward")
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         btn.setTitle("담벼락", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)

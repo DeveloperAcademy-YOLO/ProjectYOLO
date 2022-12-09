@@ -188,7 +188,7 @@ final class PaperSettingViewController: UIViewController {
     
     // 네비게이션 바 초기화
     private func setNavigationBar() {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")
         let leftCustomBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         leftCustomBackBtn.setTitle("템플릿", for: .normal)
         leftCustomBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
