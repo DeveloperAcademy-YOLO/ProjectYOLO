@@ -376,7 +376,7 @@ extension CardsInPaperViewController: UICollectionViewDelegate {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             callingVC?.present(alert, animated: true)
         } else {
-            let alert = UIAlertController(title: "Saved!", message: "이미지가 사진첩에 저장이 되었습니다", preferredStyle: .alert)
+            let alert = UIAlertController(title: "저장 완료!", message: "이미지가 사진첩에 저장이 되었습니다", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             callingVC?.present(alert, animated: true)
         } //실기계에서는 잘 작동하나 시뮬레이터에서 쓰면 앱이 죽습니다
