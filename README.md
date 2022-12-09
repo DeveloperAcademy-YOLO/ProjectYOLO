@@ -30,15 +30,16 @@
 
 ### ⭐️⭐️ Final Sprint
 
-|<img src="https://user-images.githubusercontent.com/95460398/206636378-4118a9f8-3d75-4dad-994a-34cd5fe16f7f.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206636385-1e7eebcc-5895-48ac-bc4e-f150ace6940c.gif"/>
+|<img src="https://user-images.githubusercontent.com/95460398/206640040-cc6d73bd-b34c-45a5-adbc-f4761af8e32b.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206640113-fc23e945-e039-4eda-9978-87b16b1f9c96.gif"/>
 |:---:|:---:|
 |<center>로그인</center>|<center>페이퍼 생성</center>|
 
-|<img src="https://user-images.githubusercontent.com/95460398/206637857-eaafc597-0165-42c0-bab5-68edc91e68fd.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206637846-36df5ace-1a35-427e-b12e-3dd67659cab6.gif"/>|
+|<img src="https://user-images.githubusercontent.com/95460398/206641033-08dd2c20-a75b-4dd2-9dee-39738f6e601c.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206640705-5fd3651f-86f5-45cb-bcf8-25a2f49e9ea9.gif"/>|
 |:---:|:---:|
 |<center>카드 생성</center>|<center>카드 자세히 보기</center>|
 
-|<img src="https://user-images.githubusercontent.com/95460398/206636585-fc30ee61-4d46-4726-8c3c-9e6535edb3d7.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206636594-ec5d498c-e6b6-401f-a8aa-a1543f62cf6e.gif"/>|
+
+|<img src="https://user-images.githubusercontent.com/95460398/206640326-dfab4ebf-df40-4de6-8e2f-f34fce31733e.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206640457-1a057c91-c4dd-4bbc-851a-8422e2f5f164.gif"/>|
 |:---:|:---:|
 |<center>페이퍼 방 관리</center>|<center>페이퍼 보관함</center>|
 
