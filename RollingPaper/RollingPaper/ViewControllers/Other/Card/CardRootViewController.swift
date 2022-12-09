@@ -20,7 +20,7 @@ class CardRootViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
     lazy var leftButton: UIBarButtonItem = {
-        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label ?? UIColor(red: 128, green: 128, blue: 128), renderingMode: .alwaysOriginal)
+        let customBackBtnImage = UIImage(systemName: "chevron.backward")?.withTintColor(UIColor.label, renderingMode: .alwaysOriginal)
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("돌아가기", for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
@@ -132,7 +132,7 @@ class CardRootViewController: UIViewController {
     @objc func openResultView(_ gesture: UITapGestureRecognizer) {
         let cardCreateViewVC = self.children[0] as? CardCreateViewController
         if cardCreateViewVC?.someImageView.image == nil {
-            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "사진 또는 배경을 넣어주세요.", preferredStyle: .alert)
+            let alert = UIAlertController(title: "잠깐! 카드 배경이 없어요.", message: "왼쪽 도구를 이용하여 배경을 넣어주세요.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
                 alert.dismiss(animated: true, completion: nil)
             }))
@@ -161,7 +161,7 @@ class CardRootViewController: UIViewController {
         print("cancelBtnPressed")
         let cardCreateViewVC = self.children[0] as? CardCreateViewController
         if cardCreateViewVC?.someImageView.image != nil {
-            let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "페이퍼로 돌아가시겠습니까?", preferredStyle: .alert)
+            let alert = UIAlertController(title: "잠깐! 작성중인 카드가 사라져요.", message: "보드로 돌아가시겠습니까?", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "취소", style: .destructive, handler: { (_: UIAlertAction) in
                 alert.dismiss(animated: true, completion: nil)

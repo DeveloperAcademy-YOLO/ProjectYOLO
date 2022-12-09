@@ -43,6 +43,16 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         return shadowUIView
     }()
     
+    lazy var uiView: UIView = {
+        let uiView = UIView()
+        uiView.isUserInteractionEnabled = true
+        uiView.layer.masksToBounds = true
+        uiView.layer.cornerRadius = 32
+        uiView.layer.borderWidth = 1
+        uiView.layer.borderColor = UIColor.systemGray6.cgColor
+        return uiView
+    }()
+    
     lazy var rootUIImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.isUserInteractionEnabled = true
@@ -66,8 +76,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var someImageView: UIImageView = {
         let theImageView = UIImageView()
         theImageView.translatesAutoresizingMaskIntoConstraints = false
-        theImageView.layer.masksToBounds = true
-        theImageView.layer.cornerRadius = 32
         theImageView.contentMode = .scaleAspectFill
         theImageView.image = backgroundImg
         let tapRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(tapBackground(recognizer:)))
@@ -105,16 +113,20 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     lazy var introWordingLabel: UILabel = {
         let label = UILabel()
-        label.text = "사진 또는 배경을 넣어 주세요."
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 30)
-        label.textColor = .lightGray
-        return label
-    }()
-    
-    lazy var introWordingClearLabel: UILabel = {
-        let label = UILabel()
-        label.text = ""
+        
+        let attributedString = NSMutableAttributedString(string: "")
+        let cameraImageAttachment = NSTextAttachment()
+        let paletteImageAttachment = NSTextAttachment()
+        cameraImageAttachment.image = UIImage(systemName: "camera.fill")
+        paletteImageAttachment.image = UIImage(systemName: "paintpalette.fill")
+        cameraImageAttachment.bounds = CGRect(x: 0, y: -10, width: 50, height: 40)
+        paletteImageAttachment.bounds = CGRect(x: 0, y: -10, width: 45, height: 40)
+        attributedString.append(NSAttributedString(attachment: cameraImageAttachment))
+        attributedString.append(NSAttributedString(string: "와  "))
+        attributedString.append(NSAttributedString(attachment: paletteImageAttachment))
+        attributedString.append(NSAttributedString(string: "을 눌러 배경을 채워주세요."))
+        
+        label.attributedText = attributedString
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 30)
         label.textColor = .lightGray
@@ -174,15 +186,15 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     lazy var stickerOnButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "StickerToogleOn"), for: .normal)
-        button.setImage(UIImage(named: "StickerToogleOn"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToggleOn"), for: .normal)
+        button.setImage(UIImage(named: "StickerToggleOn"), for: .highlighted)
         return button
     }()
     
     lazy var stickerOffButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "StickerToogleOff"), for: .normal)
-        button.setImage(UIImage(named: "StickerToogleOff"), for: .highlighted)
+        button.setImage(UIImage(named: "StickerToggleOff"), for: .normal)
+        button.setImage(UIImage(named: "StickerToggleOff"), for: .highlighted)
         button.addTarget(self, action: #selector(togglebutton(_:)), for: .touchUpInside)
         return button
     }()
@@ -202,16 +214,13 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
         
-        introWordingAppear()
+        view.addSubview(uiView)
+        uiViewConstraints()
         
-        view.addSubview(rootUIImageView)
+        uiView.addSubview(rootUIImageView)
         rootUIImageViewConstraints()
         
-        rootUIImageView.addSubview(someImageView)
-        someImageViewConstraints()
-        
-        rootUIImageView.addSubview(canvasView)
-        canvasViewConstraints()
+        introWordingAppear()
         
         view.addSubview(buttonLabel)
         buttonLabelConstraints()
@@ -247,6 +256,8 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
                 case .getRecentCardBackgroundImgSuccess(let background):
                     DispatchQueue.main.async(execute: {
                         self.someImageView.image = UIImage(named: "\(background ?? "Rectangle")")
+                        self.introWordingDisAppear()
+                        
                         print("get background ImgSuccess")
                     })
                 case .getRecentCardBackgroundImgFail:
@@ -328,14 +339,14 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     }
     
     private func introWordingAppear() {
+        introWordingLabel.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width * 0.80, height: self.view.bounds.height * 0.80)
         view.addSubview(introWordingLabel)
+        introWordingLabel.addDashedBorder()
         introWordingLabelConstraints()
     }
     
-    private func introWordingClearAppear() {
+    private func introWordingDisAppear() {
         introWordingLabel.isHidden = true
-        view.addSubview(introWordingClearLabel)
-        introWordingClearLabelConstraints()
     }
     
     private func dividerAppear() {
@@ -387,7 +398,6 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func setPopOverView(_ sender: UIButton) {
         self.backgroundOnButtonAppear()
-        self.introWordingClearAppear()
         
         let controller = BackgroundButtonViewController(viewModel: viewModel, backgroundImageName: backgroundImageName)
         controller.modalPresentationStyle = UIModalPresentationStyle.popover
@@ -404,6 +414,31 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
             selectedSticker!.enabledControl = false
             selectedSticker!.enabledBorder = false
             selectedSticker = nil
+        }
+    }
+    
+    private func toggleAction() {
+        self.isCanvasToolToggle.toggle()
+        self.isStickerToggle.toggle()
+        
+        if isCanvasToolToggle == true && isStickerToggle == false {
+            print("sticker button off")
+            stickerButtonOff()
+            disableEditSticker()
+            stickerCollectionViewDisappear()
+            
+            pencilButtonOn()
+            toolPickerAppear()
+            
+            canvasViewInteractionEnabled()
+        } else {
+            print("sticker button On")
+            stickerButtonOn()
+            stickerCollectionViewAppear()
+            pencilButtonOff()
+            toolPickerDisappear()
+            
+            canvasViewInteractionDisabled()
         }
     }
     
@@ -438,13 +473,12 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     
     @objc func importImage(_ gesture: UITapGestureRecognizer) {
         self.cameraOnButtonAppear()
-        self.introWordingClearAppear()
         
         var alertStyle = UIAlertController.Style.actionSheet
         if UIDevice.current.userInterfaceIdiom == .pad {
             alertStyle = UIAlertController.Style.alert
         }
-        let actionSheet = UIAlertController(title: "배경 사진 가져오기", message: nil, preferredStyle: alertStyle)
+        let actionSheet = UIAlertController(title: "사진 가져오기", message: nil, preferredStyle: alertStyle)
         
         let cameraAction = UIAlertAction(title: "카메라", style: .default) { _ in
             DispatchQueue.main.async(execute: {
@@ -530,7 +564,7 @@ extension CardCreateViewController: UICollectionViewDelegate, UICollectionViewDa
                     stickerView.enabledBorder = false
                     stickerView.tag = stickerCount
                     stickerView.delegate = self
-    
+                    
                     self.someImageView.addSubview(stickerView)
                 }
             } else {
@@ -623,6 +657,25 @@ extension UIView {
             self?.isHidden = false
         }
     }
+    
+    func addDashedBorder() {
+        let color = UIColor.gray.cgColor
+        
+        let shapeLayer: CAShapeLayer = CAShapeLayer()
+        let frameSize = self.frame.size
+        let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+        
+        shapeLayer.bounds = shapeRect
+        shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = color
+        shapeLayer.lineWidth = 2
+        shapeLayer.lineJoin = CAShapeLayerLineJoin.round
+        shapeLayer.lineDashPattern = [10, 15]
+        shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: 27).cgPath
+        
+        self.layer.addSublayer(shapeLayer)
+    }
 }
 
 extension CardCreateViewController: PHPickerViewControllerDelegate {
@@ -634,7 +687,45 @@ extension CardCreateViewController: PHPickerViewControllerDelegate {
             itemProvider.canLoadObject(ofClass: UIImage.self) {
             itemProvider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.sync {
-                    self.someImageView.image = image as? UIImage
+                    let alert = UIAlertController(title: "사진을 어떤 용도로 쓰시겠어요?", message: "", preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "배경", style: .default, handler: { (_: UIAlertAction) in
+                        self.introWordingDisAppear()
+                        self.someImageView.image = image as? UIImage
+                    }))
+                    alert.addAction(UIAlertAction(title: "스티커", style: .default, handler: { (_: UIAlertAction) in
+                        
+                        if self.stickerOnButton.isHidden == true {
+                            self.toggleAction()
+                        }
+                        
+                        if let imageSticker = image as? UIImage {
+                            if self.stickerCount > 14 {
+                                print("sticker over")
+                                let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
+                                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
+                                    alert.dismiss(animated: true, completion: nil)
+                                }))
+                                self.present(alert, animated: true)
+                            } else {
+                                self.stickerCount += 1
+                                
+                                let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 200), contentImage: imageSticker)
+                                stickerView.center = self.someImageView.center
+                                stickerView.stickerMinScale = 0.5
+                                stickerView.stickerMaxScale = 3.0
+                                stickerView.enabledControl = false
+                                stickerView.enabledBorder = false
+                                stickerView.tag = self.stickerCount
+                                stickerView.delegate = self
+                                
+                                self.someImageView.addSubview(stickerView)
+                            }
+                        } else {
+                            print("Sticker not loaded")
+                        }
+                    }))
+                    self.present(alert, animated: true)
                 }
             }
         }
@@ -662,10 +753,45 @@ extension CardCreateViewController: UIImagePickerControllerDelegate {
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            someImageView.image = pickedImage
-        }
         picker.dismiss(animated: true)
+            let alert = UIAlertController(title: "사진을 어떤 용도로 쓰시겠어요?", message: "", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "배경", style: .default, handler: { (_: UIAlertAction) in
+                if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+                    self.introWordingDisAppear()
+                    self.someImageView.image = pickedImage
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "스티커", style: .default, handler: { (_: UIAlertAction) in
+                if self.stickerOnButton.isHidden == true {
+                    self.toggleAction()
+                }
+                
+                if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+                    if self.stickerCount > 14 {
+                        print("sticker over")
+                        let alert = UIAlertController(title: "잠깐! 스티커가 많아요.", message: "스티커는 15개까지 추가할 수 있어요.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_: UIAlertAction) in
+                            alert.dismiss(animated: true, completion: nil)
+                        }))
+                        self.present(alert, animated: true)
+                    } else {
+                        self.stickerCount += 1
+                        let stickerView = IRStickerView(frame: CGRect.init(x: 0, y: 0, width: 250, height: 200), contentImage: pickedImage)
+                        stickerView.center = self.someImageView.center
+                        stickerView.stickerMinScale = 0.5
+                        stickerView.stickerMaxScale = 3.0
+                        stickerView.enabledControl = false
+                        stickerView.enabledBorder = false
+                        stickerView.tag = self.stickerCount
+                        stickerView.delegate = self
+                        
+                        self.someImageView.addSubview(stickerView)
+                    }
+                } else {
+                    print("Sticker not loaded")
+                }
+            }))
+            self.present(alert, animated: true)
     }
     
     private func cameraImagePicker() {
@@ -710,51 +836,52 @@ extension UIImage {
 }
 
 extension CardCreateViewController {
+    private func uiViewConstraints() {
+        uiView.snp.makeConstraints({ make in
+            make.width.equalTo(self.view.bounds.width * 0.80)
+            make.height.equalTo(self.view.bounds.height * 0.80)
+            make.top.equalTo(self.view.snp.top).offset(60)
+            make.centerX.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
+        })
+    }
+    
     private func rootUIImageViewConstraints() {
         rootUIImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func someImageViewConstraints() {
         someImageView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func canvasViewConstraints() {
         canvasView.snp.makeConstraints({ make in
             make.width.equalTo(self.view.bounds.width * 0.80)
-            make.height.equalTo(self.view.bounds.width * 0.75 * 0.75)
+            make.height.equalTo(self.view.bounds.height * 0.80)
             make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-self.view.bounds.height * 0.10)
         })
     }
     
     private func introWordingLabelConstraints() {
         introWordingLabel.snp.makeConstraints({ make in
-            make.width.equalTo(500)
-            make.height.equalTo(50)
+            make.width.equalTo(self.view.bounds.width * 0.80)
+            make.height.equalTo(self.view.bounds.height * 0.80)
+            make.top.equalTo(self.view.snp.top).offset(60)
             make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
-        })
-    }
-    
-    private func introWordingClearLabelConstraints() {
-        introWordingClearLabel.snp.makeConstraints({ make in
-            make.width.equalTo(500)
-            make.height.equalTo(50)
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(self.view)
         })
     }
     
@@ -763,7 +890,7 @@ extension CardCreateViewController {
             make.width.equalTo(740)
             make.height.equalTo(120)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.bottom).offset(-140)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-20)
         })
     }
     
@@ -772,7 +899,7 @@ extension CardCreateViewController {
             make.width.equalTo(740)
             make.height.equalTo(120)
             make.centerX.equalTo(self.view)
-            make.top.equalTo(self.view.snp.bottom).offset(-140)
+            make.bottom.equalTo(self.view.snp.bottom).offset(-20)
         })
     }
     

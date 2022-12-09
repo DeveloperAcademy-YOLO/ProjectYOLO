@@ -28,7 +28,7 @@ class TimerDiscriptionBalloon: UIViewController {
     
     private lazy var secondLine: BasePaddingLabel = {
         let label = BasePaddingLabel(padding: UIEdgeInsets(top: 3, left: 0, bottom: 17, right: 0))
-        label.text = "메시지를 남길 수 없어요"
+        label.text = "카드를 남길 수 없어요"
         textLabelInit(label)
         
         return label

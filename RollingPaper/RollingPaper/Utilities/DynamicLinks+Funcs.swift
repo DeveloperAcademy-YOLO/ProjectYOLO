@@ -39,7 +39,7 @@ func getPaperShareLink(creator: UserModel?, paperId: String, paperTitle: String,
     }
     let descriptionText: String
     if route == .write {
-        descriptionText = "\(creator?.name ?? "YOLO")님과 함께 페이퍼를 만들어주세요!"
+        descriptionText = "\(creator?.name ?? "YOLO")님과 함께 보드를 꾸며주세요!"
     } else {
         descriptionText = "\(creator?.name ?? "YOLO")님이 보낸 선물이 도착했습니다!"
     }
