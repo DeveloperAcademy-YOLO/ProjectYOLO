@@ -24,7 +24,7 @@ class CardRootViewController: UIViewController {
         let customBackBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customBackBtn.setTitle("돌아가기", for: .normal)
         customBackBtn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        customBackBtn.setTitleColor(.label, for: .normal)
+        customBackBtn.setTitleColor(UIColor.tintColor, for: .normal)
         customBackBtn.setImage(customBackBtnImage, for: .normal)
         customBackBtn.addLeftPadding(5)
         customBackBtn.addTarget(self, action: #selector(cancelBtnPressed(_:)), for: .touchUpInside)
@@ -36,7 +36,7 @@ class CardRootViewController: UIViewController {
         let customCompleteBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         customCompleteBtn.setTitle("완료", for: .normal)
         customCompleteBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
-        customCompleteBtn.setTitleColor(.label, for: .normal)
+        customCompleteBtn.setTitleColor(UIColor.tintColor, for: .normal)
         customCompleteBtn.addTarget(self, action: #selector(openResultView(_:)), for: .touchUpInside)
         
         let button = UIBarButtonItem(customView: customCompleteBtn)
