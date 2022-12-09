@@ -90,7 +90,7 @@ final class AppSettingViewController: UIViewController, UICollectionViewDelegate
     let colorSelectButton: UISegmentedControl = {
         let colorSelectButton = UISegmentedControl(items: ["Light", "Dark", "System"])
         colorSelectButton.backgroundColor = UIColor.systemGray4
-        colorSelectButton.tintColor = UIColor.black
+        colorSelectButton.tintColor = .tintColor
         return colorSelectButton
     }()
     

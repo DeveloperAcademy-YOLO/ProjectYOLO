@@ -113,6 +113,7 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
+        myCell.backgroundView = UIImageView(image: UIImage(systemName: "photo"))
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
         if viewModel?.paperFrom == .fromLocal {
             if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
