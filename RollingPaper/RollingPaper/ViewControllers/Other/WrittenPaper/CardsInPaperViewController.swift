@@ -79,29 +79,34 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
     }
     //commit collectionView
     func saveCard(_ indexNum: Int) {
-        guard let currentPaper = viewModel?.currentPaperPublisher.value else { return }
-        let card = currentPaper.cards[indexNum - 1]
+        guard
+            let currentPaper = viewModel?.currentPaperPublisher.value,
+            currentPaper.cards.count - 1 >= indexNum else { return }
+        let card = currentPaper.cards[indexNum]
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(imageSave(_:didFinishSavingWithError:contextInfo:)), nil)
         }
     }
     
     func shareCard( _ indexNum: Int, _ sender: CGPoint) {
-        guard let currentPaper = viewModel?.currentPaperPublisher.value else { return }
-        let card = currentPaper.cards[indexNum - 1]
+        guard let currentPaper = viewModel?.currentPaperPublisher.value,
+            currentPaper.cards.count - 1 >= indexNum else { return }
+        let card = currentPaper.cards[indexNum]
         
         if let image = NSCacheManager.shared.getImage(name: card.contentURLString) {
             imageShare(sender, image)
         }
     }
     
+    // 진짜 데이터 소스 내에 존재하는 인덱스
     func deleteCard(_ indexNum: Int) {
-        guard let viewModel = viewModel else {return}
-        guard let currentPaper = viewModel.currentPaperPublisher.value else { return }
-//        let card = currentPaper.cards[indexPath.row - 1]
-        let card = currentPaper.cards[indexNum - 1]
-        
-        if viewModel.isPaperLinkMade { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
+        guard
+            let viewModel = viewModel,
+            let currentPaper = viewModel.currentPaperPublisher.value,
+            currentPaper.cards.count - 1 >= indexNum,
+            let paperFrom = viewModel.paperFrom else { return }
+        let card = currentPaper.cards[indexNum]
+        if paperFrom == .fromServer  { //링크가 만들어진 것이 맞다면 서버에 페이퍼가 저장되어있으므로
             viewModel.deleteCard(card, from: .fromServer)
         } else {
             viewModel.deleteCard(card, from: .fromLocal)
@@ -109,11 +114,11 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print("bbb CardsInPaperView indexPath: \(indexPath)")
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.layer.cornerRadius = 12
         myCell.layer.masksToBounds = true
         guard let currentPaper = viewModel?.currentPaperPublisher.value else { return myCell }
+        myCell.backgroundView = UIImageView(image: UIImage(systemName: "photo"))
         if viewModel?.paperFrom == .fromLocal {
             if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
                 let card = currentPaper.cards[indexPath.row]
@@ -151,6 +156,7 @@ extension CardsInPaperViewController: UICollectionViewDataSource {
                         .store(in: &cancellables)
                 }
             } else {
+                print("인덱스 패스", indexPath.row)
                 if indexPath.row == 0 {
                     let addCardBtn = AddCardViewController()
                     myCell.addSubview(addCardBtn.view)
@@ -317,9 +323,10 @@ extension CardsInPaperViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let indexPath = indexPaths.first else { return nil }
+        guard
+            let currentPaper = viewModel?.currentPaperPublisher.value,
+            let indexPath = indexPaths.first else { return nil }
         var indexNum = indexPath.row
-        guard let currentPaper = viewModel?.currentPaperPublisher.value else { return nil }
         if currentPaper.endTime == currentPaper.date || self.callingVC?.timeInterval ?? 1.0 <= 0.0 {
             indexNum += 1
         } else {
@@ -336,7 +343,7 @@ extension CardsInPaperViewController: UICollectionViewDelegate {
                 discoverabilityTitle: nil,
                 state: .off
             ) { [weak self] _ in
-                self?.saveCard(indexNum)
+                self?.saveCard(indexNum - 1)
             }
             
             let share = UIAction(
@@ -346,7 +353,7 @@ extension CardsInPaperViewController: UICollectionViewDelegate {
                 discoverabilityTitle: nil,
                 state: .off
             ) { [weak self] _ in
-                self?.shareCard(indexNum, point)
+                self?.shareCard(indexNum - 1, point)
             }
             
             let delete = UIAction(
@@ -357,7 +364,7 @@ extension CardsInPaperViewController: UICollectionViewDelegate {
                 attributes: .destructive,
                 state: .off
             ) { [weak self] _ in
-                self?.deleteCard(indexNum)
+                self?.deleteCard(indexNum - 1)
             }
             
             return UIMenu(
