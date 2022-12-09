@@ -38,7 +38,7 @@ final class WrittenPaperViewController: UIViewController {
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 23))
         btn.setTitle("담벼락", for: .normal)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        btn.setTitleColor(.black, for: .normal)
+        btn.setTitleColor(UIColor.tintColor, for: .normal)
         btn.setImage(btnImg, for: .normal)
         btn.addLeftPadding(5)
         
@@ -76,6 +76,7 @@ final class WrittenPaperViewController: UIViewController {
     
     private lazy var managePaperBtn: UIButton = {
         let btnImg = UIImage(systemName: "ellipsis.circle")?
+            .withTintColor(UIColor.tintColor, renderingMode: .alwaysOriginal)
             .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -84,6 +85,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var paperLinkBtn: UIButton = {
         let btnImg = UIImage(systemName: "square.and.arrow.up")?
+            .withTintColor(UIColor.tintColor, renderingMode: .alwaysOriginal)
             .resized(to: CGSize(width: 30, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -92,6 +94,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var createCardBtn: UIButton = {
         let btnImg = UIImage(systemName: "plus.rectangle.fill")?
+            .withTintColor(UIColor.tintColor, renderingMode: .alwaysOriginal)
             .resized(to: CGSize(width: 40, height: 30))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         btn.setImage(btnImg, for: .normal)
@@ -100,6 +103,7 @@ final class WrittenPaperViewController: UIViewController {
     }()
     private lazy var giftLinkBtn: UIButton = {
         let btnImg = UIImage(systemName: "giftcard.fill")?
+            .withTintColor(UIColor.tintColor, renderingMode: .alwaysOriginal)
             .resized(to: CGSize(width: 51, height: 36))
         let btn = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: 50))
         btn.setImage(btnImg, for: .normal)

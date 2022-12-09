@@ -136,7 +136,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var cameraOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "camera.fill")
-        button.tintColor = .black
+        button.tintColor = .tintColor
         return button
     }()
     
@@ -151,7 +151,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var backgroundOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "paintpalette.fill")
-        button.tintColor = .black
+        button.tintColor = .tintColor
         return button
     }()
     
@@ -172,7 +172,7 @@ class CardCreateViewController: UIViewController, UINavigationControllerDelegate
     lazy var pencilOnButton: UIButton = {
         let button = UIButton()
         button.setUIImage(systemName: "pencil.and.outline")
-        button.tintColor = .black
+        button.tintColor = .tintColor
         return button
     }()
     
