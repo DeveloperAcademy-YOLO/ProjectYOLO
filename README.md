@@ -34,7 +34,7 @@
 |:---:|:---:|
 |<center>로그인</center>|<center>페이퍼 생성</center>|
 
-|<img src="https://user-images.githubusercontent.com/95460398/206641033-08dd2c20-a75b-4dd2-9dee-39738f6e601c.gif"/>|<img src="https://user-images.githubusercontent.com/95460398/206640705-5fd3651f-86f5-45cb-bcf8-25a2f49e9ea9.gif"/>|
+|<img src="https://user-images.githubusercontent.com/95460398/206643066-c072ebf0-62ac-4443-903c-2a1beedff950.gif" width="170%"/>|<img src="https://user-images.githubusercontent.com/95460398/206640705-5fd3651f-86f5-45cb-bcf8-25a2f49e9ea9.gif"/>|
 |:---:|:---:|
 |<center>카드 생성</center>|<center>카드 자세히 보기</center>|
 
