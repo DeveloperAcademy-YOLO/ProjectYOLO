@@ -139,7 +139,7 @@ class SettingScreenViewController: UIViewController, UIImagePickerControllerDele
                         NotificationCenter.default.post(
                             name: Notification.Name.viewChange,
                             object: nil,
-                            userInfo: [NotificationViewKey.view: "프로필"]
+                            userInfo: [NotificationViewKey.view: SecondaryView.profile]
                         )
                     }
                 case .userProfileChangeDidSuccess:

@@ -289,7 +289,7 @@ extension AppSettingViewController {
     @objc private func tapUserProfile() {
         NotificationCenter.default.post(name: .viewChange,
                                         object: nil,
-                                        userInfo: [NotificationViewKey.view: "프로필"]
+                                        userInfo: [NotificationViewKey.view: SecondaryView.profile]
         )
     }
 

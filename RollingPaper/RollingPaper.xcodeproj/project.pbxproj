@@ -10,6 +10,7 @@
 		1573562F28FFA79B00EA565B /* SettingScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1573562E28FFA79B00EA565B /* SettingScreenViewController.swift */; };
 		1573563128FFA7FF00EA565B /* SettingScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1573563028FFA7FF00EA565B /* SettingScreenViewModel.swift */; };
 		3EA0FA0D1F3A3BD27FEAB304 /* Pods_RollingPaper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */; };
+		A27458AB2A506EDC00017A50 /* SecondaryViewEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27458AA2A506EDC00017A50 /* SecondaryViewEnum.swift */; };
 		AF30AE6D28F907E1002D71C1 /* CardResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */; };
 		AF541589291E12C100A0CBD2 /* StickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF541588291E12C100A0CBD2 /* StickerCollectionViewCell.swift */; };
 		AF6FEE3C2902E2E400E44E7D /* CameraCustomPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF6FEE3B2902E2E400E44E7D /* CameraCustomPickerController.swift */; };
@@ -114,6 +115,7 @@
 		1573563028FFA7FF00EA565B /* SettingScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingScreenViewModel.swift; sourceTree = "<group>"; };
 		63E17153CFE13251542B4A58 /* Pods_RollingPaper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RollingPaper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DFFFB53FBA1A9F7D99A1411 /* Pods-RollingPaper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RollingPaper.release.xcconfig"; path = "Target Support Files/Pods-RollingPaper/Pods-RollingPaper.release.xcconfig"; sourceTree = "<group>"; };
+		A27458AA2A506EDC00017A50 /* SecondaryViewEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryViewEnum.swift; sourceTree = "<group>"; };
 		AF30AE6C28F907E1002D71C1 /* CardResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardResultViewController.swift; sourceTree = "<group>"; };
 		AF541588291E12C100A0CBD2 /* StickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		AF6FEE3B2902E2E400E44E7D /* CameraCustomPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCustomPickerController.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 				CFDA52C028F48D08006774E2 /* CategoryModel.swift */,
 				D2B6309528F69AAB008365CB /* PaperPreviewModel.swift */,
 				CFD4422229224B3D00FC0C20 /* AppSettingModels.swift */,
+				A27458AA2A506EDC00017A50 /* SecondaryViewEnum.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -815,6 +818,7 @@
 				D2B6309628F69AAB008365CB /* PaperPreviewModel.swift in Sources */,
 				D2B6308628EF0BCB008365CB /* UIFont+Extensions.swift in Sources */,
 				D22E4AC928EBFDDF001091DA /* SignInViewModel.swift in Sources */,
+				A27458AB2A506EDC00017A50 /* SecondaryViewEnum.swift in Sources */,
 				D22E4AC228EBFD7B001091DA /* FirestoreManager.swift in Sources */,
 				BC95A92D292212CF00124665 /* TimeFlowManager.swift in Sources */,
 				C59A110929236CF7009FF570 /* TimerDiscriptionBalloon.swift in Sources */,

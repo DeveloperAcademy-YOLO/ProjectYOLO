@@ -37,12 +37,7 @@ final class SidebarViewController: UIViewController {
     private var categories: [CategoryModel] = []
     private let viewModel = SidebarViewModel()
     private var cancellables = Set<AnyCancellable>()
-    private let sideBarCategories: [CategoryModel] = [
-        CategoryModel(name: "새로운 보드", icon: "square.and.pencil"),
-        CategoryModel(name: "담벼락", icon: "square.grid.2x2"),
-        CategoryModel(name: "선물 상자", icon: "giftcard"),
-        CategoryModel(name: "설정", icon: "gearshape")
-    ]
+    private let sideBarCategories: [SecondaryView] = [.newBoard, .feed, .giftBox, .setting]
     
     private let userPhoto: UIImageView = {
         let photo = UIImageView()
@@ -114,7 +109,7 @@ final class SidebarViewController: UIViewController {
                 NotificationCenter.default.post(
                     name: Notification.Name.viewChangeFromSidebar,
                     object: nil,
-                    userInfo: [NotificationViewKey.view: "프로필"])
+                    userInfo: [NotificationViewKey.view: SecondaryView.profile])
             }
             .store(in: &cancellables)
     }
@@ -205,7 +200,7 @@ final class SidebarViewController: UIViewController {
             switch section {
             case .main:
                 var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<CategoryModel>()
-                sectionSnapshot.append(sideBarCategories)
+                sectionSnapshot.append(sideBarCategories.map { $0.category })
                 dataSource.apply(sectionSnapshot, to: section)
             }
         }
@@ -252,7 +247,7 @@ extension SidebarViewController: UICollectionViewDelegate {
         NotificationCenter.default.post(
             name: Notification.Name.viewChangeFromSidebar,
             object: nil,
-            userInfo: [NotificationViewKey.view: category.name])
+            userInfo: [NotificationViewKey.view: category])
     }
 }
 

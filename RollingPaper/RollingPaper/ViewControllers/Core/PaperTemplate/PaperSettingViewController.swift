@@ -306,7 +306,7 @@ final class PaperSettingViewController: UIViewController {
               NotificationCenter.default.post(
                   name: Notification.Name.viewChange,
                   object: nil,
-                  userInfo: [NotificationViewKey.view: "담벼락"]
+                  userInfo: [NotificationViewKey.view: SecondaryView.feed]
               )
           }
       }

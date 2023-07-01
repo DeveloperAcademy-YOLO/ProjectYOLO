@@ -13,7 +13,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     
     private let splitViewManager = SplitViewManager.shared
     private let input: PassthroughSubject<SplitViewManager.Input, Never> = .init()
-    private var currentSecondaryView = "새로운 보드"
+    private var currentSecondaryView = SecondaryView.newBoard
     private var sidebarViewController: UINavigationController!
     private var paperTemplateSelectViewController: UINavigationController!
     private var paperStorageViewController: UINavigationController!
@@ -67,7 +67,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         paperStorageViewController = UINavigationController(rootViewController: PaperStorageViewController())
         giftStorageViewController = UINavigationController(rootViewController: GiftStorageViewController())
         appSettingViewController = UINavigationController(rootViewController: AppSettingViewController())
-        if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+        if UserDefaults.standard.value(forKey: "currentUserEmail") is String {
             settingScreenViewController = UINavigationController(rootViewController: SettingScreenViewController())
         } else {
             settingScreenViewController = UINavigationController(rootViewController: SignInViewController())
@@ -88,7 +88,7 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
             if let currentNavVC = viewControllers[1] as? UINavigationController {
                 currentNavVC.popToRootViewController(true) {
                     self.setViewController(self.paperStorageViewController, for: .secondary)
-                    if let paperVC = self.paperStorageViewController.viewControllers.first as? PaperStorageViewController {
+                    if self.paperStorageViewController.viewControllers.first is PaperStorageViewController {
                         let writtenVC = WrittenPaperViewController()
                         self.paperStorageViewController.pushViewController(writtenVC, animated: true) {
                             LocalDatabaseFileManager.shared.fetchPaper(paperId: paperId)
@@ -98,11 +98,10 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
                 }
             }
         } else {
-            // Gift Storage -> Gift Paper
             if let currentNavVC = viewControllers[1] as? UINavigationController {
                 currentNavVC.popToRootViewController(true) {
                     self.setViewController(self.giftStorageViewController, for: .secondary)
-                    if let giftStorageVC = self.giftStorageViewController.viewControllers.first as? GiftStorageViewController {
+                    if self.giftStorageViewController.viewControllers.first is GiftStorageViewController {
                         let giftVC = WrittenPaperViewController()
                         self.giftStorageViewController.pushViewController(giftVC, animated: true) {
                             LocalDatabaseFileManager.shared.fetchPaper(paperId: paperId)
@@ -115,29 +114,28 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
     }
     
     @objc private func changeSecondaryView(notification: Notification) {
-        guard let object = notification.userInfo?[NotificationViewKey.view] as? String else { return }
-        switch object {
-        case "새로운 보드":
+        guard let nextView = notification.userInfo?[NotificationViewKey.view] as? SecondaryView else { return }
+        switch nextView {
+        case .newBoard:
             setViewController(paperTemplateSelectViewController, for: .secondary)
-            currentSecondaryView = "새로운 보드"
-        case "담벼락":
-            if currentSecondaryView == "새로운 보드" {
+            currentSecondaryView = .newBoard
+        case .feed:
+            if currentSecondaryView == .newBoard {
                 self.paperTemplateSelectViewController.popToRootViewController(animated: false)
                 self.paperStorageViewController.pushViewController(WrittenPaperViewController(), animated: false)
                 setViewController(paperStorageViewController, for: .secondary)
             } else {
                 self.paperStorageViewController.popToRootViewController(animated: false)
             }
-            currentSecondaryView = "담벼락"
-        case "선물 상자":
+            currentSecondaryView = .feed
+        case .giftBox:
             setViewController(giftStorageViewController, for: .secondary)
-            currentSecondaryView = "선물 상자"
-        case "설정":
-            setViewController(appSettingViewController, for:.secondary)
-            currentSecondaryView = "설정"
-        case "프로필":
-            print("bbb profile did called from signInView")
-            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+            currentSecondaryView = .giftBox
+        case .setting:
+            setViewController(appSettingViewController, for: .secondary)
+            currentSecondaryView = .setting
+        case .profile:
+            if UserDefaults.standard.value(forKey: "currentUserEmail") is String {
                 self.appSettingViewController.popViewController(false) {
                     self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
                 }
@@ -147,53 +145,47 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
                     self.appSettingViewController.pushViewController(SignInViewController(), animated: false)
                 }
             }
-            currentSecondaryView = "설정"
-        default:
-            break
+            currentSecondaryView = .setting
         }
-        self.currentSecondaryView = object
+        self.currentSecondaryView = nextView
     }
     
     @objc private func changeSecondaryViewFromSidebar(notification: Notification) {
-        guard
-            let object = notification.userInfo?[NotificationViewKey.view] as? String,
-            !((object == currentSecondaryView) && (object != "프로필")) else {
+        guard let nextView = notification.userInfo?[NotificationViewKey.view] as? SecondaryView,
+            !((nextView == currentSecondaryView) && (nextView != .profile)) else {
             return
         }
         
-        switch object {
-        case "새로운 보드":
+        switch nextView {
+        case .newBoard:
             setViewController(paperTemplateSelectViewController, for: .secondary)
-            currentSecondaryView = "새로운 보드"
-        case "담벼락":
+            currentSecondaryView = .newBoard
+        case .feed:
             setViewController(paperStorageViewController, for: .secondary)
-            currentSecondaryView = "담벼락"
-        case "선물 상자":
+            currentSecondaryView = .feed
+        case .giftBox:
             setViewController(giftStorageViewController, for: .secondary)
-            currentSecondaryView = "선물 상자"
-        case "설정":
+            currentSecondaryView = .giftBox
+        case .setting:
             setViewController(appSettingViewController, for: .secondary)
-            currentSecondaryView = "설정"
-        case "프로필":
-            print("aaa chagneSecondaryViewFromSidebar")
-            if let currentUserEmail = UserDefaults.standard.value(forKey: "currentUserEmail") as? String {
+            currentSecondaryView = .setting
+        case .profile:
+            if UserDefaults.standard.value(forKey: "currentUserEmail") is String {
                 self.appSettingViewController.popToRootViewController(animated: false)
                 self.appSettingViewController.pushViewController(SettingScreenViewController(), animated: false)
-                if currentSecondaryView != "설정" {
+                if currentSecondaryView != .setting {
                     setViewController(appSettingViewController, for: .secondary)
                 }
             } else {
                 self.appSettingViewController.popToRootViewController(animated: false)
                 self.appSettingViewController.pushViewController(SignInViewController(), animated: false)
-                if currentSecondaryView != "설정" {
+                if currentSecondaryView != .setting {
                     setViewController(appSettingViewController, for: .secondary)
                 }
             }
-            currentSecondaryView = "설정"
-        default:
-            break
+            currentSecondaryView = .setting
+            self.currentSecondaryView = nextView
         }
-        self.currentSecondaryView = object
     }
     
     @objc private func initializeNavigationStack(notification: Notification) {
@@ -202,9 +194,6 @@ class SplitViewController: UISplitViewController, UISplitViewControllerDelegate 
         case "signOut":
             paperTemplateSelectViewController.popToRootViewController(animated: false)
             paperStorageViewController.popToRootViewController(animated: false)
-            // TODO: GiftboxViewController() 생성
-            // settingScreenViewController = UINavigationController(rootViewController: )
-        // case "signIn":
         default:
             break
         }
